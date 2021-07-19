@@ -1,0 +1,15 @@
+*.o
+
+*.a
+*.lib
+
+*.so
+*.dll
+*.dylib
+
+*.out
+*.exe
+
+.vscode
+
+.DS_STORE
