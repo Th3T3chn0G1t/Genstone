@@ -42,10 +42,16 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Clang-format
     - CI
         - Compilation
-        - Tests
         - Static analysis
+        - Prebuilt binaries
+    - ARGP argument parser
+- Tests
+    - Implement test runners in Makefile
+    - Test build system
+    - Use unit tester
 - Examples
     - Write examples
+        - Build system module examples
     - Perform CI on examples
 - Community
     - Discord server
