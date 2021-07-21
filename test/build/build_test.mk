@@ -13,8 +13,6 @@ BUILD_TEST_LIB_DYNAMIC = test/build/$(LIB_PREFIX)test_dynamic$(DYNAMIC_LIB_SUFFI
 BUILD_TEST_LIB_STATIC = test/build/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
 build_test: $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC)
-	objdump --syms $(BUILD_TEST_LIB_DYNAMIC)
-	objdump --syms $(BUILD_TEST_LIB_STATIC)
 ifeq ($(PLATFORM),WIN)
 	cd test/build; test/build/testexec_dynamic$(EXECUTABLE_SUFFIX)
 	cd test/build; test/build/testexec_static$(EXECUTABLE_SUFFIX)
@@ -25,8 +23,10 @@ endif
 
 $(BUILD_TEST_EXEC_DYNAMIC): LFLAGS = -Ltest/build -ltest_dynamic
 $(BUILD_TEST_EXEC_DYNAMIC): $(BUILD_TEST_EXEC_OBJECTS) $(BUILD_TEST_LIB_DYNAMIC)
+	objdump --syms $(BUILD_TEST_LIB_DYNAMIC)
 $(BUILD_TEST_EXEC_STATIC): LFLAGS = -Ltest/build -ltest_static
 $(BUILD_TEST_EXEC_STATIC): $(BUILD_TEST_EXEC_OBJECTS) $(BUILD_TEST_LIB_STATIC)
+	objdump --syms $(BUILD_TEST_LIB_STATIC)
 
 $(BUILD_TEST_LIB_DYNAMIC): LFLAGS =
 $(BUILD_TEST_LIB_DYNAMIC): $(BUILD_TEST_LIB_OBJECTS)
