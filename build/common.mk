@@ -113,4 +113,4 @@ endif
 	$(DYNAMIC_LIB_TOOL) $(LFLAGS)
 
 %$(EXECUTABLE_SUFFIX):
-	$(LINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %.o,$^)
+	$(LINKER) -o $@ $(filter %.o,$^) $(GLOBAL_L_FLAGS) $(LFLAGS) 
