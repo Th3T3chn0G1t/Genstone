@@ -13,6 +13,11 @@ ifeq ($(TEST_UNITS),1)
 	MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(TEST_UNIT_MODULES))))
 endif
 
+VENDOR_MODULES = $(wildcard genesis/vendor/*.mk)
+include $(VENDOR_MODULES)
+BUILD_PREREQS += $(notdir $(subst .mk,,$(VENDOR_MODULES)))
+MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(VENDOR_MODULES))))
+
 include $(SANDBOX_PROJECT_MODULE)
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))))
 
@@ -20,3 +25,6 @@ MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJE
 all: $(BUILD_PREREQS) $(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) $(BUILD_POST)
 
 clean: $(MODULE_CLEAN_TARGETS)
+
+genesis/vendor/lib:
+	mkdir $@
