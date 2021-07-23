@@ -50,7 +50,7 @@ c11compat: $(C11COMPAT_LIB)
 
 $(C11COMPAT_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
 $(C11COMPAT_LIB): LFLAGS =
-$(C11COMPAT_LIB): $(C11COMPAT_OBJECTS)
+$(C11COMPAT_LIB): $(C11COMPAT_OBJECTS) genesis/vendor/lib
 
 clean_c11compat:
 	-rm $(C11COMPAT_OBJECTS)
