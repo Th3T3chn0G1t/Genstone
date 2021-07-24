@@ -382,7 +382,7 @@ tss_set(tss_t key, void *val)
 
 /*-------------------- 7.25.7 Time functions --------------------*/
 // 7.25.6.1
-#ifndef HAVE_TIMESPEC_GET
+#if !defined(HAVE_TIMESPEC_GET) && !PLATFORM == DWN
 static inline int
 timespec_get(struct timespec *ts, int base)
 {
