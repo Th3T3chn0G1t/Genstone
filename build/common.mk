@@ -35,7 +35,7 @@ ifeq ($(PLATFORM),WIN)
 	DYNAMIC_LIB_C_FLAGS =
 	DYNAMIC_LIB_L_FLAGS =
 
-	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -l $(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -D $@ $(filter %.o,$^); $(LINKER) -shared -Wl,-implib:$(addsuffix $(STATIC_LIB_SUFFIX), $(basename $@)) -o $@ $(filter %.o,$^)
+	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -l $(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -Wl,-implib:$(addsuffix $(STATIC_LIB_SUFFIX), $(basename $@)) -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
 endif
 ifeq ($(PLATFORM),LNX)
