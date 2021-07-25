@@ -14,7 +14,6 @@ BUILD_TEST_LIB_STATIC = test/build/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
 build_test: $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC)
 ifeq ($(PLATFORM),WIN)
-	cat test/build/test_dynamic.def
 	cd test/build; ./testexec_dynamic$(EXECUTABLE_SUFFIX)
 	cd test/build; ./testexec_static$(EXECUTABLE_SUFFIX)
 else
