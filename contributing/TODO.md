@@ -45,6 +45,7 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Static analysis
         - Prebuilt binaries
     - ARGP argument parser
+    - Move Mesa thread compat function implementations to source file for inclusion in c11compat lib
 - Tests
     - Implement test runners in Makefile
     - Test build system

@@ -32,7 +32,7 @@ TEST = ALL
 
 # Flags to be provided to the compiler at every call
 # Does not get applied to 3rd party compilation
-GLOBAL_C_FLAGS =
+GLOBAL_C_FLAGS = -std=c17
 # Flags to be provided to the linker at every call
 # Does not get applied to 3rd party linkage
 GLOBAL_L_FLAGS =
