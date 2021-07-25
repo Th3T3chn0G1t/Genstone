@@ -29,12 +29,12 @@ GEN_DIAG_IGNORE_ALL
 #include <signal.h>
 #include <stdalign.h>
 #include <stdatomic.h>
-//#include <tgmath.h>
 #include <time.h>
 #include <threads.h>
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <tgmath.h>
 #include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
