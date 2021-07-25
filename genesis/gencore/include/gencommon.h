@@ -34,7 +34,9 @@ GEN_DIAG_IGNORE_ALL
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
+#if PLATFORM != WIN
 #include <tgmath.h>
+#endif
 #include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 

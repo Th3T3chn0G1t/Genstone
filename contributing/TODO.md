@@ -47,7 +47,6 @@ If the project ever garners multiple contributors this can be migrated to Github
     - ARGP argument parser
     - Move Mesa thread compat function implementations to source file for inclusion in c11compat lib
     - Get tgmath.h working under windows
-    - Get stdnoreturn.h working under windows
 - Tests
     - Implement test runners in Makefile
     - Test build system
