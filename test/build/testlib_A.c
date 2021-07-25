@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-#define API(t) __declspec(dllexport ) t __cdecl
+#define API(t) __declspec(dllexport ) t
 #else
 #define API(t) t
 #endif
