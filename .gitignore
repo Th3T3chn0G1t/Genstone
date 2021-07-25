@@ -10,6 +10,8 @@
 *.out
 *.exe
 
+*.def
+
 .vscode
 
 .DS_STORE

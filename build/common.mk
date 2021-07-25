@@ -35,7 +35,8 @@ ifeq ($(PLATFORM),WIN)
 	DYNAMIC_LIB_C_FLAGS =
 	DYNAMIC_LIB_L_FLAGS =
 
-	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -l $(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -Wl,-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -o $@ $(filter %.o,$^)
+#	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -l $(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -Wl,-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -o $@ $(filter %.o,$^)
+	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -e $(subst $(DYNAMIC_LIB_SUFFIX),.o,$@) -l $(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -o $@ $(filter %.o,$^) $(subst $(DYNAMIC_LIB_SUFFIX),.o,$@) -Wl,-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@),-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
 endif
 ifeq ($(PLATFORM),LNX)
