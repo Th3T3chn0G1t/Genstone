@@ -1,10 +1,12 @@
 #ifndef GEN_COMMON_H
 #define GEN_COMMON_H
 
-#define GEN_DIAG_REGION_BEGIN _Pragma GCC diagnostic push
-#define GEN_DIAG_REGION_END _Pragma GCC diagnostic pop
-#define GEN_DIAG_IGNORE_ALL _Pragma GCC diagnostic ignored "-Weverything"
+#define GEN_DIAG_REGION_BEGIN _Pragma("GCC diagnostic push")
+#define GEN_DIAG_REGION_END _Pragma("GCC diagnostic pop")
+#define GEN_DIAG_IGNORE_ALL _Pragma("GCC diagnostic ignored \"-Weverything\"")
 
+GEN_DIAG_REGION_BEGIN
+GEN_DIAG_IGNORE_ALL
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -27,12 +29,13 @@
 #include <signal.h>
 #include <stdalign.h>
 #include <stdatomic.h>
-//#include <stdnoreturn.h>
 //#include <tgmath.h>
 #include <time.h>
 #include <threads.h>
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <stdnoreturn.h>
+GEN_DIAG_REGION_END
 
 #endif
