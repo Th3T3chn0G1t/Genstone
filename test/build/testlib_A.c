@@ -1,12 +1,12 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-#define API __declspec(dllexport ) __cdecl
+#define API(t) __declspec(dllexport ) t __cdecl
 #else
-#define API
+#define API(t) t
 #endif
 
-API void foo(void) {
+API(void) foo(void) {
     printf("foo\n");
     return;
 }
