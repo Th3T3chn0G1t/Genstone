@@ -1,9 +1,40 @@
+/**
+ * @file gencommon.h
+ * Includes common helpers and utilities for across the codebase
+ * Includes the stdlib and helpers to provide missing headers on noncompliant platforms
+ * Defines helper macros for pretty keywords and diagnostic info
+ * Defines common data structures and operations
+ */
+
 #ifndef GEN_COMMON_H
 #define GEN_COMMON_H
 
-#define GEN_DIAG_REGION_BEGIN _Pragma("GCC diagnostic push")
-#define GEN_DIAG_REGION_END _Pragma("GCC diagnostic pop")
-#define GEN_DIAG_IGNORE_ALL _Pragma("GCC diagnostic ignored \"-Weverything\"")
+/**
+ * Pretty keyword _Pragma
+ * @param s string-literal argument for _Pragma
+ */
+#define pragma(s) _Pragma(s)
+/**
+ * Pretty keyword _Generic
+ * @param s type-switch statement for _Generic
+ */
+#define generic(s) _Generic(s)
+
+/**
+ * Diagnostic helper
+ * Begins a diagnostic region
+ */
+#define GEN_DIAG_REGION_BEGIN pragma("clang diagnostic push")
+/**
+ * Diagnostic helper
+ * Ends a diagnostic region
+ */
+#define GEN_DIAG_REGION_END pragma("clang diagnostic pop")
+/**
+ * Diagnostic helper
+ * Ignores all extra compiler warnings in a diagnostic region
+ */
+#define GEN_DIAG_IGNORE_ALL pragma("clang diagnostic ignored \"-Weverything\"")
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
@@ -34,7 +65,7 @@ GEN_DIAG_IGNORE_ALL
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
-#if PLATFORM != WIN
+#if PLATFORM != WIN // clang tgmath.h is broken under windows
 #include <tgmath.h>
 #endif
 #include <stdnoreturn.h>

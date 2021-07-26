@@ -12,7 +12,6 @@ int thread_func(void* pass) {
     for(size_t i = 0; i < 10; i++) {
         mtx_lock(&approot_mtx);
         ((int*) approot.data)[0]++;
-        printf("Thread Ticks: %i\n", ((int*) approot.data)[0]);
         mtx_unlock(&approot_mtx);
     }
 
@@ -30,12 +29,13 @@ int main() {
     for(size_t i = 0; i < 10; i++) {
         mtx_lock(&approot_mtx);
         ((int*) approot.data)[0]++;
-        printf("Main Ticks: %i\n", ((int*) approot.data)[0]);
         mtx_unlock(&approot_mtx);
     }
 
     int result;
     thrd_join(thread, &result);
+
+    printf("Ticks: %i\n", ((int*) approot.data)[0]);
 
     mtx_destroy(&approot_mtx);
 }

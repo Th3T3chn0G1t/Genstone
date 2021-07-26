@@ -13,13 +13,15 @@ BUILD_TEST_LIB_DYNAMIC = test/build/$(LIB_PREFIX)test_dynamic$(DYNAMIC_LIB_SUFFI
 BUILD_TEST_LIB_STATIC = test/build/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
 build_test: $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC)
+	cp $(BUILD_TEST_LIB_DYNAMIC) lib/$(notdir $(BUILD_TEST_LIB_DYNAMIC))
 ifeq ($(PLATFORM),WIN)
-	cd test/build; ./testexec_dynamic$(EXECUTABLE_SUFFIX)
-	cd test/build; ./testexec_static$(EXECUTABLE_SUFFIX)
+	cd lib; ./$(notdir $(BUILD_TEST_EXEC_DYNAMIC))
+	cd lib; ./$(notdir $(BUILD_TEST_EXEC_STATIC))
 else
-	LD_LIBRARY_PATH=test/build test/build/testexec_dynamic$(EXECUTABLE_SUFFIX)
-	LD_LIBRARY_PATH=test/build test/build/testexec_static$(EXECUTABLE_SUFFIX)
+	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
+	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
 endif
+	rm lib/$(notdir $(BUILD_TEST_LIB_DYNAMIC))
 
 $(BUILD_TEST_EXEC_DYNAMIC): LFLAGS = -Ltest/build -ltest_dynamic
 $(BUILD_TEST_EXEC_DYNAMIC): $(BUILD_TEST_EXEC_OBJECTS) $(BUILD_TEST_LIB_DYNAMIC)

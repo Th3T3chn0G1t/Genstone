@@ -54,13 +54,13 @@ C11COMPAT_LFLAGS += -lc11compat
 C11COMPAT_SOURCES = $(wildcard genesis/vendor/c11compat/musl/*.c)
 C11COMPAT_OBJECTS = $(C11COMPAT_SOURCES:.c=.o)
 
-C11COMPAT_LIB = genesis/vendor/lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
+C11COMPAT_LIB = lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
 
 c11compat: $(C11COMPAT_LIB)
 
 $(C11COMPAT_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
 $(C11COMPAT_LIB): LFLAGS =
-$(C11COMPAT_LIB): $(C11COMPAT_OBJECTS) genesis/vendor/lib
+$(C11COMPAT_LIB): $(C11COMPAT_OBJECTS) lib
 
 clean_c11compat:
 	-rm $(C11COMPAT_OBJECTS)

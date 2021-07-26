@@ -18,6 +18,11 @@ include $(VENDOR_MODULES)
 BUILD_PREREQS += $(notdir $(subst .mk,,$(VENDOR_MODULES)))
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(VENDOR_MODULES))))
 
+GENESIS_MODULES = $(wildcard genesis/*.mk)
+include $(GENESIS_MODULES)
+BUILD_PREREQS += $(notdir $(subst .mk,,$(GENESIS_MODULES)))
+MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENESIS_MODULES))))
+
 include $(SANDBOX_PROJECT_MODULE)
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))))
 
@@ -26,5 +31,5 @@ all: $(BUILD_PREREQS) $(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) $(BUILD_
 
 clean: $(MODULE_CLEAN_TARGETS)
 
-genesis/vendor/lib:
+lib:
 	mkdir $@

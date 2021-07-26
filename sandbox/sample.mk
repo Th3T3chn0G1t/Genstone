@@ -5,9 +5,8 @@ SAMPLE_EXEC = sample$(EXECUTABLE_SUFFIX)
 
 sample: $(SAMPLE_EXEC)
 
-$(SAMPLE_EXEC): CFLAGS = $(C11COMPAT_CFLAGS)
-$(SAMPLE_EXEC): CFLAGS += -Igenesis/gen-rt/include -Igenesis/gencore/include -Igenesis/genfx/gfx/include -Igenesis/genfx/sfx/include
-$(SAMPLE_EXEC): LFLAGS = -Lgenesis/vendor/lib $(C11COMPAT_LFLAGS)
+$(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)
+$(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(SAMPLE_EXEC): $(SAMPLE_OBJECTS)
 
 clean_sample:
