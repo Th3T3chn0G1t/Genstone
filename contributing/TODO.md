@@ -7,6 +7,7 @@ If the project ever garners multiple contributors this can be migrated to Github
 
 - Building
     - Allow overriding of config options via. environment
+    - Make deps. on headers
     - Generators
         - Default project
         - IDE-friendly development project (just binaries and headers)

@@ -5,7 +5,7 @@ C11_COMPAT_TEST = test/unit/c11compat_test$(EXECUTABLE_SUFFIX)
 
 c11compat_test: $(C11_COMPAT_TEST)
 ifeq ($(PLATFORM),WIN)
-	cd lib; ./$(notdir $(C11_COMPAT_TEST))
+	cd lib; ../$(C11_COMPAT_TEST)
 else
 	LD_LIBRARY_PATH=lib $(C11_COMPAT_TEST)
 endif

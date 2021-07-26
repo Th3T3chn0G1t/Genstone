@@ -5,7 +5,7 @@ GEN_CORE_TEST = test/unit/gencore_test$(EXECUTABLE_SUFFIX)
 
 gencore_test: $(GEN_CORE_TEST)
 ifeq ($(PLATFORM),WIN)
-	cd lib; ./$(notdir $(GEN_CORE_TEST))
+	cd lib; ../$(GEN_CORE_TEST)
 else
 	LD_LIBRARY_PATH=lib $(GEN_CORE_TEST)
 endif
