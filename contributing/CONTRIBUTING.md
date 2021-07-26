@@ -8,6 +8,9 @@ Issues are not to be used for issues with development outside of unexpected beha
 
 ## Code Style
 
+#### Note
+If a file or module has special or extra rules for formatting or general style then it will be outlined at the start of the file or in a `module.md` file
+
 The codebase follows a style similar to Chromium (at least according to `clang-format`). That being said there are a few changes so please do pay heed to formatting issues raised by `clang-format` during compilation
 
 If you find an inconsistency not covered by `clang-format`, feel free to open an issue on the matter

@@ -9,11 +9,9 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Generators
         - Default project
         - IDE-friendly development project (just binaries and headers)
-            - Generate IDE config
+            - Generate more IDE configs
         - Module Makefile
             - CMake submodule Makefile
-        - Documentation
-            - Doxygen
         - Visualisation
             - Dependency graph
             - Loc

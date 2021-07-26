@@ -23,6 +23,9 @@ include $(GENESIS_MODULES)
 BUILD_PREREQS += $(notdir $(subst .mk,,$(GENESIS_MODULES)))
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENESIS_MODULES))))
 
+BUILTIN_MODULES = build/dev/ideconf.mk build/docs/docs.mk
+include $(BUILTIN_MODULES)
+
 include $(SANDBOX_PROJECT_MODULE)
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))))
 

@@ -1,9 +1,9 @@
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "Glean"
+PROJECT_NAME           = "Genesis"
 # Version
 PROJECT_NUMBER         = 
-PROJECT_BRIEF          = "A simple, extensible text editor"
-PROJECT_LOGO           = res/brand/glean-logo-doc.png
+PROJECT_BRIEF          = "An approach to game engine development with a more generally applicable paradigm"
+PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = docs
 CREATE_SUBDIRS         = NO
 ALLOW_UNICODE_NAMES    = NO

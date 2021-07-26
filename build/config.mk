@@ -45,3 +45,6 @@ COMPILER = clang
 # This should be the same as the compiler
 # It is not recommended to change this
 LINKER = clang
+
+# The IDE to generate IDE configuration for with `ideconf` target
+IDE =
