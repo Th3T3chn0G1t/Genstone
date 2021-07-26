@@ -41,7 +41,6 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Clang-tidy
     - Clang-format
     - CI
-        - Compilation
         - Static analysis
         - Prebuilt binaries
     - ARGP argument parser
@@ -49,8 +48,7 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Get tgmath.h working under windows
 - Tests
     - Implement test runners in Makefile
-    - Test build system
-    - Use unit tester
+    - Write unit tester
 - Examples
     - Write examples
         - Build system module examples

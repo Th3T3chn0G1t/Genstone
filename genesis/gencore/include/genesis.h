@@ -12,4 +12,5 @@ typedef struct {
 
 typedef void (*gen_node_handler_t)(gen_node_t*);
 
-#define GEN_ROOT 0
+#define GEN_ROOT_TYPE 0
+
