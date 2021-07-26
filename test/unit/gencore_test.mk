@@ -1,9 +1,9 @@
-GEN_CORE_TEST_SOURCES = $(wildcard test/unit/genesis_core/*.c)
+GEN_CORE_TEST_SOURCES = $(wildcard test/unit/gencore/*.c)
 GEN_CORE_TEST_OBJECTS = $(GEN_CORE_TEST_SOURCES:.c=.o)
 
-GEN_CORE_TEST = test/unit/gen_core_test$(EXECUTABLE_SUFFIX)
+GEN_CORE_TEST = test/unit/gencore_test$(EXECUTABLE_SUFFIX)
 
-genesis_core_test: $(GEN_CORE_TEST)
+gencore_test: $(GEN_CORE_TEST)
 ifeq ($(PLATFORM),WIN)
 	cd lib; ./$(notdir $(GEN_CORE_TEST))
 else
@@ -14,6 +14,6 @@ $(GEN_CORE_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_CORE_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_CORE_TEST): $(GEN_CORE_TEST_OBJECTS) gencore
 
-clean_genesis_core_test:
+clean_gencore_test:
 	-rm $(GEN_CORE_TEST_OBJECTS)
 	-rm $(GEN_CORE_TEST)

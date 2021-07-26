@@ -1,0 +1,19 @@
+C11_COMPAT_TEST_SOURCES = $(wildcard test/unit/c11compat/*.c)
+C11_COMPAT_TEST_OBJECTS = $(C11_COMPAT_TEST_SOURCES:.c=.o)
+
+C11_COMPAT_TEST = test/unit/c11compat_test$(EXECUTABLE_SUFFIX)
+
+c11compat_test: $(C11_COMPAT_TEST)
+ifeq ($(PLATFORM),WIN)
+	cd lib; ./$(notdir $(C11_COMPAT_TEST))
+else
+	LD_LIBRARY_PATH=lib $(C11_COMPAT_TEST)
+endif
+
+$(C11_COMPAT_TEST): CFLAGS = $(C11_COMPAT_CFLAGS)
+$(C11_COMPAT_TEST): LFLAGS = -Llib $(C11_COMPAT_LFLAGS)
+$(C11_COMPAT_TEST): $(C11_COMPAT_TEST_OBJECTS) gencore
+
+clean_c11compat_test:
+	-rm $(C11_COMPAT_TEST_OBJECTS)
+	-rm $(C11_COMPAT_TEST)
