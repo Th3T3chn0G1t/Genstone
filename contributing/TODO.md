@@ -6,6 +6,7 @@ This document is purposely being kept off Github issues to create distinction be
 If the project ever garners multiple contributors this can be migrated to Github issues
 
 - Building
+    - Allow overriding of config options via. environment
     - Generators
         - Default project
         - IDE-friendly development project (just binaries and headers)

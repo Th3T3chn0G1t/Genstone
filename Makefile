@@ -1,5 +1,15 @@
 include build/common.mk
 
+VENDOR_MODULES = $(wildcard genesis/vendor/*.mk)
+include $(VENDOR_MODULES)
+BUILD_PREREQS += $(notdir $(subst .mk,,$(VENDOR_MODULES)))
+MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(VENDOR_MODULES))))
+
+GENESIS_MODULES = $(wildcard genesis/*.mk)
+include $(GENESIS_MODULES)
+BUILD_PREREQS += $(notdir $(subst .mk,,$(GENESIS_MODULES)))
+MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENESIS_MODULES))))
+
 ifeq ($(TEST_BUILD),1)
 	TEST_BUILD_MODULES = $(wildcard test/build/*.mk)
 	include $(TEST_BUILD_MODULES)
@@ -12,16 +22,6 @@ ifeq ($(TEST_UNITS),1)
 	BUILD_PREREQS += $(notdir $(subst .mk,,$(TEST_UNIT_MODULES)))
 	MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(TEST_UNIT_MODULES))))
 endif
-
-VENDOR_MODULES = $(wildcard genesis/vendor/*.mk)
-include $(VENDOR_MODULES)
-BUILD_PREREQS += $(notdir $(subst .mk,,$(VENDOR_MODULES)))
-MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(VENDOR_MODULES))))
-
-GENESIS_MODULES = $(wildcard genesis/*.mk)
-include $(GENESIS_MODULES)
-BUILD_PREREQS += $(notdir $(subst .mk,,$(GENESIS_MODULES)))
-MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENESIS_MODULES))))
 
 BUILTIN_MODULES = build/dev/ideconf.mk build/docs/docs.mk
 include $(BUILTIN_MODULES)

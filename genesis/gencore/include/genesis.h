@@ -70,9 +70,13 @@ typedef void (*gen_node_loader_data_handler_t)(gen_node_t*, const char*);
 extern void gen_node_load(gen_node_t* output_node, char* source, gen_node_loader_type_handler_t type_handler, gen_node_loader_data_handler_t* data_handlers);
 
 /**
+ * Export handler for all node types
+ */
+typedef void (*gen_node_exporter_type_handler_t)(char*, unsigned long);
+/**
  * Export handler for a node type
  */
-typedef void (*gen_export_handler_t)(const char*, gen_node_t*);
+typedef void (*gen_node_exporter_data_handler_t)(char*, gen_node_t*);
 
 /**
  * Exports a node to nodefile source string
@@ -80,7 +84,7 @@ typedef void (*gen_export_handler_t)(const char*, gen_node_t*);
  * @param node the node to export
  * @param handlers the export handlers, should be at least the count of the largest type enumeration value
  */
-void gen_node_export(char* output_source, gen_node_t* node, gen_export_handler_t* handlers);
+extern void gen_node_export(char* output_source, gen_node_t* node, gen_node_exporter_type_handler_t type_handler, gen_node_exporter_data_handler_t* data_handlers);
 
 /**
  * Built in node type for the apptree root
