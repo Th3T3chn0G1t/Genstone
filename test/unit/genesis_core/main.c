@@ -18,10 +18,12 @@ static void root_data_loader(gen_node_t* node, const char* data_string) {
 }
 
 int main() {
-    char* source = "ROOT\n127\n\n";
+    char* source = strdup("ROOT\n127\n\n");
     gen_node_loader_data_handler_t data_handlers[] = { root_data_loader };
     gen_node_load(&root, source, type_loader, data_handlers);
 
     assert(root.type == GEN_ROOT_TYPE);
     assert(*(int*) root.data == 127);
+
+    free(source);
 }

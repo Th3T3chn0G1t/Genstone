@@ -12,6 +12,8 @@
 
 *.def
 
+*.dSYM
+
 .vscode
 
 .DS_STORE
