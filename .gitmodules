@@ -1,0 +1,3 @@
+[submodule "genesis/vendor/dirent"]
+	path = genesis/vendor/dirent
+	url = https://github.com/tronkko/dirent
