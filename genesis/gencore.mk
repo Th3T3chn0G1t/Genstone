@@ -1,4 +1,7 @@
-GEN_CORE_CFLAGS += -Igenesis/gencore/include $(C11_COMPAT_CFLAGS)
+GEN_CORE_CFLAGS = -Igenesis/gencore/include $(C11_COMPAT_CFLAGS)
+ifeq ($(PLATFORM),WIN)
+GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include
+endif
 GEN_CORE_LFLAGS += -lgencore $(C11_COMPAT_LFLAGS)
 
 GEN_CORE_SOURCES = $(wildcard genesis/gencore/*.c)

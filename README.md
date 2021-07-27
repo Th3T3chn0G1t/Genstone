@@ -1,5 +1,5 @@
 # Genesis Engine
-### An approach to game engine development with a more generally applicable paradigm
+### An approach to app engine development with a more generally applicable paradigm
 
 #### Note
 This document is an explanation of ideas behind Genesis and their practical implications
@@ -11,12 +11,12 @@ For contribution information see the `contributing/` folder
 
 *Most of this is my own conjecture at the time of writing. I have plans to conduct more formal research into the topic but consider this a conceptual testing-ground*
 
-Genesis is my third attempt at game engine development, this time attempting to use a different paradigm that can be more generally applied to the entire engine API, and indeed application design in general if I find the system to be effective, in order to create an "elegant" solution to the APIs design and interface.
+Genesis is an application engine attempting to use a different paradigm that can be more generally applied to the entire engine API, and indeed application design in general if I find the system to be effective, in order to create an "elegant" solution to the APIs design and interface.
 
 The basic concept is that Genesis applications consist of a tree, where each node has a type. For each node type there is a global callback that handles updating nodes every time the application tree is updated.
 This effectively produces a sort of "retained mode" application design paradigm where data is set to the tree before runtime.
 
-In principle, most games written in a game engine can be reduced to this paradigm in that there is a tree of data in the form of scene graphs and their contents, and code applied to subsets of those graphs and their data in components. That being said, the reduction of the entire runtime to this paradigm is not so easily translatable.
+In principle, most applications written in a app engine can be reduced to this paradigm in that there is a tree of data in the form of scene graphs and their contents, and code applied to subsets of those graphs and their data in components. That being said, the reduction of the entire runtime to this paradigm is not so easily translatable.
 
 As for some more tangible ideas that can power this application design paradigm, it is extremely simple to illustrate the core concepts of this paradigm in code like so for example:
 ```
@@ -34,7 +34,7 @@ typedef void (*node_handler_t)(node_t*);
 ```
 The application tree can be constructed from `node_t`s and the `node_handler_t`s don't at their core require any extra metadata, though an implementation of the paradigm might choose to use mappings from type to handler instead of array indices.
 
-So if one was to (for example) construct a traditional game "entity" in Genesis consisting of a transform, a renderer and a script - you could approach it like so:
+So if one was to (for example) construct a traditional game entity in Genesis consisting of a transform, a renderer and a script - you could approach it like so:
 ```
 // This probably wouldn't be an `enum` in a final application as it would remove some of the self-modifying capabilities of the application tree
 enum {

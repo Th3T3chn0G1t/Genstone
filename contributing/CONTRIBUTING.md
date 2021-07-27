@@ -15,11 +15,21 @@ The codebase follows a style similar to Chromium (at least according to `clang-f
 
 If you find an inconsistency not covered by `clang-format`, feel free to open an issue on the matter
 
-Modules which are self-referential with includes and linkage should use their local copies of required resources. i.e. `#include "include/foo.h"` and explicit `-Lmymodule/lib -lbar`
+Modules which are self-referential with includes and linkage should use their local copies of required resources. i.e. `#include "include/foo.h"` and explicit `-Lmymodule/lib -lbar`. For inter-module operation using `#include <foo.h>` and `-lbar` is fine
 
 Opt for allowing the caller to allocate nontrivial types and take a pointer to storage. i.e. `void foo(bar_t* storage);` instead of `bar_t foo(void);`
 
-Opt for using explicit sizes instead of NULL-termination for scalar types.
+Opt for using explicit sizes instead of `NULL`-termination for buffers.
+
+### Documentation
+Please try to fix documentation warnings as reported, as non-impactful errors occlude important errors down the line
+
+#### Note
+Doxygen operates the preprocessor as `PLATFORM == LNX`, this means that platform-defined macros and types should be documented under the linux branch
+
+### Tests
+
+### Examples
 
 ## Ettiquette
 

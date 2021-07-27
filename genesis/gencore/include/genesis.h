@@ -49,42 +49,45 @@ typedef struct {
 /**
  * Runtime handler for a node type
  */
-typedef void (*gen_node_handler_t)(gen_node_t*);
+typedef void (*gen_node_handler_t)(gen_node_t*, void*);
 
 /**
  * Loadtime handler for all type-strings
  */
-typedef unsigned long (*gen_node_loader_type_handler_t)(const char*);
+typedef unsigned long (*gen_node_importer_type_handler_t)(const char*, void*);
 /**
  * Loadtime handler for a node type's data-string
  */
-typedef void (*gen_node_loader_data_handler_t)(gen_node_t*, const char*);
+typedef void (*gen_node_importer_data_handler_t)(gen_node_t*, const char*, void*);
 
 /**
  * Constructs a node from a nodefile source
  * @param output_node pointer to storage for the generated node
  * @param source the contents of a nodefile
  * @param type_handler a handler for converting type-strings to node types
- * @param data_handlers the data-string load handlers, should be at least the count of the largest type enumeration value
+ * @param data_handlers the data-string import handlers, should be at least the count of the largest type enumeration value
+ * @param passthrough a passthrough to the handler
  */
-extern void gen_node_load(gen_node_t* output_node, char* source, gen_node_loader_type_handler_t type_handler, gen_node_loader_data_handler_t* data_handlers);
+extern void gen_node_import(gen_node_t* output_node, const char* source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* data_handlers, void* passthrough);
 
 /**
  * Export handler for all node types
  */
-typedef void (*gen_node_exporter_type_handler_t)(char*, unsigned long);
+typedef void (*gen_node_exporter_type_handler_t)(char*, const unsigned long, void*);
 /**
  * Export handler for a node type
  */
-typedef void (*gen_node_exporter_data_handler_t)(char*, gen_node_t*);
+typedef void (*gen_node_exporter_data_handler_t)(char*, const gen_node_t*, void*);
 
 /**
  * Exports a node to nodefile source string
  * @param output_source pointer to storage for the generated source
  * @param node the node to export
- * @param handlers the export handlers, should be at least the count of the largest type enumeration value
+ * @param type_handler a handler for converting types to node type-strings
+ * @param data_handlers the export handlers, should be at least the count of the largest type enumeration value
+ * @param passthrough a passthrough to the handler
  */
-extern void gen_node_export(char* output_source, gen_node_t* node, gen_node_exporter_type_handler_t type_handler, gen_node_exporter_data_handler_t* data_handlers);
+extern void gen_node_export(char* output_source, const gen_node_t* node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* data_handlers, void* passthrough);
 
 /**
  * Built in node type for the apptree root

@@ -69,6 +69,10 @@ GEN_DIAG_IGNORE_ALL
 #include <tgmath.h>
 #endif
 #include <stdnoreturn.h>
+#include <dirent.h> // Emulation provided on windows by https://github.com/tronkko/dirent
+#include <unistd.h> // Apparently just works (kinda) on windows - go figure
+#include <sys/types.h>
+#include <sys/stat.h>
 GEN_DIAG_REGION_END
 
 #endif

@@ -9,7 +9,7 @@
 #define GEN_ARGS_H
 
 /**
- * Return values for `gen_process_args`
+ * Return values for gen_process_args
  */
 typedef enum {
     /**
@@ -27,15 +27,15 @@ typedef enum {
  */
 typedef enum {
     /**
-     * A short argument e.g. `-f`
+     * A short argument
      */
     GEN_ARG_SHORT,
     /**
-     * A long argument e.g. `--foo`
+     * A long argument
      */
     GEN_ARG_LONG,
     /**
-     * A raw argument e.g. `bar`
+     * A raw argument
      */
     GEN_ARG_RAW
 } gen_arg_type_t;
@@ -43,20 +43,21 @@ typedef enum {
 /**
  * Handler for parsed arguments
  */
-typedef void (*gen_arg_callback_t)(const gen_arg_type_t, const unsigned long, const char*, void*);
+typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const unsigned long, const char*, void*);
 
 /**
  * Parses UNIX-style arguments into an easy-to-interpret format for a handler
  * Similar to the argp parsing library
  * @param argc the number of arguments to parse
  * @param argv an array of arguments
- * @param callback the handler to be called for each parsed argument
+ * @param handler the handler to be called for each parsed argument
  * @param n_short_args the number of short arguments
  * @param short_args an array of short arguments
  * @param n_long_args the number of long arguments
  * @param long_args an array of long arguments
- * @return an error code, falsy if no error
+ * @param passthrough a passthrough argument for the handler
+ * @return an error code
  */
-extern gen_arg_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_callback_t callback, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough);
+extern gen_arg_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough);
 
 #endif

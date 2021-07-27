@@ -18,7 +18,6 @@ If the project ever garners multiple contributors this can be migrated to Github
             - Dependency graph
             - Loc
             - Development time
-    - Separate build commons into a standalone project
     - Embedded toolchain
     - Visual build tool for options
     - Modules
@@ -31,6 +30,7 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Pretty diffs between source and formatted source
             - Auto-replace vs. warning/error on diff
 - Documentation
+    - Custom static documentation generator
     - Formal writeup for Genesis
     - Automatic Github action for documentation generator
     - Github pages for generated docpages
@@ -46,9 +46,25 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Argument parser
     - Move Mesa thread compat function implementations to source file for inclusion in c11compat lib
     - Get tgmath.h working under windows
+    - Execution environment utilities
+        - rpath
+        - loaded dylibs
+        - executable path
+        - environment variables
+        - working directory
+        - current filesystem/volume info
+            - Check what file meta the OS/filesystem supports
+        - binary-type (ABI) info
+    - genfs
+        - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
+    - generator (editor)
+    - genesis
+        - run tree func
+    - perform validation in debug mode
+    - centralised error return value enumeration
+        - Windows GetLastError conversion table (?)
 - Examples
     - Write examples
         - Build system module examples
     - Perform CI on examples
 - Community
-    - Discord server
