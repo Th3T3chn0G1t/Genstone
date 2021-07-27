@@ -54,6 +54,9 @@ GEN_DIAG_IGNORE_ALL
 #include <inttypes.h>
 #include <iso646.h>
 #include <limits.h>
+#if PLATFORM == LNX
+#include <linux/limits.h> // Why is PATH_MAX here of all places?
+#endif
 #include <locale.h>
 #include <math.h>
 #include <setjmp.h>
