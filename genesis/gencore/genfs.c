@@ -129,11 +129,7 @@ gen_filesystem_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, c
     struct stat s;
     int error = stat(path, &s);
     if(error) return gen_fs_convert_errno(errno);
-#ifdef S_IFDIR
-    if(s.st_mode & S_IFDIR) {
-#else
-    if(s.st_mode & S_ISDIR) {
-#endif
+    if(S_ISDIR(s.st_mode)) {
         output_handle->dir = true;
         output_handle->directory_handle = opendir(path);
         if(!output_handle->directory_handle) return gen_fs_convert_errno(errno);
