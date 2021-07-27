@@ -43,7 +43,7 @@ If the project ever garners multiple contributors this can be migrated to Github
     - CI
         - Static analysis
         - Prebuilt binaries
-    - ARGP argument parser
+    - Argument parser
     - Move Mesa thread compat function implementations to source file for inclusion in c11compat lib
     - Get tgmath.h working under windows
 - Examples

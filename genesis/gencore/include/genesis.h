@@ -2,7 +2,7 @@
  * @file genesis.h
  * Includes the basic utilities for constructing an apptree
  * Defines the apptree types and controlling handler types
- * @note core genesis utilities do not use the stdlib
+ * @note does not use stdlib
  */
 
 #ifndef GENESIS_H

@@ -19,6 +19,8 @@ Modules which are self-referential with includes and linkage should use their lo
 
 Opt for allowing the caller to allocate nontrivial types and take a pointer to storage. i.e. `void foo(bar_t* storage);` instead of `bar_t foo(void);`
 
+Opt for using explicit sizes instead of NULL-termination for scalar types.
+
 ## Ettiquette
 
 Common sense applies here: don't be rude, don't be a code-snob, don't harrass people
