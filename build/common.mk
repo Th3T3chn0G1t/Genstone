@@ -23,7 +23,7 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-GLOBAL_C_FLAGS += -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -fPIC -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 ifeq ($(PLATFORM),WIN)
@@ -113,4 +113,4 @@ endif
 	$(DYNAMIC_LIB_TOOL) $(LFLAGS)
 
 %$(EXECUTABLE_SUFFIX):
-	$(LINKER) -o $@ $(filter %.o,$^) $(GLOBAL_L_FLAGS) $(LFLAGS) 
+	$(LINKER) -o $@ $(filter %.o,$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)
