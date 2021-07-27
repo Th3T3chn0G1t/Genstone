@@ -23,7 +23,7 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-GLOBAL_C_FLAGS += -fPIC -D_DEFAULT_SOURCE -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 ifeq ($(PLATFORM),WIN)
@@ -31,9 +31,6 @@ ifeq ($(PLATFORM),WIN)
 	DYNAMIC_LIB_SUFFIX = .dll
 	STATIC_LIB_SUFFIX = .lib
 	EXECUTABLE_SUFFIX = .exe
-
-	DYNAMIC_LIB_C_FLAGS =
-	DYNAMIC_LIB_L_FLAGS =
 
 	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -o $@ $(filter %.o,$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
@@ -44,7 +41,7 @@ ifeq ($(PLATFORM),LNX)
 	STATIC_LIB_SUFFIX = .a
 	EXECUTABLE_SUFFIX = .out
 
-	DYNAMIC_LIB_C_FLAGS = -fPIC
+	GLOBAL_C_FLAGS += -fPIC -D_DEFAULT_SOURCE
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
@@ -55,7 +52,7 @@ ifeq ($(PLATFORM),DWN)
 	STATIC_LIB_SUFFIX = .a
 	EXECUTABLE_SUFFIX = .out
 
-	DYNAMIC_LIB_C_FLAGS = -fPIC
+	GLOBAL_C_FLAGS += -fPIC
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %.o,$^)
@@ -66,7 +63,7 @@ ifeq ($(PLATFORM),BSD)
 	STATIC_LIB_SUFFIX = .a
 	EXECUTABLE_SUFFIX = .out
 
-	DYNAMIC_LIB_C_FLAGS = -fPIC
+	GLOBAL_C_FLAGS += -fPIC
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
