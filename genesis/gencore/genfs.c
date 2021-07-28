@@ -10,7 +10,9 @@ static gen_filesystem_error_t gen_fs_convert_errno(int error) {
         case ENOENT: return GEN_FS_NO_SUCH_OBJECT;
         case ENOMEM: return GEN_FS_OUT_OF_MEMORY;
         case ENOTDIR: return GEN_FS_WRONG_OBJECT_TYPE;
+#if PLATFORM != WIN // Bit random to be missing but okay
         case EDQUOT: return GEN_FS_OUT_OF_SPACE;
+#endif
         case EEXIST: return GEN_FS_ALREADY_EXISTS;
         case EMLINK: return GEN_FS_TOO_LONG;
         case ENOSPC: return GEN_FS_OUT_OF_SPACE;
