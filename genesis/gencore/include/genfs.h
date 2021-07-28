@@ -31,6 +31,7 @@ typedef enum {
 #include <windows.h>
 #define GEN_PATH_MAX MAX_PATH
 #else
+#include <unistd.h>
 /**
  * The OS library's maximum length of a path
  * @note does not currently support Windows 10 1607 long paths
