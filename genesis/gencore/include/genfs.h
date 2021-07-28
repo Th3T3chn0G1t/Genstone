@@ -29,6 +29,7 @@ typedef enum {
 
 #if PLATFORM == WIN
 #include <windows.h>
+#include "Shlwapi.h" // Apparently this required according to MSDN
 #define GEN_PATH_MAX MAX_PATH
 #else
 #include <unistd.h>
