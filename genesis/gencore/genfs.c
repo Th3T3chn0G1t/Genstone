@@ -80,7 +80,11 @@ gen_filesystem_error_t gen_path_extension(char* output_extension, const char* pa
 }
 
 bool gen_path_exists(const char* path) {
+#if PLATFORM == WIN
+    return PathFileExistsA(path);
+#else
     return !access(path, F_OK);
+#endif
 }
 
 gen_path_error_t gen_path_validate(const char* path) {
