@@ -31,6 +31,7 @@ static void root_data_exporter(char* output, const gen_node_t* node, void* passt
 }
 
 int main() {
+    puts("Testing gen_node_import()...");
     const char source[] = "ROOT\n127\n\n";
     gen_node_importer_data_handler_t data_handlers[] = { root_data_loader };
     gen_node_import(&root, source, type_loader, data_handlers, NULL);
@@ -38,6 +39,7 @@ int main() {
     assert(root.type == GEN_ROOT_TYPE);
     assert(*(int*) root.data == 127);
 
+    puts("Testing gen_node_export()...");
     gen_node_exporter_data_handler_t export_handlers[] = { root_data_exporter };
     size_t output_length = (4 + 1 /* ROOT\n */) + (3 + 1 /* 127\n */) + (1 /* \n */) + (1 /* \0 */);
     char* output = malloc(output_length);

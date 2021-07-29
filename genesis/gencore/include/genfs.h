@@ -8,24 +8,7 @@
 #define GEN_FS_H
 
 #include "gencommon.h"
-
-/**
- * Return values for gen_path_validate
- */
-typedef enum {
-    /**
-     * The path contains no errors
-     */
-    GEN_PATH_OK = 0,
-    /**
-     * The path contains invalid characters
-     */
-    GEN_PATH_INVALID_CHAR,
-    /**
-     * The path is an invalid length
-     */
-    GEN_PATH_INVALID_LENGTH
-} gen_path_error_t;
+#include "generrors.h"
 
 #if PLATFORM == WIN
 #include <windows.h>
@@ -73,73 +56,13 @@ typedef struct {
 } gen_filesystem_handle_t;
 
 /**
- * Return values for errorable filesystem functions
- * Only applies to errors from platform or libc library calls
- * @note some errors will become GEN_FS_UNKNOWN on platforms that do not support them or report them nontrivially
- */
-typedef enum {
-    /**
-     * No error occurred
-     */
-    GEN_FS_OK = 0,
-    /**
-     * An unknown error occurred
-     */
-    GEN_FS_UNKNOWN,
-    /**
-     * A permission error occurred
-     */
-    GEN_FS_PERMISSION,
-    /**
-     * An invalid parameter was passed
-     * @note this is only for reporting EINVAL and equivalents and does not neccesarily map directly to any passed parameter
-     */
-    GEN_FS_INVALID_PARAMETER,
-    /**
-     * An IO error occurred
-     */
-    GEN_FS_IO,
-    /**
-     * A path or path component was too long
-     * @note for libc functions that report them, this represents ELOOP and ENAMETOOLONG
-     */
-    GEN_FS_TOO_LONG,
-    /**
-     * A nonexistent filesystem object was referenced
-     */
-    GEN_FS_NO_SUCH_OBJECT,
-    /**
-     * Program ran out of usable memory
-     * @note occurs only if a libc function reported OOM
-     */
-    GEN_FS_OUT_OF_MEMORY,
-    /**
-     * A filesystem object of the wrong type was passed
-     * @note also occurs when a path contains a non-directory component in the prefix for some libc calls
-     */
-    GEN_FS_WRONG_OBJECT_TYPE,
-    /**
-     * A filesystem object already exists by passed name
-     */
-    GEN_FS_ALREADY_EXISTS,
-    /**
-     * The specified filesystem is out of space
-     */
-    GEN_FS_OUT_OF_SPACE,
-    /**
-     * Too many filesystem handles are open
-     */
-    GEN_FS_OUT_OF_HANDLES
-} gen_filesystem_error_t;
-
-/**
  * Gets the canonical representation of a path
  * @param output_path storage for the output path. Should be GEN_PATH_MAX in size if length is unknown
  * @param path the path to get a canonical representation for
  * @note under windows, GEN_PATH_MAX will be provided to GetFullPathNameA nBufferLength in all cases
  * @return an error code
  */
-extern gen_filesystem_error_t gen_path_canonical(char* output_path, const char* path);
+extern gen_error_t gen_path_canonical(char* output_path, const char* path);
 
 /**
  * Gets the relative representation of a path
@@ -149,7 +72,7 @@ extern gen_filesystem_error_t gen_path_canonical(char* output_path, const char* 
  * @note if the path cannot be made relative, the output is set equal to path
  * @return an error code
  */
-extern gen_filesystem_error_t gen_path_relative(char* output_path, const char* path, const char* to);
+extern gen_error_t gen_path_relative(char* output_path, const char* path, const char* to);
 
 /**
  * Gets the filename of a path
@@ -157,7 +80,7 @@ extern gen_filesystem_error_t gen_path_relative(char* output_path, const char* p
  * @param path the path to get a filename from
  * @return an error code
  */
-extern gen_filesystem_error_t gen_path_filename(char* output_filename, const char* path);
+extern gen_error_t gen_path_filename(char* output_filename, const char* path);
 
 /**
  * Gets the pathname of a path
@@ -165,7 +88,7 @@ extern gen_filesystem_error_t gen_path_filename(char* output_filename, const cha
  * @param path the path to get a pathname from
  * @return an error code
  */
-extern gen_filesystem_error_t gen_path_pathname(char* output_path, const char* path);
+extern gen_error_t gen_path_pathname(char* output_path, const char* path);
 
 /**
  * Gets the file extension of a path
@@ -173,7 +96,7 @@ extern gen_filesystem_error_t gen_path_pathname(char* output_path, const char* p
  * @param path the path to get an extension from
  * @return an error code
  */
-extern gen_filesystem_error_t gen_path_extension(char* output_extension, const char* path);
+extern gen_error_t gen_path_extension(char* output_extension, const char* path);
 
 /**
  * Returns whether a filesystem object exists at a path
@@ -185,9 +108,9 @@ extern bool gen_path_exists(const char* path);
 /**
  * Checks whether a path is valid
  * @param path the path to validate
- * @return an error code
+ * @return an error code. GEN_TOO_LONG or GEN_TOO_SHORT if a path is an invalid length. GEN_WRONG_OBJECT_TYPE if an invalid character is encountered in the path
  */
-extern gen_path_error_t gen_path_validate(const char* path);
+extern gen_error_t gen_path_validate(const char* path);
 
 /**
  * Creates a directory
@@ -195,14 +118,14 @@ extern gen_path_error_t gen_path_validate(const char* path);
  * @return an error code
  * @note will create with the default access flags for the platform, or a reasonable default if not applicable
  */
-extern gen_filesystem_error_t gen_path_create_dir(const char* path);
+extern gen_error_t gen_path_create_dir(const char* path);
 
 /**
  * Deletes a filesystem object
  * @param path a path to the object to destroy
  * @return an error code
  */
-extern gen_filesystem_error_t gen_path_delete(const char* path);
+extern gen_error_t gen_path_delete(const char* path);
 
 /**
  * Opens a path as a filesystem object handle for use by filesystem operations
@@ -211,7 +134,7 @@ extern gen_filesystem_error_t gen_path_delete(const char* path);
  * @param path the path to open
  * @return an error code
  */
-extern gen_filesystem_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* path);
+extern gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* path);
 
 /**
  * Closes a filesystem object handle
@@ -219,7 +142,7 @@ extern gen_filesystem_error_t gen_handle_open(gen_filesystem_handle_t* output_ha
  * @param handle pointer to the handle to close
  * @return an error code
  */
-extern gen_filesystem_error_t gen_handle_close(gen_filesystem_handle_t* handle);
+extern gen_error_t gen_handle_close(gen_filesystem_handle_t* handle);
 
 /**
  * Gets the size of a handle's object's content
@@ -239,7 +162,7 @@ extern size_t gen_handle_size(const gen_filesystem_handle_t* handle);
  * @note does not add a null terminator to the buffer
  * @return an error code
  */
-extern gen_filesystem_error_t gen_file_read(unsigned char* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end);
+extern gen_error_t gen_file_read(unsigned char* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file
@@ -248,7 +171,7 @@ extern gen_filesystem_error_t gen_file_read(unsigned char* output_buffer, const 
  * @param buffer the buffer to source bytes from for writing
  * @return an error code
  */
-extern gen_filesystem_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const unsigned char* buffer);
+extern gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const unsigned char* buffer);
 
 /**
  * Lists the contents of a directory
@@ -257,6 +180,6 @@ extern gen_filesystem_error_t gen_file_write(const gen_filesystem_handle_t* hand
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern gen_filesystem_error_t gen_directory_list(const gen_filesystem_handle_t* handle, const gen_directory_list_handler_t handler, void* passthrough);
+extern gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle, const gen_directory_list_handler_t handler, void* passthrough);
 
 #endif
