@@ -104,7 +104,7 @@ gen_error_t gen_path_create_dir(const char* path) {
 
 #if PLATFORM == WIN
     int error = CreateDirectoryA(path, NULL);
-    if(!error) return gen_fs_convert_win_error(GetLastError());
+    if(!error) return gen_convert_winerr(GetLastError());
 #else
     int error = mkdir(path, 0777);
     if(error) return gen_convert_errno(errno);
