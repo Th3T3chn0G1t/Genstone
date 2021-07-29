@@ -4,6 +4,7 @@ GEN_CORE_TEST_OBJECTS = $(GEN_CORE_TEST_SOURCES:.c=.o)
 GEN_CORE_TEST = test/unit/gencore_test$(EXECUTABLE_SUFFIX)
 
 gencore_test: $(GEN_CORE_TEST)
+	ls lib
 ifeq ($(PLATFORM),WIN)
 	cd lib; ../$(GEN_CORE_TEST)
 else
