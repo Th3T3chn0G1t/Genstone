@@ -23,8 +23,11 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-GLOBAL_C_FLAGS += -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
-GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
+# We want make to use sh.exe when the *host* is Windows
+# Mainly because Github CI wants to use a buggy Windows-bash
+ifeq ($(OS),Windows_NT)
+SHELL := sh.exe
+endif
 
 SEP = /
 CP = cp
@@ -36,6 +39,9 @@ ifeq ($(SHELL),sh.exe)
 	RM = del
 	RMDIR = rmdir
 endif
+
+GLOBAL_C_FLAGS += -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 ifeq ($(PLATFORM),WIN)
 	LIB_PREFIX =
