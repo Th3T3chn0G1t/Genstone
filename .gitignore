@@ -17,5 +17,7 @@
 docs/*
 
 .vscode
+.vs
+
 
 .DS_STORE

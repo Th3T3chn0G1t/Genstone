@@ -1,7 +1,7 @@
 #include "include/generrors.h"
 
 #if PLATFORM == WIN
-#include <windows.h>
+#include <Windows.h>
 #endif
 #include <errno.h>
 
