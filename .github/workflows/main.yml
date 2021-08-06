@@ -27,7 +27,4 @@ jobs:
         uses: egor-tensin/setup-clang@v1
 
       - name: Build & Test
-        if: ${{ runner.os == 'windows' }}
-        run: mingw32-make
-        if: ${{ runner.os != 'windows' }}
         run: make
