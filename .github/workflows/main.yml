@@ -27,4 +27,4 @@ jobs:
         uses: egor-tensin/setup-clang@v1
 
       - name: Build & Test
-        run: make
+        run: make -d
