@@ -23,17 +23,17 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-# We want make to use sh.exe when the *host* is Windows
+# We want make to use cmd.exe when the *host* is Windows
 # Mainly because Github CI wants to use a buggy Windows-bash
 ifeq ($(OS),Windows_NT)
-SHELL := sh.exe
+SHELL := cmd.exe
 endif
 
 SEP = /
 CP = cp
 RM = rm
 RMDIR = rm -rf
-ifeq ($(SHELL),sh.exe)
+ifeq ($(SHELL),cmd.exe)
 	SEP = \\
 	CP = copy /b /y
 	RM = del
