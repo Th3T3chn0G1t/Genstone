@@ -26,10 +26,8 @@ jobs:
         if: ${{ runner.os != 'macOS' }}
         uses: egor-tensin/setup-clang@v1
 
-# For GLFW
-#      - name: Install Dependencies
-#        if: ${{ runner.os == 'Linux' }}
-#        run: sudo apt-get install xorg-dev
-
       - name: Build & Test
+        if: ${{ runner.os == 'windows' }}
+        run: mingw32-make
+        if: ${{ runner.os != 'windows' }}
         run: make
