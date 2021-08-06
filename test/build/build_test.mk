@@ -14,8 +14,8 @@ BUILD_TEST_LIB_STATIC = lib/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
 build_test: $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib
 ifeq ($(PLATFORM),WIN)
-	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_DYNAMIC))
 	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_STATIC))
+	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_DYNAMIC))
 else
 	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
 	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
