@@ -13,15 +13,15 @@ BUILD_TEST_LIB_DYNAMIC = test/build/$(LIB_PREFIX)test_dynamic$(DYNAMIC_LIB_SUFFI
 BUILD_TEST_LIB_STATIC = test/build/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
 build_test: $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib
-	cp $(BUILD_TEST_LIB_DYNAMIC) lib/$(notdir $(BUILD_TEST_LIB_DYNAMIC))
+	$(CP) $(subst /,$(SEP),$(BUILD_TEST_LIB_DYNAMIC) lib/$(notdir $(BUILD_TEST_LIB_DYNAMIC)))
 ifeq ($(PLATFORM),WIN)
-	cd lib; ../$(BUILD_TEST_EXEC_DYNAMIC)
-	cd lib; ../$(BUILD_TEST_EXEC_STATIC)
+	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_DYNAMIC))
+	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_STATIC))
 else
 	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
 	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
 endif
-	rm lib/$(notdir $(BUILD_TEST_LIB_DYNAMIC))
+	$(RM) $(subst /,$(SEP),lib/$(notdir $(BUILD_TEST_LIB_DYNAMIC)))
 
 $(BUILD_TEST_EXEC_DYNAMIC): LFLAGS = -Ltest/build -ltest_dynamic
 $(BUILD_TEST_EXEC_DYNAMIC): $(BUILD_TEST_EXEC_OBJECTS) $(BUILD_TEST_LIB_DYNAMIC)
@@ -36,10 +36,10 @@ $(BUILD_TEST_LIB_STATIC): $(BUILD_TEST_LIB_OBJECTS)
 $(BUILD_TEST_LIB_OBJECTS): Makefile build/common.mk build/config.mk
 
 clean_build_test:
-	-rm $(BUILD_TEST_LIB_OBJECTS)
-	-rm $(BUILD_TEST_LIB_DYNAMIC)
-	-rm $(BUILD_TEST_LIB_STATIC)
+	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_LIB_OBJECTS))
+	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_LIB_DYNAMIC))
+	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_LIB_STATIC))
 
-	-rm $(BUILD_TEST_EXEC_OBJECTS)
-	-rm $(BUILD_TEST_EXEC_DYNAMIC)
-	-rm $(BUILD_TEST_EXEC_STATIC)
+	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_EXEC_OBJECTS))
+	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_EXEC_DYNAMIC))
+	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_EXEC_STATIC))

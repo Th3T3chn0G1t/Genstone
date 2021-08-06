@@ -5,7 +5,7 @@ GEN_FS_TEST = test/unit/genfs_test$(EXECUTABLE_SUFFIX)
 
 genfs_test: $(GEN_FS_TEST)
 ifeq ($(PLATFORM),WIN)
-	cd lib; ../$(GEN_FS_TEST)
+	cd $(subst /,$(SEP),lib && ../$(GEN_FS_TEST))
 else
 	LD_LIBRARY_PATH=lib $(GEN_FS_TEST)
 endif
@@ -15,5 +15,5 @@ $(GEN_FS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_FS_TEST): $(GEN_FS_TEST_OBJECTS) $(GEN_CORE_LIB)
 
 clean_genfs_test:
-	-rm $(GEN_FS_TEST_OBJECTS)
-	-rm $(GEN_FS_TEST)
+	-$(RM) $(subst /,$(SEP),$(GEN_FS_TEST_OBJECTS))
+	-$(RM) $(subst /,$(SEP),$(GEN_FS_TEST))

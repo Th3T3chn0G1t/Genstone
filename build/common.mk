@@ -34,8 +34,13 @@ ifeq ($(PLATFORM),WIN)
 
 	GLOBAL_L_FLAGS += -lshlwapi.lib
 
-	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -o $@ $(filter %.o,$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
+	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %.o,$^) && $(LINKER) -shared -o $@ $(filter %.o,$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
+
+	SEP = \\
+	CP = copy /b /y
+	RM = del
+	RMDIR = rmdir
 endif
 ifeq ($(PLATFORM),LNX)
 	LIB_PREFIX = lib
@@ -47,6 +52,11 @@ ifeq ($(PLATFORM),LNX)
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
+
+	SEP = /
+	CP = cp
+	RM = rm
+	RMDIR = rm -rf
 endif
 ifeq ($(PLATFORM),DWN)
 	LIB_PREFIX = lib
@@ -58,6 +68,11 @@ ifeq ($(PLATFORM),DWN)
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %.o,$^)
+
+	SEP = /
+	CP = cp
+	RM = rm
+	RMDIR = rm -rf
 endif
 ifeq ($(PLATFORM),BSD)
 	LIB_PREFIX = lib
@@ -69,6 +84,11 @@ ifeq ($(PLATFORM),BSD)
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %.o,$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
+
+	SEP = /
+	CP = cp
+	RM = rm
+	RMDIR = rm -rf
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
