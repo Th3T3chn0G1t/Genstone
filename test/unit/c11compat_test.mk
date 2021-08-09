@@ -5,7 +5,7 @@ C11_COMPAT_TEST = test/unit/c11compat_test$(EXECUTABLE_SUFFIX)
 
 c11compat_test: $(C11_COMPAT_TEST)
 ifeq ($(PLATFORM),WIN)
-	cd lib; ../$(C11_COMPAT_TEST)
+	cd $(subst /,$(SEP),lib && ../$(C11_COMPAT_TEST))
 else
 	LD_LIBRARY_PATH=lib $(C11_COMPAT_TEST)
 endif
@@ -15,5 +15,5 @@ $(C11_COMPAT_TEST): LFLAGS = -Llib $(C11_COMPAT_LFLAGS)
 $(C11_COMPAT_TEST): $(C11_COMPAT_TEST_OBJECTS) $(C11_COMPAT_LIB)
 
 clean_c11compat_test:
-	-rm $(C11_COMPAT_TEST_OBJECTS)
-	-rm $(C11_COMPAT_TEST)
+	-$(RM) $(subst /,$(SEP),$(C11_COMPAT_TEST_OBJECTS))
+	-$(RM) $(subst /,$(SEP),$(C11_COMPAT_TEST))

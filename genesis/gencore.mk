@@ -20,5 +20,5 @@ $(GEN_CORE_LIB): LFLAGS = -Llib $(C11_COMPAT_LFLAGS)
 $(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) $(C11_COMPAT_LIB) | lib
 
 clean_gencore:
-	-rm $(GEN_CORE_OBJECTS)
-	-rm $(GEN_CORE_LIB)
+	-$(RM) $(GEN_CORE_OBJECTS)
+	-$(RM) $(GEN_CORE_LIB)

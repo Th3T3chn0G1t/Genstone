@@ -11,11 +11,13 @@
 *.exe
 
 *.def
+*.exp
 
 *.dSYM
 
 docs/*
 
 .vscode
+.vs
 
 .DS_STORE

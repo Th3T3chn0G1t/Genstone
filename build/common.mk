@@ -23,6 +23,23 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
+# We want make to use cmd.exe when the *host* is Windows
+# Mainly because Github CI wants to use a buggy Windows-bash
+ifeq ($(OS),Windows_NT)
+SHELL := cmd.exe
+endif
+
+SEP = /
+CP = cp
+RM = rm
+RMDIR = rm -rf
+ifeq ($(SHELL),cmd.exe)
+	SEP = \\
+	CP = copy /b /y
+	RM = del
+	RMDIR = rmdir
+endif
+
 GLOBAL_C_FLAGS += -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
@@ -34,7 +51,7 @@ ifeq ($(PLATFORM),WIN)
 
 	GLOBAL_L_FLAGS += -lshlwapi.lib
 
-	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %.o,$^); $(LINKER) -shared -o $@ $(filter %.o,$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
+	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %.o,$^) && $(LINKER) -shared -o $@ $(filter %.o,$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
 endif
 ifeq ($(PLATFORM),LNX)
