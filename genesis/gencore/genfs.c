@@ -29,7 +29,7 @@ gen_error_t gen_path_relative(char* output_path, const char* path, const char* t
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
     _GEN_FS_PATH_PARAMETER_VALIDATION(to);
 
-    size_t mark;
+    size_t mark = 0;
     while(path[mark] == to[mark]) mark++;
     strcpy(output_path, path + mark);
 
@@ -49,7 +49,7 @@ gen_error_t gen_path_pathname(char* output_path, const char* path) {
     if(!output_path) return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
 
-    size_t mark = strrchr(path, '/') - path;
+    size_t mark = (strrchr(path, '/') + 1) - path;
     strncpy(output_path, path, mark);
     output_path[mark - 1] = '\0';
 
@@ -61,7 +61,7 @@ gen_error_t gen_path_extension(char* output_extension, const char* path) {
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
 
     size_t mark = strchr(strrchr(path, '/'), '.') - path;
-    strncpy(output_extension, path, mark);
+    strcpy(output_extension, path + mark);
     output_extension[mark - 1] = '\0';
 
     return GEN_OK;
@@ -130,7 +130,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* 
 
     struct stat s;
     int error = stat(path, &s);
-    if(error) return gen_convert_errno(errno);
+    if(error && errno != ENOENT) return gen_convert_errno(errno);
     if(S_ISDIR(s.st_mode)) {
         output_handle->dir = true;
         output_handle->directory_handle = opendir(path);
@@ -138,10 +138,10 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* 
     }
     else {
         output_handle->dir = false;
+        output_handle->file_handles[1] = fopen(path, "w+");
+        if(!output_handle->file_handles[1]) return gen_convert_errno(errno);
         output_handle->file_handles[0] = fopen(path, "r");
         if(!output_handle->file_handles[0]) return gen_convert_errno(errno);
-        output_handle->file_handles[1] = fopen(path, "w");
-        if(!output_handle->file_handles[1]) return gen_convert_errno(errno);
     }
 
     return GEN_OK;
@@ -168,6 +168,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* handle) {
 
 size_t gen_handle_size(const gen_filesystem_handle_t* handle) {
     if(!handle) return GEN_INVALID_PARAMETER;
+    if(handle->dir) return GEN_WRONG_OBJECT_TYPE;
 
     int error = fseek(handle->file_handles[0], 0, SEEK_END);
     if(error) return gen_convert_errno(errno);
@@ -179,7 +180,11 @@ size_t gen_handle_size(const gen_filesystem_handle_t* handle) {
     return mark;
 }
 
-gen_error_t gen_file_read(unsigned char* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end) {
+gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end) {
+    if(!handle) return GEN_INVALID_PARAMETER;
+    if(handle->dir) return GEN_WRONG_OBJECT_TYPE;
+    if(!output_buffer) return GEN_INVALID_PARAMETER;
+
     int error = fseek(handle->file_handles[0], (long) start, SEEK_SET);
     if(error) return gen_convert_errno(errno);
 
@@ -196,12 +201,41 @@ gen_error_t gen_file_read(unsigned char* output_buffer, const gen_filesystem_han
     return GEN_OK;
 }
 
-gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const unsigned char* buffer) {
+gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const uint8_t* buffer) {
+    if(!handle) return GEN_INVALID_PARAMETER;
+    if(handle->dir) return GEN_WRONG_OBJECT_TYPE;
+    if(!buffer) return GEN_INVALID_PARAMETER;
+
+    size_t error = fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
+    if(!error) {
+        if(ferror(handle->file_handles[1])) error = errno;
+        else error = 0;
+        clearerr(handle->file_handles[1]);
+        if(error) return gen_convert_errno(error);
+    }
+
+    rewind(handle->file_handles[1]);
 
     return GEN_OK;
 }
 
 gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle, const gen_directory_list_handler_t handler, void* passthrough) {
+    if(!handle) return GEN_INVALID_PARAMETER;
+    if(!handle->dir) return GEN_WRONG_OBJECT_TYPE;
+    if(!handler) return GEN_INVALID_PARAMETER;
+
+    struct dirent* entry;
+    errno = 0;
+    while((entry = readdir(handle->directory_handle))) {
+        if(!entry && errno) return gen_convert_errno(errno);
+        if(entry->d_name[0] == '.' && entry->d_name[1] == '\0') continue;
+        if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0') continue;
+
+        handler(entry->d_name, passthrough);
+
+        errno = 0;
+    }
+    rewinddir(handle->directory_handle);
 
     return GEN_OK;
 }

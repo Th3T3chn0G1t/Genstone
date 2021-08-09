@@ -146,9 +146,8 @@ extern gen_error_t gen_handle_close(gen_filesystem_handle_t* handle);
 
 /**
  * Gets the size of a handle's object's content
- * @param handle a handle to an object whose size to get
+ * @param handle a handle to an object whose size to get. Must not be a directory
  * @return the size of the object's content
- * @note for directories, this will be the collective size of children
  */
 extern size_t gen_handle_size(const gen_filesystem_handle_t* handle);
 
@@ -162,7 +161,7 @@ extern size_t gen_handle_size(const gen_filesystem_handle_t* handle);
  * @note does not add a null terminator to the buffer
  * @return an error code
  */
-extern gen_error_t gen_file_read(unsigned char* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end);
+extern gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file
@@ -171,7 +170,7 @@ extern gen_error_t gen_file_read(unsigned char* output_buffer, const gen_filesys
  * @param buffer the buffer to source bytes from for writing
  * @return an error code
  */
-extern gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const unsigned char* buffer);
+extern gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const uint8_t* buffer);
 
 /**
  * Lists the contents of a directory

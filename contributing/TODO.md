@@ -57,12 +57,15 @@ If the project ever garners multiple contributors this can be migrated to Github
         - binary-type (ABI) info
     - genfs
         - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
+        - Increase the tolerances on gen_path_relative
     - generator (editor)
     - genesis
         - run tree func
     - perform validation in debug mode
     - centralised error return value enumeration
         - Windows GetLastError conversion table (?)
+- Tests
+    - Expected/Got assertions for easier debugging
 - Examples
     - Write examples
         - Build system module examples
