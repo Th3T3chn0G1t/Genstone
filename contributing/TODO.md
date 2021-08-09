@@ -29,6 +29,7 @@ If the project ever garners multiple contributors this can be migrated to Github
     - `clang-format`
         - Pretty diffs between source and formatted source
             - Auto-replace vs. warning/error on diff
+    - Embedded `dlltool` binary or equivalent script for Windows builds
 - Documentation
     - Custom static documentation generator
     - Formal writeup for Genesis

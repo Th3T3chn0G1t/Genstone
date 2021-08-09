@@ -1,8 +1,12 @@
 # Building
 
-Genesis uses a configurable system of Make (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
+Genesis uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
 
 The base `Makefile` in the project root tries to build the sandbox project be default, generating it if not present
+
+## Prerequisites
+
+For the smoothest experience - its recommended to build with `clang`, but with a few modifications to the codebase `gcc` should work too. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`), and Windows users will need mingw's `dlltool` for the generation of import libraries
 
 ## Options
 

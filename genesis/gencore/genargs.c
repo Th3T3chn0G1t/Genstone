@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+
 #include "include/genargs.h"
 
 gen_arg_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough) {

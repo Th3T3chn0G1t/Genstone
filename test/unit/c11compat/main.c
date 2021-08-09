@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+
 #include <threads.h>
 #include <stdbool.h>
 #include <assert.h>

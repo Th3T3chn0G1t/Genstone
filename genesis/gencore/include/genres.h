@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+
 /**
  * @file genres.h
  * Similar to genfs.h, but utility functions take an extra state pointer to provide optimizations around already open or loaded resources

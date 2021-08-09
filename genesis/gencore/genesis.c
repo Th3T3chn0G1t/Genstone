@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+
 #include "include/genesis.h"
 
 void gen_node_import(gen_node_t* output_node, const char* source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* data_handlers, void* passthrough) {
