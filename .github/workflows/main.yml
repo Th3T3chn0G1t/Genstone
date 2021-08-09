@@ -14,7 +14,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+# Something is horribly broken with the Github actions Windows environment
+#        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+        os: [ ubuntu-latest, macOS-latest]
 
     steps:
       - uses: actions/checkout@v2
