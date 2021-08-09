@@ -48,44 +48,48 @@ ifeq ($(PLATFORM),WIN)
 	DYNAMIC_LIB_SUFFIX = .dll
 	STATIC_LIB_SUFFIX = .lib
 	EXECUTABLE_SUFFIX = .exe
+	OBJECT_SUFFIX = .obj
 
 	GLOBAL_L_FLAGS += -lshlwapi.lib
 
-	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %.o,$^) && $(LINKER) -shared -o $@ $(filter %.o,$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
-	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
+	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %$(OBJECT_SUFFIX),$^) && $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
+	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),LNX)
 	LIB_PREFIX = lib
 	DYNAMIC_LIB_SUFFIX = .so
 	STATIC_LIB_SUFFIX = .a
 	EXECUTABLE_SUFFIX = .out
+	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC -D_DEFAULT_SOURCE
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %.o,$^)
-	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
+	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),DWN)
 	LIB_PREFIX = lib
 	DYNAMIC_LIB_SUFFIX = .dylib
 	STATIC_LIB_SUFFIX = .a
 	EXECUTABLE_SUFFIX = .out
+	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %.o,$^)
-	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %.o,$^)
+	DYNAMIC_LIB_TOOL = $(LINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),BSD)
 	LIB_PREFIX = lib
 	DYNAMIC_LIB_SUFFIX = .so
 	STATIC_LIB_SUFFIX = .a
 	EXECUTABLE_SUFFIX = .out
+	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %.o,$^)
-	STATIC_LIB_TOOL = ar -cvq $@ $(filter %.o,$^)
+	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
@@ -119,7 +123,7 @@ ifeq ($(TEST),BUILD)
 	TEST_BUILD = 1
 endif
 
-%.o: %.c
+%$(OBJECT_SUFFIX): %.c
 	$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
 %$(STATIC_LIB_SUFFIX):
@@ -129,4 +133,4 @@ endif
 	$(DYNAMIC_LIB_TOOL) $(GLOBAL_L_FLAGS) $(LFLAGS)
 
 %$(EXECUTABLE_SUFFIX):
-	$(LINKER) -o $@ $(filter %.o,$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)
+	$(LINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)

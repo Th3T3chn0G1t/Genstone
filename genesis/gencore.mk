@@ -5,7 +5,7 @@ endif
 GEN_CORE_LFLAGS += -lgencore $(C11_COMPAT_LFLAGS)
 
 GEN_CORE_SOURCES = $(wildcard genesis/gencore/*.c)
-GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=.o)
+GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))
 
 GEN_CORE_LIB = lib/$(LIB_PREFIX)gencore$(DYNAMIC_LIB_SUFFIX)
 

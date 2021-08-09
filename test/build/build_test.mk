@@ -1,13 +1,13 @@
 # Test that the build system can create both static and dynamic libraries and link them correctly against an executable
 
 BUILD_TEST_EXEC_SOURCES = test/build/main.c
-BUILD_TEST_EXEC_OBJECTS = $(BUILD_TEST_EXEC_SOURCES:.c=.o)
+BUILD_TEST_EXEC_OBJECTS = $(BUILD_TEST_EXEC_SOURCES:.c=$(OBJECT_SUFFIX))
 
 BUILD_TEST_EXEC_DYNAMIC = test/build/testexec_dynamic$(EXECUTABLE_SUFFIX)
 BUILD_TEST_EXEC_STATIC = test/build/testexec_static$(EXECUTABLE_SUFFIX)
 
 BUILD_TEST_LIB_SOURCES = $(wildcard test/build/testlib_*.c)
-BUILD_TEST_LIB_OBJECTS = $(BUILD_TEST_LIB_SOURCES:.c=.o)
+BUILD_TEST_LIB_OBJECTS = $(BUILD_TEST_LIB_SOURCES:.c=$(OBJECT_SUFFIX))
 
 BUILD_TEST_LIB_DYNAMIC = lib/$(LIB_PREFIX)test_dynamic$(DYNAMIC_LIB_SUFFIX)
 BUILD_TEST_LIB_STATIC = lib/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)

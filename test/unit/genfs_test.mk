@@ -1,5 +1,5 @@
 GEN_FS_TEST_SOURCES = $(wildcard test/unit/genfs/*.c)
-GEN_FS_TEST_OBJECTS = $(GEN_FS_TEST_SOURCES:.c=.o)
+GEN_FS_TEST_OBJECTS = $(GEN_FS_TEST_SOURCES:.c=$(OBJECT_SUFFIX))
 
 GEN_FS_TEST = test/unit/genfs_test$(EXECUTABLE_SUFFIX)
 
