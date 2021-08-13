@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
-#include <threads.h>
-#include <stdbool.h>
-#include <assert.h>
+#include <gencommon.h>
 
 static int ticks = 0;
 static mtx_t ticks_mtx;
@@ -39,7 +37,7 @@ int main() {
     int result;
     thrd_join(thread, &result);
 
-    assert(ticks == 20);
+    gen_require_equal(20, ticks);
 
     mtx_destroy(&ticks_mtx);
 }

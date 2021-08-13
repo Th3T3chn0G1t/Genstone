@@ -1,5 +1,10 @@
 include build/config.mk
 
+# We want make to use cmd.exe when the *host* is Windows
+ifeq ($(OS),Windows_NT)
+SHELL := cmd.exe
+endif
+
 ifeq ($(PLATFORM),DEFAULT)
 	ifeq ($(OS),Windows_NT)
 		PLATFORM = WIN
@@ -21,12 +26,6 @@ ifeq ($(PLATFORM),DEFAULT)
 			PLATFORM = BSD
 		endif
     endif
-endif
-
-# We want make to use cmd.exe when the *host* is Windows
-# Mainly because Github CI wants to use a buggy Windows-bash
-ifeq ($(OS),Windows_NT)
-SHELL := cmd.exe
 endif
 
 SEP = /

@@ -65,8 +65,6 @@ If the project ever garners multiple contributors this can be migrated to Github
     - perform validation in debug mode
     - centralised error return value enumeration
         - Windows GetLastError conversion table (?)
-- Tests
-    - Expected/Got assertions for easier debugging
 - Examples
     - Write examples
         - Build system module examples

@@ -33,14 +33,16 @@ static void root_data_exporter(char* output, const gen_node_t* node, void* passt
     sprintf(output + (4 + 1 /* ROOT\n */), "%i\n", *(int*) node->data);
 }
 
+// This is to make sure the test value is constant for require
+#define source "ROOT\n127\n\n"
+
 int main() {
     puts("Testing gen_node_import()...");
-    const char source[] = "ROOT\n127\n\n";
     gen_node_importer_data_handler_t data_handlers[] = { root_data_loader };
     gen_node_import(&root, source, type_loader, data_handlers, NULL);
 
-    assert(root.type == GEN_ROOT_TYPE);
-    assert(*(int*) root.data == 127);
+    gen_require_equal(GEN_ROOT_TYPE, root.type);
+    gen_require_equal(127, *(int*) root.data);
 
     puts("Testing gen_node_export()...");
     gen_node_exporter_data_handler_t export_handlers[] = { root_data_exporter };
@@ -50,5 +52,5 @@ int main() {
     output[output_length - 2] = '\n'; // In an actual impl the child nodes would be loaded
     output[output_length - 1] = '\0';
 
-    assert(!strcmp(output, source));
+    gen_require_equal_string(source, output);
 }

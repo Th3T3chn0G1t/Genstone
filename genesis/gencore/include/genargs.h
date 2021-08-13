@@ -11,19 +11,7 @@
 #ifndef GEN_ARGS_H
 #define GEN_ARGS_H
 
-/**
- * Return values for gen_process_args
- */
-typedef enum {
-    /**
-     * Arguments were parsed with no errors
-     */
-    GEN_ARG_OK = 0,
-    /**
-     * A nonexistent argument was passed
-     */
-    GEN_ARG_NO_EXIST
-} gen_arg_error_t;
+#include "generrors.h"
 
 /**
  * Argument types to be passed to parser callback
@@ -61,6 +49,6 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const unsigned long, con
  * @param passthrough a passthrough argument for the handler
  * @return an error code
  */
-extern gen_arg_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough);
+extern gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough);
 
 #endif

@@ -17,30 +17,25 @@ static char* long_args[] = {
 static void arg_callback(const gen_arg_type_t type, const unsigned long argn, const char* value, void* passthrough) {
     switch(type) {
         case GEN_ARG_SHORT: {
-            assert(argn < 2);
             if(argn == 0) { // `-f`
-                assert(!value);
+                gen_require_equal(NULL, value);
             }
             else if(argn == 1) { // `-b`
-                assert(value);
-                assert(!strcmp(value, "foo"));
+                gen_require_equal_string("foo", value);
             }
             break;
         }
         case GEN_ARG_LONG: {
-            assert(argn < 2);
             if(argn == 0) { // `--fizz`
-                assert(!value);
+                gen_require_equal(NULL, value);
             }
             else if(argn == 1) { // `--buzz`
-                assert(value);
-                assert(!strcmp(value, "foo"));
+                gen_require_equal_string("foo", value);
             }
             break;
         }
         case GEN_ARG_RAW: {
-            assert(value);
-            assert(!strcmp(value, "bar"));
+            gen_require_equal_string("bar", value);
             break;
         }
     }
@@ -50,7 +45,7 @@ int main() {
     const char* argv[] = { "-f", "-bfoo", "--fizz", "--buzz=foo", "bar" };
     const int argc = sizeof(argv) / sizeof(argv[0]);
 
-    gen_arg_error_t error = gen_parse_args(argc, argv, arg_callback, 2, short_args, 2, long_args, NULL);
+    gen_error_t error = gen_parse_args(argc, argv, arg_callback, 2, short_args, 2, long_args, NULL);
     
-    assert(error == GEN_ARG_OK);
+    gen_require_equal(GEN_OK, error);
 }

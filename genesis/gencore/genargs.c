@@ -3,7 +3,7 @@
 
 #include "include/genargs.h"
 
-gen_arg_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough) {
+gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough) {
     // Precalculating the long args' lengths to save time while looping
     unsigned long long_arg_lens[n_long_args];
     for(unsigned long i = 0; i < n_long_args; i++) {
@@ -56,10 +56,10 @@ gen_arg_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_
             value = argv[i];
         }
         if(argn == (unsigned long) -1) {
-            return GEN_ARG_NO_EXIST;
+            return GEN_NO_SUCH_OBJECT;
         }
         callback(type, argn, value, passthrough);
     }
 
-    return GEN_ARG_OK;
+    return GEN_OK;
 }

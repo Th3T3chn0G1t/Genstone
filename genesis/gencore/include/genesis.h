@@ -95,6 +95,6 @@ extern void gen_node_export(char* output_source, const gen_node_t* node, const g
 /**
  * Built in node type for the apptree root
  */
-#define GEN_ROOT_TYPE 0
+#define GEN_ROOT_TYPE 0ul
 
 #endif
