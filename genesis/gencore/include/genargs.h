@@ -5,13 +5,13 @@
  * @file genargs.h
  * Utility for parsing UNIX-style arguments
  * Defines basic types used for managing the parser
- * @note does not use stdlib
  */
 
 #ifndef GEN_ARGS_H
 #define GEN_ARGS_H
 
 #include "generrors.h"
+#include "gencommon.h"
 
 /**
  * Argument types to be passed to parser callback
@@ -34,7 +34,7 @@ typedef enum {
 /**
  * Handler for parsed arguments
  */
-typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const unsigned long, const char*, void*);
+typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char*, void*);
 
 /**
  * Parses UNIX-style arguments into an easy-to-interpret format for a handler
@@ -49,6 +49,6 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const unsigned long, con
  * @param passthrough a passthrough argument for the handler
  * @return an error code
  */
-extern gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough);
+extern gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, size_t n_short_args, const char* short_args, size_t n_long_args, const char** long_args, void* passthrough);
 
 #endif

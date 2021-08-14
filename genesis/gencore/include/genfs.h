@@ -4,7 +4,6 @@
 /**
  * @file genfs.h
  * Includes filesystem utilities for manipulation and introspection
- * @see genres.h for variants of utilities which take a state pointer and have various optimizations
  */
 
 #ifndef GEN_FS_H

@@ -25,7 +25,7 @@ Opt for using explicit sizes instead of `NULL`-termination for buffers.
 Please try to fix documentation warnings as reported, as non-impactful errors occlude important errors down the line
 
 #### Note
-Doxygen operates the preprocessor as `PLATFORM == LNX`, this means that platform-defined macros and types should be documented under the linux branch
+Doxygen operates the preprocessor as `PLATFORM == LNX`, this means that platform-defined macros and types should be documented under the linux branch. The same applies as `MODE == DEBUG`
 
 ### Tests
 

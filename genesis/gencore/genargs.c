@@ -3,49 +3,45 @@
 
 #include "include/genargs.h"
 
-gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, unsigned long n_short_args, char* short_args, unsigned long n_long_args, char** long_args, void* passthrough) {
+gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, size_t n_short_args, const char* short_args, size_t n_long_args, const char** long_args, void* passthrough) {
     // Precalculating the long args' lengths to save time while looping
-    unsigned long long_arg_lens[n_long_args];
-    for(unsigned long i = 0; i < n_long_args; i++) {
-        // Calculating inline instead of using strlen to remove the stdlib dependency
-        unsigned long len = 0;
-        while(long_args[i][len]) len++;
-        long_arg_lens[i] = len;
+    size_t long_arg_lens[n_long_args];
+    GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {
+        *len = 0;
+        while(long_args[i][*len]) (*len)++;
     }
 
-    for(int i = 1; i < argc; i++) {
+    GEN_FOREACH_PTR(i, arg, argc - 1, argv + 1) {
         gen_arg_type_t type;
-        unsigned long argn = (unsigned long) -1;
-        const char* value = (const char*) 0;
-        if(argv[i][0] == '-' && argv[i][1] == '-') {
-            type = GEN_ARG_LONG;
-            for(unsigned long j = 0; j < n_long_args; j++) {
-                // Calculating inline instead of using strncmp to remove the stdlib dependency
-                // Also might be very slightly faster given the specific use-case
-                char equal = 1;
-                for(unsigned long k = 0; k < long_arg_lens[j]; k++) {
-                    if(long_args[j][k] != (argv[i] + 2)[k]) {
-                        equal = 0;
-                        break;
+        size_t argn = SIZE_MAX;
+        const char* value = NULL;
+
+        if((*arg)[0] == '-') {
+            if((*arg)[1] == '-') {
+                type = GEN_ARG_LONG;
+                GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
+                    const size_t len = long_arg_lens[j];
+
+                    // Calculating inline instead of using strncmp to remove the stdlib dependency
+                    // Also might be very slightly faster given the specific use-case
+                    GEN_FOREACH_PTR(k, arg_char, len, *long_arg) {
+                        if(*arg_char != (*arg)[k + 2]) goto long_arg_continue;
                     }
-                }
-                if(equal) {
+                
                     argn = j;
-                    if(argv[i][2 + long_arg_lens[j]]) { // If there are more chars after the switch
-                        value = argv[i] + 2 + long_arg_lens[j] + 1;
-                    }
-                    break;
+                    if((*arg)[len + 2]) value = (*arg) + 2 + len + 1;
+
+                    long_arg_continue: continue;
                 }
             }
-        }
-        else if(argv[i][0] == '-') {
-            type = GEN_ARG_SHORT;
-            for(unsigned long j = 0; j < n_short_args; j++) {
-                if(short_args[j] == argv[i][1]) {
+            else {
+                type = GEN_ARG_SHORT;
+                GEN_FOREACH_PTR(j, short_arg, n_short_args, short_args) {
+                    if((*short_arg) != (*arg)[1]) continue;
+
                     argn = j;
-                    if(argv[i][2]) { // If there are more chars after the switch
-                        value = argv[i] + 2;
-                    }
+
+                    if((*arg)[2]) value = (*arg) + 2;
                     break;
                 }
             }
@@ -53,11 +49,10 @@ gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_hand
         else {
             type = GEN_ARG_RAW;
             argn = 0;
-            value = argv[i];
+            value = (*arg);
         }
-        if(argn == (unsigned long) -1) {
-            return GEN_NO_SUCH_OBJECT;
-        }
+
+        if(argn == SIZE_MAX) return GEN_NO_SUCH_OBJECT;
         callback(type, argn, value, passthrough);
     }
 

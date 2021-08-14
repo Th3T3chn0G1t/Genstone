@@ -4,7 +4,13 @@
 #include "include/genfs.h"
 #include "include/gendbg.h"
 
-#if GEN_FS_PATH_VALIDATION == ENABLED
+#if GEN_DEBUG_PATH_VALIDATION == ENABLED
+/**
+ * @internal
+ * Validates the path parameter to filesystem functions
+ * @param path the path to validate
+ * @see GEN_DEBUG_PATH_VALIDATION
+ */
 #define _GEN_FS_PATH_PARAMETER_VALIDATION(path) \
     do { \
         if(!path) return GEN_INVALID_PARAMETER; \
@@ -93,12 +99,14 @@ gen_error_t gen_path_validate(const char* path) {
     // and Linux/BSD apparently only prevent using /
     // In practise its probably more complicated, but this will do for now
 #if PLATFORM == WIN
-    for(size_t i = 0; path[i]; i++) {
-        // Checking here instead of looping over the path twice should be faster for the case where we need to check the path's contents
-        if(i > GEN_PATH_MAX) return GEN_TOO_LONG;
+    const size_t len = strlen(path);
+
+    if(len > GEN_PATH_MAX) return GEN_TOO_LONG;
+    GEN_FOREACH(i, path_char, len, path) {
         const static char invalid_chars[] = "/\\:*?\"<>|";
-        for(size_t j = 0; j < sizeof(invalid_chars); j++)
-            if(path[i] == invalid_chars[j]) return GEN_WRONG_OBJECT_TYPE;
+        GEN_FOREACH(j, invalid, sizeof(invalid_chars), invalid_chars) {
+            if(path_char == invalid) return GEN_WRONG_OBJECT_TYPE;
+        }
     }
 #else
     if(strlen(path) > GEN_PATH_MAX) return GEN_TOO_LONG;

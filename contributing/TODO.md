@@ -60,6 +60,8 @@ If the project ever garners multiple contributors this can be migrated to Github
     - genfs
         - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
         - Increase the tolerances on gen_path_relative
+    - gencommon
+        - streq to replace strcmp
     - generator (editor)
     - genesis
         - run tree func

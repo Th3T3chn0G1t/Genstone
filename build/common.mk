@@ -49,6 +49,7 @@ ifeq ($(PLATFORM),WIN)
 	EXECUTABLE_SUFFIX = .exe
 	OBJECT_SUFFIX = .obj
 
+	GLOBAL_C_FLAGS += -D_MT
 	GLOBAL_L_FLAGS += -lshlwapi.lib
 
 	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %$(OBJECT_SUFFIX),$^) && $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
@@ -97,7 +98,6 @@ ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
 	ifeq ($(PLATFORM),WIN)
-		GLOBAL_C_FLAGS += -D_MT
 		GLOBAL_L_FLAGS += -llibcmt.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 	endif
@@ -106,7 +106,7 @@ else
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
 	ifeq ($(PLATFORM),WIN)
-		GLOBAL_C_FLAGS += -D_MT -D_DEBUG
+		GLOBAL_C_FLAGS += -D_DEBUG
 		GLOBAL_L_FLAGS += -Wl,-nodefaultlib:libcmt.lib -llibcmtd.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug
 	endif

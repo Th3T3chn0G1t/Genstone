@@ -4,12 +4,12 @@
 #include <genargs.h>
 #include <gencommon.h>
 
-static char short_args[] = {
+static const char short_args[] = {
     'f',
     'b'
 };
 
-static char* long_args[] = {
+static const char* long_args[] = {
     "fizz",
     "buzz"
 };
@@ -17,20 +17,34 @@ static char* long_args[] = {
 static void arg_callback(const gen_arg_type_t type, const unsigned long argn, const char* value, void* passthrough) {
     switch(type) {
         case GEN_ARG_SHORT: {
-            if(argn == 0) { // `-f`
-                gen_require_equal(NULL, value);
-            }
-            else if(argn == 1) { // `-b`
-                gen_require_equal_string("foo", value);
+            switch(argn) {
+                case 0: {
+                    // `-f`
+                    gen_require_equal(NULL, value);
+                    break;
+                }
+                case 1: {
+                    // `-b`
+                    gen_require_equal_string("foo", value);
+                    break;
+                }
+                default: gen_require_no_reach;
             }
             break;
         }
         case GEN_ARG_LONG: {
-            if(argn == 0) { // `--fizz`
-                gen_require_equal(NULL, value);
-            }
-            else if(argn == 1) { // `--buzz`
-                gen_require_equal_string("foo", value);
+            switch(argn) {
+                case 0: {
+                    // `--fizz`
+                    gen_require_equal(NULL, value);
+                    break;                    
+                }
+                case 1: {
+                    // `--buzz`
+                    gen_require_equal_string("foo", value);
+                    break;
+                }
+                default: gen_require_no_reach;
             }
             break;
         }
@@ -38,10 +52,11 @@ static void arg_callback(const gen_arg_type_t type, const unsigned long argn, co
             gen_require_equal_string("bar", value);
             break;
         }
+        default: gen_require_no_reach;
     }
 }
 
-int main() {
+int main() {    
     const char* argv[] = { "-f", "-bfoo", "--fizz", "--buzz=foo", "bar" };
     const int argc = sizeof(argv) / sizeof(argv[0]);
 
