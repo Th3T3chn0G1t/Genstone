@@ -2,13 +2,18 @@
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
 #include "include/genfs.h"
+#include "include/gendbg.h"
 
+#if GEN_FS_PATH_VALIDATION == ENABLED
 #define _GEN_FS_PATH_PARAMETER_VALIDATION(path) \
     do { \
         if(!path) return GEN_INVALID_PARAMETER; \
         gen_error_t path_error = gen_path_validate(path); \
         if(path_error) return path_error; \
     } while(0)
+#else
+#define _GEN_FS_PATH_PARAMETER_VALIDATION(path) (void) path
+#endif
 
 gen_error_t gen_path_canonical(char* output_path, const char* path) {
     if(!output_path) return GEN_INVALID_PARAMETER;

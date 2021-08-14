@@ -23,8 +23,12 @@ There is no error checking performed on entered values, invalid values will resu
 
 ### Compilation Options
 
-Setting in-code options is done via. `-D` flags set via. the Makefile config
+#### Note
+Options pertinent to validation or other debug features are documented in `DEBUG.md`
+
+Setting in-code options can be done via. `-D` flags set via. the config Makefile
+
 |Name|Values|Default|Description|Notes|
 |---|---|---|---|---|
 |`PLATFORM`|`WIN` `DWN` `LNX` `BSD`|Determined by Makefile|The target platform for the compilation|Do not mix platforms in a binary|
-|`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via Makefile to avoid missing mode-specific build operations|
+|`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|

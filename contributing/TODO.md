@@ -30,6 +30,7 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Pretty diffs between source and formatted source
             - Auto-replace vs. warning/error on diff
     - Embedded `dlltool` binary or equivalent script for Windows builds
+    - Validation on Makefile options
 - Documentation
     - Custom static documentation generator
     - Formal writeup for Genesis
@@ -63,8 +64,7 @@ If the project ever garners multiple contributors this can be migrated to Github
     - genesis
         - run tree func
     - perform validation in debug mode
-    - centralised error return value enumeration
-        - Windows GetLastError conversion table (?)
+    - Windows GetLastError conversion table (?)
 - Examples
     - Write examples
         - Build system module examples
