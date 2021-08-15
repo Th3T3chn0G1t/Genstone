@@ -39,11 +39,11 @@ GLOBAL_L_FLAGS =
 
 # The C compiler to use
 # It is not recommended to change this
-COMPILER = /usr/local/Cellar/llvm/12.0.1/bin/clang
+COMPILER = clang
 # The linker to use
 # For the purposes of portability and ease of invocation - this should be the same as the compiler
 # It is not recommended to change this
-LINKER = /usr/local/Cellar/llvm/12.0.1/bin/clang
+LINKER = clang
 
 # The clang-format command line to use
 CLANG_FORMAT = clang-format
