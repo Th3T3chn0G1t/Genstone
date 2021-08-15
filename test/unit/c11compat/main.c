@@ -26,7 +26,8 @@ int main() {
     thrd_t thread;
     thrd_create(&thread, thread_func, NULL);
 
-    while(!child_started);
+    while(!child_started)
+        ;
 
     for(size_t i = 0; i < 10; i++) {
         mtx_lock(&ticks_mtx);

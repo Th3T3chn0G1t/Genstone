@@ -20,7 +20,7 @@
  * Whether to use register variables for iteration in `GEN_FOREACH` statements
  * @note Disabling this can sometimes help with printing iterator values from a debugger
  */
-#define GEN_DEBUG_FOREACH_REGISTER ENABLED
+#define GEN_DEBUG_FOREACH_REGISTER DISABLED
 #endif
 #ifndef GEN_DEBUG_FOREACH_PRECALC
 /**
@@ -28,16 +28,16 @@
  * @note This will cause `GEN_FOREACH` statements to produce some pseudo-mangled variables for the length and container
  * @note Disabling this can help with printing length values or container locations
  */
-#define GEN_DEBUG_FOREACH_PRECALC ENABLED
+#define GEN_DEBUG_FOREACH_PRECALC DISABLED
 #endif
 #else
 #ifndef GEN_DEBUG_PATH_VALIDATION
 #define GEN_DEBUG_PATH_VALIDATION DISABLED
 #endif
 #ifndef GEN_DEBUG_FOREACH_REGISTER
-#define GEN_DEBUG_FOREACH_REGISTER DISABLED
+#define GEN_DEBUG_FOREACH_REGISTER ENABLED
 #endif
 #ifndef GEN_DEBUG_FOREACH_PRECALC
-#define GEN_DEBUG_FOREACH_PRECALC DISABLED
+#define GEN_DEBUG_FOREACH_PRECALC ENABLED
 #endif
 #endif

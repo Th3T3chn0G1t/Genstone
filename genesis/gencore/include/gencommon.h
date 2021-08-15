@@ -158,6 +158,7 @@ GEN_DIAG_REGION_END
         fprintf(stderr, "Require failed - Invalid control path reached at line %i in %s\n", __LINE__, __FILE__); \
         abort(); \
     } while(0)
+
 #if GEN_DEBUG_FOREACH_REGISTER == ENABLED
 /**
  * @internal

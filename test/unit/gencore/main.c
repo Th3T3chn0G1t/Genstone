@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
-#include <genesis.h>
 #include <gencommon.h>
+#include <genesis.h>
 
 static int root_data_storage;
 static gen_node_t root;
 
 const static char ROOT_TYPE_NAME[] = "ROOT";
 static unsigned long type_loader(const char* type_name, void* passthrough) {
-    if(!strncmp(type_name, ROOT_TYPE_NAME, sizeof(ROOT_TYPE_NAME))) return GEN_ROOT_TYPE;
+    if(!strncmp(type_name, ROOT_TYPE_NAME, sizeof(ROOT_TYPE_NAME)))
+        return GEN_ROOT_TYPE;
 
     return ULONG_MAX;
 }
@@ -38,14 +39,14 @@ static void root_data_exporter(char* output, const gen_node_t* node, void* passt
 
 int main() {
     puts("Testing gen_node_import()...");
-    gen_node_importer_data_handler_t data_handlers[] = { root_data_loader };
+    gen_node_importer_data_handler_t data_handlers[] = {root_data_loader};
     gen_node_import(&root, source, type_loader, data_handlers, NULL);
 
     GEN_REQUIRE_EQUAL(GEN_ROOT_TYPE, root.type);
     GEN_REQUIRE_EQUAL(127, *(int*) root.data);
 
     puts("Testing gen_node_export()...");
-    gen_node_exporter_data_handler_t export_handlers[] = { root_data_exporter };
+    gen_node_exporter_data_handler_t export_handlers[] = {root_data_exporter};
     size_t output_length = (4 + 1 /* ROOT\n */) + (3 + 1 /* 127\n */) + (1 /* \n */) + (1 /* \0 */);
     char* output = malloc(output_length);
     gen_node_export(output, &root, type_exporter, export_handlers, NULL);

@@ -4,17 +4,14 @@
 #include <genargs.h>
 #include <gencommon.h>
 
-static const char short_args[] = {
-    'f',
-    'b'
-};
+static const char short_args[] = {'f', 'b'};
 
-static const char* long_args[] = {
-    "fizz",
-    "buzz"
-};
+static const char* long_args[] = {"fizz", "buzz"};
 
-static void arg_callback(const gen_arg_type_t type, const unsigned long argn, const char* value, void* passthrough) {
+static void arg_callback(const gen_arg_type_t type,
+                         const unsigned long argn,
+                         const char* value,
+                         void* passthrough) {
     switch(type) {
         case GEN_ARG_SHORT: {
             switch(argn) {
@@ -37,7 +34,7 @@ static void arg_callback(const gen_arg_type_t type, const unsigned long argn, co
                 case 0: {
                     // `--fizz`
                     GEN_REQUIRE_EQUAL(NULL, value);
-                    break;                    
+                    break;
                 }
                 case 1: {
                     // `--buzz`
@@ -56,11 +53,11 @@ static void arg_callback(const gen_arg_type_t type, const unsigned long argn, co
     }
 }
 
-int main() {    
-    const char* argv[] = { "-f", "-bfoo", "--fizz", "--buzz=foo", "bar" };
+int main() {
+    const char* argv[] = {"-f", "-bfoo", "--fizz", "--buzz=foo", "bar"};
     const int argc = sizeof(argv) / sizeof(argv[0]);
 
     gen_error_t error = gen_parse_args(argc, argv, arg_callback, 2, short_args, 2, long_args, NULL);
-    
+
     GEN_REQUIRE_EQUAL(GEN_OK, error);
 }

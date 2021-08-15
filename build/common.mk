@@ -124,7 +124,7 @@ ifeq ($(TEST),BUILD)
 endif
 
 %$(OBJECT_SUFFIX): %.c
-	$(CLANG_FORMAT) --dry-run -Werror --style=file $<
+	$(CLANG_FORMAT) --style=file -i $<
 	$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
 %$(STATIC_LIB_SUFFIX):

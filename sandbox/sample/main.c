@@ -5,7 +5,7 @@
 #include <genesis.h>
 
 static int appticks = 0;
-static gen_node_t approot = { GEN_ROOT_TYPE, sizeof(int), &appticks, 0, NULL, NULL };
+static gen_node_t approot = {GEN_ROOT_TYPE, sizeof(int), &appticks, 0, NULL, NULL};
 static mtx_t approot_mtx;
 static gen_node_handler_t* nodehandlers;
 

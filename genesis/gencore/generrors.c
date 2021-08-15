@@ -44,4 +44,3 @@ gen_error_t gen_convert_winerr(int error) {
     return GEN_UNKNOWN;
 #endif
 }
-
