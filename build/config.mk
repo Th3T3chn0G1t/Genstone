@@ -9,7 +9,7 @@ PLATFORM = DEFAULT
 
 # Set build optimization mode
 # Possible values are
-# `DEBUG`: Include debug information, no optimization
+# `DEBUG`: Include debug information, reduced/minimal optimization
 # `RELEASE`: Don't include debug information, highest optimization
 BUILD_MODE = DEBUG
 
@@ -39,15 +39,21 @@ GLOBAL_L_FLAGS =
 
 # The C compiler to use
 # It is not recommended to change this
-COMPILER = clang
+COMPILER = /usr/local/Cellar/llvm/12.0.1/bin/clang
 # The linker to use
-# For the purposes of portability and ease of invocation -
-# This should be the same as the compiler
+# For the purposes of portability and ease of invocation - this should be the same as the compiler
 # It is not recommended to change this
-LINKER = clang
+LINKER = /usr/local/Cellar/llvm/12.0.1/bin/clang
 
 # The clang-format command line to use
 CLANG_FORMAT = clang-format
 
 # The IDE to generate IDE configuration for with `ideconf` target
 IDE =
+
+# Debugging for the build system
+# You probably don't need to enable this
+# Possible values are:
+# `ENABLED`: Enables build system debugging
+# `DISABLED`: Disables build system debugging
+BUILD_SYS_DEBUG = ENABLED

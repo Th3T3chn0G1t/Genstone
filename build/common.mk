@@ -32,15 +32,31 @@ SEP = /
 CP = cp
 RM = rm
 RMDIR = rm -rf
+DIFF = diff
 ifeq ($(SHELL),cmd.exe)
 	SEP = \\
 	CP = copy /b /y
 	RM = del
 	RMDIR = rmdir
+	DIFF = fc
 endif
 
 GLOBAL_C_FLAGS += -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
+
+ifeq ($(BUILD_SYS_DEBUG),ENABLED)
+ifeq ($(PLATFORM),DWN)
+ifneq ($(shell which $(COMPILER)),/usr/bin/clang)
+GLOBAL_C_FLAGS += -fproc-stat-report
+endif
+ifneq ($(shell which $(LINKER)),/usr/bin/clang)
+GLOBAL_L_FLAGS += -fproc-stat-report
+endif
+else
+GLOBAL_C_FLAGS += -fproc-stat-report
+GLOBAL_L_FLAGS += -fproc-stat-report
+endif
+endif
 
 ifeq ($(PLATFORM),WIN)
 	LIB_PREFIX =
@@ -94,7 +110,7 @@ endif
 
 ifeq ($(BUILD_MODE),RELEASE)
 # We don't use NDEBUG in the codebase so this is provided for convenience
-	GLOBAL_C_FLAGS += -O3 -msse2 -mavx2 -DNDEBUG
+	GLOBAL_C_FLAGS += -Ofast -ffast-math -msse2 -mavx2 -DNDEBUG -flto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
 	ifeq ($(PLATFORM),WIN)
@@ -102,7 +118,13 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 	endif
 else
-	GLOBAL_C_FLAGS += -g -O0
+	GLOBAL_C_FLAGS += -glldb -O0 -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro
+	GLOBAL_L_FLAGS += -fsanitize=address,undefined
+	ifneq ($(PLATFORM),DWN)
+		GLOBAL_C_FLAGS +=  -g -O0 -flto -fsanitize=dataflow,safe-stack
+		GLOBAL_L_FLAGS += -flto -fsanitize=dataflow,safe-stack
+	endif
+
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
 	ifeq ($(PLATFORM),WIN)
@@ -123,10 +145,14 @@ ifeq ($(TEST),BUILD)
 	TEST_BUILD = 1
 endif
 
+clean_tmpfile:
+	-$(RM) $(wildcard *.tmp)
+
 %$(OBJECT_SUFFIX): %.c
-	-($(CLANG_FORMAT) --style=file $< > $<-format.tmp) && (diff $<-format.tmp $< > /dev/stderr)
-	$(CLANG_FORMAT) --dry-run -Werror $<
+	-($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
+	-$(CLANG_FORMAT) --dry-run -Werror $<
 	$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
+
 %$(STATIC_LIB_SUFFIX):
 	$(STATIC_LIB_TOOL)
 

@@ -189,7 +189,7 @@ GEN_DIAG_REGION_END
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
 #define _GEN_FOREACH_PREDECL(iter, memb, len, container) \
-    __typeof__((container)[0])* const _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])*) (container); \
+    const __typeof__((container)[0])* const _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])* const) (container); \
     const _GEN_FOREACH_ITER_DECL _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) = (const _GEN_FOREACH_ITER_DECL) (len)
 #else
 #define _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (len)

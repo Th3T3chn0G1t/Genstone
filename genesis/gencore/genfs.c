@@ -44,7 +44,8 @@ gen_error_t gen_path_canonical(char* output_path, const char* path) {
     return GEN_OK;
 }
 
-gen_error_t gen_path_relative(char* output_path, const char* path, const char* to) {
+gen_error_t
+gen_path_relative(char* output_path, const char* path, const char* to) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -172,7 +173,8 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* 
         output_handle->directory_handle = opendir(path);
         if(!output_handle->directory_handle)
             return gen_convert_errno(errno);
-    } else {
+    }
+    else {
         output_handle->dir = false;
         output_handle->file_handles[1] = fopen(path, "w+");
         if(!output_handle->file_handles[1])
@@ -195,7 +197,8 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* handle) {
         int error = closedir(handle->directory_handle);
         if(error)
             return gen_convert_errno(errno);
-    } else {
+    }
+    else {
         int error = fclose(handle->file_handles[0]);
         if(error)
             return gen_convert_errno(errno);
@@ -225,10 +228,7 @@ size_t gen_handle_size(const gen_filesystem_handle_t* handle) {
     return mark;
 }
 
-gen_error_t gen_file_read(uint8_t* output_buffer,
-                          const gen_filesystem_handle_t* handle,
-                          const size_t start,
-                          const size_t end) {
+gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(handle->dir)
@@ -240,7 +240,8 @@ gen_error_t gen_file_read(uint8_t* output_buffer,
     if(error)
         return gen_convert_errno(errno);
 
-    error = fread(output_buffer, sizeof(char), end - start, handle->file_handles[0]);
+    error = fread(
+        output_buffer, sizeof(char), end - start, handle->file_handles[0]);
     if(!error) {
         if(ferror(handle->file_handles[0]))
             error = errno;
@@ -256,8 +257,7 @@ gen_error_t gen_file_read(uint8_t* output_buffer,
     return GEN_OK;
 }
 
-gen_error_t
-gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const uint8_t* buffer) {
+gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const uint8_t* buffer) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(handle->dir)
@@ -265,7 +265,8 @@ gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, cons
     if(!buffer)
         return GEN_INVALID_PARAMETER;
 
-    size_t error = fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
+    size_t error =
+        fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
     if(!error) {
         if(ferror(handle->file_handles[1]))
             error = errno;
@@ -281,9 +282,7 @@ gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, cons
     return GEN_OK;
 }
 
-gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle,
-                               const gen_directory_list_handler_t handler,
-                               void* passthrough) {
+gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle, const gen_directory_list_handler_t handler, void* passthrough) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(!handle->dir)
@@ -298,7 +297,8 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle,
             return gen_convert_errno(errno);
         if(entry->d_name[0] == '.' && entry->d_name[1] == '\0')
             continue;
-        if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0')
+        if(entry->d_name[0] == '.' && entry->d_name[1] == '.'
+           && entry->d_name[2] == '\0')
             continue;
 
         handler(entry->d_name, passthrough);

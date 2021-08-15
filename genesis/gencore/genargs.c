@@ -3,14 +3,7 @@
 
 #include "include/genargs.h"
 
-gen_error_t gen_parse_args(const int argc,
-                           const char** argv,
-                           const gen_arg_handler_t callback,
-                           size_t n_short_args,
-                           const char* short_args,
-                           size_t n_long_args,
-                           const char** long_args,
-                           void* passthrough) {
+gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, size_t n_short_args, const char* short_args, size_t n_long_args, const char** long_args, void* passthrough) {
     // Precalculating the long args' lengths to save time while looping
     size_t long_arg_lens[n_long_args];
     GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {
@@ -29,8 +22,9 @@ gen_error_t gen_parse_args(const int argc,
                 GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
                     const size_t len = long_arg_lens[j];
 
-                    // Calculating inline instead of using strncmp to remove the stdlib dependency
-                    // Also might be very slightly faster given the specific use-case
+                    // Calculating inline instead of using strncmp to remove the
+                    // stdlib dependency Also might be very slightly faster
+                    // given the specific use-case
                     GEN_FOREACH_PTR(k, arg_char, len, *long_arg) {
                         if(*arg_char != (*arg)[k + 2])
                             goto long_arg_continue;
@@ -43,7 +37,8 @@ gen_error_t gen_parse_args(const int argc,
                 long_arg_continue:
                     continue;
                 }
-            } else {
+            }
+            else {
                 type = GEN_ARG_SHORT;
                 GEN_FOREACH_PTR(j, short_arg, n_short_args, short_args) {
                     if((*short_arg) != (*arg)[1])
@@ -56,7 +51,8 @@ gen_error_t gen_parse_args(const int argc,
                     break;
                 }
             }
-        } else {
+        }
+        else {
             type = GEN_ARG_RAW;
             argn = 0;
             value = (*arg);

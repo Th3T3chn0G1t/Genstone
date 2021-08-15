@@ -26,6 +26,7 @@ If the project ever garners multiple contributors this can be migrated to Github
             - Pretty names
             - Diagnostic output
         - Debugging
+    - Fix clang-format file - it wraps horribly
     - Embedded `dlltool` binary or equivalent script for Windows builds
     - Validation on Makefile options
 - Documentation

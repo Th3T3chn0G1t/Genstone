@@ -7,12 +7,11 @@
 static int root_data_storage;
 static gen_node_t root;
 
-const static char ROOT_TYPE_NAME[] = "ROOT";
+#define ROOT_TYPE_NAME "ROOT"
 static unsigned long type_loader(const char* type_name, void* passthrough) {
-    if(!strncmp(type_name, ROOT_TYPE_NAME, sizeof(ROOT_TYPE_NAME)))
-        return GEN_ROOT_TYPE;
+    GEN_REQUIRE_EQUAL_STRING(ROOT_TYPE_NAME, type_name);
 
-    return ULONG_MAX;
+    return GEN_ROOT_TYPE;
 }
 
 static void root_data_loader(gen_node_t* node, const char* data_string, void* passthrough) {

@@ -29,6 +29,8 @@ include $(BUILTIN_MODULES)
 include $(SANDBOX_PROJECT_MODULE)
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))))
 
+MODULE_CLEAN_TARGETS += clean_tmpfile
+
 .DEFAULT_GOAL := all
 all: $(BUILD_PREREQS) $(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) $(BUILD_POST)
 
