@@ -45,17 +45,9 @@ GLOBAL_C_FLAGS += -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISAB
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 ifeq ($(BUILD_SYS_DEBUG),ENABLED)
-ifeq ($(PLATFORM),DWN)
-ifneq ($(shell which $(COMPILER)),/usr/bin/clang)
-GLOBAL_C_FLAGS += -fproc-stat-report
-endif
-ifneq ($(shell which $(LINKER)),/usr/bin/clang)
-GLOBAL_L_FLAGS += -fproc-stat-report
-endif
-else
-GLOBAL_C_FLAGS += -fproc-stat-report
-GLOBAL_L_FLAGS += -fproc-stat-report
-endif
+# Need to check clang version for this to work (12.0.1?)
+# 	GLOBAL_C_FLAGS += -fproc-stat-report
+# 	GLOBAL_L_FLAGS += -fproc-stat-report
 endif
 
 ifeq ($(PLATFORM),WIN)
@@ -121,8 +113,8 @@ else
 	GLOBAL_C_FLAGS += -glldb -O0 -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro
 	GLOBAL_L_FLAGS += -fsanitize=address,undefined
 	ifneq ($(PLATFORM),DWN)
-		GLOBAL_C_FLAGS +=  -g -O0 -flto -fsanitize=dataflow,safe-stack
-		GLOBAL_L_FLAGS += -flto -fsanitize=dataflow,safe-stack
+		GLOBAL_C_FLAGS +=  -g -O0 -fsanitize=dataflow
+		GLOBAL_L_FLAGS += -fsanitize=dataflow
 	endif
 
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
