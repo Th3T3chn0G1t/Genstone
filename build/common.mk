@@ -112,10 +112,6 @@ ifeq ($(BUILD_MODE),RELEASE)
 else
 	GLOBAL_C_FLAGS += -glldb -O0 -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro
 	GLOBAL_L_FLAGS += -fsanitize=address,undefined
-	ifneq ($(PLATFORM),DWN)
-		GLOBAL_C_FLAGS +=  -g -O0 -fsanitize=dataflow
-		GLOBAL_L_FLAGS += -fsanitize=dataflow
-	endif
 
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
