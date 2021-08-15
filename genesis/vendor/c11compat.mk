@@ -62,6 +62,8 @@ $(C11_COMPAT_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
 $(C11_COMPAT_LIB): LFLAGS =
 $(C11_COMPAT_LIB): $(C11_COMPAT_OBJECTS) | lib
 
+$(C11_COMPAT_OBJECTS): CLANG_FORMAT = DISABLED
+
 clean_c11compat:
 	-rm $(C11_COMPAT_OBJECTS)
 	-rm $(C11_COMPAT_LIB)

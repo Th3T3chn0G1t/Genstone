@@ -26,9 +26,6 @@ If the project ever garners multiple contributors this can be migrated to Github
             - Pretty names
             - Diagnostic output
         - Debugging
-    - `clang-format`
-        - Pretty diffs between source and formatted source
-            - Auto-replace vs. warning/error on diff
     - Embedded `dlltool` binary or equivalent script for Windows builds
     - Validation on Makefile options
 - Documentation
