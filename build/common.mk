@@ -137,8 +137,8 @@ clean_tmpfile:
 	-$(RM) $(wildcard *.tmp)
 
 %$(OBJECT_SUFFIX): %.c
-	-($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
-	-$(CLANG_FORMAT) --dry-run -Werror $<
+# 	 -($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
+# 	 -$(CLANG_FORMAT) --dry-run -Werror $<
 	$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
 %$(STATIC_LIB_SUFFIX):
