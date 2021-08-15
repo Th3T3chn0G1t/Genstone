@@ -27,17 +27,14 @@
 #define generic(...) _Generic(__VA_ARGS__)
 
 /**
- * Diagnostic helper
  * Begins a diagnostic region
  */
 #define GEN_DIAG_REGION_BEGIN pragma("clang diagnostic push")
 /**
- * Diagnostic helper
  * Ends a diagnostic region
  */
 #define GEN_DIAG_REGION_END pragma("clang diagnostic pop")
 /**
- * Diagnostic helper
  * Ignores all extra compiler warnings in a diagnostic region
  */
 #define GEN_DIAG_IGNORE_ALL pragma("clang diagnostic ignored \"-Weverything\"")
@@ -88,7 +85,7 @@ GEN_DIAG_REGION_END
  * Gets the require message from the expected expressions type
  * @param b the expected expression
  */
-#define _gen_require_equal_message(b) \
+#define _GEN_REQUIRE_EQUAL_MESSAGE(b) \
     generic((b), \
         long double: "Require failed - Expected: %s (%Lf) Got: %s (%Lf) at line %i in %s\n", \
         double: "Require failed - Expected: %s (%lf) Got: %s (%lf) at line %i in %s\n", \
@@ -115,11 +112,11 @@ GEN_DIAG_REGION_END
  * @note Determines type to use correct comparison using `generic` on second argument, this is to avoid having cases for `const`
  * @note Only works for trivial types
  */
-#define gen_require_equal(a, b) \
+#define GEN_REQUIRE_EQUAL(a, b) \
     do { \
         if(!__builtin_constant_p(a)) fprintf(stderr, "Expected expression %s is not constant\n", #a); \
         if(a != b) { \
-            fprintf(stderr, _gen_require_equal_message(b), #a, a, #b, b, __LINE__, __FILE__); \
+            fprintf(stderr, _GEN_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
@@ -128,9 +125,9 @@ GEN_DIAG_REGION_END
  * Pretty assertion for equality of strings
  * @param a the expected string
  * @param b the recieved string
- * @note Use `gen_require_equal_memregion` for non-constant expected values
+ * @note Use `GEN_REQUIRE_EQUAL_MEMREGION` for non-constant expected values
  */
-#define gen_require_equal_string(a, b) \
+#define GEN_REQUIRE_EQUAL_STRING(a, b) \
     do { \
         if(!__builtin_constant_p(a)) fprintf(stderr, "Expected expression %s (%s) is not constant at line %i in %s\n", #a, a, __LINE__, __FILE__); \
         if(!b || strcmp(a, b)) { \
@@ -145,7 +142,7 @@ GEN_DIAG_REGION_END
  * @param b the recieved data
  * @param s the amount of data in bytes to compare
  */
-#define gen_require_equal_memregion(a, b, s) \
+#define GEN_REQUIRE_EQUAL_MEMREGION(a, b, s) \
     do { \
         if((!b && s) || memcmp(a, b, s)) { \
             fprintf(stderr, "Require failed - Expected: %s (%p) (%c%c%c...) Got: %s (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char*) a)[0], ((char*) a)[1], ((char*) a)[2], #b, b, ((char*) b)[0], ((char*) b)[1], ((char*) b)[2], __LINE__, __FILE__); \
@@ -156,13 +153,49 @@ GEN_DIAG_REGION_END
 /**
  * Pretty assertion for bad control paths
  */
-#define gen_require_no_reach \
+#define GEN_REQUIRE_NO_REACH \
     do { \
         fprintf(stderr, "Require failed - Invalid control path reached at line %i in %s\n", __LINE__, __FILE__); \
         abort(); \
     } while(0)
-
 #if GEN_DEBUG_FOREACH_REGISTER == ENABLED
+/**
+ * @internal
+ * The type used when declaring an iterator in `GEN_FOREACH`
+ * @see GEN_DEBUG_FOREACH_REGISTER
+ */
+#define _GEN_FOREACH_ITER_DECL register size_t
+#else
+#define _GEN_FOREACH_ITER_DECL size_t
+#endif
+
+#if GEN_DEBUG_FOREACH_PRECALC == ENABLED
+/**
+ * @internal
+ * The identifier to use in the loop for accessing `len`
+ * @see GEN_DEBUG_FOREACH_PRECALC
+ */
+#define _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (_gen_foreach_length__##iter##__##memb##__##__func__##__LINE__);
+/**
+ * @internal
+ * The identifier to use in the loop for accessing `container`
+ * @see GEN_DEBUG_FOREACH_PRECALC
+ */
+#define _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (_gen_foreach_container__##iter##__##memb##__##__func__##__LINE__);
+/**
+ * @internal
+ * Predeclarations for `GEN_FOREACH` statements
+ * @see GEN_DEBUG_FOREACH_PRECALC
+ */
+#define _GEN_FOREACH_PREDECL(iter, memb, len, container) \
+    __typeof__((container)[0])* const _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])*) (container); \
+    const _GEN_FOREACH_ITER_DECL _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) = (const _GEN_FOREACH_ITER_DECL) (len)
+#else
+#define _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (len)
+#define _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (container) 
+#define _GEN_FOREACH_PREDECL(iter, memb, len, container) (void) NULL
+#endif
+
 /**
  * Iterates over a container with explicit length
  * @param iter the identifier to use for the iterating index
@@ -170,10 +203,12 @@ GEN_DIAG_REGION_END
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
+ * @see GEN_DEBUG_FOREACH_PRECALC
  */
 #define GEN_FOREACH(iter, memb, len, container) \
-    __typeof__((container)[0]) memb = (container)[0]; \
-    for(register size_t iter = SIZE_MAX; ++iter < (len); memb = (container)[iter + 1])
+    _GEN_FOREACH_PREDECL(iter, memb, len, container); \
+    __typeof__(_GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]) memb = _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]; \
+    for(_GEN_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len); memb = _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[iter + 1])
 /**
  * Iterates over a container with explicit length
  * `memb` is a pointer to the indexed member
@@ -185,14 +220,6 @@ GEN_DIAG_REGION_END
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
     __typeof__((container)[0])* memb = &(container)[0]; \
-    for(register size_t iter = SIZE_MAX; ++iter < (len); memb = &(container)[iter + 1])
-#else
-#define GEN_FOREACH(iter, memb, len, container) \
-    __typeof__((container)[0]) memb = (container)[0]; \
-    for(size_t iter = SIZE_MAX; ++iter < (len); memb = (container)[iter + 1])
-#define GEN_FOREACH_PTR(iter, memb, len, container) \
-    __typeof__((container)[0])* memb = &(container)[0]; \
-    for(register size_t iter = SIZE_MAX; ++iter < (len); memb = &(container)[iter + 1])
-#endif
+    for(_GEN_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (len); memb = &(container)[iter + 1])
 
 #endif

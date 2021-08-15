@@ -41,8 +41,8 @@ int main() {
     gen_node_importer_data_handler_t data_handlers[] = { root_data_loader };
     gen_node_import(&root, source, type_loader, data_handlers, NULL);
 
-    gen_require_equal(GEN_ROOT_TYPE, root.type);
-    gen_require_equal(127, *(int*) root.data);
+    GEN_REQUIRE_EQUAL(GEN_ROOT_TYPE, root.type);
+    GEN_REQUIRE_EQUAL(127, *(int*) root.data);
 
     puts("Testing gen_node_export()...");
     gen_node_exporter_data_handler_t export_handlers[] = { root_data_exporter };
@@ -52,5 +52,5 @@ int main() {
     output[output_length - 2] = '\n'; // In an actual impl the child nodes would be loaded
     output[output_length - 1] = '\0';
 
-    gen_require_equal_string(source, output);
+    GEN_REQUIRE_EQUAL_STRING(source, output);
 }

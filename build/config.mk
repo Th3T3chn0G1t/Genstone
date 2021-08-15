@@ -46,5 +46,9 @@ COMPILER = clang
 # It is not recommended to change this
 LINKER = clang
 
+# The clang-format command line to use
+# If not set, build system will omit formatting checks
+CLANG_FORMAT = clang-format
+
 # The IDE to generate IDE configuration for with `ideconf` target
 IDE =

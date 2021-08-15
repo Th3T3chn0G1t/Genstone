@@ -20,15 +20,15 @@ static void arg_callback(const gen_arg_type_t type, const unsigned long argn, co
             switch(argn) {
                 case 0: {
                     // `-f`
-                    gen_require_equal(NULL, value);
+                    GEN_REQUIRE_EQUAL(NULL, value);
                     break;
                 }
                 case 1: {
                     // `-b`
-                    gen_require_equal_string("foo", value);
+                    GEN_REQUIRE_EQUAL_STRING("foo", value);
                     break;
                 }
-                default: gen_require_no_reach;
+                default: GEN_REQUIRE_NO_REACH;
             }
             break;
         }
@@ -36,23 +36,23 @@ static void arg_callback(const gen_arg_type_t type, const unsigned long argn, co
             switch(argn) {
                 case 0: {
                     // `--fizz`
-                    gen_require_equal(NULL, value);
+                    GEN_REQUIRE_EQUAL(NULL, value);
                     break;                    
                 }
                 case 1: {
                     // `--buzz`
-                    gen_require_equal_string("foo", value);
+                    GEN_REQUIRE_EQUAL_STRING("foo", value);
                     break;
                 }
-                default: gen_require_no_reach;
+                default: GEN_REQUIRE_NO_REACH;
             }
             break;
         }
         case GEN_ARG_RAW: {
-            gen_require_equal_string("bar", value);
+            GEN_REQUIRE_EQUAL_STRING("bar", value);
             break;
         }
-        default: gen_require_no_reach;
+        default: GEN_REQUIRE_NO_REACH;
     }
 }
 
@@ -62,5 +62,5 @@ int main() {
 
     gen_error_t error = gen_parse_args(argc, argv, arg_callback, 2, short_args, 2, long_args, NULL);
     
-    gen_require_equal(GEN_OK, error);
+    GEN_REQUIRE_EQUAL(GEN_OK, error);
 }

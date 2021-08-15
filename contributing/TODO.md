@@ -62,6 +62,7 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Increase the tolerances on gen_path_relative
     - gencommon
         - streq to replace strcmp
+    - **Profiling**
     - generator (editor)
     - genesis
         - run tree func

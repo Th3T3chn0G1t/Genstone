@@ -33,6 +33,7 @@ MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJE
 all: $(BUILD_PREREQS) $(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) $(BUILD_POST)
 
 clean: $(MODULE_CLEAN_TARGETS)
+	@echo "All clean!"
 
 lib:
 	mkdir $@

@@ -37,7 +37,7 @@ int main() {
     int result;
     thrd_join(thread, &result);
 
-    gen_require_equal(20, ticks);
+    GEN_REQUIRE_EQUAL(20, ticks);
 
     mtx_destroy(&ticks_mtx);
 }
