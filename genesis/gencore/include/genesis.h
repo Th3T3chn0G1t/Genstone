@@ -10,6 +10,8 @@
 #ifndef GENESIS_H
 #define GENESIS_H
 
+#include "generrors.h"
+
 /**
  * @internal
  * Forward declaration of node type for pointers to children and parent
@@ -70,7 +72,7 @@ typedef void (*gen_node_importer_data_handler_t)(gen_node_t*, const char*, void*
  * @param data_handlers the data-string import handlers, should be at least the count of the largest type enumeration value
  * @param passthrough a passthrough to the handler
  */
-extern void gen_node_import(gen_node_t* output_node, const char* source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* data_handlers, void* passthrough);
+extern gen_error_t gen_node_import(gen_node_t* output_node, const char* source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* data_handlers, void* passthrough);
 
 /**
  * Export handler for all node types
@@ -89,7 +91,7 @@ typedef void (*gen_node_exporter_data_handler_t)(char*, const gen_node_t*, void*
  * @param data_handlers the export handlers, should be at least the count of the largest type enumeration value
  * @param passthrough a passthrough to the handler
  */
-extern void gen_node_export(char* output_source, const gen_node_t* node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* data_handlers, void* passthrough);
+extern gen_error_t gen_node_export(char* output_source, const gen_node_t* node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* data_handlers, void* passthrough);
 
 /**
  * Built in node type for the apptree root

@@ -6,7 +6,6 @@ This document is purposely being kept off Github issues to create distinction be
 If the project ever garners multiple contributors this can be migrated to Github issues
 
 - Building
-    - Fix clang-format
     - Generators
         - Default project
         - IDE-friendly development project (just binaries and headers)
@@ -25,18 +24,17 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Formal writeup for Genesis
     - Automatic Github action for documentation generator
     - Github pages for generated docpages
-- Development
-    - Contribution
-        - Comprehensive contribution guidelines
-        - Contribution ettiquette
+- Contribution
+    - Comprehensive contribution guidelines
+    - Contribution ettiquette
     - Clang-tidy
     - Clang-format
+- Development
+    - Logger
     - CI
         - Static analysis
         - Prebuilt binaries
     - Argument parser
-    - Move Mesa thread compat function implementations to source file for inclusion in c11compat lib
-    - Get tgmath.h working under windows
     - Execution environment utilities
         - rpath
         - loaded dylibs

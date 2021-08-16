@@ -3,7 +3,14 @@
 
 #include "include/genargs.h"
 
-gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, size_t n_short_args, const char* short_args, size_t n_long_args, const char** long_args, void* passthrough) {
+gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, const size_t n_short_args, const char* short_args, const size_t n_long_args, const char** long_args, void* passthrough) {
+    if(!argc) return GEN_OK;
+    if(!argv) return GEN_INVALID_PARAMETER;
+    if(argc < 0) return GEN_INVALID_PARAMETER;
+    if(!callback) return GEN_INVALID_PARAMETER;
+    if(n_short_args && !short_args) return GEN_INVALID_PARAMETER;
+    if(n_long_args && !long_args) return GEN_INVALID_PARAMETER;
+
     // Precalculating the long args' lengths to save time while looping
     size_t long_arg_lens[n_long_args];
     GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {

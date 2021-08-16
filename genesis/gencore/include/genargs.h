@@ -49,6 +49,6 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char
  * @param passthrough a passthrough argument for the handler
  * @return an error code
  */
-extern gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, size_t n_short_args, const char* short_args, size_t n_long_args, const char** long_args, void* passthrough);
+extern gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* short_args, const size_t n_long_args, const char** long_args, void* passthrough);
 
 #endif
