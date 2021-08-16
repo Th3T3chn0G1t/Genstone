@@ -3,6 +3,10 @@ SAMPLE_OBJECTS = $(SAMPLE_SOURCES:.c=.o)
 
 SAMPLE_EXEC = sample$(EXECUTABLE_SUFFIX)
 
+build_message_sample:
+	@echo "$(SECTION_PREFIX) Sample Project"
+	@echo "$(INFO_PREFIX) Genesis sandbox sample project!"
+
 sample: $(SAMPLE_EXEC)
 
 $(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)

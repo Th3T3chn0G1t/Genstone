@@ -32,10 +32,45 @@ MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(SANDBOX_PROJE
 MODULE_CLEAN_TARGETS += clean_tmpfile
 
 .DEFAULT_GOAL := all
-all: $(BUILD_PREREQS) $(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) $(BUILD_POST)
 
-clean: $(MODULE_CLEAN_TARGETS)
-	@echo "All clean!"
+build_message_pre_build:
+	@echo "$(SECTION_PREFIX) Pre-Build"
+ifneq ($(DISABLED_MODULES),)
+	@echo "$(INFO_PREFIX) Excluding disabled targets: $(addprefix \n   - ,$(DISABLED_MODULES))"
+endif
+ifneq ($(ERROR),)
+	@echo $(ERROR)
+	@exit 1
+endif
+
+ifeq ($(DISABLED_MODULES),)
+ifeq ($(ERROR),)
+	@echo "$(INFO_PREFIX) Nothing to do!"
+endif
+endif
+
+BUILD_TARGETS = \
+	$(filter-out $(DISABLED_MODULES),\
+		build_message_pre_build \
+		$(BUILD_PREREQS) \
+		$(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) \
+		$(BUILD_POST) \
+	)
+
+all: $(BUILD_TARGETS)
+
+list:
+	@echo "$(INFO_PREFIX) Targets to be built for \`all\`: $(addprefix \n   - ,$(BUILD_TARGETS))"
+	@echo "$(INFO_PREFIX) Excluded targets: $(addprefix \n   - ,$(DISABLED_MODULES))"
+	@echo "$(NOTE_PREFIX) For a list of all available targets and their descriptions, see \`make help\`"
+
+build_message_clean:
+	@echo "$(SECTION_PREFIX) Clean"
+	@echo "$(INFO_PREFIX) Cleaning up build artifacts from all modules"
+	@echo "$(NOTE_PREFIX) To clean an individual module, use \`make clean_MODULE_NAME\`$(ACTION_PREFIX)"
+
+clean: build_message_clean $(MODULE_CLEAN_TARGETS)
+	@echo "$(ACTION_SUFFIX)$(INFO_PREFIX) All clean!"
 
 lib:
 	mkdir $@

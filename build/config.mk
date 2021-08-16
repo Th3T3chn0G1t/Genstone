@@ -23,6 +23,9 @@ BUILD_PREREQS =
 # Post-build rule names
 BUILD_POST =
 
+# A list of module names to exclude from the build
+DISABLED_MODULES =
+
 # Runs tests as part of an appropriate build stage
 # Possible values are:
 # `BUILD`: Tests the build system
@@ -32,7 +35,7 @@ TEST = ALL
 
 # Flags to be provided to the compiler at every call
 # Does not get applied to 3rd party compilation
-GLOBAL_C_FLAGS = -std=c17
+GLOBAL_C_FLAGS =
 # Flags to be provided to the linker at every call
 # Does not get applied to 3rd party linkage
 GLOBAL_L_FLAGS =

@@ -14,6 +14,9 @@ Variables to influence the way an application or module is built with Genesis
 
 ### Makefile Options
 
+#### Note
+These options can be overriden with a variable `OVERRIDE_keyname` in the executing environment. e.g. `OVERRIDE_COMPILER=gcc make`
+
 Set options for the build process itself (e.g. for cross-compilation) in `build/config.mk`. All variables are commented to explain their purpose and possible values
 
 Additional build targets exist for building IDE configuration files (`ideconf`) and documentation (`docs`). These targets' settings are also controlled by values in `build/config.mk`. `ideconf` will overwrite existing configuration and does not behave differently on subsequent invocations (i.e. calling once and then modifying is recommended)

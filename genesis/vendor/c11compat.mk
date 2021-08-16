@@ -46,6 +46,10 @@ ifeq ($(PLATFORM),BSD)
 	C11_COMPAT_LFLAGS = -pthread
 endif
 
+build_message_c11compat:
+	@echo "$(SECTION_PREFIX) C11 Compat"
+	@echo "$(INFO_PREFIX) C11 optional feature compatibility layers"
+
 ifeq ($(C11_COMPAT),1)
 ifeq ($(C11_COMPAT_UCHAR),1)
 C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/musl/include
@@ -56,7 +60,7 @@ C11_COMPAT_OBJECTS = $(C11_COMPAT_SOURCES:.c=.o)
 
 C11_COMPAT_LIB = lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
 
-c11compat: $(C11_COMPAT_LIB)
+c11compat: build_message_c11compat $(C11_COMPAT_LIB)
 
 $(C11_COMPAT_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
 $(C11_COMPAT_LIB): LFLAGS =
@@ -74,6 +78,6 @@ endif
 endif
 
 ifneq ($(C11_COMPAT_UCHAR),1)
-c11compat:
+c11compat: build_message_c11compat
 clean_c11compat:
 endif

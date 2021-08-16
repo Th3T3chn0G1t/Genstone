@@ -6,8 +6,7 @@ This document is purposely being kept off Github issues to create distinction be
 If the project ever garners multiple contributors this can be migrated to Github issues
 
 - Building
-    - Allow overriding of config options via. environment
-    - Make deps. on headers
+    - Fix clang-format
     - Generators
         - Default project
         - IDE-friendly development project (just binaries and headers)
@@ -19,16 +18,8 @@ If the project ever garners multiple contributors this can be migrated to Github
             - Loc
             - Development time
     - Embedded toolchain
+        - Embedded `dlltool` binary or equivalent script for Windows builds
     - Visual build tool for options
-    - Modules
-        - Enabling/Disabling
-        - Output
-            - Pretty names
-            - Diagnostic output
-        - Debugging
-    - Fix clang-format file - it wraps horribly
-    - Embedded `dlltool` binary or equivalent script for Windows builds
-    - Validation on Makefile options
 - Documentation
     - Custom static documentation generator
     - Formal writeup for Genesis

@@ -12,13 +12,19 @@ BUILD_TEST_LIB_OBJECTS = $(BUILD_TEST_LIB_SOURCES:.c=$(OBJECT_SUFFIX))
 BUILD_TEST_LIB_DYNAMIC = lib/$(LIB_PREFIX)test_dynamic$(DYNAMIC_LIB_SUFFIX)
 BUILD_TEST_LIB_STATIC = lib/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
-build_test: $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib
+build_message_build_test:
+	@echo "$(SECTION_PREFIX) Build Test"
+	@echo "$(INFO_PREFIX) Testing build configuration"
+
+build_test: build_message_build_test $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib
+	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_STATIC)$(ACTION_SUFFIX)"
+	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_DYNAMIC)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_STATIC))
-	cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_DYNAMIC))
+	@cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_STATIC))
+	@cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_DYNAMIC))
 else
-	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
-	LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
+	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
+	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
 endif
 
 $(BUILD_TEST_EXEC_DYNAMIC): LFLAGS = -Llib -ltest_dynamic
