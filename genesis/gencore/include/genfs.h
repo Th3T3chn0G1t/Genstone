@@ -20,8 +20,8 @@
 #include <unistd.h>
 /**
  * The OS library's maximum length of a path
- * @note does not currently support Windows 10 1607 long paths
- * @note does not neccesarily represent the maximum length of a path supported by every filesystem
+ * @note Does not currently support Windows 10 1607 long paths
+ * @note Does not neccesarily represent the maximum length of a path supported by every filesystem
  */
 #define GEN_PATH_MAX PATH_MAX
 #endif
@@ -33,7 +33,7 @@ typedef void (*gen_directory_list_handler_t)(const char*, void*);
 
 /**
  * A handle to a filesystem object
- * @note directly modifying the internal handles may cause undefined behaviour
+ * @note Directly modifying the internal handles may cause undefined behaviour
  */
 typedef struct {
     /**
@@ -61,7 +61,7 @@ typedef struct {
  * Gets the canonical representation of a path
  * @param output_path storage for the output path. Should be GEN_PATH_MAX in size if length is unknown
  * @param path the path to get a canonical representation for
- * @note under windows, GEN_PATH_MAX will be provided to GetFullPathNameA nBufferLength in all cases
+ * @note Under windows, GEN_PATH_MAX will be provided to GetFullPathNameA nBufferLength in all cases
  * @return an error code
  */
 extern gen_error_t gen_path_canonical(char* output_path, const char* path);
@@ -71,7 +71,7 @@ extern gen_error_t gen_path_canonical(char* output_path, const char* path);
  * @param output_path storage for the output path. Should be GEN_PATH_MAX in size if length is unknown
  * @param path the canonical path to get a relative representation for
  * @param to the canonical path to make path relative to
- * @note if the path cannot be made relative, the output is set equal to path
+ * @note If the path cannot be made relative, the output is set equal to path
  * @return an error code
  */
 extern gen_error_t gen_path_relative(char* output_path, const char* path, const char* to);
@@ -118,7 +118,7 @@ extern gen_error_t gen_path_validate(const char* path);
  * Creates a directory
  * @param path the directory path to create
  * @return an error code
- * @note will create with the default access flags for the platform, or a reasonable default if not applicable
+ * @note Will create with the default access flags for the platform, or a reasonable default if not applicable
  */
 extern gen_error_t gen_path_create_dir(const char* path);
 
@@ -159,8 +159,8 @@ extern size_t gen_handle_size(const gen_filesystem_handle_t* handle);
  * @param handle a handle to a file object whose content to read. Must not be a directory
  * @param start an offset from the start of the file to begin reading from
  * @param end an offset from the start of the file to end reading from
- * @note use gen_handle_size as the end mark to read the whole file
- * @note does not add a null terminator to the buffer
+ * @note Use gen_handle_size as the end mark to read the whole file
+ * @note Does not add a null terminator to the buffer
  * @return an error code
  */
 extern gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end);

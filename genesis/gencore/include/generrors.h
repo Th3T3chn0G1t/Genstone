@@ -13,7 +13,7 @@
 
 /**
  * Return values for errorable functions
- * @note some errors will become GEN_UNKNOWN on platforms that do not support them or report them nontrivially
+ * @note Some errors will become GEN_UNKNOWN on platforms that do not support them or report them nontrivially
  */
 typedef enum {
     /**
