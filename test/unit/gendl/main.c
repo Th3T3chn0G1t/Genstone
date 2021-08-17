@@ -5,7 +5,6 @@ int main() {
     gen_error_t error;
     gen_dylib_t testlib;
 
-
     glog(INFO, "Testing gen_dylib_load()...");
     error = gen_dylib_load(&testlib, "gendl_test");
 
