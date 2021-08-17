@@ -2,7 +2,7 @@ GEN_CORE_CFLAGS = -Igenesis/gencore/include $(C11_COMPAT_CFLAGS)
 ifeq ($(PLATFORM),WIN)
 GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include
 endif
-GEN_CORE_LFLAGS += -lgencore $(C11_COMPAT_LFLAGS)
+GEN_CORE_LFLAGS += -lgencore $(C11_COMPAT_LFLAGS) -ldl
 
 GEN_CORE_SOURCES = $(wildcard genesis/gencore/*.c)
 GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))
@@ -19,8 +19,15 @@ ifeq ($(PLATFORM),WIN)
 _GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include # This is kind of annoying but whatever
 endif
 
+ifeq ($(PLATFORM),LNX)
+_GEN_CORE_LFLAGS = -ldl
+endif
+ifeq ($(PLATFORM),BSD)
+_GEN_CORE_LFLAGS = -ldl
+endif
+
 $(GEN_CORE_LIB): CFLAGS = $(C11_COMPAT_CFLAGS) $(_GEN_CORE_CFLAGS)
-$(GEN_CORE_LIB): LFLAGS = -Llib $(C11_COMPAT_LFLAGS)
+$(GEN_CORE_LIB): LFLAGS = -Llib $(C11_COMPAT_LFLAGS) $(_GEN_CORE_LFLAGS)
 $(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) $(C11_COMPAT_LIB) | lib
 
 $(GEN_CORE_OBJECTS): $(wildcard genesis/gencore/include/*.h)

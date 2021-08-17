@@ -35,15 +35,9 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Static analysis
         - Prebuilt binaries
     - Argument parser
-    - Execution environment utilities
-        - rpath
-        - loaded dylibs
-        - executable path
-        - environment variables
-        - working directory
-        - current filesystem/volume info
-            - Check what file meta the OS/filesystem supports
-        - binary-type (ABI) info
+    - executable path
+    - environment variables
+    - working directory
     - genfs
         - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
         - Increase the tolerances on gen_path_relative
@@ -56,7 +50,6 @@ If the project ever garners multiple contributors this can be migrated to Github
     - generator (editor)
     - genesis
         - run tree func
-    - perform validation in debug mode
     - Windows GetLastError conversion table (?)
 - Examples
     - Write examples
