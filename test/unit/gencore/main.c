@@ -39,7 +39,7 @@ static void root_data_exporter(char* output, const gen_node_t* node, void* passt
 int main() {
     gen_error_t error;
 
-    puts("Testing gen_node_import()...");
+    glog(INFO, "Testing gen_node_import()...");
     gen_node_importer_data_handler_t data_handlers[] = {root_data_loader};
     error = gen_node_import(&root, source, type_loader, data_handlers, NULL);
 
@@ -47,7 +47,7 @@ int main() {
     GEN_REQUIRE_EQUAL(GEN_ROOT_TYPE, root.type);
     GEN_REQUIRE_EQUAL(127, *(int*) root.data);
 
-    puts("Testing gen_node_export()...");
+    glog(INFO, "Testing gen_node_export()...");
     gen_node_exporter_data_handler_t export_handlers[] = {root_data_exporter};
     size_t output_length = (4 + 1 /* ROOT\n */) + (3 + 1 /* 127\n */) + (1 /* \n */) + (1 /* \0 */);
     char* output = malloc(output_length);

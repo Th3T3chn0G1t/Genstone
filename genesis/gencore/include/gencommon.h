@@ -6,7 +6,6 @@
  * Includes common helpers and utilities for across the codebase
  * Includes the stdlib and helpers to provide missing headers on noncompliant platforms
  * Defines helper macros for pretty keywords and diagnostic info
- * Defines common data structures and operations
  */
 
 #ifndef GEN_COMMON_H
@@ -80,6 +79,147 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/stat.h>
 GEN_DIAG_REGION_END
 
+
+/**
+ * ANSI color value for gray
+ */
+#define GEN_ANSI_GRAY "30"
+/**
+ * ANSI color value for red
+ */
+#define GEN_ANSI_RED "31"
+/**
+ * ANSI color value for green
+ */
+#define GEN_ANSI_GREEN "32"
+/**
+ * ANSI color value for yellow
+ */
+#define GEN_ANSI_YELLOW "33"
+/**
+ * ANSI color value for blue
+ */
+#define GEN_ANSI_BLUE "34"
+/**
+ * ANSI color value for purple
+ */
+#define GEN_ANSI_PURPLE "35"
+/**
+ * ANSI color value for cyan
+ */
+#define GEN_ANSI_CYAN "36"
+/**
+ * ANSI color value for white
+ */
+#define GEN_ANSI_WHITE "37"
+
+/**
+ * ANSI code for bold
+ */
+#define GEN_ANSI_BOLD "1"
+
+/**
+ * ANSI code for clear
+ */
+#define GEN_ANSI_CLEAR "0"
+
+/**
+ * @internal
+ * Prefix for ANSI sequences
+ */
+#define _GEN_ANSI_SEQUENCE_PREFIX "\033["
+/**
+ * @internal
+ * Suffix for ANSI sequences
+ */
+#define _GEN_ANSI_SEQUENCE_SUFFIX "m"
+/**
+ * @internal
+ * Dark modifier prefix for ANSI color codes
+ */
+#define _GEN_ANSI_COLOR_DARK_PREFIX "0;"
+/**
+ * @internal
+ * Light modifier prefix for ANSI color codes
+ */
+#define _GEN_ANSI_COLOR_LIGHT_PREFIX "1;"
+
+/**
+ * Applies ANSI sequence prefix and suffix
+ * @param code the ANSI code to apply the prefix and suffix to
+ */
+#define GEN_ANSI_SEQUENCE(code) _GEN_ANSI_SEQUENCE_PREFIX code _GEN_ANSI_SEQUENCE_SUFFIX
+
+/**
+ * Applies dark color modifier prefix
+ * @param color the ANSI color code to apply the prefix to
+ */
+#define GEN_ANSI_COLOR_DARK(color) GEN_ANSI_SEQUENCE(_GEN_ANSI_COLOR_DARK_PREFIX color)
+/**
+ * Applies light color modifier prefix to ANSI color code
+ * @param color the ANSI color code to apply the prefix to
+ */
+#define GEN_ANSI_COLOR_LIGHT(color) GEN_ANSI_SEQUENCE(_GEN_ANSI_COLOR_LIGHT_PREFIX color)
+
+/**
+ * Logging levels for logging functions
+ */
+typedef enum {
+    NOTE,
+    INFO,
+    WARNING,
+    ERROR,
+    FATAL
+} gen_logging_level_t;
+
+/**
+ * Logger prefix for debug level logging
+ */
+#define GEN_LOGGER_DEBUG_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_GREEN) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Debug: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+/**
+ * Logger prefix for note level logging
+ */
+#define GEN_LOGGER_NOTE_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_CYAN) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Note: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+/**
+ * Logger prefix for info level logging
+ */
+#define GEN_LOGGER_INFO_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_BLUE) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Info: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+/**
+ * Logger prefix for warning level logging
+ */
+#define GEN_LOGGER_WARNING_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_YELLOW) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Warning: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+/**
+ * Logger prefix for error level logging
+ */
+#define GEN_LOGGER_ERROR_PREFIX GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Error: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+/**
+ * Logger prefix for fatal level logging
+ */
+#define GEN_LOGGER_FATAL_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_PURPLE) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Fatal: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+
+/**
+ * Basic string logging function
+ * @param level a gen_logging_level_t to determine the prefix from
+ * @param string the string to print
+ */
+#define glog(level, string) \
+    do { \
+        printf("%s", GEN_LOGGER_##level##_PREFIX); \
+        puts(string); \
+    } while(0)
+/**
+ * `printf`-style formatted logging function
+ * @param level a gen_logging_level_t to determine the prefix from
+ * @param format a format string
+ * @param ... the format arguments to print
+ */
+#define glogf(level, format, ...) \
+    do { \
+        printf("%s", GEN_LOGGER_##level##_PREFIX); \
+        printf(format, __VA_ARGS__); \
+        printf("\n"); \
+    } while(0)
+
 /**
  * @internal
  * Gets the require message from the expected expressions type
@@ -114,9 +254,9 @@ GEN_DIAG_REGION_END
  */
 #define GEN_REQUIRE_EQUAL(a, b) \
     do { \
-        if(!__builtin_constant_p(a)) fprintf(stderr, "Expected expression %s is not constant\n", #a); \
+        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression %s is not constant\n", #a); \
         if(a != b) { \
-            fprintf(stderr, _GEN_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
+            glogf(FATAL, _GEN_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
@@ -129,9 +269,9 @@ GEN_DIAG_REGION_END
  */
 #define GEN_REQUIRE_EQUAL_STRING(a, b) \
     do { \
-        if(!__builtin_constant_p(a)) fprintf(stderr, "Expected expression %s (%s) is not constant at line %i in %s\n", #a, a, __LINE__, __FILE__); \
+        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression %s (%s) is not constant at line %i in %s\n", #a, a, __LINE__, __FILE__); \
         if(!b || strcmp(a, b)) { \
-            fprintf(stderr, "Require failed - Expected: %s (%s) Got: %s (%s) at line %i in %s\n", #a, a, #b, b, __LINE__, __FILE__), \
+            glogf(FATAL, "Require failed - Expected: %s (%s) Got: %s (%s) at line %i in %s\n", #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
@@ -145,7 +285,7 @@ GEN_DIAG_REGION_END
 #define GEN_REQUIRE_EQUAL_MEMREGION(a, b, s) \
     do { \
         if((!b && s) || memcmp(a, b, s)) { \
-            fprintf(stderr, "Require failed - Expected: %s (%p) (%c%c%c...) Got: %s (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char*) a)[0], ((char*) a)[1], ((char*) a)[2], #b, b, ((char*) b)[0], ((char*) b)[1], ((char*) b)[2], __LINE__, __FILE__); \
+            glogf(FATAL, "Require failed - Expected: %s (%p) (%c%c%c...) Got: %s (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char*) a)[0], ((char*) a)[1], ((char*) a)[2], #b, b, ((char*) b)[0], ((char*) b)[1], ((char*) b)[2], __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
@@ -155,7 +295,7 @@ GEN_DIAG_REGION_END
  */
 #define GEN_REQUIRE_NO_REACH \
     do { \
-        fprintf(stderr, "Require failed - Invalid control path reached at line %i in %s\n", __LINE__, __FILE__); \
+        glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s\n", __LINE__, __FILE__); \
         abort(); \
     } while(0)
 

@@ -52,6 +52,8 @@ LINKER = clang
 CLANG_FORMAT = clang-format
 
 # The IDE to generate IDE configuration for with `ideconf` target
+# Possible values are:
+# `VSC`:  VSCode
 IDE =
 
 # Debugging for the build system

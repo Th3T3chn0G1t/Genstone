@@ -7,8 +7,8 @@
  * Defines the apptree types and controlling handler types
  */
 
-#ifndef GENESIS_H
-#define GENESIS_H
+#ifndef GEN_GENESIS_H
+#define GEN_GENESIS_H
 
 #include "generrors.h"
 

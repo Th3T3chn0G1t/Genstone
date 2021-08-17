@@ -7,6 +7,9 @@
  * Provides debug configuration
  */
 
+#ifndef GEN_DEBUG_H
+#define GEN_DEBUG_H
+
 #if MODE == DEBUG
 #ifndef GEN_DEBUG_PATH_VALIDATION
 /**
@@ -40,4 +43,6 @@
 #ifndef GEN_DEBUG_FOREACH_PRECALC
 #define GEN_DEBUG_FOREACH_PRECALC ENABLED
 #endif
+#endif
+
 #endif

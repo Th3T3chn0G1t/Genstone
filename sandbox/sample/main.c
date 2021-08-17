@@ -10,7 +10,7 @@ static mtx_t approot_mtx;
 static gen_node_handler_t* nodehandlers;
 
 int thread_func(void* pass) {
-    printf("Hello, C11 threads!\n");
+    glog(INFO, "Hello, C11 threads!");
 
     for(size_t i = 0; i < 10; i++) {
         mtx_lock(&approot_mtx);
@@ -22,7 +22,7 @@ int thread_func(void* pass) {
 }
 
 int main() {
-    printf("Hello, Genesis!\n");
+    glog(INFO, "Hello, Genesis!");
 
     mtx_init(&approot_mtx, mtx_plain);
 
@@ -38,7 +38,7 @@ int main() {
     int result;
     thrd_join(thread, &result);
 
-    printf("Ticks: %i\n", ((int*) approot.data)[0]);
+    glogf(DEBUG, "Ticks: %i", ((int*) approot.data)[0]);
 
     mtx_destroy(&approot_mtx);
 }

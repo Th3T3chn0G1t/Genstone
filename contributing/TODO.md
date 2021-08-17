@@ -49,7 +49,10 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Increase the tolerances on gen_path_relative
     - gencommon
         - streq to replace strcmp
-    - **Profiling**
+    - Profiling
+        - Frequency profiling (how often something happens)
+        - Framed profiling (how much of something is spent where)
+    - Callback attribute to allow optimizations https://clang.llvm.org/docs/AttributeReference.html#callback
     - generator (editor)
     - genesis
         - run tree func
