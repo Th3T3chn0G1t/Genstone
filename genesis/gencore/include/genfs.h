@@ -64,7 +64,7 @@ typedef struct {
  * @note Under windows, GEN_PATH_MAX will be provided to GetFullPathNameA nBufferLength in all cases
  * @return an error code
  */
-extern gen_error_t gen_path_canonical(char* output_path, const char* path);
+extern gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path);
 
 /**
  * Gets the relative representation of a path
@@ -74,7 +74,7 @@ extern gen_error_t gen_path_canonical(char* output_path, const char* path);
  * @note If the path cannot be made relative, the output is set equal to path
  * @return an error code
  */
-extern gen_error_t gen_path_relative(char* output_path, const char* path, const char* to);
+extern gen_error_t gen_path_relative(char* restrict output_path, const char* const restrict path, const char* const restrict to);
 
 /**
  * Gets the filename of a path
@@ -82,7 +82,7 @@ extern gen_error_t gen_path_relative(char* output_path, const char* path, const 
  * @param path the path to get a filename from
  * @return an error code
  */
-extern gen_error_t gen_path_filename(char* output_filename, const char* path);
+extern gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path);
 
 /**
  * Gets the pathname of a path
@@ -90,7 +90,7 @@ extern gen_error_t gen_path_filename(char* output_filename, const char* path);
  * @param path the path to get a pathname from
  * @return an error code
  */
-extern gen_error_t gen_path_pathname(char* output_path, const char* path);
+extern gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path);
 
 /**
  * Gets the file extension of a path
@@ -98,21 +98,21 @@ extern gen_error_t gen_path_pathname(char* output_path, const char* path);
  * @param path the path to get an extension from
  * @return an error code
  */
-extern gen_error_t gen_path_extension(char* output_extension, const char* path);
+extern gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path);
 
 /**
  * Returns whether a filesystem object exists at a path
  * @param path the path to check
  * @return whether an object exists at path
  */
-extern bool gen_path_exists(const char* path);
+extern bool gen_path_exists(const char* const restrict path);
 
 /**
  * Checks whether a path is valid
  * @param path the path to validate
  * @return an error code. GEN_TOO_LONG or GEN_TOO_SHORT if a path is an invalid length. GEN_WRONG_OBJECT_TYPE if an invalid character is encountered in the path
  */
-extern gen_error_t gen_path_validate(const char* path);
+extern gen_error_t gen_path_validate(const char* const restrict path);
 
 /**
  * Creates a directory
@@ -120,14 +120,14 @@ extern gen_error_t gen_path_validate(const char* path);
  * @return an error code
  * @note Will create with the default access flags for the platform, or a reasonable default if not applicable
  */
-extern gen_error_t gen_path_create_dir(const char* path);
+extern gen_error_t gen_path_create_dir(const char* const restrict path);
 
 /**
  * Deletes a filesystem object
  * @param path a path to the object to destroy
  * @return an error code
  */
-extern gen_error_t gen_path_delete(const char* path);
+extern gen_error_t gen_path_delete(const char* const restrict path);
 
 /**
  * Opens a path as a filesystem object handle for use by filesystem operations
@@ -136,7 +136,7 @@ extern gen_error_t gen_path_delete(const char* path);
  * @param path the path to open
  * @return an error code
  */
-extern gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* path);
+extern gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path);
 
 /**
  * Closes a filesystem object handle
@@ -144,14 +144,14 @@ extern gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const
  * @param handle pointer to the handle to close
  * @return an error code
  */
-extern gen_error_t gen_handle_close(gen_filesystem_handle_t* handle);
+extern gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets the size of a handle's object's content
  * @param handle a handle to an object whose size to get. Must not be a directory
  * @return the size of the object's content
  */
-extern size_t gen_handle_size(const gen_filesystem_handle_t* handle);
+extern size_t gen_handle_size(const gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets a file's content
@@ -163,7 +163,7 @@ extern size_t gen_handle_size(const gen_filesystem_handle_t* handle);
  * @note Does not add a null terminator to the buffer
  * @return an error code
  */
-extern gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end);
+extern gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file
@@ -172,7 +172,7 @@ extern gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_ha
  * @param buffer the buffer to source bytes from for writing
  * @return an error code
  */
-extern gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const uint8_t* buffer);
+extern gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer);
 
 /**
  * Lists the contents of a directory
@@ -181,6 +181,6 @@ extern gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const s
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle, const gen_directory_list_handler_t handler, void* passthrough);
+extern gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* restrict passthrough);
 
 #endif

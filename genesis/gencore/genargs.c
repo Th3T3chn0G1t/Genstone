@@ -3,7 +3,7 @@
 
 #include "include/genargs.h"
 
-gen_error_t gen_parse_args(const int argc, const char** argv, const gen_arg_handler_t callback, const size_t n_short_args, const char* short_args, const size_t n_long_args, const char** long_args, void* passthrough) {
+gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t callback, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* restrict passthrough) {
     if(!argc) return GEN_OK;
     if(!argv) return GEN_INVALID_PARAMETER;
     if(argc < 0) return GEN_INVALID_PARAMETER;

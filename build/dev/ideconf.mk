@@ -3,7 +3,7 @@
 # Try to keep everything contained in the Makefile
 # If platform specific tools make sense contextually (using Windows-specific tools to generate VS configs) then you can use them
 
-IDECONF_INCLUDE_DIRS = genesis/gencore/include genesis/gen-rt/include genesis/genfx/gfx/include genesis/genfx/sfx/include 
+IDECONF_INCLUDE_DIRS = genesis/gencore/include genesis/genfx/gfx/include genesis/genfx/sfx/include 
 ifeq ($(C11_COMPAT_UCHAR),1)
 IDECONF_INCLUDE_DIRS += genesis/vendor/c11compat/musl/include
 endif

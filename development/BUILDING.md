@@ -21,13 +21,18 @@ Set options for the build process itself (e.g. for cross-compilation) in `build/
 
 Additional build targets exist for building IDE configuration files (`ideconf`) and documentation (`docs`). These targets' settings are also controlled by values in `build/config.mk`. `ideconf` will overwrite existing configuration and does not behave differently on subsequent invocations (i.e. calling once and then modifying is recommended)
 
+If you don't plan to use the source of Genesis during development, you can generate a more lightweight development environment using `make devenv`
+
+This is *not* viable if you plan to embed Genesis into your own project, as it generates the project for your platform and configuration
+
+`make devenv` will output to `out/` with generated `include`, `lib` and `docs` folders
+
+It is recommended to use this in conjunction with `make ideconf` to generate your development environment configuration
+
 #### Note
 There is no error checking performed on entered values, invalid values will result in unknown behaviour
 
 ### Compilation Options
-
-#### Note
-Options pertinent to validation or other debug features are documented in `DEBUG.md`
 
 Setting in-code options can be done via. `-D` flags set via. the config Makefile
 
@@ -35,3 +40,17 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |---|---|---|---|---|
 |`PLATFORM`|`WIN` `DWN` `LNX` `BSD`|Determined by Makefile|The target platform for the compilation|Do not mix platforms in a binary|
 |`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|
+
+In debug builds, some functionality is changed to provide extra validation or execution environment information
+
+Each key can be set to either `ENABLED` or `DISABLED`, making them truthy or falsy respectively.
+
+#### Compilation Options
+
+`MODE=DEBUG` will set these automatically, but they can also be controlled individually by setting them to either `ENABLED` or `DISABLED`
+
+|Name|Description|Notes|
+|---|---|---|
+|`GEN_DEBUG_PATH_VALIDATION`|Whether to validate paths passed to genfs functions with `gen_path_validate`|Does not affect the presence of `gen_path_validate`|
+|`GEN_DEBUG_FOREACH_REGISTER`|Whether to use register variables for iteration in `GEN_FOREACH` statements|Disabling this can sometimes help with printing iterator values from a debugger|
+|`GEN_DEBUG_FOREACH_PRECALC`|Whether to use variables outside the for loop in `GEN_FOREACH` statements to possibly allow the compiler to optimize expressions passed to `len` or `container`|This will cause `GEN_FOREACH` statements to produce some pseudo-mangled variables for the length and container. Disabling this can help with printing length values or container locations|

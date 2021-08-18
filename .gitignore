@@ -18,6 +18,7 @@
 *.tmp
 
 docs/*
+out/*
 
 .vscode
 .vs

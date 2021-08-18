@@ -31,7 +31,7 @@ typedef void* gen_dylib_t;
  * @return an error code
  * @note The library name should be provided as just the significant portion of the name. e.g. to load `libfoo.so`, `lib_name` would be `foo`. This is to ensure that the same name can be used to load libraries on multiple platforms (i.e. on Windows `foo` would load `foo.dll`)
  */
-extern gen_error_t gen_dylib_load(gen_dylib_t* output_dylib, const char* lib_name);
+extern gen_error_t gen_dylib_load(gen_dylib_t* restrict output_dylib, const char* const restrict lib_name);
 /**
  * Gets a symbol's address from a loaded dynamic library
  * @param output_address a pointer to storage for the loaded symbol address
@@ -39,7 +39,7 @@ extern gen_error_t gen_dylib_load(gen_dylib_t* output_dylib, const char* lib_nam
  * @param symname the name of the symbol to get
  * @return an error code
  */
-extern gen_error_t gen_dylib_symbol(void** output_address, const gen_dylib_t dylib, const char* symname);
+extern gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname);
 /**
  * Unloads a dynamic library
  * @param dylib the library to unload

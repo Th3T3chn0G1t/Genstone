@@ -23,7 +23,7 @@ ifeq ($(TEST_UNITS),1)
 	MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(TEST_UNIT_MODULES))))
 endif
 
-BUILTIN_MODULES = build/dev/ideconf.mk build/docs/docs.mk
+BUILTIN_MODULES = $(wildcard build/dev/*.mk) build/docs/docs.mk
 include $(BUILTIN_MODULES)
 
 include $(SANDBOX_PROJECT_MODULE)

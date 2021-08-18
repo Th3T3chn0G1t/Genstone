@@ -79,7 +79,6 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/stat.h>
 GEN_DIAG_REGION_END
 
-
 /**
  * ANSI color value for gray
  */
@@ -165,10 +164,25 @@ GEN_DIAG_REGION_END
  * Logging levels for logging functions
  */
 typedef enum {
+    /**
+     * Note logging severity level
+     */
     NOTE,
+    /**
+     * Info logging severity level
+     */
     INFO,
+    /**
+     * Warning logging severity level
+     */
     WARNING,
+    /**
+     * Error logging severity level
+     */
     ERROR,
+    /**
+     * Fatal logging severity level
+     */
     FATAL
 } gen_logging_level_t;
 
@@ -329,7 +343,7 @@ typedef enum {
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
 #define _GEN_FOREACH_PREDECL(iter, memb, len, container) \
-    const __typeof__((container)[0])* const _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])* const) (container); \
+    const __typeof__((container)[0])* const _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])* const restrict) (container); \
     const _GEN_FOREACH_ITER_DECL _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) = (const _GEN_FOREACH_ITER_DECL) (len)
 #else
 #define _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (len)

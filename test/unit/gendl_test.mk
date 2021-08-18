@@ -30,3 +30,6 @@ $(GEN_DL_TEST_LIB): $(GEN_DL_TEST_LIB_OBJECTS)
 clean_gendl_test:
 	-$(RM) $(subst /,$(SEP),$(GEN_DL_TEST_EXEC_OBJECTS))
 	-$(RM) $(subst /,$(SEP),$(GEN_DL_TEST_EXEC))
+
+	-$(RM) $(subst /,$(SEP),$(GEN_DL_TEST_LIB_OBJECTS))
+	-$(RM) $(subst /,$(SEP),$(GEN_DL_TEST_LIB))

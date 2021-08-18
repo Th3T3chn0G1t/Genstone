@@ -24,7 +24,7 @@
 #define _GEN_FS_PATH_PARAMETER_VALIDATION(path) (void) path
 #endif
 
-gen_error_t gen_path_canonical(char* output_path, const char* path) {
+gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -45,7 +45,7 @@ gen_error_t gen_path_canonical(char* output_path, const char* path) {
 }
 
 gen_error_t
-gen_path_relative(char* output_path, const char* path, const char* to) {
+gen_path_relative(char* restrict output_path, const char* const restrict path, const char* const restrict to) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -58,7 +58,7 @@ gen_path_relative(char* output_path, const char* path, const char* to) {
     return GEN_OK;
 }
 
-gen_error_t gen_path_filename(char* output_filename, const char* path) {
+gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
     if(!output_filename)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -68,7 +68,7 @@ gen_error_t gen_path_filename(char* output_filename, const char* path) {
     return GEN_OK;
 }
 
-gen_error_t gen_path_pathname(char* output_path, const char* path) {
+gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -80,7 +80,7 @@ gen_error_t gen_path_pathname(char* output_path, const char* path) {
     return GEN_OK;
 }
 
-gen_error_t gen_path_extension(char* output_extension, const char* path) {
+gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path) {
     if(!output_extension)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -92,7 +92,7 @@ gen_error_t gen_path_extension(char* output_extension, const char* path) {
     return GEN_OK;
 }
 
-bool gen_path_exists(const char* path) {
+bool gen_path_exists(const char* const restrict path) {
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == WIN
@@ -102,7 +102,7 @@ bool gen_path_exists(const char* path) {
 #endif
 }
 
-gen_error_t gen_path_validate(const char* path) {
+gen_error_t gen_path_validate(const char* const restrict path) {
     if(!path)
         return GEN_INVALID_PARAMETER;
     if(!path[0])
@@ -131,7 +131,7 @@ gen_error_t gen_path_validate(const char* path) {
     return GEN_OK;
 }
 
-gen_error_t gen_path_create_dir(const char* path) {
+gen_error_t gen_path_create_dir(const char* const restrict path) {
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == WIN
@@ -147,7 +147,7 @@ gen_error_t gen_path_create_dir(const char* path) {
     return GEN_OK;
 }
 
-gen_error_t gen_path_delete(const char* path) {
+gen_error_t gen_path_delete(const char* const restrict path) {
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
 
     int error = remove(path);
@@ -157,7 +157,7 @@ gen_error_t gen_path_delete(const char* path) {
     return GEN_OK;
 }
 
-gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* path) {
+gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
     if(!output_handle)
         return GEN_INVALID_PARAMETER;
     _GEN_FS_PATH_PARAMETER_VALIDATION(path);
@@ -187,7 +187,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* output_handle, const char* 
     return GEN_OK;
 }
 
-gen_error_t gen_handle_close(gen_filesystem_handle_t* handle) {
+gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
 
@@ -210,7 +210,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* handle) {
     return GEN_OK;
 }
 
-size_t gen_handle_size(const gen_filesystem_handle_t* handle) {
+size_t gen_handle_size(const gen_filesystem_handle_t* const restrict handle) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(handle->dir)
@@ -228,7 +228,7 @@ size_t gen_handle_size(const gen_filesystem_handle_t* handle) {
     return mark;
 }
 
-gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t* handle, const size_t start, const size_t end) {
+gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(handle->dir)
@@ -257,7 +257,7 @@ gen_error_t gen_file_read(uint8_t* output_buffer, const gen_filesystem_handle_t*
     return GEN_OK;
 }
 
-gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n_bytes, const uint8_t* buffer) {
+gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(handle->dir)
@@ -282,7 +282,7 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* handle, const size_t n
     return GEN_OK;
 }
 
-gen_error_t gen_directory_list(const gen_filesystem_handle_t* handle, const gen_directory_list_handler_t handler, void* passthrough) {
+gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* restrict passthrough) {
     if(!handle)
         return GEN_INVALID_PARAMETER;
     if(!handle->dir)

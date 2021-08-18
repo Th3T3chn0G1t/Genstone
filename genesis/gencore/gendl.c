@@ -4,7 +4,7 @@
 #include "include/gendl.h"
 #include "include/gencommon.h"
 
-gen_error_t gen_dylib_load(gen_dylib_t* output_dylib, const char* lib_name) {
+gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
     if(!output_dylib) return GEN_INVALID_PARAMETER;
     if(!lib_name) return GEN_INVALID_PARAMETER;
 
@@ -39,7 +39,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* output_dylib, const char* lib_name) {
     return GEN_OK;
 }
 
-gen_error_t gen_dylib_symbol(void** output_address, const gen_dylib_t dylib, const char* symname) {
+gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
     if(!output_address) return GEN_INVALID_PARAMETER;
     if(!dylib) return GEN_INVALID_PARAMETER; // This presumes that a valid dylib handle will always be truthy
     if(!symname) return GEN_INVALID_PARAMETER;

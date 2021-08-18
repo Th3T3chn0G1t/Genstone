@@ -4,7 +4,7 @@
 #include "include/genesis.h"
 #include "include/gencommon.h"
 
-gen_error_t gen_node_import(gen_node_t* output_node, const char* source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* data_handlers, void* passthrough) {
+gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const restrict source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* const restrict data_handlers, void* restrict passthrough) {
     if(!output_node) return GEN_INVALID_PARAMETER;
     if(!source) return GEN_INVALID_PARAMETER;
     if(!type_handler) return GEN_INVALID_PARAMETER;
@@ -23,7 +23,7 @@ gen_error_t gen_node_import(gen_node_t* output_node, const char* source, const g
     return GEN_OK;
 }
 
-gen_error_t gen_node_export(char* output_source, const gen_node_t* node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* data_handlers, void* passthrough) {
+gen_error_t gen_node_export(char* restrict output_source, const gen_node_t* const restrict node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* const restrict data_handlers, void* restrict passthrough) {
     if(!output_source) return GEN_INVALID_PARAMETER;
     if(!node) return GEN_INVALID_PARAMETER;
     if(!type_handler) return GEN_INVALID_PARAMETER;

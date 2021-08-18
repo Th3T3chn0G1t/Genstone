@@ -7,20 +7,14 @@ If the project ever garners multiple contributors this can be migrated to Github
 
 - Building
     - Generators
-        - Default project
-        - IDE-friendly development project (just binaries and headers)
-            - Generate more IDE configs
-        - Module Makefile
-            - CMake submodule Makefile
+        - Generate more IDE configs
         - Visualisation
             - Dependency graph
             - Loc
             - Development time
     - Embedded toolchain
         - Embedded `dlltool` binary or equivalent script for Windows builds
-    - Visual build tool for options
 - Documentation
-    - Custom static documentation generator
     - Formal writeup for Genesis
     - Automatic Github action for documentation generator
     - Github pages for generated docpages
@@ -35,9 +29,6 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Static analysis
         - Prebuilt binaries
     - Argument parser
-    - executable path
-    - environment variables
-    - working directory
     - genfs
         - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
         - Increase the tolerances on gen_path_relative
@@ -48,6 +39,7 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Framed profiling (how much of something is spent where)
     - Callback attribute to allow optimizations https://clang.llvm.org/docs/AttributeReference.html#callback
     - generator (editor)
+        - Visual build tool
     - genesis
         - run tree func
     - Windows GetLastError conversion table (?)

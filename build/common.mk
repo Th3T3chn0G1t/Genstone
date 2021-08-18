@@ -112,16 +112,18 @@ ifeq ($(PLATFORM),DEFAULT)
 endif
 
 SEP = /
-CP = cp
+CP = cp -r
 RM = rm
 RMDIR = rm -rf
 DIFF = diff
+CAT = cat
 ifeq ($(SHELL),cmd.exe)
 	SEP = \\
 	CP = copy /b /y
 	RM = del
 	RMDIR = rmdir
 	DIFF = fc
+	CAT = type
 endif
 
 GLOBAL_C_FLAGS += -std=c17 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
@@ -219,7 +221,7 @@ endif
 clean_tmpfile:
 	-$(RM) $(wildcard *.tmp)
 
-%$(OBJECT_SUFFIX): %.c
+%$(OBJECT_SUFFIX): %.c build/config.mk
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 # 	 -($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
