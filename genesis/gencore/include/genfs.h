@@ -29,7 +29,7 @@
 /**
  * Handler for directory listing
  */
-typedef void (*gen_directory_list_handler_t)(const char*, void*);
+typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* restrict);
 
 /**
  * A handle to a filesystem object

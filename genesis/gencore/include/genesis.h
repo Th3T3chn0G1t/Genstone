@@ -53,16 +53,16 @@ typedef struct {
 /**
  * Runtime handler for a node type
  */
-typedef void (*gen_node_handler_t)(gen_node_t*, void*);
+typedef void (*gen_node_handler_t)(gen_node_t* const restrict, void* restrict);
 
 /**
  * Loadtime handler for all type-strings
  */
-typedef unsigned long (*gen_node_importer_type_handler_t)(const char*, void*);
+typedef unsigned long (*gen_node_importer_type_handler_t)(const char* const restrict, void* restrict);
 /**
  * Loadtime handler for a node type's data-string
  */
-typedef void (*gen_node_importer_data_handler_t)(gen_node_t*, const char*, void*);
+typedef void (*gen_node_importer_data_handler_t)(gen_node_t* const restrict, const char* const restrict, void* restrict);
 
 /**
  * Constructs a node from a nodefile source
@@ -77,11 +77,11 @@ extern gen_error_t gen_node_import(gen_node_t* restrict output_node, const char*
 /**
  * Export handler for all node types
  */
-typedef void (*gen_node_exporter_type_handler_t)(char*, const unsigned long, void*);
+typedef void (*gen_node_exporter_type_handler_t)(char* restrict, const unsigned long, void* restrict);
 /**
  * Export handler for a node type
  */
-typedef void (*gen_node_exporter_data_handler_t)(char*, const gen_node_t*, void*);
+typedef void (*gen_node_exporter_data_handler_t)(char* restrict, const gen_node_t* const restrict, void* restrict);
 
 /**
  * Exports a node to nodefile source string

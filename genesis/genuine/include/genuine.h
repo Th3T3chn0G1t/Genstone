@@ -72,7 +72,7 @@ typedef struct {
 /**
  * Handler for rendering rects from UI
  */
-typedef void (*gen_ui_render_handler_t) (const gen_ui_ninepatch_t* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void*);
+typedef void (*gen_ui_render_handler_t) (const gen_ui_ninepatch_t* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void* restrict);
 
 /**
  * Indices for the segments of a ninepatch

@@ -2,7 +2,7 @@ GEN_CORE_CFLAGS = -Igenesis/gencore/include $(C11_COMPAT_CFLAGS)
 ifeq ($(PLATFORM),WIN)
 GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include
 endif
-GEN_CORE_LFLAGS += -lgencore $(C11_COMPAT_LFLAGS) -ldl
+GEN_CORE_LFLAGS = -lgencore $(C11_COMPAT_LFLAGS) -ldl
 
 GEN_CORE_SOURCES = $(wildcard genesis/gencore/*.c)
 GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))

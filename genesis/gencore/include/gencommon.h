@@ -299,7 +299,7 @@ typedef enum {
 #define GEN_REQUIRE_EQUAL_MEMREGION(a, b, s) \
     do { \
         if((!b && s) || memcmp(a, b, s)) { \
-            glogf(FATAL, "Require failed - Expected: %s (%p) (%c%c%c...) Got: %s (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char*) a)[0], ((char*) a)[1], ((char*) a)[2], #b, b, ((char*) b)[0], ((char*) b)[1], ((char*) b)[2], __LINE__, __FILE__); \
+            glogf(FATAL, "Require failed - Expected: %s (%p) (%c%c%c...) Got: %s (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char* const restrict) a)[0], ((char* const restrict) a)[1], ((char* const restrict) a)[2], #b, b, ((char* const restrict) b)[0], ((char* const restrict) b)[1], ((char* const restrict) b)[2], __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
