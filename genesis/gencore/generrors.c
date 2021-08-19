@@ -6,7 +6,7 @@
 #if PLATFORM == WIN
 #include <Windows.h>
 #endif
-#include <errno.h>
+#include "include/gencommon.h"
 
 gen_error_t gen_convert_errno(int error) {
     switch(error) {
@@ -41,6 +41,8 @@ gen_error_t gen_convert_winerr(int error) {
         default: return GEN_UNKNOWN;
     }
 #else
+    (void) error;
+    glog(WARNING, "Calling gen_convert_winerr() on non-Windows platform");
     return GEN_UNKNOWN;
 #endif
 }

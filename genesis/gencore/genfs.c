@@ -7,12 +7,11 @@
 
 #if GEN_DEBUG_PATH_VALIDATION == ENABLED
 /**
- * @internal
  * Validates the path parameter to filesystem functions
  * @param path the path to validate
  * @see GEN_DEBUG_PATH_VALIDATION
  */
-#define _GEN_FS_PATH_PARAMETER_VALIDATION(path) \
+#define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) \
     do { \
         if(!path) \
             return GEN_INVALID_PARAMETER; \
@@ -21,13 +20,13 @@
             return path_error; \
     } while(0)
 #else
-#define _GEN_FS_PATH_PARAMETER_VALIDATION(path) (void) path
+#define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) (void) path
 #endif
 
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == WIN
     // Getting an error out of this function is very strange
@@ -48,8 +47,8 @@ gen_error_t
 gen_path_relative(char* restrict output_path, const char* const restrict path, const char* const restrict to) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
-    _GEN_FS_PATH_PARAMETER_VALIDATION(to);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(to);
 
     size_t mark = 0;
     while(path[mark] == to[mark]) mark++;
@@ -61,7 +60,7 @@ gen_path_relative(char* restrict output_path, const char* const restrict path, c
 gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
     if(!output_filename)
         return GEN_INVALID_PARAMETER;
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
     strcpy(output_filename, strrchr(path, '/') + 1);
 
@@ -71,9 +70,9 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
 gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path) {
     if(!output_path)
         return GEN_INVALID_PARAMETER;
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-    size_t mark = (strrchr(path, '/') + 1) - path;
+    size_t mark = (size_t) ((strrchr(path, '/') + 1) - path);
     strncpy(output_path, path, mark);
     output_path[mark - 1] = '\0';
 
@@ -83,9 +82,9 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path) {
     if(!output_extension)
         return GEN_INVALID_PARAMETER;
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-    size_t mark = strchr(strrchr(path, '/'), '.') - path;
+    size_t mark = (size_t) (strchr(strrchr(path, '/'), '.') - path);
     strcpy(output_extension, path + mark);
     output_extension[mark - 1] = '\0';
 
@@ -93,7 +92,7 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 }
 
 bool gen_path_exists(const char* const restrict path) {
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == WIN
     return PathFileExistsA(path);
@@ -132,7 +131,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 }
 
 gen_error_t gen_path_create_dir(const char* const restrict path) {
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == WIN
     int error = CreateDirectoryA(path, NULL);
@@ -148,7 +147,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 }
 
 gen_error_t gen_path_delete(const char* const restrict path) {
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
     int error = remove(path);
     if(error)
@@ -160,7 +159,7 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
     if(!output_handle)
         return GEN_INVALID_PARAMETER;
-    _GEN_FS_PATH_PARAMETER_VALIDATION(path);
+    GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
     output_handle->path = strdup(path);
 
@@ -240,7 +239,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
     if(error)
         return gen_convert_errno(errno);
 
-    error = fread(
+    error = (int) fread(
         output_buffer, sizeof(char), end - start, handle->file_handles[0]);
     if(!error) {
         if(ferror(handle->file_handles[0]))
@@ -265,8 +264,7 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
     if(!buffer)
         return GEN_INVALID_PARAMETER;
 
-    size_t error =
-        fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
+    int error = (int) fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
     if(!error) {
         if(ferror(handle->file_handles[1]))
             error = errno;

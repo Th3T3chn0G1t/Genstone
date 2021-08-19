@@ -1,4 +1,5 @@
-GEN_CORE_CFLAGS = -Igenesis/gencore/include $(C11_COMPAT_CFLAGS)
+GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories
+GEN_CORE_CFLAGS = -Igenesis/gencore/include $(C11_COMPAT_CFLAGS) $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),WIN)
 GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include
 endif
@@ -15,6 +16,7 @@ build_message_gencore:
 
 gencore: build_message_gencore $(GEN_CORE_LIB)
 
+_GEN_CORE_CFLAGS = $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),WIN)
 _GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include # This is kind of annoying but whatever
 endif

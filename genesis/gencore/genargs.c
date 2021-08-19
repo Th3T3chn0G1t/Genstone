@@ -27,19 +27,19 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
             if((*arg)[1] == '-') {
                 type = GEN_ARG_LONG;
                 GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
-                    const size_t len = long_arg_lens[j];
+                    const size_t arg_len = long_arg_lens[j];
 
                     // Calculating inline instead of using strncmp to remove the
                     // stdlib dependency Also might be very slightly faster
                     // given the specific use-case
-                    GEN_FOREACH_PTR(k, arg_char, len, *long_arg) {
+                    GEN_FOREACH_PTR(k, arg_char, arg_len, *long_arg) {
                         if(*arg_char != (*arg)[k + 2])
                             goto long_arg_continue;
                     }
 
                     argn = j;
-                    if((*arg)[len + 2])
-                        value = (*arg) + 2 + len + 1;
+                    if((*arg)[arg_len + 2])
+                        value = (*arg) + 2 + arg_len + 1;
 
                 long_arg_continue:
                     continue;

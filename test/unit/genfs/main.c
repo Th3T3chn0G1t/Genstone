@@ -3,7 +3,10 @@
 
 #include <genfs.h>
 
-static void dir_handler(const char* file, void* passthrough) {}
+static void dir_handler(const char* file, void* passthrough) {
+    (void) file;
+    (void) passthrough;
+}
 
 // This is to make sure the test value is constant for require
 #define file_data "foobarfizzbuzz123"
@@ -82,7 +85,7 @@ int main() {
     file_read_buffer[file_size] = '\0';
 
     GEN_REQUIRE_EQUAL(GEN_OK, error);
-    GEN_REQUIRE_EQUAL_MEMREGION(file_data, file_read_buffer, sizeof(file_data));
+    GEN_REQUIRE_EQUAL_MEMREGION((void*) file_data, (void*) file_read_buffer, sizeof(file_data));
 
     glog(INFO, "Testing gen_path_create_dir()...");
     error = gen_path_create_dir("./testdir");

@@ -51,7 +51,7 @@ typedef struct {
     /**
      * The scale of each segment of the source of the texture
      */
-    int source_scale;
+    uint16_t source_scale;
 } gen_ui_ninepatch_t;
 
 

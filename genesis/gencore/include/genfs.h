@@ -36,14 +36,6 @@ typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* r
  * @note Directly modifying the internal handles may cause undefined behaviour
  */
 typedef struct {
-    /**
-     * A path to the object this handle is for
-     */
-    char* path;
-    /**
-     * Whether this handle is for a directory
-     */
-    bool dir;
     union {
         /**
          * Handles for a file if dir is false
@@ -55,6 +47,14 @@ typedef struct {
          */
         DIR* directory_handle;
     };
+    /**
+     * A path to the object this handle is for
+     */
+    char* path;
+    /**
+     * Whether this handle is for a directory
+     */
+    bool dir;
 } gen_filesystem_handle_t;
 
 /**

@@ -34,10 +34,8 @@ DISABLED_MODULES =
 TEST = ALL
 
 # Flags to be provided to the compiler at every call
-# Does not get applied to 3rd party compilation
 GLOBAL_C_FLAGS =
 # Flags to be provided to the linker at every call
-# Does not get applied to 3rd party linkage
 GLOBAL_L_FLAGS =
 
 # The C compiler to use

@@ -2,7 +2,6 @@
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
 /**
- * @internal
  * @file gendbg.h
  * Provides debug configuration
  */

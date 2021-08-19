@@ -13,7 +13,6 @@
 #include "generrors.h"
 
 /**
- * @internal
  * Forward declaration of node type for pointers to children and parent
  */
 struct gen_node_t;

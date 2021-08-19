@@ -20,8 +20,8 @@
  */
 #define pragma(s) _Pragma(s)
 /**
- * Pretty keyword _Generic
- * @param ... type-switch statement for _Generic
+ * Pretty keyword GEN_INTERNALeric
+ * @param ... type-switch statement for GEN_INTERNALeric
  */
 #define generic(...) _Generic(__VA_ARGS__)
 
@@ -123,42 +123,38 @@ GEN_DIAG_REGION_END
 #define GEN_ANSI_CLEAR "0"
 
 /**
- * @internal
  * Prefix for ANSI sequences
  */
-#define _GEN_ANSI_SEQUENCE_PREFIX "\033["
+#define GEN_INTERNAL_ANSI_SEQUENCE_PREFIX "\033["
 /**
- * @internal
  * Suffix for ANSI sequences
  */
-#define _GEN_ANSI_SEQUENCE_SUFFIX "m"
+#define GEN_INTERNAL_ANSI_SEQUENCE_SUFFIX "m"
 /**
- * @internal
  * Dark modifier prefix for ANSI color codes
  */
-#define _GEN_ANSI_COLOR_DARK_PREFIX "0;"
+#define GEN_INTERNAL_ANSI_COLOR_DARK_PREFIX "0;"
 /**
- * @internal
  * Light modifier prefix for ANSI color codes
  */
-#define _GEN_ANSI_COLOR_LIGHT_PREFIX "1;"
+#define GEN_INTERNAL_ANSI_COLOR_LIGHT_PREFIX "1;"
 
 /**
  * Applies ANSI sequence prefix and suffix
  * @param code the ANSI code to apply the prefix and suffix to
  */
-#define GEN_ANSI_SEQUENCE(code) _GEN_ANSI_SEQUENCE_PREFIX code _GEN_ANSI_SEQUENCE_SUFFIX
+#define GEN_ANSI_SEQUENCE(code) GEN_INTERNAL_ANSI_SEQUENCE_PREFIX code GEN_INTERNAL_ANSI_SEQUENCE_SUFFIX
 
 /**
  * Applies dark color modifier prefix
  * @param color the ANSI color code to apply the prefix to
  */
-#define GEN_ANSI_COLOR_DARK(color) GEN_ANSI_SEQUENCE(_GEN_ANSI_COLOR_DARK_PREFIX color)
+#define GEN_ANSI_COLOR_DARK(color) GEN_ANSI_SEQUENCE(GEN_INTERNAL_ANSI_COLOR_DARK_PREFIX color)
 /**
  * Applies light color modifier prefix to ANSI color code
  * @param color the ANSI color code to apply the prefix to
  */
-#define GEN_ANSI_COLOR_LIGHT(color) GEN_ANSI_SEQUENCE(_GEN_ANSI_COLOR_LIGHT_PREFIX color)
+#define GEN_ANSI_COLOR_LIGHT(color) GEN_ANSI_SEQUENCE(GEN_INTERNAL_ANSI_COLOR_LIGHT_PREFIX color)
 
 /**
  * Logging levels for logging functions
@@ -235,11 +231,10 @@ typedef enum {
     } while(0)
 
 /**
- * @internal
  * Gets the require message from the expected expressions type
  * @param b the expected expression
  */
-#define _GEN_REQUIRE_EQUAL_MESSAGE(b) \
+#define GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b) \
     generic((b), \
         long double: "Require failed - Expected: %s (%Lf) Got: %s (%Lf) at line %i in %s\n", \
         double: "Require failed - Expected: %s (%lf) Got: %s (%lf) at line %i in %s\n", \
@@ -270,7 +265,7 @@ typedef enum {
     do { \
         if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression %s is not constant\n", #a); \
         if(a != b) { \
-            glogf(FATAL, _GEN_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
+            glogf(FATAL, GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
@@ -315,40 +310,36 @@ typedef enum {
 
 #if GEN_DEBUG_FOREACH_REGISTER == ENABLED
 /**
- * @internal
  * The type used when declaring an iterator in `GEN_FOREACH`
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
-#define _GEN_FOREACH_ITER_DECL register size_t
+#define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
 #else
-#define _GEN_FOREACH_ITER_DECL size_t
+#define GEN_INTERNAL_FOREACH_ITER_DECL size_t
 #endif
 
 #if GEN_DEBUG_FOREACH_PRECALC == ENABLED
 /**
- * @internal
  * The identifier to use in the loop for accessing `len`
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
-#define _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (_gen_foreach_length__##iter##__##memb##__##__func__##__LINE__);
+#define GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (GEN_INTERNAL_foreach_length__##iter##__##memb##__##__func__##__LINE__);
 /**
- * @internal
  * The identifier to use in the loop for accessing `container`
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
-#define _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (_gen_foreach_container__##iter##__##memb##__##__func__##__LINE__);
+#define GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (GEN_INTERNAL_foreach_container__##iter##__##memb##__##__func__##__LINE__);
 /**
- * @internal
  * Predeclarations for `GEN_FOREACH` statements
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
-#define _GEN_FOREACH_PREDECL(iter, memb, len, container) \
-    const __typeof__((container)[0])* const _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])* const restrict) (container); \
-    const _GEN_FOREACH_ITER_DECL _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) = (const _GEN_FOREACH_ITER_DECL) (len)
+#define GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container) \
+    const __typeof__((container)[0])* const GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])* const restrict) (container); \
+    const GEN_INTERNAL_FOREACH_ITER_DECL GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) = (const GEN_INTERNAL_FOREACH_ITER_DECL) (len)
 #else
-#define _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (len)
-#define _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (container) 
-#define _GEN_FOREACH_PREDECL(iter, memb, len, container) (void) NULL
+#define GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (len)
+#define GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (container) 
+#define GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container) (void) NULL
 #endif
 
 /**
@@ -361,9 +352,9 @@ typedef enum {
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
 #define GEN_FOREACH(iter, memb, len, container) \
-    _GEN_FOREACH_PREDECL(iter, memb, len, container); \
-    __typeof__(_GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]) memb = _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]; \
-    for(_GEN_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < _GEN_FOREACH_LENGTH_IDENTIFIER(iter, memb, len); memb = _GEN_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[iter + 1])
+    GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container); \
+    __typeof__(GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]) memb = GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]; \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len); memb = GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[iter + 1])
 /**
  * Iterates over a container with explicit length
  * `memb` is a pointer to the indexed member
@@ -374,7 +365,8 @@ typedef enum {
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
-    __typeof__((container)[0])* memb = &(container)[0]; \
-    for(_GEN_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (len); memb = &(container)[iter + 1])
+    GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container); \
+    __typeof__(GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0])* memb = &GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]; \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len); memb = &GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[iter + 1])
 
 #endif

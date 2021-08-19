@@ -6,9 +6,11 @@
 static int ticks = 0;
 static mtx_t ticks_mtx;
 
-static bool child_started = false;
+static atomic_bool child_started = false;
 
 static int thread_func(void* pass) {
+    (void) pass;
+
     child_started = true;
 
     for(size_t i = 0; i < 10; i++) {
@@ -26,8 +28,7 @@ int main() {
     thrd_t thread;
     thrd_create(&thread, thread_func, NULL);
 
-    while(!child_started)
-        ;
+    while(!child_started);
 
     for(size_t i = 0; i < 10; i++) {
         mtx_lock(&ticks_mtx);
