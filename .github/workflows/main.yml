@@ -14,9 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-# Something is horribly broken with the Github actions Windows environment
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
-#        os: [ ubuntu-latest, macOS-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -27,6 +25,13 @@ jobs:
       - name: Install Clang
         if: ${{ runner.os != 'macOS' }}
         uses: egor-tensin/setup-clang@v1
+
+      - name: Install Automake
+        if: ${{ runner.os != 'windows' }}
+        uses: lyricwulf/abc@v1
+        with:
+          linux: automake
+          macos: automake
 
       - name: Build & Test
         run: make
