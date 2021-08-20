@@ -41,6 +41,8 @@ If the project ever garners multiple contributors this can be migrated to Github
     - genesis
         - run tree func
     - Windows GetLastError conversion table (?)
+    - gendl
+        - Dylib introspection
 - Examples
     - Write examples
         - Build system module examples

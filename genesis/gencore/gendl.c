@@ -38,8 +38,10 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
     if(!(*output_dylib = LoadLibraryA(lib_file_name)))
         return gen_convert_winerr(GetLastError());
 #else
-    if(!(*output_dylib = dlopen(lib_file_name, 0)))
+    if(!(*output_dylib = dlopen(lib_file_name, 0))) {
+        glogf(ERROR, "Failed to load library %s: %s", lib_file_name, dlerror());
         return gen_convert_errno(errno);
+    }
 #endif
 
     return GEN_OK;
@@ -54,8 +56,10 @@ gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, con
     if(!(*output_address = GetProcAddress(dylib, symname)))
         return gen_convert_winerr(GetLastError());
 #else
-    if(!(*output_address = dlsym(dylib, symname)))
+    if(!(*output_address = dlsym(dylib, symname))) {
+        glogf(ERROR, "Failed to locate symbol %s: %s", symname, dlerror());
         return gen_convert_errno(errno);
+    }
 #endif
 
     return GEN_OK;
@@ -68,8 +72,10 @@ gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
     if(!FreeLibrary(dylib))
         return gen_convert_winerr(GetLastError());
 #else
-    if(dlclose(dylib))
+    if(dlclose(dylib)) {
+        glogf(ERROR, "Failed to unload library: %s", dlerror());
         return gen_convert_errno(errno);
+    }
 #endif
 
     return GEN_OK;
