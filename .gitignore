@@ -17,6 +17,9 @@
 *.dSYM
 
 *.tmp
+*.plist
+
+analysis/*
 
 docs/*
 out/*

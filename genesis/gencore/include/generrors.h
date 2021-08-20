@@ -11,6 +11,8 @@
 #ifndef GEN_ERRORS_H
 #define GEN_ERRORS_H
 
+#include <errno.h>
+
 /**
  * Return values for errorable functions
  * @note Some errors will become GEN_UNKNOWN on platforms that do not support them or report them nontrivially
@@ -75,7 +77,7 @@ typedef enum {
  * @param error the errno value to convert
  * @return the converted error enumeration
  */
-extern gen_error_t gen_convert_errno(int error);
+extern gen_error_t gen_convert_errno(errno_t error);
 
 /**
  * Converts a win32 error into a genesis error

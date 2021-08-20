@@ -126,8 +126,28 @@ ifeq ($(SHELL),cmd.exe)
 	CAT = type
 endif
 
-GLOBAL_C_FLAGS += -std=c17 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -D__STDC_WANT_LIB_EXT1__=1 -std=c17 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
+
+CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
+
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=deadcode
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=optin -Xanalyzer -analyzer-checker=security
+ifneq ($(PLATFORM),WIN)
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=unix
+endif
+ifeq ($(PLATFORM),DWN)
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
+endif
+
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.clone -Xanalyzer -analyzer-checker=alpha.core
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.deadcode -Xanalyzer -analyzer-checker=alpha.security
+ifneq ($(PLATFORM),WIN)
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
+endif
+ifeq ($(PLATFORM),DWN)
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
+endif
 
 ifeq ($(BUILD_SYS_DEBUG),ENABLED)
 # Need to check clang version for this to work (12.0.1?)
@@ -220,12 +240,20 @@ endif
 
 clean_tmpfile:
 	-$(RM) $(wildcard *.tmp)
+	-$(RM) $(wildcard analysis/*.plist)
 
-%$(OBJECT_SUFFIX): %.c build/config.mk
+%$(OBJECT_SUFFIX): %.c build/config.mk analysis
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
+	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
+#	@echo "$(ACTION_PREFIX)mv $(subst /,$(SEP),$(subst .c,.plist,$(notdir $<))) analysis$(ACTION_SUFFIX)"
+#	@mv $(subst /,$(SEP),$(subst .c,.plist,$(notdir $<))) analysis
 # 	 -($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
 # 	 -$(CLANG_FORMAT) --dry-run -Werror $<
+
+analysis:
+	-mkdir $<
 
 %$(STATIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"

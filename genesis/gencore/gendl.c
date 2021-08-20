@@ -23,9 +23,20 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 
     const size_t lib_file_name_len = (sizeof(lib_prefix) - 1) + lib_name_len + (sizeof(lib_suffix) - 1) + 1;
     char lib_file_name[lib_file_name_len];
+    
+    //https://github.com/rurban/safeclib
+    //errno_t error = 0;
+    //error = memcpy_s(lib_file_name, lib_prefix, (sizeof(lib_prefix) - 1));
+    //if(error) return gen_convert_errno(error);
+    //error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1), lib_name, lib_name_len);
+    //if(error) return gen_convert_errno(error);
+    //error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1) + lib_name_len, lib_suffix, (sizeof(lib_suffix) - 1));
+    //if(error) return gen_convert_errno(error);
+
     memcpy(lib_file_name, lib_prefix, (sizeof(lib_prefix) - 1));
     memcpy(lib_file_name + (sizeof(lib_prefix) - 1), lib_name, lib_name_len);
     memcpy(lib_file_name + (sizeof(lib_prefix) - 1) + lib_name_len, lib_suffix, (sizeof(lib_suffix) - 1));
+
     lib_file_name[lib_file_name_len - 1] = '\0';
 
 #if PLATFORM == WIN

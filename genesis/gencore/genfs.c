@@ -51,7 +51,7 @@ gen_path_relative(char* restrict output_path, const char* const restrict path, c
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(to);
 
     size_t mark = 0;
-    while(path[mark] == to[mark]) mark++;
+    while(path[mark] == to[mark]) ++mark;
     strcpy(output_path, path + mark);
 
     return GEN_OK;
@@ -138,7 +138,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
     if(!error)
         return gen_convert_winerr(GetLastError());
 #else
-    int error = mkdir(path, 0777);
+    errno_t error = mkdir(path, 0777);
     if(error)
         return gen_convert_errno(errno);
 #endif
@@ -149,7 +149,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 gen_error_t gen_path_delete(const char* const restrict path) {
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-    int error = remove(path);
+    errno_t error = remove(path);
     if(error)
         return gen_convert_errno(errno);
 
@@ -164,7 +164,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
     output_handle->path = strdup(path);
 
     struct stat s;
-    int error = stat(path, &s);
+    errno_t error = stat(path, &s);
     if(error && errno != ENOENT)
         return gen_convert_errno(errno);
     if(S_ISDIR(s.st_mode)) {
@@ -193,12 +193,12 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
     free(handle->path);
 
     if(handle->dir) {
-        int error = closedir(handle->directory_handle);
+        errno_t error = closedir(handle->directory_handle);
         if(error)
             return gen_convert_errno(errno);
     }
     else {
-        int error = fclose(handle->file_handles[0]);
+        errno_t error = fclose(handle->file_handles[0]);
         if(error)
             return gen_convert_errno(errno);
         error = fclose(handle->file_handles[1]);

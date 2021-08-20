@@ -8,7 +8,7 @@
 #endif
 #include "include/gencommon.h"
 
-gen_error_t gen_convert_errno(int error) {
+gen_error_t gen_convert_errno(errno_t error) {
     switch(error) {
         case EACCES: return GEN_PERMISSION;
         case EINVAL: return GEN_INVALID_PARAMETER;

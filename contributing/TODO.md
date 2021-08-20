@@ -24,9 +24,9 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Clang-tidy
     - Clang-format
 - Development
-    - Logger
     - CI
         - Static analysis
+            - CTU
         - Prebuilt binaries
     - Argument parser
     - genfs

@@ -12,7 +12,7 @@ static int thread_func(void* passthrough) {
     (void) passthrough;
     glog(INFO, "Hello, C11 threads!");
 
-    for(size_t i = 0; i < 10; i++) {
+    for(size_t i = 0; i < 10; ++i) {
         mtx_lock(&approot_mtx);
         ((int*) approot.data)[0]++;
         mtx_unlock(&approot_mtx);
@@ -29,9 +29,9 @@ int main() {
     thrd_t thread;
     thrd_create(&thread, thread_func, NULL);
 
-    for(size_t i = 0; i < 10; i++) {
+    for(size_t i = 0; i < 10; ++i) {
         mtx_lock(&approot_mtx);
-        ((int*) approot.data)[0]++;
+        ++(((int*) approot.data)[0]);
         mtx_unlock(&approot_mtx);
     }
 

@@ -13,9 +13,9 @@ static int thread_func(void* pass) {
 
     child_started = true;
 
-    for(size_t i = 0; i < 10; i++) {
+    for(size_t i = 0; i < 10; ++i) {
         mtx_lock(&ticks_mtx);
-        ticks++;
+        ++ticks;
         mtx_unlock(&ticks_mtx);
     }
 
@@ -30,9 +30,9 @@ int main() {
 
     while(!child_started);
 
-    for(size_t i = 0; i < 10; i++) {
+    for(size_t i = 0; i < 10; ++i) {
         mtx_lock(&ticks_mtx);
-        ticks++;
+        ++ticks;
         mtx_unlock(&ticks_mtx);
     }
 

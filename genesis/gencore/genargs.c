@@ -5,6 +5,7 @@
 
 gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t callback, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* restrict passthrough) {
     if(!argc) return GEN_OK;
+
     if(!argv) return GEN_INVALID_PARAMETER;
     if(argc < 0) return GEN_INVALID_PARAMETER;
     if(!callback) return GEN_INVALID_PARAMETER;
@@ -12,10 +13,13 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
     if(n_long_args && !long_args) return GEN_INVALID_PARAMETER;
 
     // Precalculating the long args' lengths to save time while looping
-    size_t long_arg_lens[n_long_args];
-    GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {
-        *len = 0;
-        while(long_args[i][*len]) (*len)++;
+    // We need this weirdness to avoid creating a zero-length VLA
+    size_t long_arg_lens[n_long_args ? n_long_args : 1];
+    if(n_long_args) {
+        GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {
+            *len = 0;
+            while(long_args[i][*len]) ++(*len);
+        }
     }
 
     GEN_FOREACH_PTR(i, arg, argc - 1, argv + 1) {
@@ -24,7 +28,7 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
         const char* value = NULL;
 
         if((*arg)[0] == '-') {
-            if((*arg)[1] == '-') {
+            if((*arg)[1] == '-' && n_long_args) {
                 type = GEN_ARG_LONG;
                 GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
                     const size_t arg_len = long_arg_lens[j];
@@ -45,7 +49,7 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
                     continue;
                 }
             }
-            else {
+            else if(n_short_args) {
                 type = GEN_ARG_SHORT;
                 GEN_FOREACH_PTR(j, short_arg, n_short_args, short_args) {
                     if((*short_arg) != (*arg)[1])
@@ -57,6 +61,11 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
                         value = (*arg) + 2;
                     break;
                 }
+            }
+            else {
+                type = GEN_ARG_RAW;
+                argn = 0;
+                value = (*arg);
             }
         }
         else {
