@@ -5,6 +5,9 @@
 #include "include/gencommon.h"
 
 gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
+    // The static analyser has a bit of an aneurism about this function
+    // Just ignore it for now
+
     if(!output_dylib) return GEN_INVALID_PARAMETER;
     if(!lib_name) return GEN_INVALID_PARAMETER;
 
