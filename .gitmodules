@@ -1,3 +1,6 @@
 [submodule "genesis/vendor/dirent"]
 	path = genesis/vendor/dirent
 	url = https://github.com/tronkko/dirent
+[submodule "genesis/vendor/c11compat/safeclib"]
+	path = genesis/vendor/c11compat/safeclib
+	url = https://github.com/rurban/safeclib
