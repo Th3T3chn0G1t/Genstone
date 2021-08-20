@@ -1,0 +1,27 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: make docs          
+
+      - name: Publish
+        run: |
+          cd docs
+          git init
+          git symbolic-ref HEAD refs/heads/gh-docs
+          git remote add docs https://github.com/Th3T3chn0G1t/GenesisEngine
+          git add *
+          git commit -m "Documentation build from latest changes"
+          git push -f --set-upstream docs docs
