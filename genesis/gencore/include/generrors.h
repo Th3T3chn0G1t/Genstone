@@ -12,7 +12,7 @@
 #define GEN_ERRORS_H
 
 #include <errno.h>
-#ifndef __STDC_WANT_LIB_EXT1__
+#ifndef __STDC_LIB_EXT1__
 typedef int errno_t;
 #endif
 
