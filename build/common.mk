@@ -253,7 +253,7 @@ clean_tmpfile:
 # 	 -$(CLANG_FORMAT) --dry-run -Werror $<
 
 analysis:
-	-mkdir $<
+	-mkdir $@
 
 %$(STATIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
