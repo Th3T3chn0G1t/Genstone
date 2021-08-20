@@ -79,8 +79,6 @@ ifeq ($(C11_COMPAT_KANNEX),1)
 C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/safeclib/include
 C11_COMPAT_LFLAGS += -lsafec
 
-C11_COMPAT_KANNEX_LIB_VERSION = 3
-
 C11_COMPAT_KANNEX_LIB = lib/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
 _C11_COMPAT_KANNEX_LIB_INTERNAL = genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
 _C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN = $(wildcard genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
@@ -104,7 +102,7 @@ $(_C11_COMPAT_KANNEX_LIB_INTERNAL): $(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE)
 $(C11_COMPAT_KANNEX_LIB): $(_C11_COMPAT_KANNEX_LIB_INTERNAL) | lib
 	$(CP) $(subst /,$(SEP),$(_C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN) lib)
 ifeq ($(PLATFORM),DWN)
-	install_name_tool -id @rpath/$(LIB_PREFIX)safec.$(C11_COMPAT_KANNEX_LIB_VERSION).$(DYNAMIC_LIB_SUFFIX) $(C11_COMPAT_KANNEX_LIB)
+	install_name_tool -id @rpath/$(notdir $(wildcard genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec.*$(DYNAMIC_LIB_SUFFIX))) $(C11_COMPAT_KANNEX_LIB)
 endif
 endif
 endif
