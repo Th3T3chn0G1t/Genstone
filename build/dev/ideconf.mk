@@ -10,6 +10,9 @@ endif
 ifeq ($(C11_COMPAT_THREADS),1)
 IDECONF_INCLUDE_DIRS += genesis/vendor/c11compat/mesa/include
 endif
+ifeq ($(C11_COMPAT_KANNEX),1)
+IDECONF_INCLUDE_DIRS += genesis/vendor/c11compat/safeclib/include
+endif
 ifeq ($(PLATFORM),WIN)
 IDECONF_INCLUDE_DIRS += genesis/vendor/dirent/include
 endif

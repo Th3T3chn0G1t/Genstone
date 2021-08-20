@@ -73,4 +73,4 @@ clean: build_message_clean $(MODULE_CLEAN_TARGETS)
 	@echo "$(ACTION_SUFFIX)$(INFO_PREFIX) All clean!"
 
 lib:
-	mkdir $@
+	-mkdir $@

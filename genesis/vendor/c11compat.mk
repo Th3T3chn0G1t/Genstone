@@ -1,17 +1,19 @@
-C11_COMPAT = 0 # macOS always needs, Linux never needs
-C11_COMPAT_UCHAR = 0 # BSD & Windows never need
-C11_COMPAT_THREADS = 0 # FreeBSD never needs but other flavours do
+# 		UCHAR  THREADS  KANNEX
+# LNX	0	   0		1
+# WIN	0	   1		0
+# DWN	1	   1		1
+# BSD	0	   0		1
 
-# 		UCHAR		THREADS
-# LNX	0			0
-# WIN	0			1
-# DWN	1			1
-# BSD	0			FreeBSD 0, Other 1
+C11_COMPAT = 0
+C11_COMPAT_UCHAR = 0
+C11_COMPAT_THREADS = 0
+C11_COMPAT_KANNEX = 0
 
 ifeq ($(PLATFORM),LNX)
-	C11_COMPAT = 0
+	C11_COMPAT = 1
 	C11_COMPAT_UCHAR = 0
 	C11_COMPAT_THREADS = 0
+	C11_COMPAT_KANNEX = 1
 
 	C11_COMPAT_CFLAGS =
 	C11_COMPAT_LFLAGS = -pthread
@@ -20,6 +22,7 @@ ifeq ($(PLATFORM),WIN)
 	C11_COMPAT = 1
 	C11_COMPAT_UCHAR = 0
 	C11_COMPAT_THREADS = 1
+	C11_COMPAT_KANNEX = 0
 
 	C11_COMPAT_CFLAGS =
 	C11_COMPAT_LFLAGS =
@@ -28,19 +31,16 @@ ifeq ($(PLATFORM),DWN)
 	C11_COMPAT = 1
 	C11_COMPAT_UCHAR = 1
 	C11_COMPAT_THREADS = 1
+	C11_COMPAT_KANNEX = 1
 
 	C11_COMPAT_CFLAGS =
 	C11_COMPAT_LFLAGS = -pthread
 endif
 ifeq ($(PLATFORM),BSD)
+	C11_COMPAT = 1
 	C11_COMPAT_UCHAR = 0
-	ifneq ($(shell uname -r),FreeBSD)
-		C11_COMPAT = 0
-		C11_COMPAT_THREADS = 0
-	else
-		C11_COMPAT = 1
-		C11_COMPAT_THREADS = 1
-	endif
+	C11_COMPAT_THREADS = 0
+	C11_COMPAT_KANNEX = 1
 
 	C11_COMPAT_CFLAGS =
 	C11_COMPAT_LFLAGS = -pthread
@@ -55,29 +55,59 @@ ifeq ($(C11_COMPAT_UCHAR),1)
 C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/musl/include
 C11_COMPAT_LFLAGS += -lc11compat
 
-C11_COMPAT_SOURCES = $(wildcard genesis/vendor/c11compat/musl/*.c)
-C11_COMPAT_OBJECTS = $(C11_COMPAT_SOURCES:.c=.o)
+C11_COMPAT_UCHAR_SOURCES = $(wildcard genesis/vendor/c11compat/musl/*.c)
+C11_COMPAT_UCHAR_OBJECTS = $(C11_COMPAT_UCHAR_SOURCES:.c=.o)
 
-C11_COMPAT_LIB = lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
+C11_COMPAT_UCHAR_LIB = lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
 
-c11compat: build_message_c11compat $(C11_COMPAT_LIB)
+C11_COMPAT_LIB += $(C11_COMPAT_UCHAR_LIB)
+C11_COMPAT_CLEAN_TARGETS += clean_c11compat_uchar
 
-$(C11_COMPAT_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
-$(C11_COMPAT_LIB): LFLAGS =
-$(C11_COMPAT_LIB): $(C11_COMPAT_OBJECTS) | lib
+$(C11_COMPAT_UCHAR_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
+$(C11_COMPAT_UCHAR_LIB): LFLAGS = 	
+$(C11_COMPAT_UCHAR_LIB): $(C11_COMPAT_UCHAR_OBJECTS) | lib
 
-$(C11_COMPAT_OBJECTS): CLANG_FORMAT = DISABLED
-
-clean_c11compat:
-	-rm $(C11_COMPAT_OBJECTS)
-	-rm $(C11_COMPAT_LIB)
+clean_c11compat_uchar:
+	-rm $(C11_COMPAT_UCHAR_OBJECTS)
+	-rm $(C11_COMPAT_UCHAR_LIB)
 endif
 ifeq ($(C11_COMPAT_THREADS),1)
 C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/mesa/include
+C11_COMPAT_LFLAGS +=
+endif
+ifeq ($(C11_COMPAT_KANNEX),1)
+C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/safeclib/include
+C11_COMPAT_LFLAGS += -lsafec
+
+C11_COMPAT_KANNEX_LIB_VERSION = 3
+
+C11_COMPAT_KANNEX_LIB = lib/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
+_C11_COMPAT_KANNEX_LIB_INTERNAL = genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
+_C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN = $(wildcard genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
+_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE = genesis/vendor/c11compat/safeclib/Makefile
+
+C11_COMPAT_LIB += $(C11_COMPAT_KANNEX_LIB)
+
+# We could clean the submodule here for the base clean target, but we *really* want to avoid rebuilding this lib
+# (It takes forever)
+#C11_COMPAT_CLEAN_TARGETS += clean_c11compat_kannex
+clean_c11compat_kannex: | $(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE)
+	$(MAKE) -Cgenesis/vendor/c11compat/safeclib clean
+
+$(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE):
+	cd $(subst /,$(SEP),genesis/vendor/c11compat/safeclib && ./build-aux/autogen.sh)
+	cd $(subst /,$(SEP),genesis/vendor/c11compat/safeclib && ./configure --prefix=/usr)
+
+$(_C11_COMPAT_KANNEX_LIB_INTERNAL): $(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE)
+	$(MAKE) -Cgenesis/vendor/c11compat/safeclib
+
+$(C11_COMPAT_KANNEX_LIB): $(_C11_COMPAT_KANNEX_LIB_INTERNAL) | lib
+	$(CP) $(subst /,$(SEP),$(_C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN) lib)
+ifeq ($(PLATFORM),DWN)
+	install_name_tool -id @rpath/$(LIB_PREFIX)safec.$(C11_COMPAT_KANNEX_LIB_VERSION).$(DYNAMIC_LIB_SUFFIX) $(C11_COMPAT_KANNEX_LIB)
+endif
 endif
 endif
 
-ifneq ($(C11_COMPAT_UCHAR),1)
-c11compat: build_message_c11compat
-clean_c11compat:
-endif
+c11compat: build_message_c11compat $(C11_COMPAT_LIB) 
+clean_c11compat: $(C11_COMPAT_CLEAN_TARGETS)

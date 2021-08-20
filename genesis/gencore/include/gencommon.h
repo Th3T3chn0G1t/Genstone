@@ -77,6 +77,12 @@ GEN_DIAG_IGNORE_ALL
 #include <dirent.h> // Emulation provided on windows by https://github.com/tronkko/dirent
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#if PLATFROM != WIN
+#include <safe_lib.h>
+#include <safe_mem_lib.h>
+#include <safe_str_lib.h>
+#endif
 GEN_DIAG_REGION_END
 
 /**

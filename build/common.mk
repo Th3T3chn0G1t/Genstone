@@ -5,6 +5,21 @@ ifeq ($(OS),Windows_NT)
 SHELL := cmd.exe
 endif
 
+SEP = /
+CP = cp -r
+RM = rm
+RMDIR = rm -rf
+DIFF = diff
+CAT = cat
+ifeq ($(SHELL),cmd.exe)
+	SEP = \\
+	CP = copy /b /y
+	RM = del
+	RMDIR = rmdir
+	DIFF = fc
+	CAT = type
+endif
+
 ERROR_PREFIX = \\033[0;31m\033[1mError:\\033[0m
 INFO_PREFIX = \\033[0;34m\033[1mInfo:\\033[0m
 NOTE_PREFIX = \\033[0;36m\033[1mNote:\\033[0m
@@ -109,21 +124,6 @@ ifeq ($(PLATFORM),DEFAULT)
 			PLATFORM = BSD
 		endif
     endif
-endif
-
-SEP = /
-CP = cp -r
-RM = rm
-RMDIR = rm -rf
-DIFF = diff
-CAT = cat
-ifeq ($(SHELL),cmd.exe)
-	SEP = \\
-	CP = copy /b /y
-	RM = del
-	RMDIR = rmdir
-	DIFF = fc
-	CAT = type
 endif
 
 GLOBAL_C_FLAGS += -D__STDC_WANT_LIB_EXT1__=1 -std=c17 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)

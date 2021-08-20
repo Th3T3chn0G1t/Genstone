@@ -24,11 +24,9 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Clang-tidy
     - Clang-format
 - Development
+    - Static analysis CTU
     - CI
-        - Static analysis
-            - CTU
         - Prebuilt binaries
-    - Argument parser
     - genfs
         - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
         - Increase the tolerances on gen_path_relative

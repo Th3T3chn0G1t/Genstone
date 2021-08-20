@@ -27,4 +27,4 @@ out/*
 .vscode
 .vs
 
-.DS_STORE
+*.DS_STORE
