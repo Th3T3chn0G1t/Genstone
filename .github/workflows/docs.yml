@@ -22,6 +22,7 @@ jobs:
       - name: Publish
         run: |
           cd docs
+          ssh -vT git@github.com
           git init
           git branch -m gh-docs
           git config --global user.email "prs.ttg+gh@pm.me" # We'll just pretend it's me for now
