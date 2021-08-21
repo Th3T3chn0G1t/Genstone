@@ -26,7 +26,7 @@ jobs:
           git branch -m gh-docs
           git config --global user.email "prs.ttg+gh@pm.me" # We'll just pretend it's me for now
           git config --global user.name "Th3T3chn0G1t"
-          git remote add origin https://github.com/Th3T3chn0G1t/GenesisEngine
+          git remote add origin git@github.com:Th3T3chn0G1t/GenesisEngine
           git add *
           git commit -m "Documentation build from latest changes"
           git push -f -u origin gh-docs
