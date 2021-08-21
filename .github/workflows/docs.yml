@@ -29,4 +29,4 @@ jobs:
           git remote add origin https://github.com/Th3T3chn0G1t/GenesisEngine
           git add *
           git commit -m "Documentation build from latest changes"
-          git push --force --set-upstream origin origin gh-docs
+          git push -f -u origin gh-docs
