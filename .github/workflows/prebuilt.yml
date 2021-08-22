@@ -51,9 +51,9 @@ jobs:
       - name: Publish (Debug)
         run: |
           cd lib
-          mkdir ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug
-          mv * ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug
-          mv ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug .
+          mkdir ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug
+          mv * ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug
+          mv ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug .
           
           git init
           git branch -m prebuilts
