@@ -34,23 +34,62 @@ jobs:
           linux: automake
           macos: automake
         
-      - name: Build
+      - name: Build (Debug)
         if: ${{ runner.os == 'windows' }}
         run: |
+          set OVERRIDE_BUILD_MODE="DEBUG"
           set OVERRIDE_TEST="NONE"
           make
 
-      - name: Build
+      - name: Build (Debug)
         if: ${{ runner.os != 'windows' }}
-        run: OVERRIDE_TEST=NONE make
+        run: |
+          export OVERRIDE_BUILD_MODE=DEBUG
+          export OVERRIDE_TEST=NONE
+          make
 
-      - name: Publish
+      - name: Publish (Debug)
         run: |
           cd lib
-          mkdir ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")
-          mv * ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")
-          mv ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA") .
+          mkdir ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug
+          mv * ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug
+          mv ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-debug .
           
+          git init
+          git branch -m prebuilts
+          git config --global user.email "prs.ttg+gh@pm.me" # We'll just pretend it's me for now
+          git config --global user.name "Th3T3chn0G1t"
+          git remote add origin https://git:${{ secrets.GITHUB_TOKEN }}@github.com/Th3T3chn0G1t/GenesisEngine
+          git pull origin prebuilts
+          git add *
+          git commit -m "Binary build from latest changes"
+          git push -u origin prebuilts
+
+          cd ..
+          rm -rf lib/*
+          make clean
+
+      - name: Build (Release)
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          set OVERRIDE_BUILD_MODE="RELEASE"
+          set OVERRIDE_TEST="NONE"
+          make
+
+      - name: Build (Release)
+        if: ${{ runner.os != 'windows' }}
+        run: |
+          export OVERRIDE_BUILD_MODE=RELEASE
+          export OVERRIDE_TEST=NONE
+          make
+
+      - name: Publish (Release)
+        run: |
+          cd lib
+          mkdir ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
+          mv * ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
+          mv ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-release .
+
           git init
           git branch -m prebuilts
           git config --global user.email "prs.ttg+gh@pm.me" # We'll just pretend it's me for now
