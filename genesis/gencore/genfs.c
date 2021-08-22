@@ -52,7 +52,7 @@ gen_path_relative(char* restrict output_path, const char* const restrict path, c
 
     size_t mark = 0;
     while(path[mark] == to[mark]) ++mark;
-    strcpy(output_path, path + mark);
+    strcpy_s(output_path, GEN_PATH_MAX, path + mark);
 
     return GEN_OK;
 }
@@ -62,7 +62,7 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
         return GEN_INVALID_PARAMETER;
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-    strcpy(output_filename, strrchr(path, '/') + 1);
+    strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
 
     return GEN_OK;
 }
@@ -85,7 +85,7 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
     size_t mark = (size_t) (strchr(strrchr(path, '/'), '.') - path);
-    strcpy(output_extension, path + mark);
+    strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
     output_extension[mark - 1] = '\0';
 
     return GEN_OK;
@@ -239,8 +239,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
     if(error)
         return gen_convert_errno(errno);
 
-    error = (int) fread(
-        output_buffer, sizeof(char), end - start, handle->file_handles[0]);
+    error = (int) fread(output_buffer, sizeof(char), end - start, handle->file_handles[0]);
     if(!error) {
         if(ferror(handle->file_handles[0]))
             error = errno;

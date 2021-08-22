@@ -23,7 +23,6 @@ If the project ever garners multiple contributors this can be migrated to Github
     - Clang-tidy
     - Clang-format
 - Development
-    - Prebuilt binaries
     - genfs
         - Increase the tolerances on gen_path_relative
     - gencommon
