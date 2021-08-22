@@ -40,8 +40,8 @@ jobs:
       - name: Publish
         run: |
           cd lib
-          mkdir ${{ matrix.os }}-${{ $(git rev-parse --short "$GITHUB_SHA") }}
-          mv * ${{ matrix.os }}-${{ $(git rev-parse --short "$GITHUB_SHA") }}
+          mkdir ${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")
+          mv * ${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")
           
           git init
           git branch -m prebuilts
