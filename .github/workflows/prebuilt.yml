@@ -49,7 +49,7 @@ jobs:
           git config --global user.email "prs.ttg+gh@pm.me" # We'll just pretend it's me for now
           git config --global user.name "Th3T3chn0G1t"
           git remote add origin https://git:${{ secrets.GITHUB_TOKEN }}@github.com/Th3T3chn0G1t/GenesisEngine
-          git pull -u origin
+          git pull
           git add *
           git commit -m "Binary build from latest changes"
           git push -f -u origin prebuilts
