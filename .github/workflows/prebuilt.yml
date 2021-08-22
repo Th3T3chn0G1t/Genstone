@@ -44,8 +44,8 @@ jobs:
       - name: Build (Debug)
         if: ${{ runner.os != 'windows' }}
         run: |
-          OVERRIDE_BUILD_MODE=DEBUG
-          OVERRIDE_TEST=NONE
+          export OVERRIDE_BUILD_MODE=DEBUG
+          export OVERRIDE_TEST=NONE
           make
 
       - name: Publish (Debug)
@@ -79,8 +79,8 @@ jobs:
       - name: Build (Release)
         if: ${{ runner.os != 'windows' }}
         run: |
-          OVERRIDE_BUILD_MODE=RELEASE
-          OVERRIDE_TEST=NONE
+          export OVERRIDE_BUILD_MODE=RELEASE
+          export OVERRIDE_TEST=NONE
           make
 
       - name: Publish (Release)
