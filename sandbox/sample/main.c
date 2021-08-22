@@ -3,6 +3,7 @@
 
 #include <gencommon.h>
 #include <genesis.h>
+#include <gentooling.h>
 
 static int appticks = 0;
 static gen_node_t approot = {GEN_ROOT_TYPE, sizeof(int), &appticks, 0, NULL, NULL};

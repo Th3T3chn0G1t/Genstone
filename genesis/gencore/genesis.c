@@ -3,12 +3,27 @@
 
 #include "include/genesis.h"
 #include "include/gencommon.h"
+#include "include/gentooling.h"
 
 gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const restrict source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* const restrict data_handlers, void* restrict passthrough) {
-    if(!output_node) return GEN_INVALID_PARAMETER;
-    if(!source) return GEN_INVALID_PARAMETER;
-    if(!type_handler) return GEN_INVALID_PARAMETER;
-    if(!data_handlers) return GEN_INVALID_PARAMETER;
+    GEN_FRAME_BEGIN;
+
+    if(!output_node) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!source) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!type_handler) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!data_handlers) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
 
     size_t typestring_mark_out = 0;
     while(source[++typestring_mark_out] != '\n');
@@ -20,17 +35,35 @@ gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const 
 
     data_handlers[type_handler(typestring, passthrough)](output_node, source + typestring_mark_out + 1, passthrough);
 
+    GEN_FRAME_END;
+
     return GEN_OK;
 }
 
 gen_error_t gen_node_export(char* restrict output_source, const gen_node_t* const restrict node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* const restrict data_handlers, void* restrict passthrough) {
-    if(!output_source) return GEN_INVALID_PARAMETER;
-    if(!node) return GEN_INVALID_PARAMETER;
-    if(!type_handler) return GEN_INVALID_PARAMETER;
-    if(!data_handlers) return GEN_INVALID_PARAMETER;
+    GEN_FRAME_BEGIN;
+
+    if(!output_source) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!node) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!type_handler) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!data_handlers) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
 
     type_handler(output_source, node->type, passthrough);
     data_handlers[node->type](output_source, node, passthrough);
+
+    GEN_FRAME_END;
 
     return GEN_OK;
 }

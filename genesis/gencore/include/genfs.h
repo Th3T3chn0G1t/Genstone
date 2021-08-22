@@ -67,16 +67,6 @@ typedef struct {
 extern gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path);
 
 /**
- * Gets the relative representation of a path
- * @param output_path storage for the output path. Should be GEN_PATH_MAX in size if length is unknown
- * @param path the canonical path to get a relative representation for
- * @param to the canonical path to make path relative to
- * @note If the path cannot be made relative, the output is set equal to path
- * @return an error code
- */
-extern gen_error_t gen_path_relative(char* restrict output_path, const char* const restrict path, const char* const restrict to);
-
-/**
  * Gets the filename of a path
  * @param output_filename storage for the output filename. Should be GEN_PATH_MAX in size if length is unknown
  * @param path the path to get a filename from

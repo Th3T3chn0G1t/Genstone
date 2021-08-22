@@ -16,28 +16,22 @@ If the project ever garners multiple contributors this can be migrated to Github
         - Embedded `dlltool` binary or equivalent script for Windows builds
 - Documentation
     - Formal writeup for Genesis
-    - Automatic Github action for documentation generator
 - Contribution
     - Comprehensive contribution guidelines
     - Contribution ettiquette
     - Clang-tidy
     - Clang-format
 - Development
-    - genfs
-        - Increase the tolerances on gen_path_relative
-    - gencommon
-        - streq to replace strcmp
-    - Profiling
-        - Frequency profiling (how often something happens)
-        - Framed profiling (how much of something is spent where)
-    - Callback attribute to allow optimizations https://clang.llvm.org/docs/AttributeReference.html#callback
+    - Tooling
+        - Call stacks
+        - Profiling
+            - Frequency profiling (how often something happens)
+            - Framed profiling (how much of something is spent where)
     - generator (editor)
         - Visual build tool
     - genesis
         - run tree func
     - Windows GetLastError conversion table (?)
-    - gendl
-        - Dylib introspection
 - Examples
     - Write examples
         - Build system module examples

@@ -2,15 +2,36 @@
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
 #include "include/genargs.h"
+#include "include/gentooling.h"
 
-gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t callback, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* restrict passthrough) {
-    if(!argc) return GEN_OK;
+gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* restrict passthrough) {
+    GEN_FRAME_BEGIN;
 
-    if(!argv) return GEN_INVALID_PARAMETER;
-    if(argc < 0) return GEN_INVALID_PARAMETER;
-    if(!callback) return GEN_INVALID_PARAMETER;
-    if(n_short_args && !short_args) return GEN_INVALID_PARAMETER;
-    if(n_long_args && !long_args) return GEN_INVALID_PARAMETER;
+    if(!argc) {
+        GEN_FRAME_END;
+        return GEN_OK;
+    }
+
+    if(!argv) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(argc < 0) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(!handler) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(n_short_args && !short_args) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
+    if(n_long_args && !long_args) {
+        GEN_FRAME_END;
+        return GEN_INVALID_PARAMETER;
+    }
 
     // Precalculating the long args' lengths to save time while looping
     // We need this weirdness to avoid creating a zero-length VLA
@@ -74,10 +95,14 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
             value = (*arg);
         }
 
-        if(argn == SIZE_MAX)
+        if(argn == SIZE_MAX) {
+            GEN_FRAME_END;
             return GEN_NO_SUCH_OBJECT;
-        callback(type, argn, value, passthrough);
+        }
+        handler(type, argn, value, passthrough);
     }
+
+    GEN_FRAME_END;
 
     return GEN_OK;
 }

@@ -1,4 +1,5 @@
 #include "include/genuine.h"
+#include <gentooling.h>
 
 const static gen_ui_rect_t ninepatch_source_rects[9] =
 {
@@ -27,6 +28,8 @@ const static gen_ui_rect_t ninepatch_source_rects[9] =
     } while(0)
 
 void gen_ui_draw_element(const gen_ui_render_handler_t handler, const gen_ui_element_t* const restrict element, const uint16_t destination_scale, void* restrict passthrough) {
+    GEN_FRAME_BEGIN;
+
     gen_ui_rect_t source;
     gen_ui_rect_t destination;
 
@@ -39,4 +42,6 @@ void gen_ui_draw_element(const gen_ui_render_handler_t handler, const gen_ui_ele
     GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_BL, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1);
     GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_B , (uint16_t) 1, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1);
     GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_BR, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1);
+
+    GEN_FRAME_END;
 }

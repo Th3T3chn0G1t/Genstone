@@ -14,7 +14,7 @@
 #include "gencommon.h"
 
 /**
- * Argument types to be passed to parser callback
+ * Argument types to be passed to parser handler
  */
 typedef enum {
     /**

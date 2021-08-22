@@ -22,13 +22,6 @@ int main() {
 
     GEN_REQUIRE_EQUAL(GEN_OK, error);
 
-    glog(INFO, "Testing gen_path_relative()...");
-    char relative[GEN_PATH_MAX];
-    error = gen_path_relative(relative, "/foo/bar/fizz", "/foo/bar/");
-
-    GEN_REQUIRE_EQUAL(GEN_OK, error);
-    GEN_REQUIRE_EQUAL_STRING("fizz", relative);
-
     glog(INFO, "Testing gen_path_filename()...");
     char filename[GEN_PATH_MAX];
     error = gen_path_filename(filename, "foo/bar/fizz.txt");

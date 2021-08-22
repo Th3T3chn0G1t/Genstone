@@ -223,6 +223,7 @@ typedef enum {
         printf("%s", GEN_LOGGER_##level##_PREFIX); \
         puts(string); \
     } while(0)
+
 /**
  * `printf`-style formatted logging function
  * @param level a gen_logging_level_t to determine the prefix from
@@ -334,9 +335,8 @@ typedef enum {
  * @see GEN_DEBUG_FOREACH_PRECALC
  */
 #define GEN_FOREACH(iter, memb, len, container) \
-    GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container); \
-    __typeof__(GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]) memb = GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]; \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len); memb = GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[iter + 1])
+    __typeof__((container)[0]) memb = (container)[0]; \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
 /**
  * Iterates over a container with explicit length
  * `memb` is a pointer to the indexed member

@@ -1,5 +1,8 @@
 # Building
 
+#### Note
+Prebuilt binaries and documentation are available in the `prebuilts` and `gh-docs` branches respectively
+
 Genesis uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
 
 The base `Makefile` in the project root tries to build the sandbox project be default, generating it if not present
