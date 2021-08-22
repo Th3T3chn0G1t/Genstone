@@ -17,18 +17,14 @@ If the project ever garners multiple contributors this can be migrated to Github
 - Documentation
     - Formal writeup for Genesis
     - Automatic Github action for documentation generator
-    - Github pages for generated docpages
 - Contribution
     - Comprehensive contribution guidelines
     - Contribution ettiquette
     - Clang-tidy
     - Clang-format
 - Development
-    - Static analysis CTU
-    - CI
-        - Prebuilt binaries
+    - Prebuilt binaries
     - genfs
-        - Windows 10 1607 long paths support https://docs.microsoft.com/en-us/windows/win32/fileio maximum-file-path-limitation
         - Increase the tolerances on gen_path_relative
     - gencommon
         - streq to replace strcmp

@@ -92,7 +92,9 @@ endif
 ifneq ($(TEST),BUILD)
 ifneq ($(TEST),UNITS)
 ifneq ($(TEST),ALL)
+ifneq ($(TEST),NONE)
 ERROR += "$(ERROR_PREFIX) Invalid value for TEST: \"$(TEST)\"\n"
+endif
 endif
 endif
 endif
@@ -240,20 +242,14 @@ endif
 
 clean_tmpfile:
 	-$(RM) $(wildcard *.tmp)
-	-$(RM) $(wildcard analysis/*.plist)
 
-%$(OBJECT_SUFFIX): %.c build/config.mk analysis
+%$(OBJECT_SUFFIX): %.c build/config.mk
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
-#	@echo "$(ACTION_PREFIX)mv $(subst /,$(SEP),$(subst .c,.plist,$(notdir $<))) analysis$(ACTION_SUFFIX)"
-#	@mv $(subst /,$(SEP),$(subst .c,.plist,$(notdir $<))) analysis
 # 	 -($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
 # 	 -$(CLANG_FORMAT) --dry-run -Werror $<
-
-analysis:
-	-mkdir $@
 
 %$(STATIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
