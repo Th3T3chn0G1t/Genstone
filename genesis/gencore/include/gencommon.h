@@ -78,7 +78,7 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#if PLATFROM != WIN
+#if PLATFORM != WIN
 #include <safe_lib.h>
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
