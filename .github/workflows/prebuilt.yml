@@ -52,4 +52,4 @@ jobs:
           git pull origin prebuilts
           git add *
           git commit -m "Binary build from latest changes"
-          git push -f -u origin prebuilts
+          git push -u origin prebuilts
