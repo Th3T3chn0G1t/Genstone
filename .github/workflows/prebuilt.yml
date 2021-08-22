@@ -77,16 +77,13 @@ jobs:
           make
 
       - name: Build (Release)
-# Linux build has file corruption issues
-#       if: ${{ runner.os != 'windows' }}
-        if: ${{ runner.os == 'macOS' }}
+        if: ${{ runner.os != 'windows' }}
         run: |
           export OVERRIDE_BUILD_MODE=RELEASE
           export OVERRIDE_TEST=NONE
           make
 
       - name: Publish (Release)
-        if: ${{ runner.os != 'ubuntu' }}
         run: |
           cd lib
           mkdir ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
