@@ -77,18 +77,21 @@ jobs:
           make
 
       - name: Build (Release)
-        if: ${{ runner.os != 'windows' }}
+# Linux build has file corruption issues
+#       if: ${{ runner.os != 'windows' }}
+        if: ${{ runner.os == 'macOS' }}
         run: |
           export OVERRIDE_BUILD_MODE=RELEASE
           export OVERRIDE_TEST=NONE
           make
 
       - name: Publish (Release)
+        if: ${{ runner.os != 'ubuntu' }}
         run: |
           cd lib
-          mkdir ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
-          mv * ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
-          mv ../${{ matrix.os }}-$(git rev-parse --short "$GITHUB_SHA")-release .
+          mkdir ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
+          mv * ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-release
+          mv ../${{ runner.os }}-$(git rev-parse --short "$GITHUB_SHA")-release .
 
           git init
           git branch -m prebuilts
