@@ -35,6 +35,13 @@ jobs:
           macos: automake
         
       - name: Build
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          set OVERRIDE_TEST="NONE"
+          make
+
+      - name: Build
+        if: ${{ runner.os != 'windows' }}
         run: OVERRIDE_TEST=NONE make
 
       - name: Publish
