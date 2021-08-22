@@ -324,30 +324,6 @@ typedef enum {
 #define GEN_INTERNAL_FOREACH_ITER_DECL size_t
 #endif
 
-#if GEN_DEBUG_FOREACH_PRECALC == ENABLED
-/**
- * The identifier to use in the loop for accessing `len`
- * @see GEN_DEBUG_FOREACH_PRECALC
- */
-#define GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (GEN_INTERNAL_foreach_length__##iter##__##memb##__##__func__##__LINE__);
-/**
- * The identifier to use in the loop for accessing `container`
- * @see GEN_DEBUG_FOREACH_PRECALC
- */
-#define GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (GEN_INTERNAL_foreach_container__##iter##__##memb##__##__func__##__LINE__);
-/**
- * Predeclarations for `GEN_FOREACH` statements
- * @see GEN_DEBUG_FOREACH_PRECALC
- */
-#define GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container) \
-    const __typeof__((container)[0])* const GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) = (const __typeof__((container)[0])* const restrict) (container); \
-    const GEN_INTERNAL_FOREACH_ITER_DECL GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) = (const GEN_INTERNAL_FOREACH_ITER_DECL) (len)
-#else
-#define GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len) (len)
-#define GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container) (container) 
-#define GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container) (void) NULL
-#endif
-
 /**
  * Iterates over a container with explicit length
  * @param iter the identifier to use for the iterating index
@@ -371,8 +347,7 @@ typedef enum {
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
-    GEN_INTERNAL_FOREACH_PREDECL(iter, memb, len, container); \
-    __typeof__(GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0])* memb = &GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[0]; \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) GEN_INTERNAL_FOREACH_LENGTH_IDENTIFIER(iter, memb, len); memb = &GEN_INTERNAL_FOREACH_CONTAINER_IDENTIFIER(iter, memb, container)[iter + 1])
+    __typeof__((container)[0])* memb = &(container)[0]; \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
 #endif
