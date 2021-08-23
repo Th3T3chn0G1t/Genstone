@@ -174,6 +174,11 @@ GEN_DIAG_REGION_END
 #define GEN_ANSI_COLOR_LIGHT(color) GEN_ANSI_SEQUENCE(GEN_INTERNAL_ANSI_COLOR_LIGHT_PREFIX color)
 
 /**
+ * The ASCII code `BEL`
+ */
+#define GEN_ASCII_BELL '\a'
+
+/**
  * Logging levels for logging functions
  */
 typedef enum {
@@ -224,15 +229,34 @@ typedef enum {
  */
 #define GEN_LOGGER_FATAL_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_PURPLE) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Fatal: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
 
+#ifndef GEN_TOOLING_H
+/**
+ * The block to execute if logging level `>=ERROR`
+ */
+#define GEN_INTERNAL_LOG_ERROR_BLOCK \
+    do { \
+        putchar(GEN_ASCII_BELL); \
+    } while(0)
+#else
+#define GEN_INTERNAL_LOG_ERROR_BLOCK \
+    do { \
+        putchar(GEN_ASCII_BELL); \
+        gtrace; \
+    } while(0)
+#endif
+
 /**
  * Basic string logging function
  * @param level a gen_logging_level_t to determine the prefix from
  * @param string the string to print
+ * @note include gentooling.h first to get trace information on error
  */
 #define glog(level, string) \
     do { \
-        printf("%s", GEN_LOGGER_##level##_PREFIX); \
-        puts(string); \
+        FILE* const restrict streamp = level >= ERROR ? stderr : stdout; \
+        fprintf(streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
+        fprintf(streamp, "%s\n", string); \
+        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
     } while(0)
 
 /**
@@ -240,12 +264,14 @@ typedef enum {
  * @param level a gen_logging_level_t to determine the prefix from
  * @param format a format string
  * @param ... the format arguments to print
+ * @note include gentooling.h first to get trace information on error
  */
 #define glogf(level, format, ...) \
     do { \
-        printf("%s", GEN_LOGGER_##level##_PREFIX); \
-        printf(format, __VA_ARGS__); \
-        printf("\n"); \
+        FILE* const restrict __streamp = level >= ERROR ? stderr : stdout; \
+        fprintf(__streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
+        fprintf(__streamp, format, __VA_ARGS__); \
+        fprintf(__streamp, "\n"); \
     } while(0)
 
 /**

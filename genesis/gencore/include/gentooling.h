@@ -5,6 +5,8 @@
  * @file gentooling.h
  * Provides utilities for tooling and profiling
  */
+#ifndef GEN_TOOLING_H
+#define GEN_TOOLING_H
 
 #include "gencommon.h"
 
@@ -97,3 +99,5 @@ extern void gen_internal_tooling_frame_scope_end(const char* const restrict pass
  * Outputs backtrace information
  */
 #define gtrace GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions) printf("%s%p %s() %s\n", GEN_LOGGER_TRACE_PREFIX, (void*) gen_tooling_call_stack.addresses[i], trace, gen_tooling_call_stack.files[i])
+
+#endif
