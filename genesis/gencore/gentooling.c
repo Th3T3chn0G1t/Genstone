@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+
 #include "include/gentooling.h"
 
 gen_tooling_stack_t gen_tooling_call_stack = { 0, { 0 }, { 0 }, { 0 } };
