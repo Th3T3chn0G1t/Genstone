@@ -7,7 +7,7 @@ build_message_genfs_test:
 	@echo "$(SECTION_PREFIX) Genfs Test"
 	@echo "$(INFO_PREFIX) Testing Genesis filesystem utilities"
 
-genfs_test: build_message_genfs_test $(GEN_FS_TEST)
+genfs_test: gencore build_message_genfs_test $(GEN_FS_TEST)
 	@echo "$(ACTION_PREFIX)$(GEN_FS_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_FS_TEST))
@@ -17,7 +17,7 @@ endif
 
 $(GEN_FS_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_FS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
-$(GEN_FS_TEST): $(GEN_FS_TEST_OBJECTS) $(GEN_CORE_LIB)
+$(GEN_FS_TEST): $(GEN_FS_TEST_OBJECTS)
 
 clean_genfs_test:
 	-$(RM) $(subst /,$(SEP),$(GEN_FS_TEST_OBJECTS))

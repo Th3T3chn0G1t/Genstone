@@ -7,7 +7,7 @@ build_message_c11compat_test:
 	@echo "$(SECTION_PREFIX) C11 Compat Test"
 	@echo "$(INFO_PREFIX) Testing C11 optional feature compatibility layers"
 
-c11compat_test: build_message_c11compat_test $(C11_COMPAT_TEST)
+c11compat_test: gencore build_message_c11compat_test $(C11_COMPAT_TEST)
 	@echo "$(ACTION_PREFIX)$(C11_COMPAT_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(C11_COMPAT_TEST))
@@ -17,7 +17,7 @@ endif
 
 $(C11_COMPAT_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(C11_COMPAT_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
-$(C11_COMPAT_TEST): $(C11_COMPAT_TEST_OBJECTS) $(GEN_CORE_LIB)
+$(C11_COMPAT_TEST): $(C11_COMPAT_TEST_OBJECTS)
 
 clean_c11compat_test:
 	-$(RM) $(subst /,$(SEP),$(C11_COMPAT_TEST_OBJECTS))

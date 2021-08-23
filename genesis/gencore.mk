@@ -14,7 +14,7 @@ build_message_gencore:
 	@echo "$(SECTION_PREFIX) Gencore"
 	@echo "$(INFO_PREFIX) Core Genesis utilities"
 
-gencore: build_message_gencore $(GEN_CORE_LIB)
+gencore: c11compat build_message_gencore $(GEN_CORE_LIB)
 
 _GEN_CORE_CFLAGS = $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),WIN)
@@ -30,7 +30,7 @@ endif
 
 $(GEN_CORE_LIB): CFLAGS = $(C11_COMPAT_CFLAGS) $(_GEN_CORE_CFLAGS)
 $(GEN_CORE_LIB): LFLAGS = -Llib $(C11_COMPAT_LFLAGS) $(_GEN_CORE_LFLAGS)
-$(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) $(C11_COMPAT_LIB) | lib
+$(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) | lib
 
 $(GEN_CORE_OBJECTS): $(wildcard genesis/gencore/include/*.h)
 

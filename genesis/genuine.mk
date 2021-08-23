@@ -10,11 +10,11 @@ build_message_genuine:
 	@echo "$(SECTION_PREFIX) Genuine"
 	@echo "$(INFO_PREFIX) Genesis GUI module"
 
-genuine: build_message_genuine $(GEN_UI_LIB)
+genuine: gencore build_message_genuine $(GEN_UI_LIB)
 
 $(GEN_UI_LIB): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_UI_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
-$(GEN_UI_LIB): $(GEN_UI_OBJECTS) $(GEN_CORE_LIB) | lib
+$(GEN_UI_LIB): $(GEN_UI_OBJECTS) | lib
 
 $(GEN_UI_OBJECTS): $(wildcard genesis/genuine/include/*.h)
 

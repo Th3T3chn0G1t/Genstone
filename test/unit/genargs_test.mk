@@ -7,7 +7,7 @@ build_message_genargs_test:
 	@echo "$(SECTION_PREFIX) Genargs Test"
 	@echo "$(INFO_PREFIX) Testing Genesis argument parser"
 
-genargs_test: build_message_genargs_test $(GEN_ARGS_TEST)
+genargs_test: gencore build_message_genargs_test $(GEN_ARGS_TEST)
 	@echo "$(ACTION_PREFIX)$(GEN_ARGS_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_ARGS_TEST))
@@ -17,7 +17,7 @@ endif
 
 $(GEN_ARGS_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_ARGS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
-$(GEN_ARGS_TEST): $(GEN_ARGS_TEST_OBJECTS) $(GEN_CORE_LIB)
+$(GEN_ARGS_TEST): $(GEN_ARGS_TEST_OBJECTS)
 
 clean_genargs_test:
 	-$(RM) $(subst /,$(SEP),$(GEN_ARGS_TEST_OBJECTS))
