@@ -12,11 +12,9 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
     // Just ignore it for now
 
     if(!output_dylib) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!lib_name) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
 
@@ -39,17 +37,14 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
     errno_t error = 0;
     error = memcpy_s(lib_file_name, lib_file_name_len, lib_prefix, (sizeof(lib_prefix) - 1));
     if(error) {
-        GEN_FRAME_END;
         return gen_convert_errno(error);
     }
     error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1), lib_file_name_len - (sizeof(lib_prefix) - 1), lib_name, lib_name_len);
     if(error) {
-        GEN_FRAME_END;
         return gen_convert_errno(error);
     }
     error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1) + lib_name_len, lib_file_name_len - ((sizeof(lib_prefix) - 1) + lib_name_len), lib_suffix, (sizeof(lib_suffix) - 1));
     if(error) {
-        GEN_FRAME_END;
         return gen_convert_errno(error);
     }
 
@@ -57,74 +52,61 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 
 #if PLATFORM == WIN
     if(!(*output_dylib = LoadLibraryA(lib_file_name))) {
-        GEN_FRAME_END;
         return gen_convert_winerr(GetLastError());
     }
 #else
     if(!(*output_dylib = dlopen(lib_file_name, 0))) {
         glogf(ERROR, "Failed to load library %s: %s", lib_file_name, dlerror());
-        GEN_FRAME_END;
         return gen_convert_errno(errno);
     }
 #endif
 
-    GEN_FRAME_END;
 
     return GEN_OK;
 }
 
 gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
     if(!output_address) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!dylib) { // This presumes that a valid dylib handle will always be truthy
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!symname) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
 
 #if PLATFORM == WIN
     if(!(*output_address = GetProcAddress(dylib, symname))) {
-        GEN_FRAME_END;
         return gen_convert_winerr(GetLastError());
     }
 #else
     if(!(*output_address = dlsym(dylib, symname))) {
         glogf(ERROR, "Failed to locate symbol %s: %s", symname, dlerror());
-        GEN_FRAME_END;
         return gen_convert_errno(errno);
     }
 #endif
 
-    GEN_FRAME_END;
 
     return GEN_OK;
 }
 
 gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
     if(!dylib) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
 
 #if PLATFORM == WIN
     if(!FreeLibrary(dylib)) {
-        GEN_FRAME_END;
         return gen_convert_winerr(GetLastError());
     }
 #else
     if(dlclose(dylib)) {
         glogf(ERROR, "Failed to unload library: %s", dlerror());
-        GEN_FRAME_END;
         return gen_convert_errno(errno);
     }
 #endif
 
-    GEN_FRAME_END;
 
     return GEN_OK;
 }

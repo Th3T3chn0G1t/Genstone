@@ -8,28 +8,22 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
     GEN_FRAME_BEGIN;
 
     if(!argc) {
-        GEN_FRAME_END;
         return GEN_OK;
     }
 
     if(!argv) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(argc < 0) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!handler) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(n_short_args && !short_args) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(n_long_args && !long_args) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
 
@@ -96,13 +90,10 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
         }
 
         if(argn == SIZE_MAX) {
-            GEN_FRAME_END;
-            return GEN_NO_SUCH_OBJECT;
+                return GEN_NO_SUCH_OBJECT;
         }
         handler(type, argn, value, passthrough);
     }
-
-    GEN_FRAME_END;
 
     return GEN_OK;
 }

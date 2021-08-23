@@ -9,19 +9,15 @@ gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const 
     GEN_FRAME_BEGIN;
 
     if(!output_node) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!source) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!type_handler) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!data_handlers) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
 
@@ -35,7 +31,6 @@ gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const 
 
     data_handlers[type_handler(typestring, passthrough)](output_node, source + typestring_mark_out + 1, passthrough);
 
-    GEN_FRAME_END;
 
     return GEN_OK;
 }
@@ -44,26 +39,21 @@ gen_error_t gen_node_export(char* restrict output_source, const gen_node_t* cons
     GEN_FRAME_BEGIN;
 
     if(!output_source) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!node) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!type_handler) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
     if(!data_handlers) {
-        GEN_FRAME_END;
         return GEN_INVALID_PARAMETER;
     }
 
     type_handler(output_source, node->type, passthrough);
     data_handlers[node->type](output_source, node, passthrough);
 
-    GEN_FRAME_END;
 
     return GEN_OK;
 }

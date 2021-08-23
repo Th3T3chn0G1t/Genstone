@@ -10,24 +10,27 @@ typedef struct {
     const char* files[GEN_TOOLING_DEPTH];
 } gen_tooling_stack_t;
 
-typedef void (*gen_tooling_stack_push_handler_t) (gen_tooling_stack_t* const restrict);
-typedef void (*gen_tooling_stack_pop_handler_t) (gen_tooling_stack_t* const restrict);
+typedef void (*gen_tooling_stack_push_handler_t) (void);
+typedef void (*gen_tooling_stack_pop_handler_t) (void);
 
 extern gen_tooling_stack_t gen_tooling_call_stack;
 
 extern gen_tooling_stack_push_handler_t gen_tooling_push_handler;
 extern gen_tooling_stack_pop_handler_t gen_tooling_pop_handler;
 
-extern void gen_tooling_stack_push(gen_tooling_stack_t* const restrict call_stack, const char* restrict frame, const char* restrict file);
-extern void gen_tooling_stack_pop(gen_tooling_stack_t* const restrict call_stack);
+extern void gen_tooling_stack_push(const char* restrict frame, const char* restrict file);
+extern void gen_tooling_stack_pop(void);
 
-#define GEN_FRAME_BEGIN gen_tooling_stack_push(&gen_tooling_call_stack, __func__, __FILE__)
-#define GEN_FRAME_END gen_tooling_stack_pop(&gen_tooling_call_stack)
+extern void gen_internal_tooling_frame_scope_end(const char* const restrict passthrough);
+
+#define GEN_FRAME_BEGIN \
+    __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char __frame_scope_tmpvar; \
+    gen_tooling_stack_push(__func__, __FILE__)
 
 #define GEN_LOGGER_TRACE_PREFIX GEN_ANSI_COLOR_LIGHT(GEN_ANSI_GRAY) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Trace: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
 
 /**
- * Outputs trace information
+ * Outputs backtrace information
  */
 #define gtrace \
     GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.stack) \

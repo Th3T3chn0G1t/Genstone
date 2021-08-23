@@ -3,6 +3,7 @@
 
 #include <gencommon.h>
 #include <genesis.h>
+#include <gentooling.h>
 
 static int root_data_storage;
 static gen_node_t root;
