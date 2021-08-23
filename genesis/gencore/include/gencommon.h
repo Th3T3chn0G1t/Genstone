@@ -25,14 +25,6 @@
  */
 #define generic(...) _Generic(__VA_ARGS__)
 
-#ifndef __unused
-/**
- * Defines __unused on platforms which do not support it be default
- * Marks a variable or function as unused
- */
-#define __unused __attribute__((unused))
-#endif
-
 /**
  * Begins a diagnostic region
  */
@@ -45,6 +37,17 @@
  * Ignores all extra compiler warnings in a diagnostic region
  */
 #define GEN_DIAG_IGNORE_ALL pragma("clang diagnostic ignored \"-Weverything\"")
+
+GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+#ifndef __unused
+/**
+ * Defines __unused on platforms which do not support it be default
+ * Marks a variable or function as unused
+ */
+#define __unused __attribute__((unused))
+#endif
+GEN_DIAG_REGION_END
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
