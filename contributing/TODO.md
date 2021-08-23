@@ -5,33 +5,12 @@ This document is purposely being kept off Github issues to create distinction be
 
 If the project ever garners multiple contributors this can be migrated to Github issues
 
-- Building
-    - Generators
-        - Generate more IDE configs
-        - Visualisation
-            - Dependency graph
-            - Loc
-            - Development time
-    - Embedded toolchain
-        - Embedded `dlltool` binary or equivalent script for Windows builds
-- Documentation
-    - Formal writeup for Genesis
-- Contribution
-    - Comprehensive contribution guidelines
-    - Contribution ettiquette
-    - Clang-format
-- Development
-    - Tooling
-        - Profiling
-            - Frequency profiling (how often something happens)
-            - Framed profiling (how much of something is spent where)
-    - generator (editor)
-        - Visual build tool
-    - genesis
-        - run tree func
-    - Windows GetLastError conversion table (?)
-- Examples
-    - Write examples
-        - Build system module examples
-    - Perform CI on examples
-- Community
+- Embedded `dlltool` binary or equivalent script for Windows builds
+- `clang-format`
+- Profiling
+    - Frequency profiling (how often something happens)
+    - Framed profiling (how much of a timeframe is spent where)
+- generator (editor)
+    - Visual build tool
+- genesis run tree func
+- Build system module examples

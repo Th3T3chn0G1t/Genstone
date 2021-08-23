@@ -9,8 +9,6 @@ For contribution information see the `contributing/` folder
 
 ## About
 
-*Most of this is my own conjecture at the time of writing. I have plans to conduct more formal research into the topic but consider this a conceptual testing-ground*
-
 Genesis is an application engine attempting to use a different paradigm that can be more generally applied to the entire engine API, and indeed application design in general if I find the system to be effective, in order to create an "elegant" solution to the APIs design and interface.
 
 The basic concept is that Genesis applications consist of a tree, where each node has a type. For each node type there is a global callback that handles updating nodes every time the application tree is updated.
