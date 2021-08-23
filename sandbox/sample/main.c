@@ -9,8 +9,7 @@ static int appticks = 0;
 static gen_node_t approot = {GEN_ROOT_TYPE, sizeof(int), &appticks, 0, NULL, NULL};
 static mtx_t approot_mtx;
 
-static int thread_func(void* passthrough) {
-    (void) passthrough;
+static int thread_func(__unused void* passthrough) {
     glog(INFO, "Hello, C11 threads!");
 
     for(size_t i = 0; i < 10; ++i) {

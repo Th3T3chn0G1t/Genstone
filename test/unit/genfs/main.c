@@ -3,10 +3,7 @@
 
 #include <genfs.h>
 
-static void dir_handler(const char* file, void* passthrough) {
-    (void) file;
-    (void) passthrough;
-}
+static void dir_handler(__unused const char* file, __unused void* passthrough) {}
 
 // This is to make sure the test value is constant for require
 #define file_data "foobarfizzbuzz123"

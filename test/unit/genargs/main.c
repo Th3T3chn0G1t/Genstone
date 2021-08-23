@@ -8,8 +8,7 @@ static const char short_args[] = {'f', 'b'};
 
 static const char* long_args[] = {"fizz", "buzz"};
 
-static void arg_callback(const gen_arg_type_t type, const unsigned long argn, const char* value, void* passthrough) {
-    (void) passthrough;
+static void arg_callback(const gen_arg_type_t type, const unsigned long argn, const char* value, __unused void* passthrough) {
     switch(type) {
         case GEN_ARG_SHORT: {
             switch(argn) {

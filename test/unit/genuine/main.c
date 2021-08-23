@@ -6,11 +6,7 @@
 
 #define ELEMENT_SCALE (uint16_t) 5
 
-static void render_handler(const gen_ui_ninepatch_t* const restrict ninepatch, const gen_ui_rect_t source, const gen_ui_rect_t destination, void* restrict passthrough) {
-    (void) source;
-    (void) destination;
-    (void) passthrough;
-
+static void render_handler(const gen_ui_ninepatch_t* const restrict ninepatch, __unused const gen_ui_rect_t source, __unused const gen_ui_rect_t destination, __unused void* restrict passthrough) {
     GEN_REQUIRE_EQUAL(NULL, ninepatch->texture);
     GEN_REQUIRE_EQUAL(SOURCE_SCALE, ninepatch->source_scale);
 }

@@ -9,22 +9,19 @@ static int root_data_storage;
 static gen_node_t root;
 
 #define ROOT_TYPE_NAME "ROOT"
-static unsigned long type_loader(const char* type_name, void* passthrough) {
-    (void) passthrough;
+static unsigned long type_loader(const char* type_name, __unused void* passthrough) {
     GEN_REQUIRE_EQUAL_STRING(ROOT_TYPE_NAME, type_name);
 
     return GEN_ROOT_TYPE;
 }
 
-static void root_data_loader(gen_node_t* node, const char* data_string, void* passthrough) {
-    (void) passthrough;
+static void root_data_loader(gen_node_t* node, const char* data_string, __unused void* passthrough) {
     node->size = sizeof(int);
     root_data_storage = atoi(data_string);
     node->data = &root_data_storage;
 }
 
-static void type_exporter(char* output, unsigned long type, void* passthrough) {
-    (void) passthrough;
+static void type_exporter(char* output, unsigned long type, __unused void* passthrough) {
     switch(type) {
         case GEN_ROOT_TYPE: {
             sprintf(output, "%s\n", ROOT_TYPE_NAME);
@@ -33,8 +30,7 @@ static void type_exporter(char* output, unsigned long type, void* passthrough) {
     }
 }
 
-static void root_data_exporter(char* output, const gen_node_t* node, void* passthrough) {
-    (void) passthrough;
+static void root_data_exporter(char* output, const gen_node_t* node, __unused void* passthrough) {
     sprintf(output + (4 + 1 /* ROOT\n */), "%i\n", *(int*) node->data);
 }
 

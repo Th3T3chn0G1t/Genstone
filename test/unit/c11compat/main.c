@@ -8,9 +8,7 @@ static mtx_t ticks_mtx;
 
 static atomic_bool child_started = false;
 
-static int thread_func(void* pass) {
-    (void) pass;
-
+static int thread_func(__unused void* pass) {
     child_started = true;
 
     for(size_t i = 0; i < 10; ++i) {
