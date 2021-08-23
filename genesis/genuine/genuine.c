@@ -28,7 +28,7 @@ const static gen_ui_rect_t ninepatch_source_rects[9] =
     } while(0)
 
 void gen_ui_draw_element(const gen_ui_render_handler_t handler, const gen_ui_element_t* const restrict element, const uint16_t destination_scale, void* restrict passthrough) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_ui_draw_element);
 
     gen_ui_rect_t source;
     gen_ui_rect_t destination;

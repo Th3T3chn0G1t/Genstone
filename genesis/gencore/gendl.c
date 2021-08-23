@@ -6,7 +6,7 @@
 #include "include/gentooling.h"
 
 gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_dylib_load);
 
     // The static analyser has a bit of an aneurism about this function
     // Just ignore it for now

@@ -26,7 +26,7 @@
 #endif
 
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_canonical);
 
     if(!output_path) {
         return GEN_INVALID_PARAMETER;
@@ -51,7 +51,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 }
 
 gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_canonical);
 
     if(!output_filename) {
         return GEN_INVALID_PARAMETER;
@@ -64,7 +64,7 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
 }
 
 gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_pathname);
 
     if(!output_path) {
         return GEN_INVALID_PARAMETER;
@@ -80,7 +80,7 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 }
 
 gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_extension);
 
     if(!output_extension) {
         return GEN_INVALID_PARAMETER;
@@ -96,7 +96,7 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 }
 
 bool gen_path_exists(const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_exists);
 
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
@@ -109,7 +109,7 @@ bool gen_path_exists(const char* const restrict path) {
 }
 
 gen_error_t gen_path_validate(const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_validate);
 
     if(!path) {
         return GEN_INVALID_PARAMETER;
@@ -145,7 +145,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 }
 
 gen_error_t gen_path_create_dir(const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_create_dir);
 
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
@@ -166,7 +166,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 }
 
 gen_error_t gen_path_delete(const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_path_delete);
 
     GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
@@ -180,7 +180,7 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 }
 
 gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_handle_open);
 
     if(!output_handle) {
         return GEN_INVALID_PARAMETER;
@@ -218,7 +218,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 }
 
 gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_handle_close);
 
     if(!handle) {
         return GEN_INVALID_PARAMETER;
@@ -248,7 +248,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 }
 
 size_t gen_handle_size(const gen_filesystem_handle_t* const restrict handle) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_handle_size);
 
     if(!handle) {
         return GEN_INVALID_PARAMETER;
@@ -273,7 +273,7 @@ size_t gen_handle_size(const gen_filesystem_handle_t* const restrict handle) {
 }
 
 gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_file_read);
 
     if(!handle) {
         return GEN_INVALID_PARAMETER;
@@ -309,7 +309,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 }
 
 gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_file_write);
 
     if(!handle) {
         return GEN_INVALID_PARAMETER;
@@ -340,7 +340,7 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
 }
 
 gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* restrict passthrough) {
-    GEN_FRAME_BEGIN;
+    GEN_FRAME_BEGIN(gen_directory_list);
 
     if(!handle) {
         return GEN_INVALID_PARAMETER;
