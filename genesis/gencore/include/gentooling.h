@@ -96,4 +96,4 @@ extern void gen_internal_tooling_frame_scope_end(const char* const restrict pass
 /**
  * Outputs backtrace information
  */
-#define gtrace GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.stack) printf("%s%s %s() %s\n", GEN_LOGGER_TRACE_PREFIX, trace, gen_tooling_call_stack.addresses[i], gen_tooling_call_stack.files[i])
+#define gtrace GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions) printf("%s%p %s() %s\n", GEN_LOGGER_TRACE_PREFIX, (void*) gen_tooling_call_stack.addresses[i], trace, gen_tooling_call_stack.files[i])
