@@ -25,6 +25,14 @@
  */
 #define generic(...) _Generic(__VA_ARGS__)
 
+#ifndef __unused
+/**
+ * Defines __unused on platforms which do not support it be default
+ * Marks a variable or function as unused
+ */
+#define __unused __attribute__((unused))
+#endif
+
 /**
  * Begins a diagnostic region
  */
