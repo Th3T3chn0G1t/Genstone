@@ -1,7 +1,7 @@
 # Building
 
 #### Note
-Prebuilt binaries and documentation are available in the `prebuilts` and `gh-docs` branches respectively
+Prebuilt binaries and documentation are available in the `binaries` and `documentation` branches respectively
 
 Genesis uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
 
