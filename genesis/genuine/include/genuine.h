@@ -72,7 +72,7 @@ typedef struct {
 /**
  * Handler for rendering rects from UI
  */
-typedef void (*gen_ui_render_handler_t) (const gen_ui_ninepatch_t* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void* restrict);
+typedef void (*gen_ui_render_handler_t) (const gen_ui_ninepatch_t* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void* const restrict);
 
 /**
  * Indices for the segments of a ninepatch
@@ -123,6 +123,6 @@ typedef enum {
  * @param destination_scale the scale to draw the element at
  * @param passthrough a passthrough to the handler
  */
-void gen_ui_draw_element(const gen_ui_render_handler_t handler, const gen_ui_element_t* const restrict element, const uint16_t destination_scale, void* restrict passthrough);
+void gen_ui_draw_element(const gen_ui_render_handler_t handler, const gen_ui_element_t* const restrict element, const uint16_t destination_scale, void* const restrict passthrough);
 
 #endif

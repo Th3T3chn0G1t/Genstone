@@ -382,6 +382,7 @@ typedef enum {
 #define GEN_FOREACH(iter, memb, len, container) \
     __typeof__((container)[0]) memb = (container)[0]; \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
+
 /**
  * Iterates over a container with explicit length
  * `memb` is a pointer to the indexed member
@@ -394,6 +395,20 @@ typedef enum {
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
     __typeof__((container)[0])* memb = &(container)[0]; \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
+
+/**
+ * Iterates over a container with explicit length
+ * `memb` is a pointer to the indexed member
+ * Uses the container type as the member type directly
+ * @param iter the identifier to use for the iterating index
+ * @param memb the identifier to use for the indexed member
+ * @param len the length of the container to iterate
+ * @param container the container to iterate
+ * @see GEN_DEBUG_FOREACH_REGISTER
+ */
+#define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
+    __typeof__((container)) memb = (container); \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 #define GEN_MICROSECONDS_PER_SECOND 1000000
 #define GEN_MILLISECONDS_PER_SECOND 1000

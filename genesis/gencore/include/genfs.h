@@ -29,7 +29,7 @@
 /**
  * Handler for directory listing
  */
-typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* restrict);
+typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* const restrict);
 
 /**
  * A handle to a filesystem object
@@ -171,6 +171,6 @@ extern gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict 
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* restrict passthrough);
+extern gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough);
 
 #endif

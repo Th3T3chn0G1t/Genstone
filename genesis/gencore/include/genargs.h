@@ -34,7 +34,7 @@ typedef enum {
 /**
  * Handler for parsed arguments
  */
-typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char* const restrict, void* restrict);
+typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char* const restrict, void* const restrict);
 
 /**
  * Parses UNIX-style arguments into an easy-to-interpret format for a handler
@@ -49,6 +49,6 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char
  * @param passthrough a passthrough argument for the handler
  * @return an error code
  */
-extern gen_error_t gen_parse_args(const int argc, const char* const restrict * const restrict argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* const restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* restrict passthrough);
+extern gen_error_t gen_parse_args(const int argc, const char* const restrict * const restrict argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* const restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough);
 
 #endif

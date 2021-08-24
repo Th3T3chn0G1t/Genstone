@@ -34,6 +34,16 @@ static void root_data_exporter(char* output, const gen_node_t* node, __unused vo
     sprintf(output + (4 + 1 /* ROOT\n */), "%i\n", *(int*) node->data);
 }
 
+static void root_handler(gen_node_t* const restrict node, __unused void* const restrict passthrough) {
+    GEN_REQUIRE_EQUAL_MEMREGION((void*) &root, (void*) node, sizeof(gen_node_t));
+}
+
+noreturn static void no_use_handler(__unused gen_node_t* const restrict node, __unused void* const restrict passthrough) {
+    GEN_REQUIRE_NO_REACH;
+}
+
+static gen_node_handler_t handlers[] = { root_handler, no_use_handler };
+
 // This is to make sure the test value is constant for require
 #define source "ROOT\n127\n\n"
 
@@ -47,6 +57,9 @@ int main() {
     GEN_REQUIRE_EQUAL(GEN_OK, error);
     GEN_REQUIRE_EQUAL(GEN_ROOT_TYPE, root.type);
     GEN_REQUIRE_EQUAL(127, *(int*) root.data);
+
+    glog(INFO, "Testing gen_tree_run()...");
+    gen_tree_run(&root, handlers, NULL);
 
     glog(INFO, "Testing gen_node_export()...");
     gen_node_exporter_data_handler_t export_handlers[] = {root_data_exporter};
