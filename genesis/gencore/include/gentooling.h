@@ -10,11 +10,20 @@
 
 #include "gencommon.h"
 
+#define GEN_INTERNAL_USECONDS_PER_SECOND 1000000
+
 #ifndef GEN_TOOLING_DEPTH
 /**
  * The maximum depth of a tooled call stack
  */
 #define GEN_TOOLING_DEPTH 64
+#endif
+
+#ifndef GEN_FREQ_PROFILE_MAX
+/**
+ * The maximum number of frequency profilers
+ */
+#define GEN_FREQ_PROFILE_MAX 64
 #endif
 
 /**
@@ -40,6 +49,32 @@ typedef struct {
 } gen_tooling_stack_t;
 
 /**
+ * A frequency profile
+ */
+typedef struct {
+    /**
+     * The name of the profile 
+     */
+    const char* name;
+    /**
+     * The number of calls the profile has had
+     */
+    uintmax_t n_calls;
+    /**
+     * The running total time for all calls
+     */
+    struct timeval running;
+    /**
+     * The time of the first call
+     */
+    struct timeval first;
+    /**
+     * The time of the last call
+     */
+    struct timeval last;
+} gen_tooling_freq_profile_t;
+
+/**
  * Handler for call stack push events
  */
 typedef void (*gen_tooling_stack_push_handler_t) (void);
@@ -52,6 +87,17 @@ typedef void (*gen_tooling_stack_pop_handler_t) (void);
  * The global tooled call stack
  */
 extern gen_tooling_stack_t gen_tooling_call_stack;
+
+/**
+ * The global frequency profile pool
+ */
+extern gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX];
+
+/**
+ * The offset of the next free space in the global frequency profile pool
+ * @see gen_tooling_freq_profiles
+ */
+extern size_t gen_tooling_freq_profile_next;
 
 /**
  * The global pre-push handler for the tooled call stack
@@ -82,6 +128,11 @@ extern void gen_tooling_stack_pop(void);
 extern void gen_internal_tooling_frame_scope_end(const char* const restrict passthrough);
 
 /**
+ * Updates or adds a frequency profile
+ */
+extern void gen_tooling_freq_profile_ping(const char* const restrict name);
+
+/**
  * Begins a tooled frame with an automatic lifetime
  * @param func the address of this frame
  * @note for non-function frames use gen_tooling_stack_push directly
@@ -89,6 +140,20 @@ extern void gen_internal_tooling_frame_scope_end(const char* const restrict pass
 #define GEN_FRAME_BEGIN(func) \
     __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char __frame_scope_tmpvar; \
     gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
+
+/**
+ * Frequency profiling for calls to the current function
+ */
+#define GEN_FREQ_PROFILE gen_tooling_freq_profile_ping(__func__) /* `__func__` is fine to compare against numerically without being constant */
+
+/**
+ * Frequency profiling for the call site
+ */
+#define GEN_NAMED_FREQ_PROFILE(name) \
+    do { \
+        if(!__builtin_constant_p(name)) glogf(ERROR, "Non-constant frequency profile name %s (%s)", #name, name); \
+        gen_tooling_freq_profile_ping(__func__); \
+    } while(0)
 
 /**
  * Backtrace logging prefix

@@ -14,7 +14,7 @@ static void gen_internal_initialize_vt100emu(void) {
     SetConsoleMode(stderr_hnd, oldmode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }
 #else
-// "ISO C requires a translation unit to contain at least one declaration"
+/** "ISO C requires a translation unit to contain at least one declaration" */
 void gen_internal_glog_dummy(void);
 void gen_internal_glog_dummy(void) {}
 #endif

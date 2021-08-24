@@ -208,8 +208,9 @@ ifeq ($(PLATFORM),BSD)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
-# We don't use NDEBUG in the codebase so this is provided for convenience
-	GLOBAL_C_FLAGS += -Ofast -ffast-math -msse2 -mavx2 -DNDEBUG -flto
+# We don't use NDEBUG in the codebase so this is provided for compatibility with potential other libs
+	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -msse4.2 -mfma -mfma4 -mavx512f -mlong-double-80 -DNDEBUG -flto
+	GLOBAL_L_FLAGS += -flto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
 	ifeq ($(PLATFORM),WIN)
@@ -217,8 +218,9 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 	endif
 else
-	GLOBAL_C_FLAGS += -glldb -O0 -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro
-	GLOBAL_L_FLAGS += -fsanitize=address,undefined
+# We don't use DEBUG in the codebase so this is provided for compatibility with potential other libs
+	GLOBAL_C_FLAGS += -m64 -mlong-double-80 -glldb -O0 -DDEBUG -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
+	GLOBAL_L_FLAGS += -fno-lto -fsanitize=address,undefined
 
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 

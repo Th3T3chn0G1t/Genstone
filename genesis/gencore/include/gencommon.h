@@ -183,6 +183,10 @@ GEN_DIAG_REGION_END
  */
 typedef enum {
     /**
+     * Performance logging severity level
+     */
+    PERFORMANCE,
+    /**
      * Note logging severity level
      */
     NOTE,
@@ -204,6 +208,10 @@ typedef enum {
     FATAL
 } gen_logging_level_t;
 
+/**
+ * Logger prefix for performance level logging
+ */
+#define GEN_LOGGER_PERFORMANCE_PREFIX GEN_ANSI_COLOR_LIGHT(GEN_ANSI_GRAY) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Performance: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
 /**
  * Logger prefix for debug level logging
  */
@@ -386,5 +394,20 @@ typedef enum {
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
     __typeof__((container)[0])* memb = &(container)[0]; \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
+
+#if PLATFORM == WIN
+typedef struct timeval {
+    long tv_sec;
+    long tv_usec;
+} timeval;
+
+/**
+ * @see https://pubs.opengroup.org/onlinepubs/000095399/functions/gettimeofday.html
+ * @see https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows/26085827#26085827
+ */
+extern int gettimeofday(struct timeval* const restrict tp, __unused const void* const restrict tzp);
+#else
+#include <sys/time.h>
+#endif
 
 #endif

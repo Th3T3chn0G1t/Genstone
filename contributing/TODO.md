@@ -5,11 +5,9 @@ This document is purposely being kept off Github issues to create distinction be
 
 If the project ever garners multiple contributors this can be migrated to Github issues
 
-- Embedded `dlltool` binary or equivalent script for Windows builds
+- Move timeval compat to common
 - `clang-format`
-- Profiling
-    - Frequency profiling (how often something happens)
-    - Framed profiling (how much of a timeframe is spent where)
+- Framed profiling (how much of a timeframe is spent where)
 - generator (editor)
     - Visual build tool
 - genesis run tree func
