@@ -395,6 +395,9 @@ typedef enum {
     __typeof__((container)[0])* memb = &(container)[0]; \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
+#define GEN_MICROSECONDS_PER_SECOND 1000000
+#define GEN_MILLISECONDS_PER_SECOND 1000
+
 #if PLATFORM == WIN
 typedef struct timeval {
     long tv_sec;
@@ -409,5 +412,28 @@ extern int gettimeofday(struct timeval* const restrict tp, __unused const void* 
 #else
 #include <sys/time.h>
 #endif
+
+/**
+ * Converts a timeval to seconds as a `long double`
+ * @param timeval the timeval to convert
+ */
+#define GEN_TIMEVAL_AS_SECONDS(timeval) ((long double) (timeval).tv_usec + ((long double) (timeval).tv_sec * (long double) GEN_MICROSECONDS_PER_SECOND))
+
+/**
+ * Adds two timevals
+ * @param a the first value
+ * @param b the second value
+ * @param result pointer to storage for the result
+ * @see https://gist.github.com/vchernov/4774682#file-timeval_add-cpp
+ */
+extern void gen_timeval_add(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result);
+/**
+ * Subtracts two timevals
+ * @param a the first value
+ * @param b the second value
+ * @param result pointer to storage for the result
+ * @see https://gist.github.com/vchernov/4774682#file-timeval_sub-cpp
+ */
+extern void gen_timeval_sub(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result);
 
 #endif

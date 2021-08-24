@@ -1,3 +1,5 @@
+#include "include/gencommon.h"
+
 #if PLATFORM == WIN
 // Thanks to https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows/26085827#26085827
 #include <Windows.h>
@@ -21,8 +23,46 @@ int gettimeofday(struct timeval* const restrict tp, __unused const void* const r
     tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
     return 0;
 }
-#else
-/** "ISO C requires a translation unit to contain at least one declaration" */
-void gen_internal_gencommon_dummy(void);
-void gen_internal_gencommon_dummy(void) {}
 #endif
+
+
+void gen_timeval_add(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result) {
+    result->tv_sec = a->tv_sec + b->tv_sec;
+    result->tv_usec = a->tv_usec + b->tv_usec;
+    if (result->tv_usec >= GEN_MICROSECONDS_PER_SECOND) {
+        result->tv_sec++;
+        result->tv_usec -= GEN_MICROSECONDS_PER_SECOND;
+    }
+}
+
+void gen_timeval_sub(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result) {
+    if (a->tv_sec > b->tv_sec) {
+        if (a->tv_usec >= b->tv_usec) {
+            result->tv_sec = a->tv_sec - b->tv_sec;
+            result->tv_usec = a->tv_usec - b->tv_usec;
+        }
+        else {
+            result->tv_sec = a->tv_sec - b->tv_sec - 1;
+            result->tv_usec = GEN_MICROSECONDS_PER_SECOND - b->tv_usec + a->tv_usec;
+        }
+    }
+    else if (a->tv_sec < b->tv_sec) {
+        if (a->tv_usec > b->tv_usec) {
+            result->tv_sec = b->tv_sec - a->tv_sec - 1;
+            result->tv_usec = GEN_MICROSECONDS_PER_SECOND - a->tv_usec + b->tv_usec;
+        }
+        else {
+            result->tv_sec = b->tv_sec - a->tv_sec;
+            result->tv_usec = b->tv_usec - a->tv_usec;
+        }
+    }
+    else {
+        result->tv_sec = 0;
+        if (a->tv_usec >= b->tv_usec) {
+            result->tv_usec = a->tv_usec - b->tv_usec;
+        }
+        else {
+            result->tv_usec = b->tv_usec - a->tv_usec;
+        }
+    }
+}

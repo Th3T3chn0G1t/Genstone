@@ -10,8 +10,6 @@
 
 #include "gencommon.h"
 
-#define GEN_INTERNAL_USECONDS_PER_SECOND 1000000
-
 #ifndef GEN_TOOLING_DEPTH
 /**
  * The maximum depth of a tooled call stack

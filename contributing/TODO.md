@@ -1,14 +1,10 @@
 # TODO
 
-#### Note
-This document is purposely being kept off Github issues to create distinction between actual in progress features and "plans for the future" which is effectively what this. It also makes it easier to throw plans onto this doc during development as new requirements are found
-
-If the project ever garners multiple contributors this can be migrated to Github issues
-
-- Move timeval compat to common
-- `clang-format`
 - Framed profiling (how much of a timeframe is spent where)
+- genesis run tree func
+- Thread safety for tooling
+- `clang-format`
 - generator (editor)
     - Visual build tool
-- genesis run tree func
 - Build system module examples
+- Delete this and go to github issues

@@ -25,12 +25,13 @@ static void freq_prof_test(void) {
 int main() {
     tooling_test();
 
+    glog(INFO, "Testing GEN_FREQ_PROFILE...");
     for(size_t i = 0; i < 1000000; i++)
         freq_prof_test();
 
     const gen_tooling_freq_profile_t* const profile = &gen_tooling_freq_profiles[gen_tooling_freq_profile_next - 1];
 
-    const long double total = (long double) profile->running.tv_usec + ((long double) profile->running.tv_sec * (long double) GEN_INTERNAL_USECONDS_PER_SECOND);
-    const long double average = total / profile->n_calls;
-    glogf(PERFORMANCE, "%s: av. %Lf ms tot. %Lf ms", profile->name, average / 1000.0L, total / 1000.0L);
+    const long double total = GEN_TIMEVAL_AS_SECONDS(profile->running) / (long double) GEN_MILLISECONDS_PER_SECOND;
+    const long double average = (total / profile->n_calls) / (long double) GEN_MILLISECONDS_PER_SECOND;
+    glogf(PERFORMANCE, "%s: av. %Lf ms tot. %Lf ms", profile->name, average, total);
 }
