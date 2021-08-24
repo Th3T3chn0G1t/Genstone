@@ -2,7 +2,7 @@ name: Prebuilt Binaries
 
 on:
   push:
-    branches: [ master ]
+    branches: [ trunk ]
 
   workflow_dispatch:
 
