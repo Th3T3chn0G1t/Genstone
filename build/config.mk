@@ -42,7 +42,7 @@ GLOBAL_L_FLAGS =
 # Whether to apply clang-format changes to files directly
 # `ENABLED`: Enables application of format changes
 # `DISABLED`: Disables application of format changes
-AUTO_APPLY_FORMAT = ENABLED
+AUTO_APPLY_FORMAT = DISABLED
 
 # The C compiler to use
 # It is not recommended to change this
