@@ -39,6 +39,11 @@ GLOBAL_C_FLAGS =
 # Flags to be provided to the linker at every call
 GLOBAL_L_FLAGS =
 
+# Whether to apply clang-format changes to files directly
+# `ENABLED`: Enables application of format changes
+# `DISABLED`: Disables application of format changes
+AUTO_APPLY_FORMAT = ENABLED
+
 # The C compiler to use
 # It is not recommended to change this
 COMPILER = clang

@@ -100,8 +100,14 @@ endif
 endif
 
 ifneq ($(BUILD_SYS_DEBUG),ENABLED)
-ifneq ($(BUILD_SYS_DEBUG),ENABLED)
+ifneq ($(BUILD_SYS_DEBUG),DISABLED)
 ERROR += "$(ERROR_PREFIX) Invalid value for BUILD_SYS_DEBUG: \"$(BUILD_SYS_DEBUG)\"\n"
+endif
+endif
+
+ifneq ($(AUTO_APPLY_FORMAT),ENABLED)
+ifneq ($(AUTO_APPLY_FORMAT),DISABLED)
+ERROR += "$(ERROR_PREFIX) Invalid value for AUTO_APPLY_FORMAT: \"$(AUTO_APPLY_FORMAT)\"\n"
 endif
 endif
 
@@ -243,15 +249,26 @@ ifeq ($(TEST),BUILD)
 endif
 
 clean_tmpfile:
-	-$(RM) $(wildcard *.tmp)
+	@echo "$(ACTION_PREFIX)$(RM) $(wildcard *.tmp)$(ACTION_SUFFIX)"
+	-@$(RM) $(wildcard *.tmp)
 
 %$(OBJECT_SUFFIX): %.c build/config.mk
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
+
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
-# 	 -($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp > /dev/stderr)
-# 	 -$(CLANG_FORMAT) --dry-run -Werror $<
+
+	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp)
+
+	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
+ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
+	-@$(CLANG_FORMAT) -i $<
+endif
+ifeq ($(AUTO_APPLY_FORMAT),DISABLED)
+	-@$(CLANG_FORMAT) --dry-run -Werror $<
+endif
 
 %$(STATIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"

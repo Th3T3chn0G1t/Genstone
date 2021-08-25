@@ -57,7 +57,8 @@ BUILD_TARGETS = \
 		$(BUILD_POST) \
 	)
 
-all: $(BUILD_TARGETS)
+all: $(BUILD_TARGETS) clean_tmpfile
+	@echo "$(INFO_PREFIX) All built!"
 
 list:
 	@echo "$(INFO_PREFIX) Targets to be built for \`all\`: $(addprefix \n   - ,$(BUILD_TARGETS))"

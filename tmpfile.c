@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
-#include "include/genfs.h"
-
 #include "include/gendbg.h"
+#include "include/genfs.h"
 #include "include/gentooling.h"
 
 #if GEN_DEBUG_PATH_VALIDATION == ENABLED
