@@ -3,3 +3,15 @@
 - generator (editor)
     - Visual build tool
 - Work on GenUIne with binary partitioning
+- Embedded toolchain
+    - Embedded LibC
+- Math extensions
+    - `ext_vector_type` attribute
+    - `__vector_size__` attribute
+        - Vector types support overloaded operators
+    - `matrix_type` attribute
+- OpenMP support
+- XRay instrumentation
+- Thread safety analysis
+- Apply `__likely` and `__unlikely`
+- Apply `hot` and `cold` function attributes

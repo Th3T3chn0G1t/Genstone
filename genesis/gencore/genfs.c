@@ -22,6 +22,18 @@
 #define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) (void) path
 #endif
 
+#define GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, fhandle_index, error) \
+	do { \
+		if(!error) { \
+			if(ferror(handle->file_handles[fhandle_index])) \
+				error = errno; \
+			else \
+				error = 0; \
+			clearerr(handle->file_handles[fhandle_index]); \
+			if(error) return gen_convert_errno(error); \
+		} \
+	} while(0)
+
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_canonical);
 
@@ -59,7 +71,7 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	size_t mark = (size_t) ((strrchr(path, '/') + 1) - path);
-	strncpy(output_path, path, mark);
+	strncpy_s(output_path, GEN_PATH_MAX, path, mark);
 	output_path[mark - 1] = '\0';
 
 	return GEN_OK;
@@ -222,14 +234,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	if(error) return gen_convert_errno(errno);
 
 	error = (int) fread(output_buffer, sizeof(char), end - start, handle->file_handles[0]);
-	if(!error) {
-		if(ferror(handle->file_handles[0]))
-			error = errno;
-		else
-			error = 0;
-		clearerr(handle->file_handles[0]);
-		if(error) return gen_convert_errno(error);
-	}
+	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 0, error);
 
 	rewind(handle->file_handles[0]);
 
@@ -244,14 +249,7 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
 	if(!buffer) return GEN_INVALID_PARAMETER;
 
 	int error = (int) fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
-	if(!error) {
-		if(ferror(handle->file_handles[1]))
-			error = errno;
-		else
-			error = 0;
-		clearerr(handle->file_handles[1]);
-		if(error) return gen_convert_errno(error);
-	}
+	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 1, error);
 
 	rewind(handle->file_handles[1]);
 

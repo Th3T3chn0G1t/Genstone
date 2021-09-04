@@ -6,7 +6,7 @@
 #include "include/gencommon.h"
 #include "include/gentooling.h"
 
-gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const restrict source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* const restrict data_handlers, void* const restrict passthrough) {
+GEN_ERRORABLE_RETURN gen_node_import(gen_node_t* restrict output_node, const char* const restrict source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* const restrict data_handlers, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_node_import);
 
 	if(!output_node) return GEN_INVALID_PARAMETER;
@@ -29,7 +29,7 @@ gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const 
 	return GEN_OK;
 }
 
-gen_error_t gen_node_export(char* restrict output_source, const gen_node_t* const restrict node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* const restrict data_handlers, void* const restrict passthrough) {
+GEN_ERRORABLE_RETURN gen_node_export(char* restrict output_source, const gen_node_t* const restrict node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* const restrict data_handlers, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_node_export);
 
 	if(!output_source) return GEN_INVALID_PARAMETER;
@@ -43,7 +43,7 @@ gen_error_t gen_node_export(char* restrict output_source, const gen_node_t* cons
 	return GEN_OK;
 }
 
-static gen_error_t gen_internal_tree_run_propogate(gen_node_t* const restrict node, const gen_node_handler_t* const restrict handlers, void* const restrict passthrough) {
+static GEN_ERRORABLE_RETURN gen_internal_tree_run_propogate(gen_node_t* const restrict node, const gen_node_handler_t* const restrict handlers, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_internal_tree_run_propogate);
 
 	if(!node) return GEN_INVALID_PARAMETER;
@@ -59,7 +59,7 @@ static gen_error_t gen_internal_tree_run_propogate(gen_node_t* const restrict no
 	return GEN_OK;
 }
 
-gen_error_t gen_tree_run(gen_node_t* const restrict root, const gen_node_handler_t* const restrict handlers, void* const restrict passthrough) {
+GEN_ERRORABLE_RETURN gen_tree_run(gen_node_t* const restrict root, const gen_node_handler_t* const restrict handlers, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_tree_run);
 
 	if(!root) return GEN_INVALID_PARAMETER;

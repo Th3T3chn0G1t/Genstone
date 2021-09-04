@@ -10,7 +10,6 @@
 #ifndef GEN_GENESIS_H
 #define GEN_GENESIS_H
 
-#include "generrors.h"
 #include "gencommon.h"
 
 /**
@@ -77,7 +76,7 @@ typedef void (*gen_node_importer_data_handler_t)(gen_node_t* const restrict, con
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern gen_error_t gen_node_import(gen_node_t* restrict output_node, const char* const restrict source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* const restrict data_handlers, void* const restrict passthrough);
+extern GEN_ERRORABLE_RETURN gen_node_import(gen_node_t* restrict output_node, const char* const restrict source, const gen_node_importer_type_handler_t type_handler, const gen_node_importer_data_handler_t* const restrict data_handlers, void* const restrict passthrough);
 
 /**
  * Export handler for all node types
@@ -97,7 +96,7 @@ typedef void (*gen_node_exporter_data_handler_t)(char* restrict, const gen_node_
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern gen_error_t gen_node_export(char* restrict output_source, const gen_node_t* const restrict node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* const restrict data_handlers, void* const restrict passthrough);
+extern GEN_ERRORABLE_RETURN gen_node_export(char* restrict output_source, const gen_node_t* const restrict node, const gen_node_exporter_type_handler_t type_handler, const gen_node_exporter_data_handler_t* const restrict data_handlers, void* const restrict passthrough);
 
 /**
  * Runs a tree of nodes with their handlers
@@ -106,7 +105,7 @@ extern gen_error_t gen_node_export(char* restrict output_source, const gen_node_
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern gen_error_t gen_tree_run(gen_node_t* const restrict root, const gen_node_handler_t* const restrict handlers, void* const restrict passthrough);
+extern GEN_ERRORABLE_RETURN gen_tree_run(gen_node_t* const restrict root, const gen_node_handler_t* const restrict handlers, void* const restrict passthrough);
 
 /**
  * Built in node type for the apptree root

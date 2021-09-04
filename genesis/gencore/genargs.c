@@ -5,7 +5,7 @@
 
 #include "include/gentooling.h"
 
-gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough) {
+GEN_ERRORABLE_RETURN gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_parse_args);
 
 	if(!argc) return GEN_OK;

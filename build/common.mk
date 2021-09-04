@@ -134,7 +134,7 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-GLOBAL_C_FLAGS += -D__STDC_WANT_LIB_EXT1__=1 -std=c17 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
@@ -214,8 +214,10 @@ ifeq ($(PLATFORM),BSD)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
-# We don't use NDEBUG in the codebase so this is provided for compatibility with potential other libs
-	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -msse4.2 -mfma -mfma4 -mavx512f -mlong-double-80 -DNDEBUG -flto
+	GLOBAL_C_FLAGS += -m64 -fopenmp -Ofast -ffast-math -DNDEBUG -flto
+	ifneq ($(wildcard *.profraw),)
+		GLOBAL_C_FLAGS += -fprofile-instr-use=$(wildcard *.profraw)
+	endif
 	GLOBAL_L_FLAGS += -flto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
@@ -224,9 +226,8 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 	endif
 else
-# We don't use DEBUG in the codebase so this is provided for compatibility with potential other libs
-	GLOBAL_C_FLAGS += -m64 -mlong-double-80 -glldb -O0 -DDEBUG -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
-	GLOBAL_L_FLAGS += -fno-lto -fsanitize=address,undefined
+	GLOBAL_C_FLAGS += -m64 -glldb -O0 -DDEBUG --coverage -fprofile-instr-generate -fxray-instrument -fxray-instruction-threshold=1 -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
+	GLOBAL_L_FLAGS += -fno-lto -fprofile-instr-generate -fsanitize=address,undefined
 
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
@@ -249,18 +250,21 @@ ifeq ($(TEST),BUILD)
 endif
 
 clean_tmpfile:
-	@echo "$(ACTION_PREFIX)$(RM) $(wildcard *.tmp)$(ACTION_SUFFIX)"
-	-@$(RM) $(wildcard *.tmp)
+	@echo "$(ACTION_PREFIX)$(RM) $(wildcard tmp/*.tmp)$(ACTION_SUFFIX)"
+	-@$(RM) $(wildcard tmp/*.tmp)
 
-%$(OBJECT_SUFFIX): %.c build/config.mk
+tmp:
+	-mkdir $@
+
+%$(OBJECT_SUFFIX): %.c build/config.mk | tmp
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 
-	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
-	-@($(CLANG_FORMAT) --style=file $< > $(notdir $<)-format.tmp) && ($(DIFF) $< $(notdir $<)-format.tmp)
+	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
 
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)

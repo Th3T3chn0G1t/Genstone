@@ -11,9 +11,6 @@
 #ifndef GEN_COMMON_H
 #define GEN_COMMON_H
 
-#include "gendbg.h"
-#include "generrors.h"
-
 /**
  * Pretty keyword _Pragma
  * @param s string-literal argument for _Pragma
@@ -42,12 +39,50 @@ GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #ifndef __unused
 /**
- * Defines __unused on platforms which do not support it be default
+ * Defines __unused on platforms which do not support it by default
  * Marks a variable or function as unused
  */
 #define __unused __attribute__((unused))
 #endif
+#ifndef __inline
+/**
+ * Defines __inline on platforms which do not support it by default
+ * Marks a function to be inlined (force inline)
+ */
+#define __inline __attribute__((always_inline)) __attribute__((artificial))
+#endif
+#ifndef __deprecated
+/**
+ * Defines __deprecated on platforms which do not support it by default
+ * Marks a function as deprecated
+ */
+#define __deprecated __attribute__((deprecated))
+#endif
+#ifndef __nodiscard
+/**
+ * Defines __nodiscard on platforms which do not support it by default
+ * Marks a function return value as not to be discarded
+ */
+#define __nodiscard __attribute__((warn_unused_result))
+#endif
+#ifndef __likely
+/**
+ * Specifies a control path as likely
+ */
+#define __likely [[clang::likely]]  
+#endif
+#ifndef __unlikely
+/**
+ * Specifies a control path as unlikely
+ */
+#define __unlikely [[clang::unlikely]]
+#endif
 GEN_DIAG_REGION_END
+
+#define GEN_ERRORABLE_RETURN __nodiscard gen_error_t
+
+#include "gendbg.h"
+#include "generrors.h"
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
@@ -361,13 +396,27 @@ typedef enum {
     } while(0)
 
 #if GEN_DEBUG_FOREACH_REGISTER == ENABLED
+#define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
+#else
 /**
  * The type used when declaring an iterator in `GEN_FOREACH`
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
-#define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
-#else
 #define GEN_INTERNAL_FOREACH_ITER_DECL size_t
+#endif
+
+#if GEN_DEBUG_CLANG_LOOP_EXT == ENABLED
+#define GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
+    pragma("clang loop vectorize(enable)") \
+    pragma("clang loop interleave(enable)") \
+    pragma("clang loop unroll(full)") \
+    pragma("clang loop distribute(enable)")
+#else
+/**
+ * Applies clang extension loop qualifiers to `GEN_FOREACH`
+ * @see GEN_DEBUG_CLANG_LOOP_EXT
+ */
+#define GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
 #endif
 
 /**
@@ -377,10 +426,11 @@ typedef enum {
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_DEBUG_FOREACH_PRECALC
+ * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH(iter, memb, len, container) \
     __typeof__((container)[0]) memb = (container)[0]; \
+    GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
 
 /**
@@ -391,9 +441,11 @@ typedef enum {
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
+ * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
     __typeof__((container)[0])* memb = &(container)[0]; \
+    GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
 /**
@@ -405,9 +457,11 @@ typedef enum {
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
+ * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
     __typeof__((container)) memb = (container); \
+    GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 #define GEN_MICROSECONDS_PER_SECOND 1000000

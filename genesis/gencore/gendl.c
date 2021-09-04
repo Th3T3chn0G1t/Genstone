@@ -6,7 +6,7 @@
 #include "include/gencommon.h"
 #include "include/gentooling.h"
 
-gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
+GEN_ERRORABLE_RETURN gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
 	GEN_FRAME_BEGIN(gen_dylib_load);
 
 	// The static analyser has a bit of an aneurism about this function
@@ -55,7 +55,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	return GEN_OK;
 }
 
-gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
+GEN_ERRORABLE_RETURN gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
 	if(!output_address) return GEN_INVALID_PARAMETER;
 	if(!dylib) return GEN_INVALID_PARAMETER;
 	if(!symname) return GEN_INVALID_PARAMETER;
@@ -74,7 +74,7 @@ gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, con
 	return GEN_OK;
 }
 
-gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
+GEN_ERRORABLE_RETURN gen_dylib_unload(const gen_dylib_t dylib) {
 	if(!dylib) return GEN_INVALID_PARAMETER;
 
 #if PLATFORM == WIN

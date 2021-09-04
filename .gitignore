@@ -19,6 +19,10 @@
 *.tmp
 *.plist
 
+*.gcda
+*.gcno
+*.profraw
+
 docs/*
 out/*
 

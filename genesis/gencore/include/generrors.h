@@ -5,7 +5,6 @@
  * @file generrors.h
  * Contains error value enumerations
  * These error values are reported across the library so most headers transiently include this one
- * But it is still recommended to explicitly include
  */
 
 #ifndef GEN_ERRORS_H
@@ -80,13 +79,13 @@ typedef enum {
  * @param error the errno value to convert
  * @return the converted error enumeration
  */
-extern gen_error_t gen_convert_errno(errno_t error);
+extern GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error);
 
 /**
  * Converts a win32 error into a genesis error
  * @param error the win32 error value to convert
  * @return the converted error enumeration
  */
-extern gen_error_t gen_convert_winerr(int error);
+extern GEN_ERRORABLE_RETURN gen_convert_winerr(int error);
 
 #endif

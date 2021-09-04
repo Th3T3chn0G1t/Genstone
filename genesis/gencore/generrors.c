@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
-#include "include/generrors.h"
-
 #if PLATFORM == WIN
 #include <Windows.h>
 #endif
 #include "include/gencommon.h"
 
-gen_error_t gen_convert_errno(errno_t error) {
+GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 	switch(error) {
 		case EACCES: return GEN_PERMISSION;
 		case EINVAL: return GEN_INVALID_PARAMETER;
@@ -33,7 +31,7 @@ gen_error_t gen_convert_errno(errno_t error) {
 	}
 }
 
-gen_error_t gen_convert_winerr(int error) {
+GEN_ERRORABLE_RETURN gen_convert_winerr(int error) {
 #if PLATFORM == WIN
 	switch(error) {
 		case ERROR_ALREADY_EXISTS: return GEN_ALREADY_EXISTS;

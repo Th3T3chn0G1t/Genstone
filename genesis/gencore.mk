@@ -1,4 +1,4 @@
-GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories
+GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-c++98-compat -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories
 GEN_CORE_CFLAGS = -Igenesis/gencore/include $(C11_COMPAT_CFLAGS) $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),WIN)
 GEN_CORE_CFLAGS += -Igenesis/vendor/dirent/include

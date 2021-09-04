@@ -21,17 +21,19 @@ static void root_data_loader(gen_node_t* node, const char* data_string, __unused
 	node->data = &root_data_storage;
 }
 
+#define OUTPUT_LENGTH ((4 + 1 /* ROOT\n */) + (3 + 1 /* 127\n */) + (1 /* \n */) + (1 /* \0 */))
+
 static void type_exporter(char* output, unsigned long type, __unused void* passthrough) {
 	switch(type) {
 		case GEN_ROOT_TYPE: {
-			sprintf(output, "%s\n", ROOT_TYPE_NAME);
+			sprintf_s(output, OUTPUT_LENGTH, "%s\n", ROOT_TYPE_NAME);
 			break;
 		}
 	}
 }
 
 static void root_data_exporter(char* output, const gen_node_t* node, __unused void* passthrough) {
-	sprintf(output + (4 + 1 /* ROOT\n */), "%i\n", *(int*) node->data);
+	sprintf_s(output + (4 + 1 /* ROOT\n */), OUTPUT_LENGTH - (4 + 1 /* ROOT\n */), "%i\n", *(int*) node->data);
 }
 
 static void root_handler(gen_node_t* const restrict node, __unused void* const restrict passthrough) {
@@ -59,15 +61,16 @@ int main() {
 	GEN_REQUIRE_EQUAL(127, *(int*) root.data);
 
 	glog(INFO, "Testing gen_tree_run()...");
-	gen_tree_run(&root, handlers, NULL);
+	error = gen_tree_run(&root, handlers, NULL);
+
+	GEN_REQUIRE_EQUAL(GEN_OK, error);
 
 	glog(INFO, "Testing gen_node_export()...");
 	gen_node_exporter_data_handler_t export_handlers[] = {root_data_exporter};
-	size_t output_length = (4 + 1 /* ROOT\n */) + (3 + 1 /* 127\n */) + (1 /* \n */) + (1 /* \0 */);
-	char* output = malloc(output_length);
+	char* output = malloc(OUTPUT_LENGTH);
 	error = gen_node_export(output, &root, type_exporter, export_handlers, NULL);
-	output[output_length - 2] = '\n'; // In an actual impl the child nodes would be loaded
-	output[output_length - 1] = '\0';
+	output[OUTPUT_LENGTH - 2] = '\n'; // In an actual impl the child nodes would be loaded
+	output[OUTPUT_LENGTH - 1] = '\0';
 
 	GEN_REQUIRE_EQUAL(GEN_OK, error);
 	GEN_REQUIRE_EQUAL_STRING(source, output);
