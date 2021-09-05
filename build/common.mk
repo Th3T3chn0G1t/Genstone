@@ -234,10 +234,10 @@ ifeq ($(PLATFORM),WEB)
 	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC
-	GLOBAL_L_FLAGS += -mwasm64 -s SIDE_MODULE=1
+	GLOBAL_L_FLAGS += -mwasm64 -s SIDE_MODULE=1 -Wl,-mwasm64
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(LINKER) -static $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(LINKER) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(LINKER) -static -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
