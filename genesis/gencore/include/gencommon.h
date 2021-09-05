@@ -124,12 +124,21 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#if PLATFORM != WIN
+#if PLATFORM != WIN && PLATFORM != WEB
 #include <safe_lib.h>
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
 #endif
 GEN_DIAG_REGION_END
+
+#if PLATFORM == WEB
+__inline char* strdup(const char* const restrict s) {
+	const size_t l = strlen(s);
+	char* const d = malloc(l + 1);
+	if(!d) return NULL;
+	return memcpy(d, s, l + 1);
+}
+#endif
 
 /**
  * ANSI color value for gray
@@ -288,6 +297,20 @@ typedef enum {
     } while(0)
 #endif
 
+#if PLATFORM == WEB
+#define glog(level, string) \
+    do { \
+        printf("%s", GEN_LOGGER_##level##_PREFIX); \
+        printf("%s\n", string); \
+        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
+    } while(0)
+#define glogf(level, format, ...) \
+    do { \
+        printf("%s", GEN_LOGGER_##level##_PREFIX); \
+        printf(format, __VA_ARGS__); \
+        printf("\n"); \
+    } while(0)
+#else
 /**
  * Basic string logging function
  * @param level a gen_logging_level_t to determine the prefix from
@@ -296,12 +319,11 @@ typedef enum {
  */
 #define glog(level, string) \
     do { \
-        FILE* const restrict streamp = level >= ERROR ? stderr : stdout; \
-        fprintf(streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
-        fprintf(streamp, "%s\n", string); \
+        FILE* const restrict gen_internal_streamp = level >= ERROR ? stderr : stdout; \
+        fprintf(gen_internal_streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
+        fprintf(gen_internal_streamp, "%s\n", string); \
         if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
     } while(0)
-
 /**
  * `printf`-style formatted logging function
  * @param level a gen_logging_level_t to determine the prefix from
@@ -311,11 +333,12 @@ typedef enum {
  */
 #define glogf(level, format, ...) \
     do { \
-        FILE* const restrict __streamp = level >= ERROR ? stderr : stdout; \
-        fprintf(__streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
-        fprintf(__streamp, format, __VA_ARGS__); \
-        fprintf(__streamp, "\n"); \
+        FILE* const restrict gen_internal_streamp = level >= ERROR ? stderr : stdout; \
+        fprintf(gen_internal_streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
+        fprintf(gen_internal_streamp, format, __VA_ARGS__); \
+        fprintf(gen_internal_streamp, "\n"); \
     } while(0)
+#endif
 
 /**
  * Gets the require message from the expected expressions type

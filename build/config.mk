@@ -5,6 +5,7 @@
 # `DWN`: macOS
 # `LNX`: Linux
 # `BSD`: BSD
+# `WEB`: WebASM (Emscripten)
 PLATFORM = DEFAULT
 
 # Set build optimization mode
@@ -42,7 +43,7 @@ GLOBAL_L_FLAGS =
 # Whether to apply clang-format changes to files directly
 # `ENABLED`: Enables application of format changes
 # `DISABLED`: Disables application of format changes
-AUTO_APPLY_FORMAT = DISABLED
+AUTO_APPLY_FORMAT = ENABLED
 
 # The C compiler to use
 # It is not recommended to change this
@@ -51,6 +52,12 @@ COMPILER = clang
 # For the purposes of portability and ease of invocation - this should be the same as the compiler
 # It is not recommended to change this
 LINKER = clang
+
+# Whether to perform static analysis
+# Possible values are:
+# `ENABLED`: Enables static analysis
+# `DISABLED`: Disables static analysis
+STATIC_ANALYSIS = ENABLED
 
 # The clang-format command line to use
 CLANG_FORMAT = clang-format

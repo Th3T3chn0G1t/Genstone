@@ -17,12 +17,16 @@
 #define GEN_PATH_MAX MAX_PATH
 #else
 #include <unistd.h>
+#ifndef PATH_MAX
+#define GEN_PATH_MAX 1024
+#else
 /**
  * The OS library's maximum length of a path
  * @note Does not currently support Windows 10 1607 long paths
  * @note Does not neccesarily represent the maximum length of a path supported by every filesystem
  */
 #define GEN_PATH_MAX PATH_MAX
+#endif
 #endif
 
 /**

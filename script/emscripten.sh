@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export OVERRIDE_PLATFORM=WEB
+export OVERRIDE_COMPILER=emcc
+export OVERRIDE_LINKER=emcc
+export OVERRIDE_STATIC_ANALYSIS=DISABLED
+
+make

@@ -15,3 +15,4 @@
 - Thread safety analysis
 - Apply `__likely` and `__unlikely`
 - Apply `hot` and `cold` function attributes
+- C11 Analyzability

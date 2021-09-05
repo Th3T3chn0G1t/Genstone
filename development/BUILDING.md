@@ -37,6 +37,9 @@ There is no error checking performed on entered values, invalid values will resu
 
 ### Compilation Options
 
+#### Note
+Build config helper scripts for some targets are available in `script/`
+
 Setting in-code options can be done via. `-D` flags set via. the config Makefile
 
 |Name|Values|Default|Description|Notes|

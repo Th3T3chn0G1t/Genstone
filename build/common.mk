@@ -70,13 +70,21 @@ endif
 ifneq ($(OVERRIDE_BUILD_SYS_DEBUG),)
 BUILD_SYS_DEBUG = $(OVERRIDE_BUILD_SYS_DEBUG)
 endif
+ifneq ($(OVERRIDE_AUTO_APPLY_FORMAT),)
+AUTO_APPLY_FORMAT = $(OVERRIDE_AUTO_APPLY_FORMAT)
+endif
+ifneq ($(OVERRIDE_STATIC_ANALYSIS),)
+STATIC_ANALYSIS = $(OVERRIDE_STATIC_ANALYSIS)
+endif
 
 ifneq ($(PLATFORM),DEFAULT)
 ifneq ($(PLATFORM),WIN)
 ifneq ($(PLATFORM),DWN)
 ifneq ($(PLATFORM),LNX)
 ifneq ($(PLATFORM),BSD)
+ifneq ($(PLATFORM),WEB)
 ERROR += "$(ERROR_PREFIX) Invalid value for PLATFORM: \"$(PLATFORM)\"\n"
+endif
 endif
 endif
 endif
@@ -111,6 +119,12 @@ ERROR += "$(ERROR_PREFIX) Invalid value for AUTO_APPLY_FORMAT: \"$(AUTO_APPLY_FO
 endif
 endif
 
+ifneq ($(STATIC_ANALYSIS),ENABLED)
+ifneq ($(STATIC_ANALYSIS),DISABLED)
+ERROR += "$(ERROR_PREFIX) Invalid value for STATIC_ANALYSIS: \"$(STATIC_ANALYSIS)\"\n"
+endif
+endif
+
 ifeq ($(PLATFORM),DEFAULT)
 	ifeq ($(OS),Windows_NT)
 		PLATFORM = WIN
@@ -134,7 +148,7 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DWEB=5 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
@@ -212,6 +226,19 @@ ifeq ($(PLATFORM),BSD)
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
+ifeq ($(PLATFORM),WEB)
+	LIB_PREFIX = lib
+	DYNAMIC_LIB_SUFFIX = .so
+	STATIC_LIB_SUFFIX = .a
+	EXECUTABLE_SUFFIX = .out
+	OBJECT_SUFFIX = .o
+
+	GLOBAL_C_FLAGS += -fPIC
+	GLOBAL_L_FLAGS += -mwasm64 -s SIDE_MODULE=1
+
+	DYNAMIC_LIB_TOOL = $(LINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(LINKER) -static $@ $(filter %$(OBJECT_SUFFIX),$^)
+endif
 
 ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_C_FLAGS += -m64 -fopenmp -Ofast -ffast-math -DNDEBUG -flto
@@ -226,8 +253,12 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 	endif
 else
-	GLOBAL_C_FLAGS += -m64 -glldb -O0 -DDEBUG --coverage -fprofile-instr-generate -fxray-instrument -fxray-instruction-threshold=1 -fsanitize=address,undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
-	GLOBAL_L_FLAGS += -fno-lto -fprofile-instr-generate -fsanitize=address,undefined
+	GLOBAL_C_FLAGS += -m64 -glldb -O0 -DDEBUG --coverage -fprofile-instr-generate -fsanitize=undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
+	GLOBAL_L_FLAGS += -fno-lto -fprofile-instr-generate -fsanitize=undefined
+	ifneq ($(PLATFORM),WEB)
+		GLOBAL_C_FLAGS += -fsanitize=address
+		GLOBAL_L_FLAGS += -fsanitize=address
+	endif
 
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
@@ -260,8 +291,10 @@ tmp:
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
+ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
+endif
 
 	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
@@ -269,8 +302,7 @@ tmp:
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
 	-@$(CLANG_FORMAT) -i $<
-endif
-ifeq ($(AUTO_APPLY_FORMAT),DISABLED)
+else
 	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 

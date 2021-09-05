@@ -130,13 +130,15 @@ extern void gen_internal_tooling_frame_scope_end(const char* const restrict pass
  */
 extern void gen_tooling_freq_profile_ping(const char* const restrict name);
 
+
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
 /**
  * Begins a tooled frame with an automatic lifetime
  * @param func the address of this frame
  * @note for non-function frames use gen_tooling_stack_push directly
  */
 #define GEN_FRAME_BEGIN(func) \
-    __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char __frame_scope_tmpvar; \
+    __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar; \
     gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
 
 /**
