@@ -3,6 +3,9 @@ include build/config.mk
 # We want make to use cmd.exe when the *host* is Windows
 ifeq ($(OS),Windows_NT)
 SHELL := cmd.exe
+HAVE_FIND = DISABLED
+else
+HAVE_FIND = ENABLED
 endif
 
 SEP = /
@@ -76,6 +79,15 @@ endif
 ifneq ($(OVERRIDE_STATIC_ANALYSIS),)
 STATIC_ANALYSIS = $(OVERRIDE_STATIC_ANALYSIS)
 endif
+ifneq ($(OVERRIDE_HAVE_STAT_REPORT),)
+HAVE_STAT_REPORT = $(OVERRIDE_HAVE_STAT_REPORT)
+endif
+ifneq ($(OVERRIDE_TOOLING),)
+TOOLING = $(OVERRIDE_TOOLING)
+endif
+ifneq ($(OVERRIDE_FASTBUILD_TOOLS),)
+FASTBUILD_TOOLS = $(OVERRIDE_FASTBUILD_TOOLS)
+endif
 
 ifneq ($(PLATFORM),DEFAULT)
 ifneq ($(PLATFORM),WIN)
@@ -125,6 +137,25 @@ ERROR += "$(ERROR_PREFIX) Invalid value for STATIC_ANALYSIS: \"$(STATIC_ANALYSIS
 endif
 endif
 
+ifneq ($(HAVE_STAT_REPORT),ENABLED)
+ifneq ($(HAVE_STAT_REPORT),DISABLED)
+ERROR += "$(ERROR_PREFIX) Invalid value for HAVE_STAT_REPORT: \"$(HAVE_STAT_REPORT)\"\n"
+endif
+endif
+
+ifneq ($(TOOLING),ENABLED)
+ifneq ($(TOOLING),DISABLED)
+ERROR += "$(ERROR_PREFIX) Invalid value for TOOLING: \"$(TOOLING)\"\n"
+endif
+endif
+
+ifneq ($(FASTBUILD_TOOLS),ENABLED)
+ifneq ($(FASTBUILD_TOOLS),DISABLED)
+ERROR += "$(ERROR_PREFIX) Invalid value for FASTBUILD_TOOLS: \"$(FASTBUILD_TOOLS)\"\n"
+endif
+endif
+
+
 ifeq ($(PLATFORM),DEFAULT)
 	ifeq ($(OS),Windows_NT)
 		PLATFORM = WIN
@@ -171,10 +202,13 @@ ifeq ($(PLATFORM),DWN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
 endif
 
-ifeq ($(BUILD_SYS_DEBUG),ENABLED)
 # Need to check clang version for this to work (12.0.1?)
-# 	GLOBAL_C_FLAGS += -fproc-stat-report
-# 	GLOBAL_L_FLAGS += -fproc-stat-report
+ifeq ($(BUILD_SYS_DEBUG),ENABLED)
+	ifeq ($(HAVE_STAT_REPORT),ENABLED)
+		GLOBAL_C_FLAGS += -fproc-stat-report
+		GLOBAL_L_FLAGS += -fproc-stat-report
+	endif
+	GLOBAL_C_FLAGS += -v
 endif
 
 ifeq ($(PLATFORM),WIN)
@@ -186,6 +220,8 @@ ifeq ($(PLATFORM),WIN)
 
 	GLOBAL_C_FLAGS += -D_MT
 	GLOBAL_L_FLAGS += -lshlwapi.lib
+
+	OBJECT_FORMAT = PE
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
@@ -199,6 +235,8 @@ ifeq ($(PLATFORM),LNX)
 
 	GLOBAL_C_FLAGS += -fPIC -D_DEFAULT_SOURCE
 
+	OBJECT_FORMAT = ELF
+
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
@@ -210,6 +248,8 @@ ifeq ($(PLATFORM),DWN)
 	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC
+
+	OBJECT_FORMAT = MACHO
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %$(OBJECT_SUFFIX),$^)
@@ -223,6 +263,8 @@ ifeq ($(PLATFORM),BSD)
 
 	GLOBAL_C_FLAGS += -fPIC
 
+	OBJECT_FORMAT = ELF
+
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
@@ -235,6 +277,8 @@ ifeq ($(PLATFORM),WEB)
 
 	GLOBAL_C_FLAGS += -fPIC
 	GLOBAL_L_FLAGS += -mwasm64 -s SIDE_MODULE=1 -Wl,-mwasm64
+
+	OBJECT_FORMAT = WASM
 
 	DYNAMIC_LIB_TOOL = $(LINKER) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(LINKER) -static -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
@@ -253,19 +297,23 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
 	endif
 else
-	GLOBAL_C_FLAGS += -m64 -glldb -O0 -DDEBUG --coverage -fprofile-instr-generate -fsanitize=undefined -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
-	GLOBAL_L_FLAGS += -fno-lto -fprofile-instr-generate -fsanitize=undefined
-	ifneq ($(PLATFORM),WEB)
-		GLOBAL_C_FLAGS += -fsanitize=address
-		GLOBAL_L_FLAGS += -fsanitize=address
-	endif
-
+	GLOBAL_C_FLAGS += -m64 -glldb -O0 -DDEBUG -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
+	GLOBAL_L_FLAGS += -fno-lto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
 	ifeq ($(PLATFORM),WIN)
 		GLOBAL_C_FLAGS += -D_DEBUG
 		GLOBAL_L_FLAGS += -Wl,-nodefaultlib:libcmt.lib -llibcmtd.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug
+	endif
+endif
+
+ifeq ($(TOOLING),ENABLED)
+	GLOBAL_C_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined
+	GLOBAL_L_FLAGS += -fprofile-instr-generate -fsanitize=undefined
+	ifneq ($(PLATFORM),WEB)
+		GLOBAL_C_FLAGS += -fsanitize=address
+		GLOBAL_L_FLAGS += -fsanitize=address
 	endif
 endif
 
@@ -280,9 +328,23 @@ ifeq ($(TEST),BUILD)
 	TEST_BUILD = 1
 endif
 
+ifeq ($(FASTBUILD_TOOLS),ENABLED)
+	ifeq ($(OBJECT_FORMAT),ELF)
+		include build/vendor/mold.mk
+		BUILD_PREREQS += mold
+		COMPILER = $(COMPILER) --ld-path=$(realpath build/vendor/mold/mold)
+	endif
+endif
+
 clean_tmpfile:
 	@echo "$(ACTION_PREFIX)$(RM) $(wildcard tmp/*.tmp)$(ACTION_SUFFIX)"
 	-@$(RM) $(wildcard tmp/*.tmp)
+
+clean_clang_tooling_artifacts:
+ifeq ($(HAVE_FIND),ENABLED)
+	-rm $(shell find . -name "*.gcda")
+	-rm $(shell find . -name "*.gcno")
+endif
 
 tmp:
 	-mkdir $@
@@ -299,10 +361,11 @@ endif
 	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
 
-	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
+	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
 	-@$(CLANG_FORMAT) -i $<
 else
+	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
 	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 

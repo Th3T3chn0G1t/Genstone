@@ -41,6 +41,7 @@ GLOBAL_C_FLAGS =
 GLOBAL_L_FLAGS =
 
 # Whether to apply clang-format changes to files directly
+# Possible values are:
 # `ENABLED`: Enables application of format changes
 # `DISABLED`: Disables application of format changes
 AUTO_APPLY_FORMAT = ENABLED
@@ -52,6 +53,21 @@ COMPILER = clang
 # For the purposes of portability and ease of invocation - this should be the same as the compiler
 # It is not recommended to change this
 LINKER = clang
+
+# Allows the build system to build alternative tools that make building overall faster
+# This does not improve the speed of produced code, only the time taken to produce them
+# e.g. allows building of `mold` on ELF targets to improve link times drastically
+# Note: This may disable LTO on some targets
+# Possible values are:
+# `ENABLED`: Allow building of additional build tools
+# `DISABLED`: Don't allow building of additional build tools
+FASTBUILD_TOOLS = ENABLED
+
+# Whether to enable clang tooling on generated binaries
+# Possible values are:
+# `ENABLED`: Apply tooling
+# `DISABLED`: Don't apply tooling
+TOOLING = ENABLED
 
 # Whether to perform static analysis
 # Possible values are:
@@ -72,4 +88,10 @@ IDE =
 # Possible values are:
 # `ENABLED`: Enables build system debugging
 # `DISABLED`: Disables build system debugging
-BUILD_SYS_DEBUG = ENABLED
+BUILD_SYS_DEBUG = DISABLED
+
+# Whether the provided clang version has support for `-fproc-stat-report`
+# Possible values are:
+# `ENABLED`: Have `-fproc-stat-report`
+# `DISABLED`: Don't have `-fproc-stat-report`
+HAVE_STAT_REPORT = DISABLED

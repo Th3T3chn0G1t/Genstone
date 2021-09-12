@@ -11,6 +11,12 @@ The base `Makefile` in the project root tries to build the sandbox project be de
 
 For the smoothest experience - its recommended to build with `clang`, but with a few modifications to the codebase `gcc` should work too. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`), and Windows users will need mingw's `dlltool` for the generation of import libraries
 
+## Building
+
+The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions.
+
+The KAnnex compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_c11compat_kannex`. The same applies to mold when `FASTBUILD_TOOLS = ENABLED` on ELF-based systems, though it doesn't take long to build it doesn't really make sense to clean a build tool with a clean target, so the separate clean command `clean_mold` is provided.
+
 ## Options
 
 Variables to influence the way an application or module is built with Genesis
@@ -32,13 +38,10 @@ This is *not* viable if you plan to embed Genesis into your own project, as it g
 
 It is recommended to use this in conjunction with `make ideconf` to generate your development environment configuration
 
-#### Note
-There is no error checking performed on entered values, invalid values will result in unknown behaviour
-
 ### Compilation Options
 
 #### Note
-Build config helper scripts for some targets are available in `script/`
+Build config helper scripts for some targets are available in `script/target/`. These are only available for hosts supporting `sh`
 
 Setting in-code options can be done via. `-D` flags set via. the config Makefile
 

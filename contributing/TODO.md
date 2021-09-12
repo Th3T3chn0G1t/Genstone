@@ -4,7 +4,7 @@
     - Visual build tool
 - Work on GenUIne with binary partitioning
 - Embedded toolchain
-    - Embedded LibC
+- Embedded LibC
 - Math extensions
     - `ext_vector_type` attribute
     - `__vector_size__` attribute
@@ -17,3 +17,8 @@
 - Apply `hot` and `cold` function attributes
 - C11 Analyzability
 - emscripten
+- Detect toolchain version
+    - `clang`
+    - `clang-format`
+- Use `libtool`
+- Keep an eye on `mold` mach-o support

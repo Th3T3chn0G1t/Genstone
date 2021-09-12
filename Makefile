@@ -70,7 +70,7 @@ build_message_clean:
 	@echo "$(INFO_PREFIX) Cleaning up build artifacts from all modules"
 	@echo "$(NOTE_PREFIX) To clean an individual module, use \`make clean_MODULE_NAME\`$(ACTION_PREFIX)"
 
-clean: build_message_clean $(MODULE_CLEAN_TARGETS)
+clean: build_message_clean $(MODULE_CLEAN_TARGETS) clean_clang_tooling_artifacts
 	@echo "$(ACTION_SUFFIX)$(INFO_PREFIX) All clean!"
 
 lib:
