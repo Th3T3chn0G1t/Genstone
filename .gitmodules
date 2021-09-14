@@ -4,6 +4,3 @@
 [submodule "genesis/vendor/c11compat/safeclib"]
 	path = genesis/vendor/c11compat/safeclib
 	url = https://github.com/rurban/safeclib
-[submodule "build/vendor/mold"]
-	path = build/vendor/mold
-	url = https://github.com/rui314/mold

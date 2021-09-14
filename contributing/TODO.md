@@ -4,6 +4,7 @@
     - Visual build tool
 - Work on GenUIne with binary partitioning
 - Embedded toolchain
+    - Mold linker for fast build
 - Embedded LibC
 - Math extensions
     - `ext_vector_type` attribute
@@ -21,4 +22,3 @@
     - `clang`
     - `clang-format`
 - Use `libtool`
-- Keep an eye on `mold` mach-o support

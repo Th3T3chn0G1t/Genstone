@@ -54,15 +54,6 @@ COMPILER = clang
 # It is not recommended to change this
 LINKER = clang
 
-# Allows the build system to build alternative tools that make building overall faster
-# This does not improve the speed of produced code, only the time taken to produce them
-# e.g. allows building of `mold` on ELF targets to improve link times drastically
-# Note: This may disable LTO on some targets
-# Possible values are:
-# `ENABLED`: Allow building of additional build tools
-# `DISABLED`: Don't allow building of additional build tools
-FASTBUILD_TOOLS = ENABLED
-
 # Whether to enable clang tooling on generated binaries
 # Possible values are:
 # `ENABLED`: Apply tooling

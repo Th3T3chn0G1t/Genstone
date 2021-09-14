@@ -85,9 +85,6 @@ endif
 ifneq ($(OVERRIDE_TOOLING),)
 TOOLING = $(OVERRIDE_TOOLING)
 endif
-ifneq ($(OVERRIDE_FASTBUILD_TOOLS),)
-FASTBUILD_TOOLS = $(OVERRIDE_FASTBUILD_TOOLS)
-endif
 
 ifneq ($(PLATFORM),DEFAULT)
 ifneq ($(PLATFORM),WIN)
@@ -149,11 +146,6 @@ ERROR += "$(ERROR_PREFIX) Invalid value for TOOLING: \"$(TOOLING)\"\n"
 endif
 endif
 
-ifneq ($(FASTBUILD_TOOLS),ENABLED)
-ifneq ($(FASTBUILD_TOOLS),DISABLED)
-ERROR += "$(ERROR_PREFIX) Invalid value for FASTBUILD_TOOLS: \"$(FASTBUILD_TOOLS)\"\n"
-endif
-endif
 
 
 ifeq ($(PLATFORM),DEFAULT)
@@ -326,14 +318,6 @@ ifeq ($(TEST),UNITS)
 endif
 ifeq ($(TEST),BUILD)
 	TEST_BUILD = 1
-endif
-
-ifeq ($(FASTBUILD_TOOLS),ENABLED)
-	ifeq ($(OBJECT_FORMAT),ELF)
-		include build/vendor/mold.mk
-		BUILD_PREREQS += mold
-		COMPILER = $(COMPILER) --ld-path=$(realpath build/vendor/mold/mold)
-	endif
 endif
 
 clean_tmpfile:
