@@ -47,12 +47,11 @@ GLOBAL_L_FLAGS =
 AUTO_APPLY_FORMAT = ENABLED
 
 # The C compiler to use
-# It is not recommended to change this
+# This is unlikely to work with compilers other than clang
 COMPILER = clang
 # The linker to use
-# For the purposes of portability and ease of invocation - this should be the same as the compiler
-# It is not recommended to change this
-LINKER = clang
+# Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
+LINKER = ld
 
 # Whether to enable clang tooling on generated binaries
 # Possible values are:
