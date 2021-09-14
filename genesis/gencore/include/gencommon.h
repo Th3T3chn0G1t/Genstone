@@ -428,20 +428,6 @@ typedef enum {
 #define GEN_INTERNAL_FOREACH_ITER_DECL size_t
 #endif
 
-#if GEN_DEBUG_CLANG_LOOP_EXT == ENABLED
-#define GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
-    pragma("clang loop vectorize(enable)") \
-    pragma("clang loop interleave(enable)") \
-    pragma("clang loop unroll(full)") \
-    pragma("clang loop distribute(enable)")
-#else
-/**
- * Applies clang extension loop qualifiers to `GEN_FOREACH`
- * @see GEN_DEBUG_CLANG_LOOP_EXT
- */
-#define GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
-#endif
-
 /**
  * Iterates over a container with explicit length
  * @param iter the identifier to use for the iterating index
@@ -453,7 +439,6 @@ typedef enum {
  */
 #define GEN_FOREACH(iter, memb, len, container) \
     __typeof__((container)[0]) memb = (container)[0]; \
-    GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
 
 /**
@@ -468,7 +453,6 @@ typedef enum {
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
     __typeof__((container)[0])* memb = &(container)[0]; \
-    GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
 /**
@@ -484,7 +468,6 @@ typedef enum {
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
     __typeof__((container)) memb = (container); \
-    GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 #define GEN_MICROSECONDS_PER_SECOND 1000000

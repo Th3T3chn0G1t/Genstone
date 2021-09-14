@@ -85,6 +85,12 @@ endif
 ifneq ($(OVERRIDE_TOOLING),)
 TOOLING = $(OVERRIDE_TOOLING)
 endif
+ifneq ($(OVERRIDE_STRIP_BINARIES),)
+STRIP_BINARIES = $(OVERRIDE_STRIP_BINARIES)
+endif
+ifneq ($(OVERIDE_STRIP_TOOL),)
+STRIP_TOOL = $(OVERIDE_STRIP_TOOL)
+endif
 
 ifneq ($(PLATFORM),DEFAULT)
 ifneq ($(PLATFORM),WIN)
@@ -147,6 +153,14 @@ endif
 endif
 
 
+ifneq ($(STRIP_BINARIES),ENABLED)
+ifneq ($(STRIP_BINARIES),DISABLED)
+ifneq ($(STRIP_BINARIES),DEBUG)
+ERROR += "$(ERROR_PREFIX) Invalid value for STRIP_BINARIES: \"$(STRIP_BINARIES)\"\n"
+endif
+endif
+endif
+
 
 ifeq ($(PLATFORM),DEFAULT)
 	ifeq ($(OS),Windows_NT)
@@ -171,7 +185,11 @@ ifeq ($(PLATFORM),DEFAULT)
     endif
 endif
 
-LINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
+ifeq ($(LINKER),DEFAULT)
+CLINKER := $(COMPILER)
+else
+CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
+endif
 
 GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DWEB=5 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
@@ -202,7 +220,6 @@ ifeq ($(BUILD_SYS_DEBUG),ENABLED)
 		GLOBAL_C_FLAGS += -fproc-stat-report
 		GLOBAL_L_FLAGS += -fproc-stat-report
 	endif
-	GLOBAL_C_FLAGS += -v
 endif
 
 ifeq ($(PLATFORM),WIN)
@@ -217,7 +234,7 @@ ifeq ($(PLATFORM),WIN)
 
 	OBJECT_FORMAT = PE
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),LNX)
@@ -231,7 +248,7 @@ ifeq ($(PLATFORM),LNX)
 
 	OBJECT_FORMAT = ELF
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),DWN)
@@ -245,7 +262,7 @@ ifeq ($(PLATFORM),DWN)
 
 	OBJECT_FORMAT = MACHO
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),BSD)
@@ -259,7 +276,7 @@ ifeq ($(PLATFORM),BSD)
 
 	OBJECT_FORMAT = ELF
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),WEB)
@@ -274,21 +291,26 @@ ifeq ($(PLATFORM),WEB)
 
 	OBJECT_FORMAT = WASM
 
-	DYNAMIC_LIB_TOOL = $(LINKER) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(LINKER) -static -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(CLINKER) -static -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
-	GLOBAL_C_FLAGS += -m64 -fopenmp -Ofast -ffast-math -DNDEBUG -flto
+	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -DNDEBUG -flto
+	GLOBAL_L_FLAGS += -flto
+	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
+
 	ifneq ($(wildcard *.profraw),)
 		GLOBAL_C_FLAGS += -fprofile-instr-use=$(wildcard *.profraw)
 	endif
-	GLOBAL_L_FLAGS += -flto
-	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
 	ifeq ($(PLATFORM),WIN)
 		GLOBAL_L_FLAGS += -llibcmt.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+	endif
+
+	ifeq ($(PLATFORM),DWN)
+		GLOBAL_L_FLAGS += -Wl,-dead_strip,-no_implicit_dylibs,-warn_unused_dylibs,-dead_strip_dylibs,-interposable,-warn_stabs,-warn_commons,-debug_variant,-unaligned_pointers,warning
 	endif
 else
 	GLOBAL_C_FLAGS += -m64 -glldb -O0 -DDEBUG -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
@@ -299,6 +321,10 @@ else
 		GLOBAL_C_FLAGS += -D_DEBUG
 		GLOBAL_L_FLAGS += -Wl,-nodefaultlib:libcmt.lib -llibcmtd.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug
+	endif
+
+	ifeq ($(PLATFORM),DWN)
+		GLOBAL_L_FLAGS += -Wl,-random_uuid,-warn_stabs,-warn_commons
 	endif
 endif
 
@@ -355,14 +381,91 @@ else
 	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 
+ifeq ($(STRIP_BINARIES),ENABLED)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-s -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -x -D -o $@ $@
+endif
+endif
+ifeq ($(STRIP_BINARIES),DEBUG)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-S -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -S -D -o $@ $@
+endif
+endif
+
 %$(STATIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(STATIC_LIB_TOOL)
+
+ifeq ($(STRIP_BINARIES),ENABLED)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-s -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -x -D -o $@ $@
+endif
+endif
+ifeq ($(STRIP_BINARIES),DEBUG)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-S -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -S -D -o $@ $@
+endif
+endif
+
 
 %$(DYNAMIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL) $(GLOBAL_L_FLAGS) $(LFLAGS)$(ACTION_SUFFIX)"
 	@$(DYNAMIC_LIB_TOOL) $(GLOBAL_L_FLAGS) $(LFLAGS)
 
+ifeq ($(STRIP_BINARIES),ENABLED)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-s -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -x -D -o $@ $@
+endif
+endif
+ifeq ($(STRIP_BINARIES),DEBUG)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-S -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -S -D -o $@ $@
+endif
+endif
+
 %$(EXECUTABLE_SUFFIX):
-	@echo "$(ACTION_PREFIX)$(LINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)$(ACTION_SUFFIX)"
-	@$(LINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)$(ACTION_SUFFIX)"
+	@$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)
+
+ifeq ($(STRIP_BINARIES),ENABLED)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-s -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -x -D -o $@ $@
+endif
+endif
+ifeq ($(STRIP_BINARIES),DEBUG)
+ifeq ($(STRIP_TOOL),LINKER)
+	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
+	@$(CLINKER) -Wl,-S -o $@ $@
+else
+	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
+	@$(STRIP_TOOL) -S -D -o $@ $@
+endif
+endif

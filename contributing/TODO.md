@@ -5,6 +5,7 @@
 - Work on GenUIne with binary partitioning
 - Embedded toolchain
     - Mold linker for fast build
+    - Build caching (`ld64` `-cache_path_lto`, `mold` daemonisation)
 - Embedded LibC
 - Math extensions
     - `ext_vector_type` attribute
@@ -22,3 +23,15 @@
     - `clang`
     - `clang-format`
 - Use `libtool`
+- MS `mimalloc`
+- Investigate more ld options (like clang)
+    - `-Z`
+    - Specific binary output types
+- Static builds
+- `_fini` `_init`
+- `-u` `-U` for compilation verification
+- Build-system debugging
+    - `-why_load` 
+    - `-print_statistics` 
+- `ld64` `-dot` for visualisation
+- `ld` `-map`

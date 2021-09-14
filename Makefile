@@ -57,6 +57,10 @@ BUILD_TARGETS = \
 		$(BUILD_POST) \
 	)
 
+include $(ADDITIONAL_BUILD_MODULES)
+BUILD_PREREQS += $(notdir $(subst .mk,,$(ADDITIONAL_BUILD_MODULES)))
+MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(ADDITIONAL_BUILD_MODULES))))
+
 all: $(BUILD_TARGETS) clean_tmpfile
 	@echo "$(INFO_PREFIX) All built!"
 

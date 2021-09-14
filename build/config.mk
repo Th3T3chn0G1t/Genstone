@@ -9,10 +9,23 @@
 PLATFORM = DEFAULT
 
 # Set build optimization mode
-# Possible values are
+# Possible values are:
 # `DEBUG`: Include debug information, reduced/minimal optimization
 # `RELEASE`: Don't include debug information, highest optimization
 BUILD_MODE = DEBUG
+
+# Whether to strip binaries after building
+# Possible values are:
+# `DEBUG`: Strip debug symbols
+# `ENABLED`: Strip all symbols
+# `DISABLED`: Don't strip binaries
+STRIP_BINARIES = DISABLED
+
+# The tool to use for stripping binaries
+# Expected to have a command line interface similar to `llvm-strip`
+# If the target platform's linker should supports stripping, please set this to `LINKER` (the literal word *not* the value of the `LINKER` variable)
+# Stripping is more effective if the linker is responsible for stripping
+STRIP_TOOL = strip
 
 # Path to the sandbox project module Makefile
 SANDBOX_PROJECT_MODULE = sandbox/sample.mk
@@ -51,7 +64,8 @@ AUTO_APPLY_FORMAT = ENABLED
 COMPILER = clang
 # The linker to use
 # Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
-LINKER = ld
+# Set to `DEFAULT` to allow the compiler to select a linker
+LINKER = DEFAULT
 
 # Whether to enable clang tooling on generated binaries
 # Possible values are:

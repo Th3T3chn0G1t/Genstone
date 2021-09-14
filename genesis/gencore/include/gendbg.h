@@ -24,22 +24,12 @@
  */
 #define GEN_DEBUG_FOREACH_REGISTER DISABLED
 #endif
-#ifndef GEN_DEBUG_CLANG_LOOP_EXT
-/**
- * Whether to use clang for loop qualifier pragmas in `GEN_FOREACH` statements
- * @note Disabling this can sometimes help with debugging loops
- */
-#define GEN_DEBUG_CLANG_LOOP_EXT DISABLED
-#endif
 #else
 #ifndef GEN_DEBUG_PATH_VALIDATION
 #define GEN_DEBUG_PATH_VALIDATION DISABLED
 #endif
 #ifndef GEN_DEBUG_FOREACH_REGISTER
 #define GEN_DEBUG_FOREACH_REGISTER ENABLED
-#endif
-#ifndef GEN_DEBUG_CLANG_LOOP_EXT
-#define GEN_DEBUG_CLANG_LOOP_EXT ENABLED
 #endif
 #endif
 
