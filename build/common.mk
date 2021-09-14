@@ -115,7 +115,7 @@ endif
 ifneq ($(TEST),BUILD)
 ifneq ($(TEST),UNITS)
 ifneq ($(TEST),ALL)
-ifneq ($(TEST),NONE)
+ifneq ($(TEST),DISABLED)
 ERROR += "$(ERROR_PREFIX) Invalid value for TEST: \"$(TEST)\"\n"
 endif
 endif
@@ -216,6 +216,9 @@ endif
 
 # Need to check clang version for this to work (12.0.1?)
 ifeq ($(BUILD_SYS_DEBUG),ENABLED)
+	ifeq ($(PLATFORM),DWN)
+		GLOBAL_L_FLAGS += -Wl,-why_load,-print_statistics
+	endif
 	ifeq ($(HAVE_STAT_REPORT),ENABLED)
 		GLOBAL_C_FLAGS += -fproc-stat-report
 		GLOBAL_L_FLAGS += -fproc-stat-report
@@ -234,7 +237,7 @@ ifeq ($(PLATFORM),WIN)
 
 	OBJECT_FORMAT = PE
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
+	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),LNX)
@@ -248,7 +251,7 @@ ifeq ($(PLATFORM),LNX)
 
 	OBJECT_FORMAT = ELF
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),DWN)
@@ -262,7 +265,7 @@ ifeq ($(PLATFORM),DWN)
 
 	OBJECT_FORMAT = MACHO
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),BSD)
@@ -276,7 +279,7 @@ ifeq ($(PLATFORM),BSD)
 
 	OBJECT_FORMAT = ELF
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),WEB)
@@ -291,7 +294,7 @@ ifeq ($(PLATFORM),WEB)
 
 	OBJECT_FORMAT = WASM
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(CLINKER) -static -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
@@ -330,7 +333,7 @@ endif
 
 ifeq ($(TOOLING),ENABLED)
 	GLOBAL_C_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined
-	GLOBAL_L_FLAGS += -fprofile-instr-generate -fsanitize=undefined
+	GLOBAL_L_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined
 	ifneq ($(PLATFORM),WEB)
 		GLOBAL_C_FLAGS += -fsanitize=address
 		GLOBAL_L_FLAGS += -fsanitize=address
@@ -425,8 +428,8 @@ endif
 
 
 %$(DYNAMIC_LIB_SUFFIX):
-	@echo "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL) $(GLOBAL_L_FLAGS) $(LFLAGS)$(ACTION_SUFFIX)"
-	@$(DYNAMIC_LIB_TOOL) $(GLOBAL_L_FLAGS) $(LFLAGS)
+	@echo "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL)$(ACTION_SUFFIX)"
+	@$(DYNAMIC_LIB_TOOL)
 
 ifeq ($(STRIP_BINARIES),ENABLED)
 ifeq ($(STRIP_TOOL),LINKER)

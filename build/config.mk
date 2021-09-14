@@ -45,7 +45,7 @@ DISABLED_MODULES =
 # `BUILD`: Tests the build system
 # `UNITS`: Runs unit tests
 # `ALL`: Runs all available tests
-# `NONE`: Don't run tests
+# `DISABLED`: Don't run tests
 TEST = ALL
 
 # Flags to be provided to the compiler at every call

@@ -17,8 +17,8 @@
 - Thread safety analysis
 - Apply `__likely` and `__unlikely`
 - Apply `hot` and `cold` function attributes
-- C11 Analyzability
 - emscripten
+- `constraint_handler_t` `set_constraint_handler_s`
 - Detect toolchain version
     - `clang`
     - `clang-format`
@@ -30,8 +30,5 @@
 - Static builds
 - `_fini` `_init`
 - `-u` `-U` for compilation verification
-- Build-system debugging
-    - `-why_load` 
-    - `-print_statistics` 
 - `ld64` `-dot` for visualisation
 - `ld` `-map`
