@@ -11,9 +11,18 @@
 
 #include <gencommon.h>
 
+/**
+ * Signed 128-bit integer
+ */
 typedef __int128 gint128;
+/**
+ * Unsigned 128-bit integer
+ */
 typedef unsigned __int128 guint128;
 
+/**
+ * 16-bit floating point storage type
+ */
 typedef __fp16 gfloat16;
 
 /**
