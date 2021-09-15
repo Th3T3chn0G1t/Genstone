@@ -191,7 +191,7 @@ else
 CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
 endif
 
-GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DWEB=5 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -fenable-matrix -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DWEB=5 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
@@ -232,7 +232,8 @@ ifeq ($(PLATFORM),WIN)
 	EXECUTABLE_SUFFIX = .exe
 	OBJECT_SUFFIX = .obj
 
-	GLOBAL_C_FLAGS += -D_MT
+	# Presume windows targets are x86 for now
+	GLOBAL_C_FLAGS += -D_MT -mavx512-fp16
 	GLOBAL_L_FLAGS += -lshlwapi.lib
 
 	OBJECT_FORMAT = PE

@@ -7,11 +7,11 @@
     - Mold linker for fast build
     - Build caching (`ld64` `-cache_path_lto`, `mold` daemonisation)
 - Embedded LibC
-- Math extensions
-    - `ext_vector_type` attribute
-    - `__vector_size__` attribute
-        - Vector types support overloaded operators
-    - `matrix_type` attribute
+    - Clang builtin string functions (https://clang.llvm.org/docs/LanguageExtensions.html#string-builtins)
+    - Clang builtin memory functions (https://clang.llvm.org/docs/LanguageExtensions.html#memory-builtins)
+- Use clang C11 atomic builtins in C11 threads emulation (https://clang.llvm.org/docs/LanguageExtensions.html#c11-atomic-builtins)
+- LLVM Coroutines in C? (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
+- Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
 - OpenMP support
 - XRay instrumentation
 - Thread safety analysis
@@ -19,10 +19,7 @@
 - Apply `hot` and `cold` function attributes
 - emscripten
 - `constraint_handler_t` `set_constraint_handler_s`
-- Detect toolchain version
-    - `clang`
-    - `clang-format`
-- Use `libtool`
+- `libtool`
 - MS `mimalloc`
 - Investigate more ld options (like clang)
     - `-Z`

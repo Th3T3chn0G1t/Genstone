@@ -20,7 +20,7 @@ static int thread_func(__unused void* passthrough) {
 
 	return 0;
 }
-
+#include "../../genesis/gencalc/include/gencalc.h"
 int main() {
 	glog(INFO, "Hello, Genesis!");
 
