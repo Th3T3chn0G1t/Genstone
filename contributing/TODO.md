@@ -6,6 +6,7 @@
 - Embedded toolchain
     - Mold linker for fast build
     - Build caching (`ld64` `-cache_path_lto`, `mold` daemonisation)
+    - Force lld for Windows builds
 - Embedded LibC
     - Clang builtin string functions (https://clang.llvm.org/docs/LanguageExtensions.html#string-builtins)
     - Clang builtin memory functions (https://clang.llvm.org/docs/LanguageExtensions.html#memory-builtins)
@@ -21,13 +22,16 @@
 - `constraint_handler_t` `set_constraint_handler_s`
 - `libtool`
 - MS `mimalloc`
-- Investigate more ld options (like clang)
+- Investigate more `ld` options (Same vein as with `clang`)
     - `-Z`
     - Specific binary output types
+- Validate paths in `common.mk` with wildcard
 - Static builds
 - `_fini` `_init`
 - `-u` `-U` for compilation verification
 - `ld64` `-dot` for visualisation
 - `ld` `-map`
-- Safe floating-point comparison for `GEN_REQUIRE`
-- Talk about Doxygen docs in BUILDING
+- Epsilon comparison gencalc
+    - Safe floating-point comparison for `GEN_REQUIRE`
+- Talk about Doxygen docs in `BUILDING.md`
+- Reorganise `config.mk`

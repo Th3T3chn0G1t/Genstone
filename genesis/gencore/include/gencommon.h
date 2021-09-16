@@ -18,7 +18,7 @@
 #define pragma(s) _Pragma(s)
 /**
  * Pretty keyword GEN_INTERNALeric
- * @param ... type-switch statement for GEN_INTERNALeric
+ * @param ... type-switch statement for _Generic
  */
 #define generic(...) _Generic(__VA_ARGS__)
 
@@ -34,6 +34,11 @@
  * Ignores all extra compiler warnings in a diagnostic region
  */
 #define GEN_DIAG_IGNORE_ALL pragma("clang diagnostic ignored \"-Weverything\"")
+
+/**
+ * Ignores floating point equality test compiler warnings in a diagnostic region
+ */
+#define GEN_DIAG_IGNORE_FP_EQ pragma("clang diagnostic ignored \"-Wfloat-equal\"")
 
 GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wreserved-id-macro"

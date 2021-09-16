@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
+#include <gencalc.h>
 #include <gencommon.h>
 #include <genesis.h>
 #include <gentooling.h>
-#include <gencalc.h>
 
 static int appticks = 0;
 static gen_node_t approot = {GEN_ROOT_TYPE, sizeof(int), &appticks, 0, NULL, NULL};

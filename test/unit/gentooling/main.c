@@ -10,7 +10,7 @@ static void tooling_test(void) {
 
 	GEN_REQUIRE_EQUAL_STRING("tooling_test", gen_tooling_call_stack.functions[gen_tooling_call_stack.next - 1]);
 	GEN_REQUIRE_EQUAL_STRING("test/unit/gentooling/main.c", gen_tooling_call_stack.files[gen_tooling_call_stack.next - 1]);
-	GEN_REQUIRE_EQUAL((uintptr_t) tooling_test, gen_tooling_call_stack.addresses[gen_tooling_call_stack.next - 1]);
+	GEN_REQUIRE_EQUAL((uintptr_t) /* This is safe for all currently supported architectures */ tooling_test, gen_tooling_call_stack.addresses[gen_tooling_call_stack.next - 1]);
 
 	glog(INFO, "Testing gtrace...");
 	gtrace;

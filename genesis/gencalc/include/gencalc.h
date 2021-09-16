@@ -47,6 +47,12 @@ typedef __fp16 gfloat16;
 #define GEN_CONVERT_VECTOR(vector, new_type) __builtin_convertvector(vector, new_type)
 
 /**
+ * Transposes a matrix
+ * @param mat the matrix to transpose
+ */
+#define GEN_TRANSPOSE_MATRIX(mat) __builtin_matrix_transpose(mat)
+
+/**
  * A 2-component vector of floats
  */
 GEN_INTERNAL_VECTOR_TYPE(float, 2);
