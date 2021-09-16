@@ -4,6 +4,7 @@
 #include <gencommon.h>
 #include <genesis.h>
 #include <gentooling.h>
+#include <gencalc.h>
 
 static int appticks = 0;
 static gen_node_t approot = {GEN_ROOT_TYPE, sizeof(int), &appticks, 0, NULL, NULL};
@@ -20,7 +21,6 @@ static int thread_func(__unused void* passthrough) {
 
 	return 0;
 }
-#include "../../genesis/gencalc/include/gencalc.h"
 int main() {
 	glog(INFO, "Hello, Genesis!");
 

@@ -29,3 +29,5 @@
 - `-u` `-U` for compilation verification
 - `ld64` `-dot` for visualisation
 - `ld` `-map`
+- Safe floating-point comparison for `GEN_REQUIRE`
+- Talk about Doxygen docs in BUILDING
