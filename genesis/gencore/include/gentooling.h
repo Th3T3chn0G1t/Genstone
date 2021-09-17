@@ -120,7 +120,7 @@ extern void gen_tooling_stack_push(const char* restrict frame, const uintptr_t a
 extern void gen_tooling_stack_pop(void);
 
 /**
- * cleanup attribute wrapper for gen_tooling_stack_pop()
+ * Cleanup attribute wrapper for `gen_tooling_stack_pop`
  * @see GEN_FRAME_BEGIN
  */
 extern void gen_internal_tooling_frame_scope_end(const char* const restrict passthrough);
@@ -135,7 +135,7 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
 /**
  * Begins a tooled frame with an automatic lifetime
  * @param func the address of this frame
- * @note for non-function frames use gen_tooling_stack_push directly
+ * @note for non-function frames use `gen_tooling_stack_push` directly
  */
 #define GEN_FRAME_BEGIN(func) \
     __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar; \

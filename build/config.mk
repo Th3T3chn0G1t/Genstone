@@ -53,7 +53,7 @@ GLOBAL_C_FLAGS =
 # Flags to be provided to the linker at every call
 GLOBAL_L_FLAGS =
 
-# Whether to apply clang-format changes to files directly
+# Whether to apply `clang-format` changes to files directly
 # Possible values are:
 # `ENABLED`: Enables application of format changes
 # `DISABLED`: Disables application of format changes
@@ -94,7 +94,7 @@ IDE =
 # `DISABLED`: Disables build system debugging
 BUILD_SYS_DEBUG = DISABLED
 
-# Whether the provided clang version has support for `-fproc-stat-report`
+# Whether the provided `clang` version has support for `-fproc-stat-report`
 # Possible values are:
 # `ENABLED`: Have `-fproc-stat-report`
 # `DISABLED`: Don't have `-fproc-stat-report`

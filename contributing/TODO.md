@@ -1,37 +1,44 @@
 # TODO
 
-- generator (editor)
-    - Visual build tool
-- Work on GenUIne with binary partitioning
-- Embedded toolchain
+- Features
+    - generator (editor)
+        - Visual build tool
+    - Work on GenUIne with binary partitioning
+    - Epsilon comparison gencalc
+        - Safe floating-point comparison for `GEN_REQUIRE`
+    - Reorganise `config.mk`
+- Builds
+    - Validate paths in `common.mk` with wildcard
     - Mold linker for fast build
     - Build caching (`ld64` `-cache_path_lto`, `mold` daemonisation)
     - Force lld for Windows builds
-- Embedded LibC
-    - Clang builtin string functions (https://clang.llvm.org/docs/LanguageExtensions.html#string-builtins)
-    - Clang builtin memory functions (https://clang.llvm.org/docs/LanguageExtensions.html#memory-builtins)
-- Use clang C11 atomic builtins in C11 threads emulation (https://clang.llvm.org/docs/LanguageExtensions.html#c11-atomic-builtins)
-- LLVM Coroutines in C? (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
-- Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
-- OpenMP support
-- XRay instrumentation
-- Thread safety analysis
-- Apply `__likely` and `__unlikely`
-- Apply `hot` and `cold` function attributes
-- emscripten
-- `constraint_handler_t` `set_constraint_handler_s`
-- `libtool`
-- MS `mimalloc`
-- Investigate more `ld` options (Same vein as with `clang`)
-    - `-Z`
-    - Specific binary output types
-- Validate paths in `common.mk` with wildcard
-- Static builds
-- `_fini` `_init`
-- `-u` `-U` for compilation verification
-- `ld64` `-dot` for visualisation
-- `ld` `-map`
-- Epsilon comparison gencalc
-    - Safe floating-point comparison for `GEN_REQUIRE`
-- Talk about Doxygen docs in `BUILDING.md`
-- Reorganise `config.mk`
+    - Embedded LibC
+    - `libtool`
+    - Linkage
+        - `_fini` `_init`
+        - `-u` `-U` for compilation verification
+        - `ld64` `-dot` for visualisation
+        - `ld` `-map`
+        - `-Z`
+        - Specify binary output types explicitly
+    - Static builds
+- Targets
+    - emscripten
+- Debugging
+    - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
+- Optimization
+    - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
+    - OpenMP support
+    - XRay instrumentation
+    - Apply `__likely` and `__unlikely`
+    - Apply `hot` and `cold` function attributes
+    - MS `mimalloc`
+- Security
+    - Thread safety analysis
+    - Checked C
+    - Annex K
+        - `constraint_handler_t` `set_constraint_handler_s`
+    - Clang builtin atomic utils (C11Compat) (https://clang.llvm.org/docs/LanguageExtensions.html#c11-atomic-builtins)
+- Documentation
+    - Tutorials
+    - Comprehensive `@example` tags

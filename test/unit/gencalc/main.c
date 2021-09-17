@@ -5,7 +5,7 @@ int main() {
 	const gfloat4 vec = {1.0f, 2.0f, 3.0f, 4.0f};
 	GEN_DIAG_REGION_BEGIN
 	GEN_DIAG_IGNORE_FP_EQ // We know that floating-point comparison is safe here
-		GEN_REQUIRE_EQUAL((double) 1.0f, (double) vec.x);
+	GEN_REQUIRE_EQUAL((double) 1.0f, (double) vec.x);
 	GEN_REQUIRE_EQUAL((double) 2.0f, (double) vec.y);
 	GEN_REQUIRE_EQUAL((double) 3.0f, (double) vec.z);
 	GEN_REQUIRE_EQUAL((double) 4.0f, (double) vec.w);

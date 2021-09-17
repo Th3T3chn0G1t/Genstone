@@ -16,7 +16,7 @@ build_message_build_test:
 	@echo "$(SECTION_PREFIX) Build Test"
 	@echo "$(INFO_PREFIX) Testing build configuration"
 
-build_test: build_message_build_test $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib
+build_test: build_message_build_test $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib ### @Test Builds and runs build-system tests
 	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_STATIC)$(ACTION_SUFFIX)"
 	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_DYNAMIC)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)

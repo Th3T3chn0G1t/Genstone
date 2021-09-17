@@ -7,31 +7,31 @@ Genesis uses a configurable system of `Makefile` (Have only tested with GNU Make
 
 The base `Makefile` in the project root tries to build the sandbox project be default, generating it if not present
 
+Documentation of most user-oriented targets is available through `make help`. This is provided through `###` docstrings in Makefiles. These can be specified in user modules in the following format:
+```
+target: PREREQUISITES (Will be removed from output) ### @Highlighted Docstring
+```
+
+`make list` will list the targets due to be built for `all` (the default target) based on configuration. 
+
 ## Prerequisites
 
-For the smoothest experience - its recommended to build with `clang`, but with a few modifications to the codebase `gcc` should work too. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`), and Windows users will need mingw's `dlltool` for the generation of import libraries
+The codebase will only build with `clang`. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`)
 
 ## Building
 
 #### Note
-On some versions of macOS, the provided `clang` version does not support some of the features used in `gencalc`. To disable `gencalc` avoid this issue, add `gencalc` (and `gencalc_test` if neccesary) to `DISABLED_MODULES`. Alternatively, if you need `gencalc`, consider installing the Homebrew version of `clang` with the features enabled using `brew install llvm` and adding a link to `/usr/local/Cellar/llvm/{VERSION}/bin/clang` in your path (with `ln -sf /usr/local/Cellar/llvm/{VERSION}/bin/clang /usr/local/bin/clang-12` or the like). Homebrew can be gotten from [brew.sh]. 
+On some versions of macOS, the provided `clang` version does not support some of the features used in `gencalc`. To disable `gencalc` avoid this issue, add `gencalc` (and `gencalc_test` if neccesary) to `DISABLED_MODULES`. Alternatively, if you need `gencalc`, consider installing the Homebrew version of `clang` with the features enabled using `brew install llvm` and adding a link to `/usr/local/Cellar/llvm/{VERSION}/bin/clang` in your path (with `ln -sf /usr/local/Cellar/llvm/{VERSION}/bin/clang /usr/local/bin/clang-12` or the like). Homebrew can be gotten from [brew.sh]
 
-The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions.
+The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions
 
 The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_c11compat_kannex`
 
-## Options
-
-Variables to influence the way an application or module is built with Genesis
-
-### Makefile Options
-
-#### Note
-These options can be overriden with a variable `OVERRIDE_keyname` in the executing environment. e.g. `OVERRIDE_COMPILER=gcc make`
-
-Set options for the build process itself (e.g. for cross-compilation) in `build/config.mk`. All variables are commented to explain their purpose and possible values
+## Special Targets
 
 Additional build targets exist for building IDE configuration files (`ideconf`) and documentation (`docs`). These targets' settings are also controlled by values in `build/config.mk`. `ideconf` will overwrite existing configuration and does not behave differently on subsequent invocations (i.e. calling once and then modifying is recommended)
+
+Documentation requires `Doxygen` to be installed and available on the `PATH`
 
 If you don't plan to use the source of Genesis during development, you can generate a more lightweight development environment using `make devenv`
 
@@ -40,6 +40,17 @@ This is *not* viable if you plan to embed Genesis into your own project, as it g
 `make devenv` will output to `out/` with generated `include`, `lib` and `docs` folders
 
 It is recommended to use this in conjunction with `make ideconf` to generate your development environment configuration
+
+## Options
+
+Variables to influence the way an application or module is built with Genesis
+
+### Makefile Options
+
+#### Note
+These options can be overriden with a variable `OVERRIDE_keyname` in the executing environment. e.g. `OVERRIDE_LINKER=lld.ld make`
+
+Set options for the build process itself (e.g. for cross-compilation) in `build/config.mk`. All variables are commented to explain their purpose and possible values
 
 ### Compilation Options
 
@@ -57,7 +68,7 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 
 In debug builds, some functionality is changed to provide extra validation or execution environment information
 
-Each key can be set to either `ENABLED` or `DISABLED`, making them truthy or falsy respectively.
+Each key can be set to either `ENABLED` or `DISABLED`, making them truthy or falsy respectively
 
 #### Compilation Options
 

@@ -220,7 +220,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 }
 
 gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
-	GEN_FRAME_BEGIN(gen_path_canonical);
+	GEN_FRAME_BEGIN(gen_path_filename);
 
 	if(!output_filename) return GEN_INVALID_PARAMETER;
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
@@ -402,7 +402,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	int error = fseek(handle->file_handles[0], (long) start, SEEK_SET);
 	if(error) return gen_convert_errno(errno);
 
-	error = (int) fread(output_buffer, sizeof(char), end - start, handle->file_handles[0]);
+	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handles[0]);
 	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 0, error);
 
 	rewind(handle->file_handles[0]);

@@ -7,7 +7,7 @@ build_message_c11compat_test:
 	@echo "$(SECTION_PREFIX) C11 Compat Test"
 	@echo "$(INFO_PREFIX) Testing C11 optional feature compatibility layers"
 
-c11compat_test: gencore build_message_c11compat_test $(C11_COMPAT_TEST)
+c11compat_test: gencore build_message_c11compat_test $(C11_COMPAT_TEST) ### @Test Builds and runs C11 compatibility layer tests
 	@echo "$(ACTION_PREFIX)$(C11_COMPAT_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(C11_COMPAT_TEST))

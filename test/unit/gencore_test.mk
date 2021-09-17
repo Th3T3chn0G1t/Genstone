@@ -7,7 +7,7 @@ build_message_gencore_test:
 	@echo "$(SECTION_PREFIX) Gencore Test"
 	@echo "$(INFO_PREFIX) Testing core Genesis utilities"
 
-gencore_test: gencore build_message_gencore_test $(GEN_CORE_TEST)
+gencore_test: gencore build_message_gencore_test $(GEN_CORE_TEST) ### @Test Builds and runs Genesis core utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_CORE_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_CORE_TEST))

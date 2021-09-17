@@ -7,10 +7,10 @@ build_message_sample:
 	@echo "$(SECTION_PREFIX) Sample Project"
 	@echo "$(INFO_PREFIX) Genesis sandbox sample project!"
 
-sample: $(SAMPLE_EXEC)
+sample: gencore $(SAMPLE_EXEC) ### @User Builds a sample sandbox project
 
-$(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS)
-$(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS)
+$(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)
+$(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(SAMPLE_EXEC): $(SAMPLE_OBJECTS)
 
 clean_sample:

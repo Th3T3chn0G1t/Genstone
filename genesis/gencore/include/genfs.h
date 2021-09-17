@@ -18,13 +18,13 @@
 #else
 #include <unistd.h>
 #ifndef PATH_MAX
-#define GEN_PATH_MAX 1024
-#else
 /**
  * The OS library's maximum length of a path
- * @note Does not currently support Windows 10 1607 long paths
- * @note Does not neccesarily represent the maximum length of a path supported by every filesystem
+ * @note Does not support Windows 10 1607 long paths
+ * @note Does not represent the maximum length of a path supported by every filesystem
  */
+#define GEN_PATH_MAX 1024
+#else
 #define GEN_PATH_MAX PATH_MAX
 #endif
 #endif
@@ -42,7 +42,7 @@ typedef struct {
     union {
         /**
          * Handles for a file if dir is false
-         * A handle is opened for each mode (r & w) as-needed
+         * @note A handle is opened for each mode (`r` & `w`) as-needed
          */
         FILE* file_handles[2];
         /**
@@ -62,16 +62,16 @@ typedef struct {
 
 /**
  * Gets the canonical representation of a path
- * @param output_path storage for the output path. Should be GEN_PATH_MAX in size if length is unknown
+ * @param output_path storage for the output path. Should be `GEN_PATH_MAX` in size if length is unknown
  * @param path the path to get a canonical representation for
- * @note Under windows, GEN_PATH_MAX will be provided to GetFullPathNameA nBufferLength in all cases
+ * @note Under Windows, `GEN_PATH_MAX` will be provided to `GetFullPathNameA` `nBufferLength` in all cases
  * @return an error code
  */
 extern GEN_ERRORABLE_RETURN gen_path_canonical(char* restrict output_path, const char* const restrict path);
 
 /**
  * Gets the filename of a path
- * @param output_filename storage for the output filename. Should be GEN_PATH_MAX in size if length is unknown
+ * @param output_filename storage for the output filename. Should be `GEN_PATH_MAX` in size if length is unknown
  * @param path the path to get a filename from
  * @return an error code
  */
@@ -79,7 +79,7 @@ extern GEN_ERRORABLE_RETURN gen_path_filename(char* restrict output_filename, co
 
 /**
  * Gets the pathname of a path
- * @param output_path storage for the output path. Should be GEN_PATH_MAX in size if length is unknown
+ * @param output_path storage for the output path. Should be `GEN_PATH_MAX` in size if length is unknown
  * @param path the path to get a pathname from
  * @return an error code
  */
@@ -87,7 +87,7 @@ extern GEN_ERRORABLE_RETURN gen_path_pathname(char* restrict output_path, const 
 
 /**
  * Gets the file extension of a path
- * @param output_extension storage for the output extension, Should be GEN_PATH_MAX in size if length is unknown
+ * @param output_extension storage for the output extension, Should be `GEN_PATH_MAX` in size if length is unknown
  * @param path the path to get an extension from
  * @return an error code
  */
@@ -103,7 +103,7 @@ extern bool gen_path_exists(const char* const restrict path);
 /**
  * Checks whether a path is valid
  * @param path the path to validate
- * @return an error code. GEN_TOO_LONG or GEN_TOO_SHORT if a path is an invalid length. GEN_WRONG_OBJECT_TYPE if an invalid character is encountered in the path
+ * @return an error code. `GEN_TOO_LONG` or `GEN_TOO_SHORT` if a path is an invalid length. `GEN_WRONG_OBJECT_TYPE` if an invalid character is encountered in the path
  */
 extern GEN_ERRORABLE_RETURN gen_path_validate(const char* const restrict path);
 
@@ -152,7 +152,7 @@ extern size_t gen_handle_size(const gen_filesystem_handle_t* const restrict hand
  * @param handle a handle to a file object whose content to read. Must not be a directory
  * @param start an offset from the start of the file to begin reading from
  * @param end an offset from the start of the file to end reading from
- * @note Use gen_handle_size as the end mark to read the whole file
+ * @note Use `gen_handle_size` as the end mark to read the whole file
  * @note Does not add a null terminator to the buffer
  * @return an error code
  */

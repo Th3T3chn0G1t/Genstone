@@ -7,7 +7,7 @@ build_message_genuine_test:
 	@echo "$(SECTION_PREFIX) Genuine Test"
 	@echo "$(INFO_PREFIX) Testing Genesis GUI module"
 
-genuine_test: genuine build_message_genuine_test $(GEN_UI_TEST)
+genuine_test: genuine build_message_genuine_test $(GEN_UI_TEST) ### @Test Builds and runs Genesis user-interface utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_UI_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_UI_TEST))

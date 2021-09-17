@@ -12,7 +12,7 @@
 #if MODE == DEBUG
 #ifndef GEN_DEBUG_PATH_VALIDATION
 /**
- * Whether to validate paths passed to genfs functions with `gen_path_validate`
+ * Whether to validate paths passed to `genfs` functions with `gen_path_validate`
  * @note Does not affect the presence of `gen_path_validate`
  */
 #define GEN_DEBUG_PATH_VALIDATION ENABLED

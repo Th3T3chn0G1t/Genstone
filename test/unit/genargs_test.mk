@@ -7,7 +7,7 @@ build_message_genargs_test:
 	@echo "$(SECTION_PREFIX) Genargs Test"
 	@echo "$(INFO_PREFIX) Testing Genesis argument parser"
 
-genargs_test: gencore build_message_genargs_test $(GEN_ARGS_TEST)
+genargs_test: gencore build_message_genargs_test $(GEN_ARGS_TEST) ### @Test Builds and runs Genesis argument parser tests
 	@echo "$(ACTION_PREFIX)$(GEN_ARGS_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_ARGS_TEST))

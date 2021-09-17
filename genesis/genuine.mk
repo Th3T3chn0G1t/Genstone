@@ -10,7 +10,7 @@ build_message_genuine:
 	@echo "$(SECTION_PREFIX) Genuine"
 	@echo "$(INFO_PREFIX) Genesis GUI module"
 
-genuine: gencore build_message_genuine $(GEN_UI_LIB)
+genuine: gencore build_message_genuine $(GEN_UI_LIB) ### @Genesis Builds Genesis user-interface utilities
 
 $(GEN_UI_LIB): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_UI_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

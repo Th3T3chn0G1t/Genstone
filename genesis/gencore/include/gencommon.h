@@ -13,12 +13,12 @@
 
 /**
  * Pretty keyword _Pragma
- * @param s string-literal argument for _Pragma
+ * @param s string-literal argument for `_Pragma`
  */
 #define pragma(s) _Pragma(s)
 /**
  * Pretty keyword GEN_INTERNALeric
- * @param ... type-switch statement for _Generic
+ * @param ... type-switch statement for `_Generic`
  */
 #define generic(...) _Generic(__VA_ARGS__)
 
@@ -44,28 +44,28 @@ GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #ifndef __unused
 /**
- * Defines __unused on platforms which do not support it by default
+ * Defines `__unused` on platforms which do not support it by default
  * Marks a variable or function as unused
  */
 #define __unused __attribute__((unused))
 #endif
 #ifndef __inline
 /**
- * Defines __inline on platforms which do not support it by default
+ * Defines `__inline` on platforms which do not support it by default
  * Marks a function to be inlined (force inline)
  */
 #define __inline __attribute__((always_inline)) __attribute__((artificial))
 #endif
 #ifndef __deprecated
 /**
- * Defines __deprecated on platforms which do not support it by default
+ * Defines `__deprecated` on platforms which do not support it by default
  * Marks a function as deprecated
  */
 #define __deprecated __attribute__((deprecated))
 #endif
 #ifndef __nodiscard
 /**
- * Defines __nodiscard on platforms which do not support it by default
+ * Defines `__nodiscard` on platforms which do not support it by default
  * Marks a function return value as not to be discarded
  */
 #define __nodiscard __attribute__((warn_unused_result))
@@ -84,6 +84,9 @@ GEN_DIAG_REGION_BEGIN
 #endif
 GEN_DIAG_REGION_END
 
+/**
+ * Return value specification for functions which use `generror` for error reporting
+ */
 #define GEN_ERRORABLE_RETURN __nodiscard gen_error_t
 
 #include "gendbg.h"
@@ -314,13 +317,14 @@ typedef enum {
         printf("%s", GEN_LOGGER_##level##_PREFIX); \
         printf(format, __VA_ARGS__); \
         printf("\n"); \
+        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
     } while(0)
 #else
 /**
  * Basic string logging function
- * @param level a gen_logging_level_t to determine the prefix from
+ * @param level a `gen_logging_level_t` to determine the prefix from
  * @param string the string to print
- * @note include gentooling.h first to get trace information on error
+ * @note include `gentooling.h` first to get trace information on error
  */
 #define glog(level, string) \
     do { \
@@ -331,10 +335,10 @@ typedef enum {
     } while(0)
 /**
  * `printf`-style formatted logging function
- * @param level a gen_logging_level_t to determine the prefix from
+ * @param level a `gen_logging_level_t` to determine the prefix from
  * @param format a format string
  * @param ... the format arguments to print
- * @note include gentooling.h first to get trace information on error
+ * @note include `gentooling.h` first to get trace information on error
  */
 #define glogf(level, format, ...) \
     do { \
@@ -342,6 +346,7 @@ typedef enum {
         fprintf(gen_internal_streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
         fprintf(gen_internal_streamp, format, __VA_ARGS__); \
         fprintf(gen_internal_streamp, "\n"); \
+        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
     } while(0)
 #endif
 
@@ -495,7 +500,7 @@ extern int gettimeofday(struct timeval* const restrict tp, __unused const void* 
 
 /**
  * Converts a timeval to seconds as a `long double`
- * @param timeval the timeval to convert
+ * @param timeval the `struct timeval` to convert
  */
 #define GEN_TIMEVAL_AS_SECONDS(timeval) ((long double) (timeval).tv_usec + ((long double) (timeval).tv_sec * (long double) GEN_MICROSECONDS_PER_SECOND))
 

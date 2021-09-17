@@ -14,7 +14,7 @@ build_message_gencore:
 	@echo "$(SECTION_PREFIX) Gencore"
 	@echo "$(INFO_PREFIX) Core Genesis utilities"
 
-gencore: c11compat build_message_gencore $(GEN_CORE_LIB)
+gencore: c11compat build_message_gencore $(GEN_CORE_LIB) ### @Genesis Builds core Genesis utilities
 
 _GEN_CORE_CFLAGS = $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),WIN)

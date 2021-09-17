@@ -23,13 +23,19 @@ ifeq ($(SHELL),cmd.exe)
 	CAT = type
 endif
 
-ERROR_PREFIX = \\033[0;31m\033[1mError:\\033[0m
-INFO_PREFIX = \\033[0;34m\033[1mInfo:\\033[0m
-NOTE_PREFIX = \\033[0;36m\033[1mNote:\\033[0m
-SECTION_PREFIX = \\033[1;32m\033[1mSection:\\033[0m
+ERROR_PREFIX = \\033[0;31m\\033[1mError:\\033[0m
+INFO_PREFIX = \\033[0;34m\\033[1mInfo:\\033[0m
+NOTE_PREFIX = \\033[0;36m\\033[1mNote:\\033[0m
+SECTION_PREFIX = \\033[1;32m\\033[1mSection:\\033[0m
 
 ACTION_PREFIX = \\033[1;30m
 ACTION_SUFFIX = \\033[0m
+
+TARGET_PREFIX = \\033[1;32m\\033[1m
+TARGET_SUFFIX = \\033[0m
+
+NOTABLE_PREFIX = \\033[0;33m\\033[1m
+NOTABLE_SUFFIX = \\033[0m
 
 ifneq ($(OVERRIDE_PLATFORM),)
 PLATFORM = $(OVERRIDE_PLATFORM)
@@ -361,6 +367,7 @@ ifeq ($(HAVE_FIND),ENABLED)
 	-rm $(shell find . -name "*.gcda")
 	-rm $(shell find . -name "*.gcno")
 endif
+	-rm $(wildcard "*.profraw")
 
 tmp:
 	-mkdir $@
