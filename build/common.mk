@@ -14,6 +14,7 @@ RM = rm
 RMDIR = rm -rf
 DIFF = diff
 CAT = cat
+WHICH = which -s
 ifeq ($(SHELL),cmd.exe)
 	SEP = \\
 	CP = copy /b /y
@@ -21,6 +22,7 @@ ifeq ($(SHELL),cmd.exe)
 	RMDIR = rmdir
 	DIFF = fc
 	CAT = type
+	WHICH = where /q
 endif
 
 ERROR_PREFIX = \\033[0;31m\\033[1mError:\\033[0m
@@ -49,12 +51,6 @@ endif
 ifneq ($(OVERRIDE_ADDITIONAL_BUILD_MODULES),)
 ADDITIONAL_BUILD_MODULES = $(OVERRIDE_ADDITIONAL_BUILD_MODULES)
 endif
-ifneq ($(OVERRIDE_BUILD_PREREQS),)
-BUILD_PREREQS = $(OVERRIDE_BUILD_PREREQS)
-endif
-ifneq ($(OVERRIDE_BUILD_POST),)
-BUILD_POST = $(OVERRIDE_BUILD_POST)
-endif
 ifneq ($(OVERRIDE_TEST),)
 TEST = $(OVERRIDE_TEST)
 endif
@@ -69,6 +65,9 @@ COMPILER = $(OVERRIDE_COMPILER)
 endif
 ifneq ($(OVERRIDE_LINKER),)
 LINKER = $(OVERRIDE_LINKER)
+endif
+ifneq ($(OVERRIDE_AR),)
+AR = $(OVERRIDE_AR)
 endif
 ifneq ($(OVERRIDE_CLANG_FORMAT),)
 CLANG_FORMAT = $(OVERRIDE_CLANG_FORMAT)
@@ -115,6 +114,58 @@ endif
 ifneq ($(BUILD_MODE),DEBUG)
 ifneq ($(BUILD_MODE),RELEASE)
 ERROR += "$(ERROR_PREFIX) Invalid value for BUILD_MODE: \"$(BUILD_MODE)\"\n"
+endif
+endif
+
+ifeq ($(wildcard $(SANDBOX_PROJECT_MODULE)),)
+ERROR += "$(ERROR_PREFIX) Invalid value for SANDBOX_PROJECT_MODULE: \"$(SANDBOX_PROJECT_MODULE)\" - File not found\n"
+endif
+
+EXIT_CODE := $(shell $(WHICH) $(COMPILER); echo $$?)
+ifneq ($(EXIT_CODE),0)
+EXIT_CODE := $(shell $(WHICH) $(realpath $(COMPILER)); echo $$?)
+ifneq ($(EXIT_CODE),0)
+ERROR += "$(ERROR_PREFIX) Invalid value for COMPILER: \"$(COMPILER)\" - File not found\n"
+endif
+endif
+
+ifneq ($(LINKER),DEFAULT)
+EXIT_CODE := $(shell $(WHICH) $(LINKER); echo $$?)
+ifneq ($(EXIT_CODE),0)
+EXIT_CODE := $(shell $(WHICH) $(realpath $(LINKER)); echo $$?)
+ifneq ($(EXIT_CODE),0)
+ERROR += "$(ERROR_PREFIX) Invalid value for LINKER: \"$(LINKER)\" - File not found\n"
+endif
+endif
+endif
+
+EXIT_CODE := $(shell $(WHICH) $(AR); echo $$?)
+ifneq ($(EXIT_CODE),0)
+EXIT_CODE := $(shell $(WHICH) $(realpath $(AR)); echo $$?)
+ifneq ($(EXIT_CODE),0)
+ERROR += "$(ERROR_PREFIX) Invalid value for AR: \"$(AR)\" - File not found\n"
+endif
+endif
+
+EXIT_CODE := $(shell $(WHICH) $(CLANG_FORMAT); echo $$?)
+ifneq ($(EXIT_CODE),0)
+EXIT_CODE := $(shell $(WHICH) $(realpath $(CLANG_FORMAT)); echo $$?)
+ifneq ($(EXIT_CODE),0)
+ERROR += "$(ERROR_PREFIX) Invalid value for CLANG_FORMAT: \"$(CLANG_FORMAT)\" - File not found\n"
+endif
+endif
+
+EXIT_CODE := $(shell $(WHICH) $(STRIP_TOOL); echo $$?)
+ifneq ($(EXIT_CODE),0)
+EXIT_CODE := $(shell $(WHICH) $(realpath $(STRIP_TOOL)); echo $$?)
+ifneq ($(EXIT_CODE),0)
+ERROR += "$(ERROR_PREFIX) Invalid value for STRIP_TOOL: \"$(STRIP_TOOL)\" - File not found\n"
+endif
+endif
+
+ifneq ($(ADDITIONAL_BUILD_MODULES),)
+ifeq ($(wildcard $(ADDITIONAL_BUILD_MODULES)),)
+ERROR += "$(ERROR_PREFIX) Invalid value for ADDITIONAL_BUILD_MODULES: \"$(ADDITIONAL_BUILD_MODULES)\" - File not found\n"
 endif
 endif
 
@@ -244,8 +295,8 @@ ifeq ($(PLATFORM),WIN)
 
 	OBJECT_FORMAT = PE
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
-	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
+	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),LNX)
 	LIB_PREFIX = lib
@@ -255,11 +306,12 @@ ifeq ($(PLATFORM),LNX)
 	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC -D_DEFAULT_SOURCE
+	GLOBAL_L_FLAGS += -Wl,-O1
 
 	OBJECT_FORMAT = ELF
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS)-o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),DWN)
 	LIB_PREFIX = lib
@@ -272,8 +324,8 @@ ifeq ($(PLATFORM),DWN)
 
 	OBJECT_FORMAT = MACHO
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -dynamiclib -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = libtool -static -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib $(GLOBAL_L_FLAGS) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),BSD)
 	LIB_PREFIX = lib
@@ -283,11 +335,12 @@ ifeq ($(PLATFORM),BSD)
 	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC
+	GLOBAL_L_FLAGS += -Wl,-O1
 
 	OBJECT_FORMAT = ELF
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = ar -cvq $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),WEB)
 	LIB_PREFIX = lib
@@ -301,8 +354,8 @@ ifeq ($(PLATFORM),WEB)
 
 	OBJECT_FORMAT = WASM
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) $(GLOBAL_L_FLAGS) $(LFLAGS) -shared -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(CLINKER) -static -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)

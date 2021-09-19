@@ -4,23 +4,15 @@
     - generator (editor)
         - Visual build tool
     - Work on GenUIne with binary partitioning
-    - Epsilon comparison gencalc
-        - Safe floating-point comparison for `GEN_REQUIRE`
-    - Reorganise `config.mk`
 - Builds
-    - Validate paths in `common.mk` with wildcard
-    - Mold linker for fast build
-    - Build caching (`ld64` `-cache_path_lto`, `mold` daemonisation)
-    - Force lld for Windows builds
-    - Embedded LibC
-    - `libtool`
-    - Linkage
-        - `_fini` `_init`
-        - `-u` `-U` for compilation verification
-        - `ld64` `-dot` for visualisation
-        - `ld` `-map`
-        - `-Z`
-        - Specify binary output types explicitly
+    - Review all tooling used in builds
+    - Build Speed
+        - `mold` linker
+            - `mold` daemonisation
+        - `ld64 -cache_path_lto`
+        - Precompiled headers
+        - `make` `.ONESHELL`
+    - Force `lld` on all targets
     - Static builds
 - Targets
     - emscripten

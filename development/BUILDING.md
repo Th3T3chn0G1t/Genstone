@@ -50,7 +50,7 @@ Variables to influence the way an application or module is built with Genesis
 #### Note
 These options can be overriden with a variable `OVERRIDE_keyname` in the executing environment. e.g. `OVERRIDE_LINKER=lld.ld make`
 
-Set options for the build process itself (e.g. for cross-compilation) in `build/config.mk`. All variables are commented to explain their purpose and possible values
+Set options for the build process itself (e.g. for cross-compilation) in `build/config.mk`. All variables are commented to explain their purpose and possible values. The more commonly used options are toward the top of the file
 
 ### Compilation Options
 
