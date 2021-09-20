@@ -69,9 +69,9 @@ static __inline char* realpath(const char* restrict filename, char* const restri
 		return 0;
 	}
 	if(l >= GEN_PATH_MAX) goto toolong;
-	p = sizeof stack - l - 1;
+	p = sizeof(stack) - l - 1;
 	q = 0;
-	memcpy(stack + p, filename, l + 1);
+	memcpy_s(stack + p, sizeof(stack) - p, filename, l + 1);
 
 	/* Main loop. Each iteration pops the next part from stack of
 	 * remaining path components and consumes any slashes that follow.
@@ -113,7 +113,7 @@ restart:
 			l++;
 		}
 		if(q + l >= GEN_PATH_MAX) goto toolong;
-		memcpy(output + q, stack + p, l);
+		memcpy_s(output + q, sizeof(output) - q, stack + p, l);
 		output[q + l] = 0;
 		p += l;
 
@@ -185,12 +185,12 @@ restart:
 		if(q - p && stack[l - 1] != '/') stack[l++] = '/';
 		if(l + (q - p) + 1 >= GEN_PATH_MAX) goto toolong;
 		memmove(output + l, output + p, q - p + 1);
-		memcpy(output, stack, l);
+		memcpy_s(output, sizeof(output), stack, l);
 		q = l + q - p;
 	}
 
 	if(resolved)
-		return memcpy(resolved, output, q + 1);
+		return memcpy_s(resolved, GEN_PATH_MAX, output, q + 1);
 	else
 		return strdup(output);
 
@@ -225,8 +225,8 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
 	if(!output_filename) return GEN_INVALID_PARAMETER;
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	//strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
-	strcpy(output_filename, strrchr(path, '/') + 1);
+	errno_t error = strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
+	if(error) return gen_convert_errno(error);
 
 	return GEN_OK;
 }
@@ -238,8 +238,8 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	size_t mark = (size_t) ((strrchr(path, '/') + 1) - path);
-	//strncpy_s(output_path, GEN_PATH_MAX, path, mark);
-	strncpy(output_path, path, mark);
+	errno_t error = strncpy_s(output_path, GEN_PATH_MAX, path, mark);
+	if(error) return gen_convert_errno(error);
 	output_path[mark - 1] = '\0';
 
 	return GEN_OK;
@@ -252,8 +252,8 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	size_t mark = (size_t) (strchr(strrchr(path, '/'), '.') - path);
-	//strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
-	strcpy(output_extension, path + mark);
+	errno_t error = strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
+	if(error) return gen_convert_errno(error);
 	output_extension[mark - 1] = '\0';
 
 	return GEN_OK;

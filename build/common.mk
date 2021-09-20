@@ -296,7 +296,7 @@ ifeq ($(PLATFORM),WIN)
 	OBJECT_FORMAT = PE
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
-	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),LNX)
 	LIB_PREFIX = lib
@@ -311,7 +311,7 @@ ifeq ($(PLATFORM),LNX)
 	OBJECT_FORMAT = ELF
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS)-o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),DWN)
 	LIB_PREFIX = lib
@@ -325,7 +325,7 @@ ifeq ($(PLATFORM),DWN)
 	OBJECT_FORMAT = MACHO
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib $(GLOBAL_L_FLAGS) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),BSD)
 	LIB_PREFIX = lib
@@ -340,7 +340,7 @@ ifeq ($(PLATFORM),BSD)
 	OBJECT_FORMAT = ELF
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),WEB)
 	LIB_PREFIX = lib
@@ -355,7 +355,7 @@ ifeq ($(PLATFORM),WEB)
 	OBJECT_FORMAT = WASM
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(AR) -rv $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)

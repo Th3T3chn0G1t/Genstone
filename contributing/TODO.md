@@ -26,11 +26,11 @@
     - Apply `hot` and `cold` function attributes
     - MS `mimalloc`
 - Security
-    - Thread safety analysis
-    - Checked C
     - Annex K
         - `constraint_handler_t` `set_constraint_handler_s`
     - Clang builtin atomic utils (C11Compat) (https://clang.llvm.org/docs/LanguageExtensions.html#c11-atomic-builtins)
+    - Thread safety analysis
+    - Checked C
 - Documentation
     - Tutorials
     - Comprehensive `@example` tags
