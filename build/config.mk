@@ -99,4 +99,4 @@ BUILD_SYS_DEBUG = DISABLED
 # Possible values are:
 # `ENABLED`: Have `-fproc-stat-report`
 # `DISABLED`: Don't have `-fproc-stat-report`
-HAVE_STAT_REPORT = DISABLED
+HAVE_STAT_REPORT = ENABLED

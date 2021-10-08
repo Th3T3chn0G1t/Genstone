@@ -2,6 +2,9 @@
 
 ## Issues
 
+#### Note
+Some in-progress issues are listed in `TODO.md`
+
 If you find a **bug** or have a **feature request** you should open an issue
 
 Issues are not to be used for issues with development outside of unexpected behaviour or for any general development help. There are better places to ask
@@ -35,8 +38,6 @@ Every function in the codebase should be tested, `test/unit/` contains existing 
 `gencommon.h` provides assertion macros through `GEN_REQUIRE_*` for expected values as well as logging functions to outline test progress in the form `glog(INFO, "Testing foo_bar()...");`
 
 The `GEN_REQUIRE_*` and `glog/f` macros are untested because they are ubiquitously used across the codebase and as such breakage should be evident
-
-### Examples
 
 ## Ettiquette
 

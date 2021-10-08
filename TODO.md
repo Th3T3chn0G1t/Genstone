@@ -1,6 +1,14 @@
 # TODO
 
-- **Rebrand**
+- Meta
+    - **Rebrand**
+    - Restructure `vendor` subdirectory locations
+    - Github organisation?
+    - Remove prebuilt branch
+    - Write examples
+        - Tests
+        - Modules
+        - General code examples (docstring tags `@example`)
 - Features
     - generator (editor)
         - Visual build tool
