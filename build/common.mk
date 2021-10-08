@@ -243,7 +243,7 @@ ifeq ($(PLATFORM),WIN)
 	OBJECT_SUFFIX = .obj
 
 	# Presume windows targets are x86 for now
-	GLOBAL_C_FLAGS += -D_MT -mavx512-fp16
+	GLOBAL_C_FLAGS += -D_MT
 	GLOBAL_L_FLAGS += -lshlwapi.lib
 
 	OBJECT_FORMAT = PE
