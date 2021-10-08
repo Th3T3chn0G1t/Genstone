@@ -464,11 +464,7 @@ typedef enum {
 #define GEN_MILLISECONDS_PER_SECOND 1000
 
 #if PLATFORM == WIN
-typedef struct timeval {
-    long tv_sec;
-    long tv_usec;
-} timeval;
-
+#include <winsock.h>
 /**
  * @see https://pubs.opengroup.org/onlinepubs/000095399/functions/gettimeofday.html
  * @see https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows/26085827#26085827
