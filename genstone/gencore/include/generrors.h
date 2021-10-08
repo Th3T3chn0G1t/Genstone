@@ -86,6 +86,6 @@ extern GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error);
  * @param error the win32 error value to convert
  * @return the converted error enumeration
  */
-extern GEN_ERRORABLE_RETURN gen_convert_winerr(int error);
+extern GEN_ERRORABLE_RETURN gen_convert_winerr(unsigned long error);
 
 #endif

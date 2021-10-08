@@ -31,7 +31,7 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 	}
 }
 
-GEN_ERRORABLE_RETURN gen_convert_winerr(int error) {
+GEN_ERRORABLE_RETURN gen_convert_winerr(unsigned long error) {
 #if PLATFORM == WIN
 	switch(error) {
 		case ERROR_ALREADY_EXISTS: return GEN_ALREADY_EXISTS;
