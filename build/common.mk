@@ -14,7 +14,6 @@ RM = rm
 RMDIR = rm -rf
 DIFF = diff
 CAT = cat
-WHICH = which -s
 ifeq ($(SHELL),cmd.exe)
 	SEP = \\
 	CP = copy /b /y
@@ -22,7 +21,6 @@ ifeq ($(SHELL),cmd.exe)
 	RMDIR = rmdir
 	DIFF = fc
 	CAT = type
-	WHICH = where /q
 endif
 
 ERROR_PREFIX = \\033[0;31m\\033[1mError:\\033[0m
@@ -116,48 +114,6 @@ endif
 
 ifeq ($(wildcard $(SANDBOX_PROJECT_MODULE)),)
 ERROR += "$(ERROR_PREFIX) Invalid value for SANDBOX_PROJECT_MODULE: \"$(SANDBOX_PROJECT_MODULE)\" - File not found\n"
-endif
-
-EXIT_CODE := $(shell $(WHICH) $(COMPILER); echo $$?)
-ifneq ($(EXIT_CODE),0)
-EXIT_CODE := $(shell $(WHICH) $(realpath $(COMPILER)); echo $$?)
-ifneq ($(EXIT_CODE),0)
-ERROR += "$(ERROR_PREFIX) Invalid value for COMPILER: \"$(COMPILER)\" - File not found\n"
-endif
-endif
-
-ifneq ($(LINKER),DEFAULT)
-EXIT_CODE := $(shell $(WHICH) $(LINKER); echo $$?)
-ifneq ($(EXIT_CODE),0)
-EXIT_CODE := $(shell $(WHICH) $(realpath $(LINKER)); echo $$?)
-ifneq ($(EXIT_CODE),0)
-ERROR += "$(ERROR_PREFIX) Invalid value for LINKER: \"$(LINKER)\" - File not found\n"
-endif
-endif
-endif
-
-EXIT_CODE := $(shell $(WHICH) $(AR); echo $$?)
-ifneq ($(EXIT_CODE),0)
-EXIT_CODE := $(shell $(WHICH) $(realpath $(AR)); echo $$?)
-ifneq ($(EXIT_CODE),0)
-ERROR += "$(ERROR_PREFIX) Invalid value for AR: \"$(AR)\" - File not found\n"
-endif
-endif
-
-EXIT_CODE := $(shell $(WHICH) $(CLANG_FORMAT); echo $$?)
-ifneq ($(EXIT_CODE),0)
-EXIT_CODE := $(shell $(WHICH) $(realpath $(CLANG_FORMAT)); echo $$?)
-ifneq ($(EXIT_CODE),0)
-ERROR += "$(ERROR_PREFIX) Invalid value for CLANG_FORMAT: \"$(CLANG_FORMAT)\" - File not found\n"
-endif
-endif
-
-EXIT_CODE := $(shell $(WHICH) $(STRIP_TOOL); echo $$?)
-ifneq ($(EXIT_CODE),0)
-EXIT_CODE := $(shell $(WHICH) $(realpath $(STRIP_TOOL)); echo $$?)
-ifneq ($(EXIT_CODE),0)
-ERROR += "$(ERROR_PREFIX) Invalid value for STRIP_TOOL: \"$(STRIP_TOOL)\" - File not found\n"
-endif
 endif
 
 ifneq ($(ADDITIONAL_BUILD_MODULES),)
