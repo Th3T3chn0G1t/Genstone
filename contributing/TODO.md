@@ -1,11 +1,78 @@
 # TODO
 
+- **Rebrand**
 - Features
     - generator (editor)
         - Visual build tool
     - Work on GenUIne with binary partitioning
+    - Centralised (Callbacks) vs. Decentralised (Errno) EH
+        - Terminal-verbose (Printing shit) vs. Terminal-silent (Don't do that) EH
+    - Locales
+        - Unicode
+            - Wide-path handling (standardise paths to wide? path type?)
+        - Time-formats
+    - Fix up `glog` spewing stuff randomly into stdout
+    - Integrate `notcurses` for terminal stuff
+    - More Date & Time utils
+    - Process control utils
+        - Steal from `Geno` impl.
+        - Redirects
+    - Networking
+        - Debugger ports (Pretty much the only reason networking is here already)
+            - Visual debugger connection
+    - Audio
+        - Compression
+        - Native audio interface
+            - ALSA
+            - PulseAudio
+            - CoreAudio
+            - Windows stuff?
+            - What does BSD use?
+    - Memory tools
+        - Measure usage
+        - Wrapped *alloc
+        - Integrate `mimalloc`
+            - Integrate into submodules
+        - Integrate `Annex K` EH
+            - `Annex K`-specific `errno` values
+            - Managed vs. user callbacks
+    - Native UI
+        - File dialogue
+        - **Windowing**
+    - Database stuff
+    - Cryptography
+        - Hashing
+        - Secure-rand
+    - Porting backward C++ utils
+        - Integrate EASTL?
+        - `STC` container types interop. for passthrough
+    - Integrate a renderer (Probably need to port back from C++)
+        - Figure out yer' scene format
+        - More floating-point stuff (more performance-focused than stdlib)
+        - More matrix/vector operations
+            - ~~Steal~~ Borrow stuff from `cglm` and adapt to `clang` matrix intrins
+            - Rework renderer to use matrix intrins instead of whatever it uses internally
+        - Integrate a physics system
+            - Rework to use matrix intrins instead of whatever it uses internally
+    - Multiprocessing
+        - Fibers intrins
+        - Better threading interface
+        - OpenMP
+        - `clang` mutex intrins
+        - Thread-safety checker intrins
+        - Native-IO
+            - NT
+            - Pipes
 - Builds
     - Review all tooling used in builds
+        - `make`
+        - `clang`
+        - `ar`
+        - `clang-format`
+        - `strip`
+        - `ld`/`ld64`/`mslink`
+            or
+        - `ld.lld`/`ld64.lld`/`lld-link`
     - Build Speed
         - `mold` linker
             - `mold` daemonisation
@@ -14,8 +81,6 @@
         - `make` `.ONESHELL`
     - Force `lld` on all targets
     - Static builds
-- Targets
-    - emscripten
 - Debugging
     - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
 - Optimization
@@ -26,10 +91,6 @@
     - Apply `hot` and `cold` function attributes
     - MS `mimalloc`
 - Security
-    - Annex K
-        - `constraint_handler_t` `set_constraint_handler_s`
-    - Clang builtin atomic utils (C11Compat) (https://clang.llvm.org/docs/LanguageExtensions.html#c11-atomic-builtins)
-    - Thread safety analysis
     - Checked C
 - Documentation
     - Tutorials

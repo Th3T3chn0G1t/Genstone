@@ -3,7 +3,6 @@
 # WIN	0	   1		0
 # DWN	1	   1		1
 # BSD	0	   0		1
-# WEB   0      0        0
 
 C11_COMPAT = 0
 C11_COMPAT_UCHAR = 0
@@ -45,15 +44,6 @@ ifeq ($(PLATFORM),BSD)
 
 	C11_COMPAT_CFLAGS =
 	C11_COMPAT_LFLAGS = -pthread
-endif
-ifeq ($(PLATFORM),WEB)
-	C11_COMPAT = 1
-	C11_COMPAT_UCHAR = 0
-	C11_COMPAT_THREADS = 0
-	C11_COMPAT_KANNEX = 0
-
-	C11_COMPAT_CFLAGS =
-	C11_COMPAT_LFLAGS =
 endif
 
 build_message_c11compat:

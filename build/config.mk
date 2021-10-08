@@ -22,7 +22,6 @@ TEST = ALL
 # `DWN`: macOS
 # `LNX`: Linux
 # `BSD`: BSD
-# `WEB`: WebASM (Emscripten)
 PLATFORM = DEFAULT
 
 # The IDE to generate IDE configuration for with `ideconf` target

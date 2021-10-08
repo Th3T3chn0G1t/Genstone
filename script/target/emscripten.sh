@@ -1,8 +1,0 @@
-#!/bin/sh
-
-export OVERRIDE_PLATFORM=WEB
-export OVERRIDE_COMPILER=emcc
-export OVERRIDE_LINKER=wasm-ld
-export OVERRIDE_STATIC_ANALYSIS=DISABLED
-
-make

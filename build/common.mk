@@ -102,9 +102,6 @@ ifneq ($(PLATFORM),WIN)
 ifneq ($(PLATFORM),DWN)
 ifneq ($(PLATFORM),LNX)
 ifneq ($(PLATFORM),BSD)
-ifneq ($(PLATFORM),WEB)
-ERROR += "$(ERROR_PREFIX) Invalid value for PLATFORM: \"$(PLATFORM)\"\n"
-endif
 endif
 endif
 endif
@@ -248,7 +245,7 @@ else
 CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
 endif
 
-GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DWEB=5 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
@@ -342,21 +339,6 @@ ifeq ($(PLATFORM),BSD)
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
-ifeq ($(PLATFORM),WEB)
-	LIB_PREFIX = lib
-	DYNAMIC_LIB_SUFFIX = .so
-	STATIC_LIB_SUFFIX = .a
-	EXECUTABLE_SUFFIX = .out
-	OBJECT_SUFFIX = .o
-
-	GLOBAL_C_FLAGS += -fPIC
-	GLOBAL_L_FLAGS += -mwasm64 -s SIDE_MODULE=1 -Wl,-mwasm64
-
-	OBJECT_FORMAT = WASM
-
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -Wl,-mwasm64 -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
-endif
 
 ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -DNDEBUG -flto
@@ -392,12 +374,8 @@ else
 endif
 
 ifeq ($(TOOLING),ENABLED)
-	GLOBAL_C_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined
-	GLOBAL_L_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined
-	ifneq ($(PLATFORM),WEB)
-		GLOBAL_C_FLAGS += -fsanitize=address
-		GLOBAL_L_FLAGS += -fsanitize=address
-	endif
+	GLOBAL_C_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined,address
+	GLOBAL_L_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined,address
 endif
 
 ifeq ($(TEST),ALL)
