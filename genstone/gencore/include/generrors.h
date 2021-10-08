@@ -75,14 +75,14 @@ typedef enum {
 } gen_error_t;
 
 /**
- * Converts an errno into a genesis error
+ * Converts an errno into a genstone error
  * @param error the errno value to convert
  * @return the converted error enumeration
  */
 extern GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error);
 
 /**
- * Converts a win32 error into a genesis error
+ * Converts a win32 error into a genstone error
  * @param error the win32 error value to convert
  * @return the converted error enumeration
  */

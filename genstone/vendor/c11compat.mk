@@ -52,10 +52,10 @@ build_message_c11compat:
 
 ifeq ($(C11_COMPAT),1)
 ifeq ($(C11_COMPAT_UCHAR),1)
-C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/musl/include
+C11_COMPAT_CFLAGS += -Igenstone/vendor/c11compat/musl/include
 C11_COMPAT_LFLAGS += -lc11compat
 
-C11_COMPAT_UCHAR_SOURCES = $(wildcard genesis/vendor/c11compat/musl/*.c)
+C11_COMPAT_UCHAR_SOURCES = $(wildcard genstone/vendor/c11compat/musl/*.c)
 C11_COMPAT_UCHAR_OBJECTS = $(C11_COMPAT_UCHAR_SOURCES:.c=.o)
 
 C11_COMPAT_UCHAR_LIB = lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
@@ -63,7 +63,7 @@ C11_COMPAT_UCHAR_LIB = lib/$(LIB_PREFIX)c11compat$(DYNAMIC_LIB_SUFFIX)
 C11_COMPAT_LIB += $(C11_COMPAT_UCHAR_LIB)
 C11_COMPAT_CLEAN_TARGETS += clean_c11compat_uchar
 
-$(C11_COMPAT_UCHAR_LIB): CFLAGS = -Igenesis/vendor/c11compat/musl/include
+$(C11_COMPAT_UCHAR_LIB): CFLAGS = -Igenstone/vendor/c11compat/musl/include
 $(C11_COMPAT_UCHAR_LIB): LFLAGS = 	
 $(C11_COMPAT_UCHAR_LIB): $(C11_COMPAT_UCHAR_OBJECTS) | lib
 
@@ -73,17 +73,17 @@ clean_c11compat_uchar:
 	-rm $(C11_COMPAT_UCHAR_LIB)
 endif
 ifeq ($(C11_COMPAT_THREADS),1)
-C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/mesa/include
+C11_COMPAT_CFLAGS += -Igenstone/vendor/c11compat/mesa/include
 C11_COMPAT_LFLAGS +=
 endif
 ifeq ($(C11_COMPAT_KANNEX),1)
-C11_COMPAT_CFLAGS += -Igenesis/vendor/c11compat/safeclib/include
+C11_COMPAT_CFLAGS += -Igenstone/vendor/c11compat/safeclib/include
 C11_COMPAT_LFLAGS += -lsafec
 
 C11_COMPAT_KANNEX_LIB = lib/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
-_C11_COMPAT_KANNEX_LIB_INTERNAL = genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
-_C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN = $(wildcard genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
-_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE = genesis/vendor/c11compat/safeclib/Makefile
+_C11_COMPAT_KANNEX_LIB_INTERNAL = genstone/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
+_C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN = $(wildcard genstone/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
+_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE = genstone/vendor/c11compat/safeclib/Makefile
 
 C11_COMPAT_LIB += $(C11_COMPAT_KANNEX_LIB)
 
@@ -91,19 +91,19 @@ C11_COMPAT_LIB += $(C11_COMPAT_KANNEX_LIB)
 # (It takes forever)
 #C11_COMPAT_CLEAN_TARGETS += clean_c11compat_kannex
 clean_c11compat_kannex: | $(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE)
-	$(MAKE) -Cgenesis/vendor/c11compat/safeclib clean
+	$(MAKE) -Cgenstone/vendor/c11compat/safeclib clean
 
 $(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE):
-	cd $(subst /,$(SEP),genesis/vendor/c11compat/safeclib && ./build-aux/autogen.sh)
-	cd $(subst /,$(SEP),genesis/vendor/c11compat/safeclib && ./configure --prefix=/usr)
+	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib && ./build-aux/autogen.sh)
+	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib && ./configure --prefix=/usr)
 
 $(_C11_COMPAT_KANNEX_LIB_INTERNAL): $(_C11_COMPAT_KANNEX_LIB_INTERNAL_MAKEFILE)
-	$(MAKE) -Cgenesis/vendor/c11compat/safeclib
+	$(MAKE) -Cgenstone/vendor/c11compat/safeclib
 
 $(C11_COMPAT_KANNEX_LIB): $(_C11_COMPAT_KANNEX_LIB_INTERNAL) | lib
 	$(CP) $(subst /,$(SEP),$(_C11_COMPAT_KANNEX_LIB_INTERNAL_PATTERN) lib)
 ifeq ($(PLATFORM),DWN)
-	install_name_tool -id @rpath/$(notdir $(wildcard genesis/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec.*$(DYNAMIC_LIB_SUFFIX))) $(C11_COMPAT_KANNEX_LIB)
+	install_name_tool -id @rpath/$(notdir $(wildcard genstone/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec.*$(DYNAMIC_LIB_SUFFIX))) $(C11_COMPAT_KANNEX_LIB)
 endif
 endif
 endif

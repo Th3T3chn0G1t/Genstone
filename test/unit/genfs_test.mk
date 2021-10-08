@@ -5,9 +5,9 @@ GEN_FS_TEST = test/unit/genfs_test$(EXECUTABLE_SUFFIX)
 
 build_message_genfs_test:
 	@echo "$(SECTION_PREFIX) Genfs Test"
-	@echo "$(INFO_PREFIX) Testing Genesis filesystem utilities"
+	@echo "$(INFO_PREFIX) Testing Genstone filesystem utilities"
 
-genfs_test: gencore build_message_genfs_test $(GEN_FS_TEST) ### @Test Builds and runs Genesis filesystem utility tests
+genfs_test: gencore build_message_genfs_test $(GEN_FS_TEST) ### @Test Builds and runs Genstone filesystem utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_FS_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_FS_TEST))

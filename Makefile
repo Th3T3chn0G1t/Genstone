@@ -1,14 +1,14 @@
 include build/common.mk
 
-VENDOR_MODULES = $(wildcard genesis/vendor/*.mk)
+VENDOR_MODULES = $(wildcard genstone/vendor/*.mk)
 include $(VENDOR_MODULES)
 BUILD_PREREQS += $(notdir $(subst .mk,,$(VENDOR_MODULES)))
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(VENDOR_MODULES))))
 
-GENESIS_MODULES = $(wildcard genesis/*.mk)
-include $(GENESIS_MODULES)
-BUILD_PREREQS += $(notdir $(subst .mk,,$(GENESIS_MODULES)))
-MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENESIS_MODULES))))
+GENSTONE_MODULES = $(wildcard genstone/*.mk)
+include $(GENSTONE_MODULES)
+BUILD_PREREQS += $(notdir $(subst .mk,,$(GENSTONE_MODULES)))
+MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENSTONE_MODULES))))
 
 ifeq ($(TEST_BUILD),1)
 	TEST_BUILD_MODULES = $(wildcard test/build/*.mk)

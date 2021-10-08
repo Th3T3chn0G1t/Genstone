@@ -5,9 +5,9 @@ GEN_CALC_TEST = test/unit/gencalc_test$(EXECUTABLE_SUFFIX)
 
 build_message_gencalc_test:
 	@echo "$(SECTION_PREFIX) Gencalc Test"
-	@echo "$(INFO_PREFIX) Testing Genesis mathematics utilities"
+	@echo "$(INFO_PREFIX) Testing Genstone mathematics utilities"
 
-gencalc_test: gencalc build_message_gencalc_test $(GEN_CALC_TEST) ### @Test Builds and runs Genesis mathematics utility tests
+gencalc_test: gencalc build_message_gencalc_test $(GEN_CALC_TEST) ### @Test Builds and runs Genstone mathematics utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_CALC_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_CALC_TEST))

@@ -1,5 +1,5 @@
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "Genesis"
+PROJECT_NAME           = "Genstone"
 # Version
 PROJECT_NUMBER         = 
 PROJECT_BRIEF          = "An approach to app engine development with a more generally applicable paradigm"
@@ -722,7 +722,7 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = genesis/gencore genesis/genfx genesis/genuine genesis/vendor/c11compat/c11compat.md contributing development README.md
+INPUT                  = genstone/gencore genstone/genfx genstone/genuine genstone/vendor/c11compat/c11compat.md contributing development README.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

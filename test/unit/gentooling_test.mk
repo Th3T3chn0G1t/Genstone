@@ -5,9 +5,9 @@ GEN_TOOLING_TEST = test/unit/gentooling_test$(EXECUTABLE_SUFFIX)
 
 build_message_gentooling_test:
 	@echo "$(SECTION_PREFIX) Gentooling Test"
-	@echo "$(INFO_PREFIX) Testing Genesis tooling utilities"
+	@echo "$(INFO_PREFIX) Testing Genstone tooling utilities"
 
-gentooling_test: gencore build_message_gentooling_test $(GEN_TOOLING_TEST) ### @Test Builds and runs Genesis tooling utility tests
+gentooling_test: gencore build_message_gentooling_test $(GEN_TOOLING_TEST) ### @Test Builds and runs Genstone tooling utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_TOOLING_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_TOOLING_TEST))

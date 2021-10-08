@@ -5,7 +5,7 @@ SAMPLE_EXEC = sample$(EXECUTABLE_SUFFIX)
 
 build_message_sample:
 	@echo "$(SECTION_PREFIX) Sample Project"
-	@echo "$(INFO_PREFIX) Genesis sandbox sample project!"
+	@echo "$(INFO_PREFIX) Genstone sandbox sample project!"
 
 sample: gencore $(SAMPLE_EXEC) ### @User Builds a sample sandbox project
 

@@ -1,12 +1,12 @@
-# Genesis
+# Genstone
 ### A personal C development framework which creates a consistent, configurable cross-platform abstraction layer for a variety of applications
 
 ## Building
 
 #### Note
-Genesis uses Javadoc-style docstrings to document functions, variables outside of functions, macros, structures and structure members. You can view these directly in the headers, generate local docs (Use `make docs`), or view the latest documentation build on Github pages at [https://th3t3chn0g1t.github.io/GenesisEngine/] (Recommended).
+Genstone uses Javadoc-style docstrings to document functions, variables outside of functions, macros, structures and structure members. You can view these directly in the headers, generate local docs (Use `make docs`), or view the latest documentation build on Github pages at [https://th3t3chn0g1t.github.io/GenstoneEngine/] (Recommended).
 
-Genesis uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
+Genstone uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
 
 The base `Makefile` in the project root tries to build the sandbox project be default, generating it if not present
 
@@ -36,9 +36,9 @@ Additional build targets exist for building IDE configuration files (`ideconf`) 
 
 Documentation requires `Doxygen` to be installed and available on the `PATH`
 
-If you don't plan to use the source of Genesis during development, you can generate a more lightweight development environment using `make devenv`
+If you don't plan to use the source of Genstone during development, you can generate a more lightweight development environment using `make devenv`
 
-This is *not* viable if you plan to embed Genesis into your own project, as it generates the project for your platform and configuration
+This is *not* viable if you plan to embed Genstone into your own project, as it generates the project for your platform and configuration
 
 `make devenv` will output to `out/` with generated `include`, `lib` and `docs` folders
 
@@ -46,7 +46,7 @@ It is recommended to use this in conjunction with `make ideconf` to generate you
 
 ### Options
 
-Variables to influence the way an application or module is built with Genesis
+Variables to influence the way an application or module is built with Genstone
 
 ### Makefile Options
 

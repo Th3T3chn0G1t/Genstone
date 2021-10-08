@@ -9,9 +9,9 @@ GEN_DL_TEST_EXEC = test/unit/gendl_test$(EXECUTABLE_SUFFIX)
 
 build_message_gendl_test:
 	@echo "$(SECTION_PREFIX) Gendl Test"
-	@echo "$(INFO_PREFIX) Testing Genesis dynamic library management"
+	@echo "$(INFO_PREFIX) Testing Genstone dynamic library management"
 
-gendl_test: gencore build_message_gendl_test $(GEN_DL_TEST_EXEC) $(GEN_DL_TEST_LIB) ### @Test Builds and runs Genesis dynamic library utility tests
+gendl_test: gencore build_message_gendl_test $(GEN_DL_TEST_EXEC) $(GEN_DL_TEST_LIB) ### @Test Builds and runs Genstone dynamic library utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_DL_TEST_EXEC)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
 	@cd $(subst /,$(SEP),lib && ../$(GEN_DL_TEST_EXEC))

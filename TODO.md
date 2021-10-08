@@ -1,7 +1,6 @@
 # TODO
 
 - Meta
-    - **Rebrand**
     - Restructure `vendor` subdirectory locations
     - Github organisation?
     - Remove prebuilt branch

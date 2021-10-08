@@ -36,7 +36,7 @@
 
 #if PLATFORM == WIN
 // Source adapted from MUSL LibC
-// See `genesis/vendor/c11compat/musl/COPYRIGHT` for further licence information
+// See `genstone/vendor/c11compat/musl/COPYRIGHT` for further licence information
 
 static __inline char* strchrnul(char* restrict s, int c) {
 	c = (unsigned char) c;
