@@ -12,12 +12,12 @@
 #define GEN_COMMON_H
 
 /**
- * Pretty keyword _Pragma
+ * Pretty keyword for _Pragma
  * @param s string-literal argument for `_Pragma`
  */
 #define pragma(s) _Pragma(s)
 /**
- * Pretty keyword GEN_INTERNALeric
+ * Pretty keyword for _Generic
  * @param ... type-switch statement for `_Generic`
  */
 #define generic(...) _Generic(__VA_ARGS__)
@@ -220,6 +220,11 @@ GEN_DIAG_REGION_END
  * The ASCII code `BEL`
  */
 #define GEN_ASCII_BELL '\a'
+
+#if PLATFORM == WIN
+/* How do you solve a problem like win32.... */
+#undef ERROR
+#endif
 
 /**
  * Logging levels for logging functions
