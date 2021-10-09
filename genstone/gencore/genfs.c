@@ -172,7 +172,11 @@ restart:
 	output[q] = 0;
 
 	if(output[0] != '/') {
+		#if PLATFORM == WIN
+		if(!GetCurrentDirectory(sizeof stack, stack)) return 0;
+		#else
 		if(!getcwd(stack, sizeof stack)) return 0;
+		#endif
 		l = strlen(stack);
 		/* Cancel any initial .. components. */
 		p = 0;

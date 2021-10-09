@@ -143,7 +143,7 @@ GEN_DIAG_REGION_END
 /**
  * Provide `ssize_t` on Windows
  */
-typedef long long ssize_t
+typedef long long ssize_t;
 #endif
 
 /**
