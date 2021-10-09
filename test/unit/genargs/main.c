@@ -8,7 +8,7 @@ static const char short_args[] = {'f', 'b'};
 
 static const char* long_args[] = {"fizz", "buzz"};
 
-static void arg_callback(const gen_arg_type_t type, const unsigned long argn, const char* value, __unused void* passthrough) {
+static void arg_callback(const gen_arg_type_t type, const size_t argn, const char* const restrict value, __unused void* const restrict passthrough) {
 	if(type < GEN_ARG_RAW)
 		if(!argn)
 			GEN_REQUIRE_EQUAL(NULL, (const void*) value);
