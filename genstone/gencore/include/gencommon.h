@@ -139,6 +139,13 @@ GEN_DIAG_IGNORE_ALL
 #endif
 GEN_DIAG_REGION_END
 
+#if PLATFORM == WIN
+/**
+ * Provide `ssize_t` on Windows
+ */
+typedef long long ssize_t
+#endif
+
 /**
  * ANSI color value for gray
  */

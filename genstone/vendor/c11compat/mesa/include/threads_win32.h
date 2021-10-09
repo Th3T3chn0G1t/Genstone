@@ -55,7 +55,7 @@ Configuration macro:
 #define EMULATED_THREADS_TSS_DTOR_SLOTNUM 64  // see TLS_MINIMUM_AVAILABLE
 
 
-#include <windows.h>
+#include <Windows.h>
 
 // check configuration
 #if defined(EMULATED_THREADS_USE_NATIVE_CALL_ONCE) && (_WIN32_WINNT < 0x0600)

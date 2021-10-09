@@ -12,7 +12,7 @@
 #include "gencommon.h"
 
 #if PLATFORM == WIN
-#include <windows.h>
+#include <Windows.h>
 #include "Shlwapi.h" // Apparently this required according to MSDN
 #define GEN_PATH_MAX MAX_PATH
 #else

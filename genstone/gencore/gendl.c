@@ -62,9 +62,9 @@ gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, con
 
 #if PLATFORM == WIN
 	GEN_DIAG_REGION_BEGIN
-	#pragma clang diagnostic ignored "-Wpedantic"
+#pragma clang diagnostic ignored "-Wpedantic"
 	if(!(*output_address = GetProcAddress(dylib, symname))) {
-	GEN_DIAG_REGION_END
+		GEN_DIAG_REGION_END
 		return gen_convert_winerr(GetLastError());
 	}
 #else

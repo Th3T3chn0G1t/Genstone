@@ -38,7 +38,7 @@
 // Source adapted from MUSL LibC
 // See `genstone/vendor/c11compat/musl/COPYRIGHT` for further licence information
 
-static __inline char* strchrnul(char* restrict s, int c) {
+__inline char* strchrnul(char* restrict s, int c) {
 	c = (unsigned char) c;
 	if(!c) return s + strlen(s);
 
@@ -47,13 +47,13 @@ static __inline char* strchrnul(char* restrict s, int c) {
 	return (char*) s;
 }
 
-static __inline size_t slash_len(const char* s) {
+__inline size_t slash_len(const char* s) {
 	const char* s0 = s;
 	while(*s == '/') s++;
 	return (uintptr_t) (s - s0);
 }
 
-static __inline char* realpath(const char* restrict filename, char* const restrict resolved) {
+__inline char* realpath(const char* restrict filename, char* const restrict resolved) {
 	char stack[GEN_PATH_MAX + 1];
 	char output[GEN_PATH_MAX];
 	size_t p, q, l, l0, cnt = 0, nup = 0;
@@ -190,7 +190,7 @@ restart:
 	}
 
 	if(resolved)
-		return memcpy_s(resolved, GEN_PATH_MAX, output, q + 1);
+		return memcpy(resolved, output, q + 1);
 	else
 		return strdup(output);
 
@@ -209,7 +209,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 #if PLATFORM == WIN
 	// Getting an error out of this function is very strange
 	// We just have to presume that GEN_PATH_MAX will always be enough storage
-	int error = GetFullPathNameA(path, GEN_PATH_MAX, output_path, NULL);
+	unsigned long error = GetFullPathNameA(path, GEN_PATH_MAX, output_path, NULL);
 	if(!error) return gen_convert_winerr(GetLastError());
 #else
 	char* error = realpath(path, output_path);
@@ -286,10 +286,10 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	if(len > GEN_PATH_MAX) {
 		return GEN_TOO_LONG;
 	}
-	GEN_FOREACH(i, path_char, len, path) {
+	GEN_FOREACH_PTR(i, path_char, len, path) {
 		const static char invalid_chars[] = "/\\:*?\"<>|";
-		GEN_FOREACH(j, invalid, sizeof(invalid_chars), invalid_chars) {
-			if(path_char == invalid) {
+		GEN_FOREACH_PTR(j, invalid, sizeof(invalid_chars), invalid_chars) {
+			if(*path_char == *invalid) {
 				return GEN_WRONG_OBJECT_TYPE;
 			}
 		}
@@ -307,7 +307,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == WIN
-	int error = CreateDirectoryA(path, NULL);
+	unsigned long error = CreateDirectoryA(path, NULL);
 	if(!error) return gen_convert_winerr(GetLastError());
 #else
 	errno_t error = mkdir(path, 0777);
@@ -334,10 +334,12 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	if(!output_handle) return GEN_INVALID_PARAMETER;
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	output_handle->path = strdup(path);
+	errno_t error = 0;
+	error = strcpy_s(output_handle->path, GEN_PATH_MAX, path);
+	if(error) return gen_convert_errno(errno);
 
 	struct stat s;
-	errno_t error = stat(path, &s);
+	error = stat(path, &s);
 	if(error && errno != ENOENT) return gen_convert_errno(errno);
 	if(S_ISDIR(s.st_mode)) {
 		output_handle->dir = true;

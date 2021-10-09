@@ -53,6 +53,7 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
+	file_handle.path = malloc(GEN_PATH_MAX);
 	error = gen_handle_open(&file_handle, "./testfile");
 
 	GEN_REQUIRE_EQUAL(GEN_OK, error);
@@ -85,6 +86,7 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (directory)...");
 	gen_filesystem_handle_t dir_handle;
+	dir_handle.path = malloc(GEN_PATH_MAX);
 	error = gen_handle_open(&dir_handle, "./testdir");
 
 	GEN_REQUIRE_EQUAL(GEN_OK, error);
