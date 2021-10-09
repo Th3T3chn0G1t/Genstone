@@ -66,8 +66,10 @@ int main() {
 	GEN_REQUIRE_EQUAL(GEN_OK, error);
 
 	glog(INFO, "Testing gen_handle_size()...");
-	const size_t file_size = gen_handle_size(&file_handle);
+	size_t file_size;
+	error = gen_handle_size(&file_size, &file_handle);
 
+	GEN_REQUIRE_EQUAL(GEN_OK, error);
 	GEN_REQUIRE_EQUAL(sizeof(file_data), file_size);
 
 	glog(INFO, "Testing gen_file_read()...");

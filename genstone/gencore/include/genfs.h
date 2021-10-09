@@ -141,10 +141,11 @@ extern GEN_ERRORABLE_RETURN gen_handle_close(gen_filesystem_handle_t* const rest
 
 /**
  * Gets the size of a handle's object's content
+ * @param out_size a pointer to storage for the size of the handle
  * @param handle a handle to an object whose size to get. Must not be a directory
- * @return the size of the object's content
+ * @return an error code
  */
-extern size_t gen_handle_size(const gen_filesystem_handle_t* const restrict handle);
+extern GEN_ERRORABLE_RETURN gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets a file's content
