@@ -89,6 +89,7 @@
         - Precompiled headers
         - `make` `.ONESHELL`
     - Force `lld` on all targets
+        - Re-enable ASAN on Windows
     - Static builds
 - Debugging
     - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
