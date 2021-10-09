@@ -225,7 +225,7 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 
 	rewind(handle->file_handles[0]);
 
-	*out_size = mark
+	*out_size = mark;
 	return GEN_OK;
 }
 
