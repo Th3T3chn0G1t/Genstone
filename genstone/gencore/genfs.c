@@ -121,7 +121,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 		return GEN_TOO_LONG;
 	}
 	GEN_FOREACH_PTR(i, path_char, len, path) {
-		const static char invalid_chars[] = "/\\:*?\"<>|";
+		const static char invalid_chars[] = ":*?\"<>|";
 		GEN_FOREACH_PTR(j, invalid, sizeof(invalid_chars), invalid_chars) {
 			if(*path_char == *invalid) {
 				return GEN_WRONG_OBJECT_TYPE;
