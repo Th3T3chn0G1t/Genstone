@@ -108,6 +108,13 @@ extern bool gen_path_exists(const char* const restrict path);
 extern GEN_ERRORABLE_RETURN gen_path_validate(const char* const restrict path);
 
 /**
+ * Creates a file
+ * @param path the file path to create
+ * @return an error code
+ */
+extern GEN_ERRORABLE_RETURN gen_path_create_file(const char* const restrict path);
+
+/**
  * Creates a directory
  * @param path the directory path to create
  * @return an error code

@@ -135,6 +135,18 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	return GEN_OK;
 }
 
+gen_error_t gen_path_create_file(const char* const restrict path) {
+	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
+
+	FILE* const stream;
+	errno_t error = fopen_s(&stream, path, 'w+');
+	if(error) return gen_convert_errno(errno);
+	error = fclose(stream);
+	if(error) return gen_convert_errno(errno);
+
+	return GEN_OK;
+}
+
 gen_error_t gen_path_create_dir(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_create_dir);
 

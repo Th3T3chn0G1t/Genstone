@@ -51,13 +51,18 @@ int main() {
 	glog(INFO, "Testing gen_path_exists()...");
 	GEN_REQUIRE_EQUAL(true, gen_path_exists("."));
 
+	glog(INFO, "Testing gen_path_create_file()...");
+	error = gen_path_create_file("./testfile");
+
+	GEN_REQUIRE_EQUAL(GEN_OK, error);
+	GEN_REQUIRE_EQUAL(true, gen_path_exists("./testfile"));
+
 	glog(INFO, "Testing gen_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
 	file_handle.path = malloc(GEN_PATH_MAX);
 	error = gen_handle_open(&file_handle, "./testfile");
 
 	GEN_REQUIRE_EQUAL(GEN_OK, error);
-	GEN_REQUIRE_EQUAL(true, gen_path_exists("./testfile"));
 	GEN_REQUIRE_EQUAL(false, file_handle.dir);
 
 	glog(INFO, "Testing gen_file_write()...");
