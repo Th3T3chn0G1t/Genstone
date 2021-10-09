@@ -54,7 +54,7 @@ GEN_DIAG_REGION_BEGIN
  * Defines `__inline` on platforms which do not support it by default
  * Marks a function to be inlined (force inline)
  */
-#define __inline __attribute__((always_inline)) __attribute__((artificial))
+#define __inline __attribute__((always_inline)) __attribute__((artificial)) inline
 #endif
 #ifndef __deprecated
 /**
