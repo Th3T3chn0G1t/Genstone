@@ -46,7 +46,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 		return gen_convert_winerr(GetLastError());
 	}
 #else
-	if(!(*output_dylib = dlopen(lib_file_name, 0))) {
+	if(!(*output_dylib = dlopen(lib_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
 		glogf(ERROR, "Failed to load library %s: %s", lib_file_name, dlerror());
 		return gen_convert_errno(errno);
 	}
