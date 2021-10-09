@@ -330,8 +330,12 @@ else
 endif
 
 ifeq ($(TOOLING),ENABLED)
-	GLOBAL_C_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined,address
-	GLOBAL_L_FLAGS += --coverage -fprofile-instr-generate -fsanitize=undefined,address
+	GLOBAL_C_FLAGS += -fprofile-instr-generate -fsanitize=undefined
+	GLOBAL_L_FLAGS += -fprofile-instr-generate -fsanitize=undefined
+	ifneq ($(PLATFORM),WIN)
+		GLOBAL_C_FLAGS += --coverage -fsanitize=address
+		GLOBAL_L_FLAGS += --coverage -fsanitize=address
+	endif
 endif
 
 ifeq ($(TEST),ALL)
