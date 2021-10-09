@@ -248,7 +248,7 @@ ifeq ($(PLATFORM),WIN)
 
 	OBJECT_FORMAT = PE
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script/winimplibgen.bat $@
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^) && script\\winimplibgen.bat $(subst /,$(SEP),$@)
 	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),LNX)
