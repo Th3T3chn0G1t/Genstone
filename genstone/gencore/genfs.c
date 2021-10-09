@@ -186,7 +186,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 
 	struct stat s;
 	error = stat(path, &s);
-	if(error && errno != ENOENT) return gen_convert_errno(errno);
+	if(error) return gen_convert_errno(errno);
 	if(S_ISDIR(s.st_mode)) {
 		output_handle->dir = true;
 		output_handle->directory_handle = opendir(path);
