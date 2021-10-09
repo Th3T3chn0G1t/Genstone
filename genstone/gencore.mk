@@ -3,7 +3,13 @@ GEN_CORE_CFLAGS = -Igenstone/gencore/include $(C11_COMPAT_CFLAGS) $(GEN_CORE_DIA
 ifeq ($(PLATFORM),WIN)
 GEN_CORE_CFLAGS += -Igenstone/vendor/dirent/include
 endif
-GEN_CORE_LFLAGS = -lgencore $(C11_COMPAT_LFLAGS) -ldl
+GEN_CORE_LFLAGS = -lgencore $(C11_COMPAT_LFLAGS)
+ifeq ($(PLATFORM),LNX)
+GEN_CORE_LFLAGS += -ldl
+endif
+ifeq ($(PLATFORM),BSD)
+GEN_CORE_LFLAGS += -ldl
+endif
 
 GEN_CORE_SOURCES = $(wildcard genstone/gencore/*.c)
 GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))
