@@ -138,7 +138,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 gen_error_t gen_path_create_file(const char* const restrict path) {
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	FILE* const stream;
+	FILE* stream;
 	errno_t error = fopen_s(&stream, path, "w+");
 	if(error) return gen_convert_errno(errno);
 	error = fclose(stream);
