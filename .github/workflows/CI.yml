@@ -34,4 +34,4 @@ jobs:
           macos: automake
 
       - name: Build & Test
-        run: make
+        run: make OVERRIDE_DISABLED_MODULES=gencalc_test
