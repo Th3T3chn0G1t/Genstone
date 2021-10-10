@@ -9,23 +9,24 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
-    - Centralised & safer heap management
-        - Replace minimal existing heap calls in genfs (& submodules?)
-    - generator (editor)
-        - Visual build tool
-    - Work on GenUIne with binary partitioning
+    - Fix up `glog` spewing stuff randomly into stdout
+        - `clang` constexpr builtin `strcat` with `generic` for glog message format chars
     - Centralised (Callbacks) vs. Decentralised (Errno) EH
         - Terminal-verbose (Printing shit) vs. Terminal-silent (Don't do that) EH
     - Locales
         - Unicode
             - Wide-path handling (standardise paths to wide? path type?)
         - Time-formats
-    - Fix up `glog` spewing stuff randomly into stdout
     - Integrate `notcurses` for terminal stuff
     - More Date & Time utils
     - Process control utils
         - Steal from `Geno` impl.
         - Redirects
+    - Centralised & safer heap management
+        - Replace minimal existing heap calls in genfs (& submodules?)
+    - generator (editor)
+        - Visual build tool
+    - Work on GenUIne with binary partitioning
     - Networking
         - Debugger ports (Pretty much the only reason networking is here already)
             - Visual debugger connection

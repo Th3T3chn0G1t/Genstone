@@ -343,22 +343,22 @@ typedef enum {
  */
 #define GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b) \
     generic((b), \
-        long double: "Require failed - Expected: %s (%Lf) Got: %s (%Lf) at line %i in %s\n", \
-        double: "Require failed - Expected: %s (%lf) Got: %s (%lf) at line %i in %s\n", \
-        float: "Require failed - Expected: %s (%f) Got: %s (%f) at line %i in %s\n", \
-        unsigned long long: "Require failed - Expected: %s (%llu) Got: %s (%llu) at line %i in %s\n", \
-        long long: "Require failed - Expected: %s (%lli) Got: %s (%lli) at line %i in %s\n", \
-        unsigned long: "Require failed - Expected: %s (%lu) Got: %s (%lu) at line %i in %s\n", \
-        long: "Require failed - Expected: %s (%li) Got: %s (%li) at line %i in %s\n", \
-        unsigned int: "Require failed - Expected: %s (%u) Got: %s (%u) at line %i in %s\n", \
-        int: "Require failed - Expected: %s (%i) Got: %s (%i) at line %i in %s\n", \
-        unsigned short: "Require failed - Expected: %s (%hu) Got: %s (%hu) at line %i in %s\n", \
-        short: "Require failed - Expected: %s (%hi) Got: %s (%hi) at line %i in %s\n", \
-        signed char: "Require failed - Expected: %s (%hhi) Got: %s (%hhi) at line %i in %s\n", \
-        unsigned char: "Require failed - Expected: %s (%hhu) Got: %s (%hhu) at line %i in %s\n", \
-        char: "Require failed - Expected: %s (%c) Got: %s (%c) at line %i in %s\n", \
-        bool: "Require failed - Expected: %s (%i) Got: %s (%i) at line %i in %s\n", \
-        default: "Require failed - Expected: %s (%p) Got: %s (%p) at line %i in %s\n" \
+        long double: "Require failed - Expected: `%s` (%Lf) Got: `%s` (%Lf) at line %i in %s\n", \
+        double: "Require failed - Expected: `%s` (%lf) Got: `%s` (%lf) at line %i in %s\n", \
+        float: "Require failed - Expected: `%s` (%f) Got: `%s` (%f) at line %i in %s\n", \
+        unsigned long long: "Require failed - Expected: `%s` (%llu) Got: `%s` (%llu) at line %i in %s\n", \
+        long long: "Require failed - Expected: `%s` (%lli) Got: `%s` (%lli) at line %i in %s\n", \
+        unsigned long: "Require failed - Expected: `%s` (%lu) Got: `%s` (%lu) at line %i in %s\n", \
+        long: "Require failed - Expected: `%s` (%li) Got: `%s` (%li) at line %i in %s\n", \
+        unsigned int: "Require failed - Expected: `%s` (%u) Got: `%s` (%u) at line %i in %s\n", \
+        int: "Require failed - Expected: `%s` (%i) Got: `%s` (%i) at line %i in %s\n", \
+        unsigned short: "Require failed - Expected: `%s` (%hu) Got: `%s` (%hu) at line %i in %s\n", \
+        short: "Require failed - Expected: `%s` (%hi) Got: `%s` (%hi) at line %i in %s\n", \
+        signed char: "Require failed - Expected: `%s` (%hhi) Got: `%s` (%hhi) at line %i in %s\n", \
+        unsigned char: "Require failed - Expected: `%s` (%hhu) Got: `%s` (%hhu) at line %i in %s\n", \
+        char: "Require failed - Expected: `%s` (%c) Got: `%s` (%c) at line %i in %s\n", \
+        bool: "Require failed - Expected: `%s` (%i) Got: `%s` (%i) at line %i in %s\n", \
+        default: "Require failed - Expected: `%s` (%p) Got: `%s` (%p) at line %i in %s\n" \
     )
     
 /**
@@ -370,7 +370,7 @@ typedef enum {
  */
 #define GEN_REQUIRE_EQUAL(a, b) \
     do { \
-        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression %s is not constant\n", #a); \
+        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` is not constant at line %i in %s\n", #a, __LINE__, __FILE__); \
         if(a != b) { \
             glogf(FATAL, GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
@@ -385,7 +385,7 @@ typedef enum {
  */
 #define GEN_REQUIRE_EQUAL_STRING(a, b) \
     do { \
-        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression %s (%s) is not constant at line %i in %s\n", #a, a, __LINE__, __FILE__); \
+        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` (%s) is not constant at line %i in %s\n", #a, a, __LINE__, __FILE__); \
         if(!b || strcmp(a, b)) { \
             glogf(FATAL, "Require failed - Expected: %s (%s) Got: %s (%s) at line %i in %s\n", #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
@@ -401,7 +401,7 @@ typedef enum {
 #define GEN_REQUIRE_EQUAL_MEMREGION(a, b, s) \
     do { \
         if((!b && s) || memcmp(a, b, s)) { \
-            glogf(FATAL, "Require failed - Expected: %s (%p) (%c%c%c...) Got: %s (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char* const restrict) a)[0], ((char* const restrict) a)[1], ((char* const restrict) a)[2], #b, b, ((char* const restrict) b)[0], ((char* const restrict) b)[1], ((char* const restrict) b)[2], __LINE__, __FILE__); \
+            glogf(FATAL, "Require failed - Expected: `%s` (%p) (%c%c%c...) Got: `%s` (%p) (%c%c%c...) at line %i in %s\n", #a, a, ((char* const restrict) a)[0], ((char* const restrict) a)[1], ((char* const restrict) a)[2], #b, b, ((char* const restrict) b)[0], ((char* const restrict) b)[1], ((char* const restrict) b)[2], __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
