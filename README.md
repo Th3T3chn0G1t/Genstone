@@ -4,7 +4,7 @@
 ## Building
 
 #### Note
-Genstone uses Javadoc-style docstrings to document functions, variables outside of functions, macros, structures and structure members. You can view these directly in the headers, generate local docs (Use `make docs`), or view the latest documentation build on Github pages at (https://th3t3chn0g1t.github.io/GenstoneEngine/) (Recommended).
+Genstone uses Javadoc-style docstrings to document functions, variables outside of functions, macros, structures and structure members. You can view these directly in the headers, generate local docs (Use `make docs`), or view the latest documentation build on Github pages at https://th3t3chn0g1t.github.io/GenstoneEngine/ (Recommended).
 
 Genstone uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building
 
