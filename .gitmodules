@@ -1,3 +1,6 @@
 [submodule "genstone/vendor/c11compat/safeclib"]
 	path = genstone/vendor/c11compat/safeclib
 	url = https://github.com/rurban/safeclib
+[submodule "genstone/vendor/dirent"]
+	path = genstone/vendor/dirent
+	url = https://github.com/tronkko/dirent
