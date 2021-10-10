@@ -1,4 +1,4 @@
-![Genstone Logo](brand/logo.png)
+![Genstone Logo](brand/logo.svg)
 
 # Genstone
 ### A personal C development framework which creates a consistent, configurable cross-platform abstraction layer for a variety of applications
