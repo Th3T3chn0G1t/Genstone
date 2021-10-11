@@ -3,18 +3,19 @@
 
 #include "include/genargs.h"
 
+#include "include/gencommon.h"
 #include "include/gentooling.h"
 
-GEN_ERRORABLE_RETURN gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough) {
+gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict const argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_parse_args);
 
-	if(!argc) return GEN_OK;
+	if(!argc) GEN_ERROR_OUT(GEN_OK, "");
 
-	if(!argv) return GEN_INVALID_PARAMETER;
-	if(argc < 0) return GEN_INVALID_PARAMETER;
-	if(!handler) return GEN_INVALID_PARAMETER;
-	if(n_short_args && !short_args) return GEN_INVALID_PARAMETER;
-	if(n_long_args && !long_args) return GEN_INVALID_PARAMETER;
+	if(!argv) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`argv` was NULL");
+	if(argc < 0) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`argc` was invalid (`argc` < 0)");
+	if(!handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handler` was NULL");
+	if(n_short_args && !short_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`short_args` was NULL but `n_short_args` > 0");
+	if(n_long_args && !long_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`long_args` was NULL but `n_long_args` > 0");
 
 	// Precalculating the long args' lengths to save time while looping
 	// We need this weirdness to avoid creating a zero-length VLA
@@ -74,9 +75,9 @@ GEN_ERRORABLE_RETURN gen_parse_args(const int argc, const char* const restrict *
 			value = (*arg);
 		}
 
-		if(argn == SIZE_MAX) return GEN_NO_SUCH_OBJECT;
+		if(argn == SIZE_MAX) GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "An unknown argument was passed");
 		handler(type, argn, value, passthrough);
 	}
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 }

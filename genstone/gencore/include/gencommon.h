@@ -86,11 +86,6 @@ GEN_DIAG_REGION_BEGIN
 #endif
 GEN_DIAG_REGION_END
 
-/**
- * Return value specification for functions which use `generror` for error reporting
- */
-#define GEN_ERRORABLE_RETURN __nodiscard gen_error_t
-
 #include "gendbg.h"
 #include "generrors.h"
 
@@ -393,18 +388,21 @@ extern GEN_ERRORABLE_RETURN gen_format_to_buffer(char* const restrict out, const
  */
 #define glog(level, string) \
     do { \
-        const static char GLOG_FORMAT[] = "%s%s"; \
-        FILE** const outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
-        size_t outbuff_size; \
-        (void) gen_format_to_buffer_len(&outbuff_size, GLOG_FORMAT, GEN_LOGGER_##level##_PREFIX, string); \
-        char outbuff[outbuff_size]; \
-        (void) gen_format_to_buffer(outbuff, outbuff_size, GLOG_FORMAT, GEN_LOGGER_##level##_PREFIX, string); \
-        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, outstreams) { \
-            if(!streamp) break; \
-            fputs(outbuff, streamp); \
-            fputc('\n', streamp); \
+        GEN_DIAG_REGION_BEGIN \
+        pragma("clang diagnostic ignored \"-Wshadow\"") \
+        FILE** const gen_internal_glog_outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
+        size_t gen_internal_glog_outbuff_size = strlen(GEN_LOGGER_##level##_PREFIX) + strlen(string) + 1; \
+        char gen_internal_glog_outbuff[gen_internal_glog_outbuff_size]; \
+        gen_internal_glog_outbuff[0] = '\0'; \
+        strcat_s(gen_internal_glog_outbuff, gen_internal_glog_outbuff_size, GEN_LOGGER_##level##_PREFIX); \
+        strcat_s(gen_internal_glog_outbuff, gen_internal_glog_outbuff_size, GEN_LOGGER_##level##_PREFIX); \
+        GEN_FOREACH(gen_internal_glog_stream_iterator, gen_internal_glog_iterator_value_streamp, GEN_GLOG_STREAM_COUNT, gen_internal_glog_outstreams) { \
+            if(!gen_internal_glog_iterator_value_streamp) break; \
+            fputs(gen_internal_glog_outbuff, gen_internal_glog_iterator_value_streamp); \
+            fputc('\n', gen_internal_glog_iterator_value_streamp); \
         } \
         if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK; \
+        GEN_DIAG_REGION_END \
     } while(0)
 /**
  * `printf`-style formatted logging function
@@ -417,21 +415,24 @@ extern GEN_ERRORABLE_RETURN gen_format_to_buffer(char* const restrict out, const
  */
 #define glogf(level, format, ...) \
     do { \
+        GEN_DIAG_REGION_BEGIN \
+        pragma("clang diagnostic ignored \"-Wshadow\"") \
         const size_t glogf_format_len = 2 /* %s */ + strlen(format) + 1 /* \0 */; \
         char glogf_format[glogf_format_len]; \
         strcat_s(glogf_format, glogf_format_len, "%s"); \
         strcat_s(glogf_format, glogf_format_len, format); \
-        FILE** const outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
-        size_t outbuff_size; \
-        (void) gen_format_to_buffer_len(&outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
-        char outbuff[outbuff_size]; \
-        (void) gen_format_to_buffer(outbuff, outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
-        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, outstreams) { \
-            if(!streamp) break; \
-            fputs(outbuff, streamp); \
-            fputc('\n', streamp); \
+        FILE** const gen_internal_glog_outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
+        size_t gen_internal_glog_outbuff_size; \
+        (void) gen_format_to_buffer_len(&gen_internal_glog_outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
+        char gen_internal_glog_outbuff[gen_internal_glog_outbuff_size]; \
+        (void) gen_format_to_buffer(gen_internal_glog_outbuff, gen_internal_glog_outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
+        GEN_FOREACH(gen_internal_glog_stream_iterator, gen_internal_glog_iterator_value_streamp, GEN_GLOG_STREAM_COUNT, gen_internal_glog_outstreams) { \
+            if(!gen_internal_glog_iterator_value_streamp) break; \
+            fputs(gen_internal_glog_outbuff, gen_internal_glog_iterator_value_streamp); \
+            fputc('\n', gen_internal_glog_iterator_value_streamp); \
         } \
         if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK; \
+        GEN_DIAG_REGION_END \
     } while(0)
 
 /**

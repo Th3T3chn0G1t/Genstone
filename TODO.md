@@ -7,9 +7,16 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
-    - `strcat` with `generic` for `GEN_REQUIRE` message format chars
     - Centralised (Callbacks) vs. Decentralised (Errno) EH
+        - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
+        - `strerror` on `gen_error_t`
         - Terminal-verbose (Printing shit) vs. Terminal-silent (Don't do that) EH
+            - Windows `strerror` output from `GetLastError`
+    - Non-returning error reporting
+        - Employ in `glog`
+    - Raw `glog` for `gen_format_to_buffer` and `gen_format_to_buffer_len`
+    - Create tooling frames for glog
+    - `gendl` check valid *filenames* for dylibs
     - Locales
         - Unicode
             - Wide-path handling (standardise paths to wide? path type?)
@@ -90,9 +97,10 @@
         - Re-enable ASAN on Windows
     - Static builds
 - Tests
+    - Add `GEN_FRAME_BEGIN` to all tests
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
-- Debugging
-    - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
+    - Write tests for generror for error callback
+    - Test genfs directory iteration by filling a buffer with filenames from the callback
 - Optimization
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
     - OpenMP support

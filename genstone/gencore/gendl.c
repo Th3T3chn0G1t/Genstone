@@ -12,8 +12,8 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	// The static analyser has a bit of an aneurism about this function
 	// Just ignore it for now
 
-	if(!output_dylib) return GEN_INVALID_PARAMETER;
-	if(!lib_name) return GEN_INVALID_PARAMETER;
+	if(!output_dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_dylib` was NULL");
+	if(!lib_name) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`lib_name` was invalid");
 
 	const size_t lib_name_len = strlen(lib_name);
 
@@ -33,63 +33,70 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 
 	errno_t error = 0;
 	error = memcpy_s(lib_file_name, lib_file_name_len, lib_prefix, (sizeof(lib_prefix) - 1));
-	if(error) return gen_convert_errno(error);
+	if(error) GEN_ERROR_OUT(gen_convert_errno(error), "`memcpy_s` failed");
 	error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1), lib_file_name_len - (sizeof(lib_prefix) - 1), lib_name, lib_name_len);
-	if(error) return gen_convert_errno(error);
+	if(error) GEN_ERROR_OUT(gen_convert_errno(error), "`memcpy_s` failed");
 	error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1) + lib_name_len, lib_file_name_len - ((sizeof(lib_prefix) - 1) + lib_name_len), lib_suffix, (sizeof(lib_suffix) - 1));
-	if(error) return gen_convert_errno(error);
+	if(error) GEN_ERROR_OUT(gen_convert_errno(error), "`memcpy_s` failed");
 
 	lib_file_name[lib_file_name_len - 1] = '\0';
 
 #if PLATFORM == WIN
 	if(!(*output_dylib = LoadLibraryA(lib_file_name))) {
-		return gen_convert_winerr(GetLastError());
+		GEN_ERROR_OUT(gen_convert_winerr(GetLastError()), "`LoadLibraryA` failed");
 	}
 #else
 	if(!(*output_dylib = dlopen(lib_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
+#if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "Failed to load library %s: %s", lib_file_name, dlerror());
-		return gen_convert_errno(errno);
+#endif
+		GEN_ERROR_OUT(GEN_UNKNOWN, "`dlopen` failed");
 	}
 #endif
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 }
 
 gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
-	if(!output_address) return GEN_INVALID_PARAMETER;
-	if(!dylib) return GEN_INVALID_PARAMETER;
-	if(!symname) return GEN_INVALID_PARAMETER;
+	if(!output_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_address` was NULL");
+	if(!dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`dylib` was NULL");
+	if(!symname) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was NULL");
+	if(!strlen(symname)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`strlen(symname)` < 0)");
 
 #if PLATFORM == WIN
 	GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wpedantic"
 	if(!(*output_address = GetProcAddress(dylib, symname))) {
-		GEN_DIAG_REGION_END
-		return gen_convert_winerr(GetLastError());
+		GEN_ERROR_OUT(gen_convert_winerr(GetLastError()), "`GetProcAddress` failed");
 	}
+	GEN_DIAG_REGION_END
 #else
 	if(!(*output_address = dlsym(dylib, symname))) {
+#if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "Failed to locate symbol %s: %s", symname, dlerror());
-		return gen_convert_errno(errno);
+#endif
+		GEN_ERROR_OUT(GEN_UNKNOWN, "`dlsym` failed");
 	}
 #endif
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 }
 
 gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
-	if(!dylib) return GEN_INVALID_PARAMETER;
+	if(!dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`dylib` was NULL");
 
 #if PLATFORM == WIN
 	if(!FreeLibrary(dylib)) {
-		return gen_convert_winerr(GetLastError());
+		GEN_ERROR_OUT(gen_convert_winerr(GetLastError()), "`FreeLibrary` failed");
 	}
 #else
 	if(dlclose(dylib)) {
+#if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "Failed to unload library: %s", dlerror());
-		return gen_convert_errno(errno);
+#endif
+		GEN_ERROR_OUT(GEN_UNKNOWN, "`dlclose` failed");
 	}
 #endif
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 }

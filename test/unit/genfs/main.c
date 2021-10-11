@@ -45,9 +45,6 @@ int main() {
 	error = gen_path_validate("foo/bar.txt");
 	GEN_REQUIRE_EQUAL(GEN_OK, error);
 
-	error = gen_path_validate("");
-	GEN_REQUIRE_EQUAL(GEN_TOO_SHORT, error);
-
 	glog(INFO, "Testing gen_path_exists()...");
 	GEN_REQUIRE_EQUAL(true, gen_path_exists("."));
 
