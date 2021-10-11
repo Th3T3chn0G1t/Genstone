@@ -2,15 +2,12 @@
 
 - Meta
     - Restructure `vendor` subdirectory locations
-    - Github organisation?
-    - Remove prebuilt branch
     - Write examples
         - Tests
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
-    - Fix up `glog` spewing stuff randomly into stdout
-        - `clang` constexpr builtin `strcat` with `generic` for glog message format chars
+    - `strcat` with `generic` for `GEN_REQUIRE` message format chars
     - Centralised (Callbacks) vs. Decentralised (Errno) EH
         - Terminal-verbose (Printing shit) vs. Terminal-silent (Don't do that) EH
     - Locales
@@ -92,6 +89,8 @@
     - Force `lld` on all targets
         - Re-enable ASAN on Windows
     - Static builds
+- Tests
+    - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
 - Debugging
     - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
 - Optimization
