@@ -7,6 +7,7 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
+    - Fix screwed up `GEN_ERROR_OUT` and `glog`
     - Centralised (Callbacks) vs. Decentralised (Errno) EH
         - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
         - `strerror` on `gen_error_t`
