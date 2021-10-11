@@ -13,14 +13,16 @@
 
 /**
  * Pretty keyword for _Pragma
- * @param s string-literal argument for `_Pragma`
  */
-#define pragma(s) _Pragma(s)
+#define pragma _Pragma
 /**
  * Pretty keyword for _Generic
- * @param ... type-switch statement for `_Generic`
  */
-#define generic(...) _Generic(__VA_ARGS__)
+#define generic _Generic
+/**
+ * Pretty intrinsic for __typeof__
+ */
+#define typeof __typeof__
 
 /**
  * Begins a diagnostic region
@@ -145,6 +147,58 @@ GEN_DIAG_REGION_END
  */
 typedef long long ssize_t;
 #endif
+
+#if GEN_DEBUG_FOREACH_REGISTER == ENABLED
+#define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
+#else
+/**
+ * The type used when declaring an iterator in `GEN_FOREACH`
+ * @see GEN_DEBUG_FOREACH_REGISTER
+ */
+#define GEN_INTERNAL_FOREACH_ITER_DECL size_t
+#endif
+
+/**
+ * Iterates over a container with explicit length
+ * @param iter the identifier to use for the iterating index
+ * @param memb the identifier to use for the indexed member
+ * @param len the length of the container to iterate
+ * @param container the container to iterate
+ * @see GEN_DEBUG_FOREACH_REGISTER
+ * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
+ */
+#define GEN_FOREACH(iter, memb, len, container) \
+    typeof((container)[0]) memb = (container)[0]; \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
+
+/**
+ * Iterates over a container with explicit length
+ * `memb` is a pointer to the indexed member
+ * @param iter the identifier to use for the iterating index
+ * @param memb the identifier to use for the indexed member
+ * @param len the length of the container to iterate
+ * @param container the container to iterate
+ * @see GEN_DEBUG_FOREACH_REGISTER
+ * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
+ */
+#define GEN_FOREACH_PTR(iter, memb, len, container) \
+    typeof((container)[0])* memb = &(container)[0]; \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
+
+/**
+ * Iterates over a container with explicit length
+ * `memb` is a pointer to the indexed member
+ * Uses the container type as the member type directly
+ * @param iter the identifier to use for the iterating index
+ * @param memb the identifier to use for the indexed member
+ * @param len the length of the container to iterate
+ * @param container the container to iterate
+ * @see GEN_DEBUG_FOREACH_REGISTER
+ * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
+ */
+#define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
+    typeof((container)) memb = (container); \
+    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 /**
  * ANSI color value for gray
@@ -308,18 +362,49 @@ typedef enum {
     } while(0)
 #endif
 
+#ifndef GEN_GLOG_STREAM_COUNT
+/**
+ * The number of output/error streams available to glog
+ */
+#define GEN_GLOG_STREAM_COUNT 8
+#endif
+
+/**
+ * glog output streams
+ * @note buffer is null terminated for simplicity
+ */
+extern FILE* gen_glog_out_streams[GEN_GLOG_STREAM_COUNT + 1];
+/**
+ * glog error streams
+ * @note buffer is null terminated for simplicity
+ */
+extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
+
+extern GEN_ERRORABLE_RETURN gen_format_to_buffer_len(size_t* const restrict out_size, const char* const restrict format, ...);
+extern GEN_ERRORABLE_RETURN gen_format_to_buffer(char* const restrict out, const size_t maxchars, const char* const restrict format, ...);
+
 /**
  * Basic string logging function
  * @param level a `gen_logging_level_t` to determine the prefix from
  * @param string the string to print
  * @note include `gentooling.h` first to get trace information on error
+ * @see gen_glog_out_streams for configuring of output streams
+ * @see gen_glog_err_streams for configuring of output streams
  */
 #define glog(level, string) \
     do { \
-        FILE* const restrict gen_internal_streamp = level >= ERROR ? stderr : stdout; \
-        fprintf(gen_internal_streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
-        fprintf(gen_internal_streamp, "%s\n", string); \
-        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
+        const static char GLOG_FORMAT[] = "%s%s"; \
+        FILE** const outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
+        size_t outbuff_size; \
+        (void) gen_format_to_buffer_len(&outbuff_size, GLOG_FORMAT, GEN_LOGGER_##level##_PREFIX, string); \
+        char outbuff[outbuff_size]; \
+        (void) gen_format_to_buffer(outbuff, outbuff_size, GLOG_FORMAT, GEN_LOGGER_##level##_PREFIX, string); \
+        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, outstreams) { \
+            if(!streamp) break; \
+            fputs(outbuff, streamp); \
+            fputc('\n', streamp); \
+        } \
+        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK; \
     } while(0)
 /**
  * `printf`-style formatted logging function
@@ -327,14 +412,26 @@ typedef enum {
  * @param format a format string
  * @param ... the format arguments to print
  * @note include `gentooling.h` first to get trace information on error
+ * @see gen_glog_out_streams for configuring of output streams
+ * @see gen_glog_err_streams for configuring of output streams
  */
 #define glogf(level, format, ...) \
     do { \
-        FILE* const restrict gen_internal_streamp = level >= ERROR ? stderr : stdout; \
-        fprintf(gen_internal_streamp, "%s", GEN_LOGGER_##level##_PREFIX); \
-        fprintf(gen_internal_streamp, format, __VA_ARGS__); \
-        fprintf(gen_internal_streamp, "\n"); \
-        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK;\
+        const size_t glogf_format_len = 2 /* %s */ + strlen(format) + 1 /* \0 */; \
+        char glogf_format[glogf_format_len]; \
+        strcat_s(glogf_format, glogf_format_len, "%s"); \
+        strcat_s(glogf_format, glogf_format_len, format); \
+        FILE** const outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
+        size_t outbuff_size; \
+        (void) gen_format_to_buffer_len(&outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
+        char outbuff[outbuff_size]; \
+        (void) gen_format_to_buffer(outbuff, outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
+        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, outstreams) { \
+            if(!streamp) break; \
+            fputs(outbuff, streamp); \
+            fputc('\n', streamp); \
+        } \
+        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK; \
     } while(0)
 
 /**
@@ -414,58 +511,6 @@ typedef enum {
         glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s\n", __LINE__, __FILE__); \
         abort(); \
     } while(0)
-
-#if GEN_DEBUG_FOREACH_REGISTER == ENABLED
-#define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
-#else
-/**
- * The type used when declaring an iterator in `GEN_FOREACH`
- * @see GEN_DEBUG_FOREACH_REGISTER
- */
-#define GEN_INTERNAL_FOREACH_ITER_DECL size_t
-#endif
-
-/**
- * Iterates over a container with explicit length
- * @param iter the identifier to use for the iterating index
- * @param memb the identifier to use for the indexed member
- * @param len the length of the container to iterate
- * @param container the container to iterate
- * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
- */
-#define GEN_FOREACH(iter, memb, len, container) \
-    __typeof__((container)[0]) memb = (container)[0]; \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
-
-/**
- * Iterates over a container with explicit length
- * `memb` is a pointer to the indexed member
- * @param iter the identifier to use for the iterating index
- * @param memb the identifier to use for the indexed member
- * @param len the length of the container to iterate
- * @param container the container to iterate
- * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
- */
-#define GEN_FOREACH_PTR(iter, memb, len, container) \
-    __typeof__((container)[0])* memb = &(container)[0]; \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
-
-/**
- * Iterates over a container with explicit length
- * `memb` is a pointer to the indexed member
- * Uses the container type as the member type directly
- * @param iter the identifier to use for the iterating index
- * @param memb the identifier to use for the indexed member
- * @param len the length of the container to iterate
- * @param container the container to iterate
- * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
- */
-#define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
-    __typeof__((container)) memb = (container); \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 #define GEN_MICROSECONDS_PER_SECOND 1000000
 #define GEN_MILLISECONDS_PER_SECOND 1000

@@ -68,14 +68,13 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |---|---|---|---|---|
 |`PLATFORM`|`WIN` `DWN` `LNX` `BSD`|Determined by Makefile|The target platform for the compilation|Do not mix platforms in a binary|
 |`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|
-|`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a static stateful buffer|
-|`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a static stateful buffer|
+|`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a stateful buffer|
+|`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a stateful buffer|
+|`GEN_GLOG_STREAM_COUNT`|Any valid array size|8|The maximum number of output streams `glog` and `glogf` can output to|Is used to initialize a stateful buffer|
 
 In debug builds, some functionality is changed to provide extra validation or execution environment information
 
 Each key can be set to either `ENABLED` or `DISABLED`, making them truthy or falsy respectively
-
-### Compilation Options
 
 `MODE=DEBUG` will set these automatically, but they can also be controlled individually by setting them to either `ENABLED` or `DISABLED`
 
