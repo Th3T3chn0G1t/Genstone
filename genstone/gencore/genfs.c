@@ -44,7 +44,17 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 	// Getting an error out of this function is very strange
 	// We just have to presume that GEN_PATH_MAX will always be enough storage
 	unsigned long error = GetFullPathNameA(path, GEN_PATH_MAX, output_path, NULL);
-	if(!error) GEN_ERROR_OUT(gen_convert_winerr(GetLastError()), "`GetFullPathNameA` failed");
+	if(!error) {
+		unsigned long winerror = GetLastError();
+#if GEN_GLOGGIFY_EH == ENABLED
+		size_t size = 0;
+		gen_winerr_as_string(NULL, &size, winerror);
+		char winerror_string[size];
+		gen_winerr_as_string(winerror_string, 0, winerror);
+		glogf(ERROR, "Failed to load library '%s': %s", lib_file_name, winerror_string);
+#endif
+		GEN_ERROR_OUT(gen_convert_winerr(winerror), "`GetFullPathNameA` failed");
+	}
 #else
 	char* error = realpath(path, output_path);
 	if(!error) GEN_ERROR_OUT(gen_convert_errno(errno), "`realpath` failed");
@@ -155,7 +165,17 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 
 #if PLATFORM == WIN
 	int error = CreateDirectoryA(path, NULL);
-	if(error) GEN_ERROR_OUT(gen_convert_winerr(GetLastError()), "`CreateDirectoryA` failed");
+	if(error) {
+		unsigned long winerror = GetLastError();
+#if GEN_GLOGGIFY_EH == ENABLED
+		size_t size = 0;
+		gen_winerr_as_string(NULL, &size, winerror);
+		char winerror_string[size];
+		gen_winerr_as_string(winerror_string, 0, winerror);
+		glogf(ERROR, "Failed to load library '%s': %s", lib_file_name, winerror_string);
+#endif
+		GEN_ERROR_OUT(gen_convert_winerr(winerror), "`CreateDirectoryA` failed");
+	}
 #else
 	errno_t error = mkdir(path, 0777);
 	if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "`mkdir` failed");

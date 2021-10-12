@@ -375,9 +375,6 @@ extern FILE* gen_glog_out_streams[GEN_GLOG_STREAM_COUNT + 1];
  */
 extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 
-extern GEN_ERRORABLE_RETURN gen_format_to_buffer_len(size_t* const restrict out_size, const char* const restrict format, ...);
-extern GEN_ERRORABLE_RETURN gen_format_to_buffer(char* const restrict out, const size_t maxchars, const char* const restrict format, ...);
-
 /**
  * Basic string logging function
  * @param level a `gen_logging_level_t` to determine the prefix from
@@ -390,20 +387,13 @@ extern GEN_ERRORABLE_RETURN gen_format_to_buffer(char* const restrict out, const
     do { \
         GEN_DIAG_REGION_BEGIN \
         pragma("clang diagnostic ignored \"-Wshadow\"") \
-        FILE** const gen_internal_glog_outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
-        size_t gen_internal_glog_outbuff_size = strlen(GEN_LOGGER_##level##_PREFIX) + strlen(string) + 1; \
-        char gen_internal_glog_outbuff[gen_internal_glog_outbuff_size]; \
-        gen_internal_glog_outbuff[0] = '\0'; \
-        strcat_s(gen_internal_glog_outbuff, gen_internal_glog_outbuff_size, GEN_LOGGER_##level##_PREFIX); \
-        strcat_s(gen_internal_glog_outbuff, gen_internal_glog_outbuff_size, GEN_LOGGER_##level##_PREFIX); \
-        GEN_FOREACH(gen_internal_glog_stream_iterator, gen_internal_glog_iterator_value_streamp, GEN_GLOG_STREAM_COUNT, gen_internal_glog_outstreams) { \
-            if(!gen_internal_glog_iterator_value_streamp) break; \
-            fputs(gen_internal_glog_outbuff, gen_internal_glog_iterator_value_streamp); \
-            fputc('\n', gen_internal_glog_iterator_value_streamp); \
+        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, level >= ERROR ? gen_glog_err_streams : gen_glog_out_streams) { \
+            if(!streamp) break; \
+            fprintf_s(streamp, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
         } \
-        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK; \
         GEN_DIAG_REGION_END \
-    } while(0)
+    } while(0) \
+
 /**
  * `printf`-style formatted logging function
  * @param level a `gen_logging_level_t` to determine the prefix from
@@ -417,23 +407,14 @@ extern GEN_ERRORABLE_RETURN gen_format_to_buffer(char* const restrict out, const
     do { \
         GEN_DIAG_REGION_BEGIN \
         pragma("clang diagnostic ignored \"-Wshadow\"") \
-        const size_t glogf_format_len = 2 /* %s */ + strlen(format) + 1 /* \0 */; \
-        char glogf_format[glogf_format_len]; \
-        strcat_s(glogf_format, glogf_format_len, "%s"); \
-        strcat_s(glogf_format, glogf_format_len, format); \
-        FILE** const gen_internal_glog_outstreams = level >= ERROR ? gen_glog_out_streams : gen_glog_err_streams; \
-        size_t gen_internal_glog_outbuff_size; \
-        (void) gen_format_to_buffer_len(&gen_internal_glog_outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
-        char gen_internal_glog_outbuff[gen_internal_glog_outbuff_size]; \
-        (void) gen_format_to_buffer(gen_internal_glog_outbuff, gen_internal_glog_outbuff_size, glogf_format, GEN_LOGGER_##level##_PREFIX, __VA_ARGS__); \
-        GEN_FOREACH(gen_internal_glog_stream_iterator, gen_internal_glog_iterator_value_streamp, GEN_GLOG_STREAM_COUNT, gen_internal_glog_outstreams) { \
-            if(!gen_internal_glog_iterator_value_streamp) break; \
-            fputs(gen_internal_glog_outbuff, gen_internal_glog_iterator_value_streamp); \
-            fputc('\n', gen_internal_glog_iterator_value_streamp); \
+        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, level >= ERROR ? gen_glog_err_streams : gen_glog_out_streams) { \
+            if(!streamp) break; \
+            fputs(GEN_LOGGER_##level##_PREFIX, streamp); \
+            fprintf_s(streamp, format, __VA_ARGS__); \
+            fputc('\n', streamp); \
         } \
-        if(level >= ERROR) GEN_INTERNAL_LOG_ERROR_BLOCK; \
         GEN_DIAG_REGION_END \
-    } while(0)
+    } while(0) \
 
 /**
  * Gets the require message from the expected expressions type
@@ -549,5 +530,13 @@ extern void gen_timeval_add(const struct timeval* const restrict a, const struct
  * @see https://gist.github.com/vchernov/4774682#file-timeval_sub-cpp
  */
 extern void gen_timeval_sub(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result);
+
+/**
+ * Converts a win32 error into a string
+ * @param outbuff a pointer to storage for the converted message. Nullable
+ * @param outsize a pointer to storage for the measured size of the converted message. Nullable
+ * @param error the error value to convert
+ */
+extern void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict outsize,  const unsigned long error);
 
 #endif

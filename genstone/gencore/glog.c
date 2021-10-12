@@ -24,35 +24,3 @@ __attribute__((constructor)) static void gen_internal_initialize_glog_streams(vo
 	gen_glog_out_streams[0] = stdout;
 	gen_glog_err_streams[0] = stderr;
 }
-
-GEN_DIAG_REGION_BEGIN
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
-gen_error_t gen_format_to_buffer_len(size_t* const restrict out_size, const char* const restrict format, ...) {
-	GEN_FRAME_BEGIN(gen_format_to_buffer_len);
-
-	va_list args;
-	va_start(args, format);
-	int bytes_written = vsnprintf(NULL, 0, format, args);
-	if(bytes_written < 0) fprintf(stderr, "%i %s", gen_convert_errno(errno), "`vsnprintf` failed");
-
-	*out_size = (size_t) bytes_written;
-	return GEN_OK;
-}
-
-gen_error_t gen_format_to_buffer(char* const restrict out, const size_t maxchars, const char* const restrict format, ...) {
-	GEN_FRAME_BEGIN(gen_format_to_buffer);
-
-	va_list args;
-	va_start(args, format);
-	va_list args2;
-	va_start(args2, format);
-	if(vsnprintf_s(out, maxchars, format, args) < 0) {
-		gtrace;
-		fprintf(stderr, "%p %zu %s %s\n", (void*) out, maxchars, strerror(errno), "`vsnprintf_s` failed");
-		vfprintf(stderr, format, args2);
-		exit(-1);
-	}
-
-	return GEN_OK;
-}
-GEN_DIAG_REGION_END

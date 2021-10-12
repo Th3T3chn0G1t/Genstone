@@ -55,6 +55,31 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 	}
 }
 
+// https://stackoverflow.com/questions/1387064/how-to-get-the-error-message-from-the-error-code-returned-by-getlasterror/17387176#17387176
+// Returns the last Win32 error, in string format. Returns an empty string if there is no error.
+void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict outsize, const unsigned long error) {
+#if PLATFORM == WIN
+	char* locoutbuff = NULL;
+
+	// Ask Win32 to give us the string version of that message ID.
+	// The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &locoutbuff, 0, NULL);
+
+	if(outsize) *outsize = size;
+	if(outbuff) strcpy(outbuff, outbuff);
+
+	// Free the Win32's string's buffer.
+	LocalFree(locoutbuff);
+
+	return message;
+#else
+	(void) outbuff;
+	(void) outsize;
+	(void) error;
+	glog(WARNING, "Calling gen_winerr_as_string() on non-Windows platform");
+#endif
+}
+
 GEN_ERRORABLE_RETURN gen_convert_winerr(unsigned long error) {
 #if PLATFORM == WIN
 	switch(error) {

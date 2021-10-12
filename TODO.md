@@ -7,16 +7,7 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
-    - Fix screwed up `GEN_ERROR_OUT` and `glog`
-    - Centralised (Callbacks) vs. Decentralised (Errno) EH
-        - Source location builtins (https://clang.llvm.org/docs/LanguageExtensions.html#source-location-builtins)
-        - `strerror` on `gen_error_t`
-        - Terminal-verbose (Printing shit) vs. Terminal-silent (Don't do that) EH
-            - Windows `strerror` output from `GetLastError`
-    - Non-returning error reporting
-        - Employ in `glog`
-    - Raw `glog` for `gen_format_to_buffer` and `gen_format_to_buffer_len`
-    - Create tooling frames for glog
+    - `strerror` on `gen_error_t`
     - `gendl` check valid *filenames* for dylibs
     - Locales
         - Unicode
