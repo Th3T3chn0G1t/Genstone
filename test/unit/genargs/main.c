@@ -28,5 +28,5 @@ int main() {
 
 	gen_error_t error = gen_parse_args(argc, argv, arg_callback, 2, short_args, 2, long_args, NULL);
 
-	GEN_REQUIRE_EQUAL(GEN_OK, error);
+	GEN_REQUIRE_NO_ERROR(error);
 }

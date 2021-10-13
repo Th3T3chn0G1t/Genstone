@@ -34,7 +34,7 @@ typedef enum {
      */
     GEN_PERMISSION,
     /**
-     * An invalid parameter was passed
+     * The provided parameter was invalid
      */
     GEN_INVALID_PARAMETER,
     /**
@@ -42,7 +42,7 @@ typedef enum {
      */
     GEN_IO,
     /**
-     * A provided argument is too long
+     * The provided argument is too long
      */
     GEN_TOO_LONG,
     /**
@@ -54,11 +54,11 @@ typedef enum {
      */
     GEN_OUT_OF_MEMORY,
     /**
-     * An object of the wrong type was passed
+     * An object of the wrong type was provided
      */
     GEN_WRONG_OBJECT_TYPE,
     /**
-     * An object already exists by a passed identifier
+     * An object already exists by the provided identifier
      */
     GEN_ALREADY_EXISTS,
     /**
@@ -70,7 +70,7 @@ typedef enum {
      */
     GEN_OUT_OF_HANDLES,
     /**
-     * A provided argument is too short
+     * The provided argument is too short
      */
     GEN_TOO_SHORT,
     /**
@@ -83,6 +83,11 @@ typedef enum {
  * Gets the name of a `gen_error_t`
  */
 extern const char* gen_error_name(const gen_error_t error);
+
+/**
+ * Gets the generic description of a `gen_error_t`
+ */
+extern const char* gen_error_description(const gen_error_t error);
 
 /**
  * Return value specification for functions which use `generror` for error reporting

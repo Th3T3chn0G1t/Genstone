@@ -108,6 +108,8 @@
 - Security
     - Checked C
     - `clang` thread safety intrinsics
+    - Annex K errno
+    - Annex K constraint handler callback into Genstone EH
 - Documentation
     - Tutorials
     - Comprehensive `@example` tags

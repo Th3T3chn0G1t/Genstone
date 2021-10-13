@@ -30,6 +30,25 @@ const char* gen_error_name(const gen_error_t error) {
 	}
 }
 
+const char* gen_error_description(const gen_error_t error) {
+	switch(error) {
+		case GEN_OK: return "No error occurred";
+		case GEN_UNKNOWN: return "An unknown error occurred";
+		case GEN_PERMISSION: return "A permission error occurred";
+		case GEN_INVALID_PARAMETER: return "The provided parameter was invalid";
+		case GEN_IO: return "An IO error occurred";
+		case GEN_TOO_LONG: return "The provided argument is too long";
+		case GEN_NO_SUCH_OBJECT: return "A nonexistent object was referenced";
+		case GEN_OUT_OF_MEMORY: return "Program ran out of usable memory";
+		case GEN_WRONG_OBJECT_TYPE: return "An object of the wrong type was provided";
+		case GEN_ALREADY_EXISTS: return "An object already exists by the provided identifier";
+		case GEN_OUT_OF_SPACE: return "The specified destination is out of space";
+		case GEN_OUT_OF_HANDLES: return "Too many platform handles are open";
+		case GEN_TOO_SHORT: return "The provided argument is too short";
+		case GEN_BAD_CONTENT: return "The provided argument contains bad or invalid content";
+	}
+}
+
 GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 	switch(error) {
 		case EACCES: return GEN_PERMISSION;

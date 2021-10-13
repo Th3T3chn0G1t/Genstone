@@ -348,9 +348,9 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 
 	int error = fseek(handle->file_handles[0], 0, SEEK_END);
 	if(error) {
-			error = errno;
+		error = errno;
 #if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`fseek` failed: %s", strerror(error));
+		glogf(ERROR, "`fseek` failed: %s", strerror(error));
 #endif
 		GEN_ERROR_OUT(gen_convert_errno(error), "`fseek` failed");
 	}
@@ -419,7 +419,7 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	errno = 0;
 	while((entry = readdir(handle->directory_handle))) {
 		if(!entry && errno) {
-			error = errno;
+			errno_t error = errno;
 #if GEN_GLOGGIFY_EH == ENABLED
 			glogf(ERROR, "`readdir` failed: %s", strerror(error));
 #endif
