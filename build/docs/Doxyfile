@@ -3,7 +3,7 @@ PROJECT_NAME           = "Genstone"
 # Version
 PROJECT_NUMBER         = 
 PROJECT_BRIEF          = "An approach to app engine development with a more generally applicable paradigm"
-PROJECT_LOGO           = brand/logo64x64.png
+PROJECT_LOGO           = brand/logo.svg
 OUTPUT_DIRECTORY       = docs
 CREATE_SUBDIRS         = NO
 ALLOW_UNICODE_NAMES    = NO
