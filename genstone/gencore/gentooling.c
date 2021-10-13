@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
 
-#include "include/gentooling.h"
+#include "include/gencommon.h"
 
 gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
 gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX] = {0};
@@ -56,4 +56,9 @@ void gen_tooling_freq_profile_ping(const char* const restrict name) {
 	new_profile->last.tv_sec = current_time.tv_sec;
 	new_profile->last.tv_usec = current_time.tv_usec;
 	++new_profile->n_calls;
+}
+
+void gen_tooling_print_backtrace(void) {
+	GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions)
+		glogf(TRACE, "%zu. %p %s() %s", i, (void*) gen_tooling_call_stack.addresses[i], trace, gen_tooling_call_stack.files[i]);
 }

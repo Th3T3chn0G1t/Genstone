@@ -9,6 +9,8 @@ static const char short_args[] = {'f', 'b'};
 static const char* long_args[] = {"fizz", "buzz"};
 
 static void arg_callback(const gen_arg_type_t type, const size_t argn, const char* const restrict value, __unused void* const restrict passthrough) {
+	GEN_FRAME_BEGIN(arg_callback);
+
 	if(type < GEN_ARG_RAW)
 		if(!argn)
 			GEN_REQUIRE_EQUAL(NULL, (const void*) value);
@@ -19,6 +21,8 @@ static void arg_callback(const gen_arg_type_t type, const size_t argn, const cha
 }
 
 int main() {
+	GEN_FRAME_BEGIN(main);
+
 	const char* argv[] = {"-f", "-bfoo", "--fizz", "--buzz=foo", "bar"};
 	const int argc = sizeof(argv) / sizeof(argv[0]);
 

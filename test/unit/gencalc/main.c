@@ -1,6 +1,8 @@
 #include <gencalc.h>
 
 int main() {
+	GEN_FRAME_BEGIN(main);
+
 	glog(INFO, "Testing vector support...");
 	const gfloat4 vec = {1.0f, 2.0f, 3.0f, 4.0f};
 	GEN_REQUIRE_EQUAL(true, GEN_FUZZY_COMPARE_FP((double) 1.0f, (double) vec.x, -1.0));

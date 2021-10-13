@@ -19,10 +19,6 @@
  * Pretty keyword for _Generic
  */
 #define generic _Generic
-/**
- * Pretty intrinsic for __typeof__
- */
-#define typeof __typeof__
 
 /**
  * Begins a diagnostic region
@@ -163,7 +159,7 @@ typedef long long ssize_t;
  * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH(iter, memb, len, container) \
-    typeof((container)[0]) memb = (container)[0]; \
+    __typeof__((container)[0]) memb = (container)[0]; \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
 
 /**
@@ -177,7 +173,7 @@ typedef long long ssize_t;
  * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
-    typeof((container)[0])* memb = &(container)[0]; \
+    __typeof__((container)[0])* memb = &(container)[0]; \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
 /**
@@ -192,7 +188,7 @@ typedef long long ssize_t;
  * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
-    typeof((container)) memb = (container); \
+    __typeof__((container)) memb = (container); \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 /**
@@ -287,6 +283,10 @@ typedef long long ssize_t;
  */
 typedef enum {
     /**
+     * Trace logging severity level
+     */
+    TRACE,
+    /**
      * Performance logging severity level
      */
     PERFORMANCE,
@@ -311,6 +311,11 @@ typedef enum {
      */
     FATAL
 } gen_logging_level_t;
+
+/**
+ * Logger prefix for backtraces
+ */
+#define GEN_LOGGER_TRACE_PREFIX GEN_ANSI_COLOR_LIGHT(GEN_ANSI_GRAY) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Trace: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
 
 /**
  * Logger prefix for performance level logging
@@ -341,22 +346,6 @@ typedef enum {
  */
 #define GEN_LOGGER_FATAL_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_PURPLE) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Fatal: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
 
-#ifndef GEN_TOOLING_H
-/**
- * The block to execute if logging level `>=ERROR`
- */
-#define GEN_INTERNAL_LOG_ERROR_BLOCK \
-    do { \
-        putchar(GEN_ASCII_BELL); \
-    } while(0)
-#else
-#define GEN_INTERNAL_LOG_ERROR_BLOCK \
-    do { \
-        putchar(GEN_ASCII_BELL); \
-        gtrace; \
-    } while(0)
-#endif
-
 #ifndef GEN_GLOG_STREAM_COUNT
 /**
  * The number of output/error streams available to glog
@@ -379,7 +368,6 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
  * Basic string logging function
  * @param level a `gen_logging_level_t` to determine the prefix from
  * @param string the string to print
- * @note include `gentooling.h` first to get trace information on error
  * @see gen_glog_out_streams for configuring of output streams
  * @see gen_glog_err_streams for configuring of output streams
  */
@@ -387,10 +375,12 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
     do { \
         GEN_DIAG_REGION_BEGIN \
         pragma("clang diagnostic ignored \"-Wshadow\"") \
-        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, level >= ERROR ? gen_glog_err_streams : gen_glog_out_streams) { \
-            if(!streamp) break; \
-            fprintf_s(streamp, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
+        bool gen_internal_glog_level_is_error = level >= ERROR; \
+        GEN_FOREACH(gen_internal_glog_streams_iterator_index, gen_internal_glog_streams_iterator_value, GEN_GLOG_STREAM_COUNT, gen_internal_glog_level_is_error ? gen_glog_err_streams : gen_glog_out_streams) { \
+            if(!gen_internal_glog_streams_iterator_value) break; \
+            fprintf_s(gen_internal_glog_streams_iterator_value, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
         } \
+        if(gen_internal_glog_level_is_error) gtrace; \
         GEN_DIAG_REGION_END \
     } while(0) \
 
@@ -407,12 +397,14 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
     do { \
         GEN_DIAG_REGION_BEGIN \
         pragma("clang diagnostic ignored \"-Wshadow\"") \
-        GEN_FOREACH(i, streamp, GEN_GLOG_STREAM_COUNT, level >= ERROR ? gen_glog_err_streams : gen_glog_out_streams) { \
-            if(!streamp) break; \
-            fputs(GEN_LOGGER_##level##_PREFIX, streamp); \
-            fprintf_s(streamp, format, __VA_ARGS__); \
-            fputc('\n', streamp); \
+        bool gen_internal_glog_level_is_error = level >= ERROR; \
+        GEN_FOREACH(gen_internal_glog_streams_iterator_index, gen_internal_glog_streams_iterator_value, GEN_GLOG_STREAM_COUNT, gen_internal_glog_level_is_error ? gen_glog_err_streams : gen_glog_out_streams) { \
+            if(!gen_internal_glog_streams_iterator_value) break; \
+            fputs(GEN_LOGGER_##level##_PREFIX, gen_internal_glog_streams_iterator_value); \
+            fprintf_s(gen_internal_glog_streams_iterator_value, format, __VA_ARGS__); \
+            fputc('\n', gen_internal_glog_streams_iterator_value); \
         } \
+        if(gen_internal_glog_level_is_error) gtrace; \
         GEN_DIAG_REGION_END \
     } while(0) \
 
@@ -538,5 +530,7 @@ extern void gen_timeval_sub(const struct timeval* const restrict a, const struct
  * @param error the error value to convert
  */
 extern void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict outsize,  const unsigned long error);
+
+#include "gentooling.h"
 
 #endif

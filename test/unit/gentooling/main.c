@@ -19,10 +19,14 @@ static void tooling_test(void) {
 }
 
 static void freq_prof_test(void) {
+	GEN_FRAME_BEGIN(freq_prof_test);
+
 	GEN_FREQ_PROFILE;
 }
 
 int main() {
+	GEN_FRAME_BEGIN(main);
+
 	tooling_test();
 
 	glog(INFO, "Testing GEN_FREQ_PROFILE...");

@@ -5,6 +5,8 @@
 #include <gendl.h>
 
 int main() {
+	GEN_FRAME_BEGIN(main);
+
 	gen_error_t error;
 	gen_dylib_t testlib;
 

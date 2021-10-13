@@ -9,6 +9,8 @@ static void dir_handler(__unused const char* file, __unused void* passthrough) {
 #define file_data "foobarfizzbuzz123"
 
 int main() {
+	GEN_FRAME_BEGIN(main);
+
 	gen_error_t error = GEN_OK;
 
 	// We can't really check that this is correct in-language

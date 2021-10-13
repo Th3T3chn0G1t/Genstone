@@ -9,6 +9,8 @@ static mtx_t ticks_mtx;
 static atomic_bool child_started = false;
 
 static int thread_func(__unused void* pass) {
+	GEN_FRAME_BEGIN(thread_func);
+
 	child_started = true;
 
 	for(size_t i = 0; i < 10; ++i) {
@@ -21,6 +23,8 @@ static int thread_func(__unused void* pass) {
 }
 
 int main() {
+	GEN_FRAME_BEGIN(main);
+
 	mtx_init(&ticks_mtx, mtx_plain);
 
 	thrd_t thread;

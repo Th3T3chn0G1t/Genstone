@@ -8,8 +8,6 @@
 #ifndef GEN_TOOLING_H
 #define GEN_TOOLING_H
 
-#include "gencommon.h"
-
 #ifndef GEN_TOOLING_DEPTH
 /**
  * The maximum depth of a tooled call stack
@@ -33,15 +31,15 @@ typedef struct {
      */
     size_t next;
     /**
-     * A buffer function names
+     * A buffer of function names
      */
     const char* functions[GEN_TOOLING_DEPTH];
     /**
-     * A buffer function addresses
+     * A buffer of function addresses
      */
     uintptr_t addresses[GEN_TOOLING_DEPTH]; 
     /**
-     * A buffer source files for functions
+     * A buffer of source files for functions
      */
     const char* files[GEN_TOOLING_DEPTH];
 } gen_tooling_stack_t;
@@ -155,14 +153,11 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
         gen_tooling_freq_profile_ping(__func__); \
     } while(0)
 
-/**
- * Backtrace logging prefix
- */
-#define GEN_LOGGER_TRACE_PREFIX GEN_ANSI_COLOR_LIGHT(GEN_ANSI_GRAY) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Trace: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
+extern void gen_tooling_print_backtrace(void);
 
 /**
  * Outputs backtrace information
  */
-#define gtrace GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions) printf("%s%p %s() %s\n", GEN_LOGGER_TRACE_PREFIX, (void*) gen_tooling_call_stack.addresses[i], trace, gen_tooling_call_stack.files[i])
+#define gtrace gen_tooling_print_backtrace()
 
 #endif

@@ -33,24 +33,24 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 
 	errno_t error = 0;
 	error = memcpy_s(lib_file_name, lib_file_name_len, lib_prefix, (sizeof(lib_prefix) - 1));
-	error = errno;
 	if(error) {
+		error = errno;
 #if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "`memcpy_s` failed: %s", strerror(error));
 #endif
 		GEN_ERROR_OUT(gen_convert_errno(error), "`memcpy_s` failed");
 	}
 	error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1), lib_file_name_len - (sizeof(lib_prefix) - 1), lib_name, lib_name_len);
-	error = errno;
 	if(error) {
+		error = errno;
 #if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "`memcpy_s` failed: %s", strerror(error));
 #endif
 		GEN_ERROR_OUT(gen_convert_errno(error), "`memcpy_s` failed");
 	}
 	error = memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1) + lib_name_len, lib_file_name_len - ((sizeof(lib_prefix) - 1) + lib_name_len), lib_suffix, (sizeof(lib_suffix) - 1));
-	error = errno;
 	if(error) {
+		error = errno;
 #if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "`memcpy_s` failed: %s", strerror(error));
 #endif

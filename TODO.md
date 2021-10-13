@@ -7,6 +7,7 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
+    - Validate where neccesary with `gen_path_exists`)
     - `strerror` on `gen_error_t`
     - `gendl` check valid *filenames* for dylibs
     - Locales
