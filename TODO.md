@@ -7,7 +7,9 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
-    - Validate where neccesary with `gen_path_exists`)
+    - Add a way to determine the `config.mk` from the command line
+        - Remove target scripts
+    - Validate where neccesary with `gen_path_exists`
     - `strerror` on `gen_error_t`
     - `gendl` check valid *filenames* for dylibs
     - Locales
@@ -71,15 +73,17 @@
             - NT
             - Pipes
 - Builds
+    - Centralized toolchain management config (separate from `config.mk`)
+        - Fetch (& Build) toolchain from remote (Not submodule!)
     - Review all tooling used in builds
         - `make`
         - `clang`
         - `ar`
         - `clang-format`
-        - `strip`
+        - `strip`/CTU-strip capable linker
         - `ld`/`ld64`/`mslink`
             or
-        - `ld.lld`/`ld64.lld`/`lld-link`
+        - `ld.lld` (or `mold`)/`ld64.lld` (or `mold` once MACHO support is done)/`lld-link`
     - Build Speed
         - `mold` linker
             - `mold` daemonisation
@@ -90,9 +94,9 @@
         - Re-enable ASAN on Windows
     - Static builds
 - Tests
-    - Add `GEN_FRAME_BEGIN` to all tests
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
     - Write tests for generror for error callback
+    - Wrie tests for gentooling by capturing glog output
     - Test genfs directory iteration by filling a buffer with filenames from the callback
 - Optimization
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
@@ -103,7 +107,7 @@
     - MS `mimalloc`
 - Security
     - Checked C
-    - Annex K in genfs 'borrowed' functions
+    - `clang` thread safety intrinsics
 - Documentation
     - Tutorials
     - Comprehensive `@example` tags
