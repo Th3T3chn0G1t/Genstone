@@ -310,13 +310,31 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 
 	if(handle->dir) {
 		errno_t error = closedir(handle->directory_handle);
-		if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "`closedir` failed");
+		if(error) {
+			error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+			glogf(ERROR, "`closedir` failed: %s", strerror(error));
+#endif
+			GEN_ERROR_OUT(gen_convert_errno(error), "`closedir` failed");
+		}
 	}
 	else {
 		errno_t error = fclose(handle->file_handles[0]);
-		if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "`fclose` failed");
+		if(error) {
+			error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+			glogf(ERROR, "`fclose` failed: %s", strerror(error));
+#endif
+			GEN_ERROR_OUT(gen_convert_errno(error), "`fclose` failed");
+		}
 		error = fclose(handle->file_handles[1]);
-		if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "`fclose` failed");
+		if(error) {
+			error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+			glogf(ERROR, "`fclose` failed: %s", strerror(error));
+#endif
+			GEN_ERROR_OUT(gen_convert_errno(error), "`fclose` failed");
+		}
 	}
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -329,9 +347,21 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 
 	int error = fseek(handle->file_handles[0], 0, SEEK_END);
-	if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "`fseek` failed");
+	if(error) {
+			error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+			glogf(ERROR, "`fseek` failed: %s", strerror(error));
+#endif
+		GEN_ERROR_OUT(gen_convert_errno(error), "`fseek` failed");
+	}
 	size_t mark = (size_t) ftell(handle->file_handles[0]);
-	if(mark == SIZE_MAX) GEN_ERROR_OUT(gen_convert_errno(errno), "`ftell` failed");
+	if(mark == SIZE_MAX) {
+		error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+		glogf(ERROR, "`ftell` failed: %s", strerror(error));
+#endif
+		GEN_ERROR_OUT(gen_convert_errno(error), "`ftell` failed");
+	}
 
 	rewind(handle->file_handles[0]);
 
@@ -347,7 +377,13 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	if(!output_buffer) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_buffer` was NULL");
 
 	int error = fseek(handle->file_handles[0], (long) start, SEEK_SET);
-	if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "`fseek` failed");
+	if(error) {
+		error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+		glogf(ERROR, "`fseek` failed: %s", strerror(error));
+#endif
+		GEN_ERROR_OUT(gen_convert_errno(error), "`fseek` failed");
+	}
 
 	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handles[0]);
 	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 0, error);
@@ -382,7 +418,13 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	struct dirent* entry;
 	errno = 0;
 	while((entry = readdir(handle->directory_handle))) {
-		if(!entry && errno) GEN_ERROR_OUT(gen_convert_errno(errno), "`readdir` failed");
+		if(!entry && errno) {
+			error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+			glogf(ERROR, "`readdir` failed: %s", strerror(error));
+#endif
+			GEN_ERROR_OUT(gen_convert_errno(error), "`readdir` failed");
+		}
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '\0') continue;
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0') continue;
 
