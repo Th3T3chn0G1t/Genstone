@@ -4,3 +4,6 @@
 [submodule "genstone/vendor/dirent"]
 	path = genstone/vendor/dirent
 	url = https://github.com/tronkko/dirent
+[submodule "genstone/vendor/mimalloc"]
+	path = genstone/vendor/mimalloc
+	url = https://github.com/microsoft/mimalloc

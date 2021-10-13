@@ -7,14 +7,13 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
+    - genproc signals/killing subprocesses
     - Add a way to determine the `config.mk` from the command line
         - Remove target scripts
     - Validate where neccesary with `gen_path_exists`
-    - `strerror` on `gen_error_t`
     - `gendl` check valid *filenames* for dylibs
     - Locales
         - Unicode
-            - Wide-path handling (standardise paths to wide? path type?)
         - Time-formats
     - Integrate `notcurses` for terminal stuff
     - More Date & Time utils
@@ -73,6 +72,7 @@
             - NT
             - Pipes
 - Builds
+    - Replace mentions of the nonexistent `KANNEX` with `ANNEXK`
     - Centralized toolchain management config (separate from `config.mk`)
         - Fetch (& Build) toolchain from remote (Not submodule!)
     - Review all tooling used in builds
@@ -84,6 +84,8 @@
         - `ld`/`ld64`/`mslink`
             or
         - `ld.lld` (or `mold`)/`ld64.lld` (or `mold` once MACHO support is done)/`lld-link`
+        - `cmake` for `mimalloc`
+        - `autotools` and associated junk for `safeclib`
     - Build Speed
         - `mold` linker
             - `mold` daemonisation

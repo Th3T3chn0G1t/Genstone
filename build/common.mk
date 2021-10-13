@@ -97,12 +97,16 @@ endif
 ifneq ($(OVERRIDE_DISABLED_MODULES),)
 DISABLED_MODULES = $(OVERRIDE_DISABLED_MODULES)
 endif
+ifneq ($(OVERRIDE_CMAKE),)
+CMAKE = $(OVERRIDE_CMAKE)
+endif
 
 ifneq ($(PLATFORM),DEFAULT)
 ifneq ($(PLATFORM),WIN)
 ifneq ($(PLATFORM),DWN)
 ifneq ($(PLATFORM),LNX)
 ifneq ($(PLATFORM),BSD)
+ERROR += "$(ERROR_PREFIX) Invalid value for PLATFORM: \"$(PLATFORM)\"\n"
 endif
 endif
 endif

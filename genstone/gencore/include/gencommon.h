@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+// Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
  * @file gencommon.h
@@ -84,6 +84,7 @@ GEN_DIAG_REGION_END
 
 #include "gendbg.h"
 #include "generrors.h"
+#include "gemory.h"
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
@@ -117,13 +118,18 @@ GEN_DIAG_IGNORE_ALL
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
-#if PLATFORM != WIN // clang tgmath.h is broken under windows
-#include <tgmath.h>
+#if PLATFORM != WIN
+#include <tgmath.h> // clang tgmath.h is broken under windows
+#include <unistd.h>
 #endif
 #include <stdnoreturn.h>
-#include <dirent.h> // Emulation provided on windows by https://github.com/tronkko/dirent
+
+#include <dirent.h> // Emulation layer provided on Windows by https://github.com/tronkko/dirent
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 #if PLATFORM != WIN
 #include <safe_lib.h>
@@ -137,6 +143,8 @@ GEN_DIAG_REGION_END
  * Provide `ssize_t` on Windows
  */
 typedef long long ssize_t;
+#include <Windows.h> // Grumble
+#include <corecrt_io.h>
 #endif
 
 #if GEN_DEBUG_FOREACH_REGISTER == ENABLED

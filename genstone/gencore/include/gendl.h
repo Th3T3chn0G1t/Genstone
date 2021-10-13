@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2021 TTG <prs.ttg+gengine@pm.me>
+// Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
  * @file gendl.h
@@ -43,6 +43,7 @@ extern GEN_ERRORABLE_RETURN gen_dylib_symbol(void* restrict * const restrict out
 /**
  * Unloads a dynamic library
  * @param dylib the library to unload
+ * @return an error code
  * @note This may not immediately remove the library from memory depending on the dynamic linker and program state 
  */
 extern GEN_ERRORABLE_RETURN gen_dylib_unload(const gen_dylib_t dylib);

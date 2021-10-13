@@ -25,6 +25,9 @@
 
 docs/*
 out/*
+tmp/*
+
+genstone/vendor/tmp/*
 
 .vscode
 .vs

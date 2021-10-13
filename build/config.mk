@@ -100,3 +100,6 @@ BUILD_SYS_DEBUG = DISABLED
 # `ENABLED`: Have `-fproc-stat-report`
 # `DISABLED`: Don't have `-fproc-stat-report`
 HAVE_STAT_REPORT = ENABLED
+
+# CMake exec to use for building CMake submodules
+CMAKE = cmake
