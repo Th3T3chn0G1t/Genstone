@@ -7,7 +7,10 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
-    - genproc signals/killing subprocesses
+    - Validation on user-controllable macros
+    - `genproc`
+        - Signals/killing subprocesses
+        - Shitload of error checking
     - Add a way to determine the `config.mk` from the command line
         - Remove target scripts
     - Validate where neccesary with `gen_path_exists`
@@ -17,9 +20,6 @@
         - Time-formats
     - Integrate `notcurses` for terminal stuff
     - More Date & Time utils
-    - Process control utils
-        - Steal from `Geno` impl.
-        - Redirects
     - Centralised & safer heap management
         - Replace minimal existing heap calls in genfs (& submodules?)
     - generator (editor)

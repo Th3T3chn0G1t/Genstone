@@ -84,7 +84,6 @@ GEN_DIAG_REGION_END
 
 #include "gendbg.h"
 #include "generrors.h"
-#include "gemory.h"
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
@@ -130,6 +129,8 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+
+#include <mimalloc.h> // \[0]/
 
 #if PLATFORM != WIN
 #include <safe_lib.h>
@@ -363,12 +364,12 @@ typedef enum {
 
 /**
  * glog output streams
- * @note buffer is null terminated for simplicity
+ * @note Buffer is null terminated for simplicity
  */
 extern FILE* gen_glog_out_streams[GEN_GLOG_STREAM_COUNT + 1];
 /**
  * glog error streams
- * @note buffer is null terminated for simplicity
+ * @note Buffer is null terminated for simplicity
  */
 extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 
@@ -397,7 +398,6 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
  * @param level a `gen_logging_level_t` to determine the prefix from
  * @param format a format string
  * @param ... the format arguments to print
- * @note include `gentooling.h` first to get trace information on error
  * @see gen_glog_out_streams for configuring of output streams
  * @see gen_glog_err_streams for configuring of output streams
  */
@@ -551,5 +551,6 @@ extern void gen_timeval_sub(const struct timeval* const restrict a, const struct
 extern void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict outsize,  const unsigned long error);
 
 #include "gentooling.h"
+#include "gemory.h"
 
 #endif

@@ -95,9 +95,17 @@ extern const char* gen_error_description(const gen_error_t error);
 #define GEN_ERRORABLE_RETURN __nodiscard gen_error_t
 
 #ifndef GEN_GLOGGIFY_EH
+/**
+ * Whether error sites in Genstone modules are allowed to output string information via. `glog`
+ * @note Depending on the error, this may contain more information than centralized error functions
+ */
 #define GEN_GLOGGIFY_EH ENABLED
 #endif
 #ifndef GEN_CENTRALIZE_EH
+/**
+ * Whether to define `gen_error_handler_t` and call `gen_error_handler` at error sites in Genstone modules
+ * @note Creates global state if enabled. Set `gen_error_handler_passthrough` to get a passthrough pointer in `gen_error_handler`
+ */
 #define GEN_CENTRALIZE_EH DISABLED
 #endif
 

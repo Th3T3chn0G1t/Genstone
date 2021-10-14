@@ -14,6 +14,7 @@ RM = rm
 RMDIR = rm -rf
 DIFF = diff
 CAT = cat
+MV = mv
 ifeq ($(SHELL),cmd.exe)
 	SEP = \\
 	CP = copy /b /y
@@ -21,6 +22,7 @@ ifeq ($(SHELL),cmd.exe)
 	RMDIR = rmdir
 	DIFF = fc
 	CAT = type
+	MV = move
 endif
 
 ERROR_PREFIX = \\033[0;31m\\033[1mError:\\033[0m

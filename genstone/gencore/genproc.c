@@ -2,7 +2,7 @@
 
 gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect) {
 #if PLATFORM == WIN
-	STARTUPINFOA process_settings = { 0 };
+	STARTUPINFOA process_settings = {0};
 	process_settings.cb = sizeof(STARTUPINFO);
 	process_settings.wShowWindow = SW_HIDE;
 	process_settings.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
@@ -11,21 +11,21 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 
 	PROCESS_INFORMATION process;
 	if(!CreateProcessA(NULL, exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process))) {
-		unsigned long winerror = GetLastError();
+			unsigned long winerror = GetLastError();
 #if GEN_GLOGGIFY_EH == ENABLED
-		size_t size = 0;
-		gen_winerr_as_string(NULL, &size, winerror);
-		char winerror_string[size];
-		gen_winerr_as_string(winerror_string, 0, winerror);
-		glogf(ERROR, "Failed to create process '%s': %s", exec, winerror_string);
+			size_t size = 0;
+			gen_winerr_as_string(NULL, &size, winerror);
+			char winerror_string[size];
+			gen_winerr_as_string(winerror_string, 0, winerror);
+			glogf(ERROR, "Failed to create process '%s': %s", exec, winerror_string);
 #endif
-		GEN_ERROR_OUT(winerror, "`CreateProcessA` failed");
-	}
+			GEN_ERROR_OUT(winerror, "`CreateProcessA` failed");
+		}
 	CloseHandle(process.hThread);
 
 	*process_out = process.hProcess;
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 #else
 	gen_process_t pid = fork();
 
@@ -45,7 +45,9 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 		GEN_REQUIRE_NO_REACH;
 	}
 
-	return pid;
+	*process_out = pid;
+
+	GEN_ERROR_OUT(GEN_OK, "");
 #endif
 }
 
@@ -59,71 +61,82 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 
 	if(!result) out_result = -1;
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 #else
-	waitpid(pid, out_result, 0);
+	waitpid(process, out_result, 0);
 
-	return GEN_OK;
+	GEN_ERROR_OUT(GEN_OK, "");
 #endif
 }
 
-gen_error_t gen_proc_get_output(char** const restrict out_buffer_pointer, int* const restrict out_result, const char* const restrict exec) {
+gen_error_t gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec) {
 #if PLATFORM == WIN
 	HANDLE read;
 	HANDLE write;
-	SECURITY_ATTRIBUTES SecurityAttributes = { 0 };
-	SecurityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-	SecurityAttributes.bInheritHandle = true;
-	SecurityAttributes.lpSecurityDescriptor = NULL;
+	SECURITY_ATTRIBUTES security = {0};
+	security.noutput_buffsize = sizeof(SECURITY_ATTRIBUTES);
+	security.bInheritHandle = true;
+	security.lpSecurityDescriptor = NULL;
 
-	if(CreatePipe(&read, &write, &SecurityAttributes, 0)) {
+	if(CreatePipe(&read, &write, &security, 0)) {
 		char* const output = NULL;
-		char* const ansi_output = NULL;
-		FILE* redirect_handle = _fdopen(_open_osfhandle((intptr_t) write, _O_APPEND), "w");
+		size_t output_buffsize = 0;
+
+		FILE* const redirect_handle = _fdopen(_open_osfhandle((intptr_t) write, _O_APPEND), "w");
 		gen_process_t pid = gen_proc_start_redirected(exec, redirect_handle);
 		gen_proc_wait(out_result, pid);
 
-		unsigned int BytesAvailable;
-		if(PeekNamedPipe(read, NULL, 0, NULL, &BytesAvailable, NULL) && BytesAvailable) {
-			ansi_output.resize(BytesAvailable);
-			output.resize(BytesAvailable);
+		unsigned int n_readable;
+		if(PeekNamedPipe(read, NULL, 0, NULL, &n_readable, NULL) && n_readable) {
+			output_buffsize += n_readable;
+			grealloc(&output, sizeof(char), output_buffsize);
 
-			readFile(read, ansi_output.data(), BytesAvailable, NULL, NULL);
-			MultiByteToWideChar(CP_ACP, 0, ansi_output.c_str(), BytesAvailable, output.data(), BytesAvailable);
+			ReadFile(read, output, n_readable, NULL, NULL);
 		}
 
 		fclose(redirect_handle);
 		CloseHandle(read);
 
-		return output;
+		*out_output = output;
+
+		GEN_ERROR_OUT(GEN_OK, "");
 	}
 
-	return std::wstring();
+	GEN_ERROR_OUT(GEN_UNKNOWN, "Something went wrong in `gen_proc_get_output`");
+#else
+	int fds[2];
+	pipe(fds);
+	fcntl(fds[0], F_SETFL, O_NONBLOCK); // Don't want to block on read
 
-#elif defined(__linux__) || defined(__APPLE__) // _WIN32
+	FILE* redirect_handle = fdopen(fds[1], "w");
+	gen_process_t pid;
+	gen_error_t error;
+	if((error = gen_proc_start_redirected(&pid, exec, redirect_handle)))
+		GEN_ERROR_OUT(error, "`gen_proc_start_redirected` failed");
+	if((error = gen_proc_wait(out_result, pid)))
+		GEN_ERROR_OUT(error, "`gen_proc_wait` failed");
 
-	int FileDescriptors[ 2 ];
-	pipe(FileDescriptors);
-	fcntl(FileDescriptors[ 0 ], F_SETFL, O_NONBLOCK); // Don't want to block on read
+	char* output = NULL;
+	if((error = gzalloc((void**) &output, sizeof(char), GEN_PROC_READ_BUFFER_CHUNK)))
+		GEN_ERROR_OUT(error, "`gzalloc` failed");
+	size_t output_buffsize = 0;
 
-	FILE*     pStream = fdopen(FileDescriptors[ 1 ], "w");
-	ProcessID pid     = StartProcess(CommandLine, pStream);
-	rResult           = WaitProcess(pid);
+	char read_data[GEN_PROC_READ_BUFFER_CHUNK] = {0};
+	ssize_t read_size;
 
-	char        Buffer[ 1024 ];
-	ssize_t     Length;
-	std::string output;
+	while((read_size = read(fds[0], output, GEN_PROC_READ_BUFFER_CHUNK)) > 0) {
+		output_buffsize += (size_t) read_size;
+		if((error = grealloc((void**) &output, sizeof(char), output_buffsize)))
+			GEN_ERROR_OUT(error, "`grealloc` failed");
 
-	while((Length = read(FileDescriptors[ 0 ], Buffer, std::size(Buffer))) > 0)
-	{
-		output.append(Buffer, Length);
+		strcat_s(output, output_buffsize, read_data);
 	}
 
-	fclose(pStream);
-	close(FileDescriptors[ 0 ]);
+	fclose(redirect_handle);
+	close(fds[0]);
 
-	return UTF8Converter().from_bytes(output);
+	*out_output = output;
 
-#endif // __linux__ || __APPLE__
-
-} // OutputOf
+	GEN_ERROR_OUT(GEN_OK, "");
+#endif
+}
