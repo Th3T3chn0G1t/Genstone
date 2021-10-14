@@ -1,6 +1,8 @@
 #include "include/genproc.h"
 
 gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect) {
+	GEN_FRAME_BEGIN(gen_proc_start_redirected);
+
 #if PLATFORM == WIN
 	STARTUPINFOA process_settings = {0};
 	process_settings.cb = sizeof(STARTUPINFO);
@@ -29,6 +31,14 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 #else
 	gen_process_t pid = fork();
 
+	if(pid == -1) {
+		errno_t error = errno;
+#if GEN_GLOGGIFY_EH == ENABLED
+		glogf(ERROR, "`fork` failed: %s", strerror(error));
+#endif
+		GEN_ERROR_OUT(gen_convert_errno(error), "`fork` failed");
+	}
+
 	if(!pid) { // The child
 		// Take control of output
 		dup2(fileno(redirect), 1);
@@ -52,6 +62,8 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 }
 
 gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process) {
+	GEN_FRAME_BEGIN(gen_proc_wait);
+
 #if PLATFORM == WIN
 	unsigned char result;
 
@@ -70,6 +82,11 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 }
 
 gen_error_t gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec) {
+	GEN_FRAME_BEGIN(gen_proc_get_output);
+
+	if(!out_output) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_output` was NULL");
+	if(!out_result) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_result` was NULL");
+
 #if PLATFORM == WIN
 	HANDLE read;
 	HANDLE write;

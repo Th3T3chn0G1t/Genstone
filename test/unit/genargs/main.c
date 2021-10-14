@@ -26,6 +26,7 @@ int main() {
 	const char* argv[] = {"-f", "-bfoo", "--fizz", "--buzz=foo", "bar"};
 	const int argc = sizeof(argv) / sizeof(argv[0]);
 
+	glog(INFO, "Testing `gen_parse_args`...");
 	gen_error_t error = gen_parse_args(argc, argv, arg_callback, 2, short_args, 2, long_args, NULL);
 
 	GEN_REQUIRE_NO_ERROR(error);

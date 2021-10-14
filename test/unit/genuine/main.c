@@ -23,5 +23,6 @@ int main() {
 
 	gen_ui_element_t element = {&ninepatch, {.xywh = {0, 0, ELEMENT_SCALE, ELEMENT_SCALE}}};
 
+	glog(INFO, "Testing `gen_ui_draw_element`...");
 	gen_ui_draw_element(render_handler, &element, OUTPUT_SCALE, NULL);
 }
