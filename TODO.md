@@ -7,6 +7,7 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
+    - Fix `genproc`
     - Async IO `aio_read` `aio_write`
     - Timers `timer_create` `setitimer` `alarm`
     - Validation on user-controllable macros

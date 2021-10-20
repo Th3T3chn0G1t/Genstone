@@ -466,7 +466,7 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
     do { \
         if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` (%s) is not constant at line %i in %s", #a, a, __LINE__, __FILE__); \
         if(!b || strcmp(a, b)) { \
-            glogf(FATAL, "Require failed - Expected: %s (%s) Got: %s (%s) at line %i in %s", #a, a, #b, b, __LINE__, __FILE__); \
+            glogf(FATAL, "Require failed - Expected: `%s` (%s) Got: `%s` (%s) at line %i in %s", #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
         } \
     } while(0)
