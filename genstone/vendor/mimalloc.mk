@@ -26,8 +26,7 @@ $(_MIMALLOC_LIB_INTERNAL): $(_MIMALLOC_LIB_INTERNAL_MAKEFILE)
 $(MIMALLOC_LIB): $(_MIMALLOC_LIB_INTERNAL) | lib
 # Windows multiple copy requires + to combine the list
 ifeq ($(PLATFORM),WIN)
-	$(CP) $(firstword $(subst /,$(SEP),$(_MIMALLOC_LIB_INTERNAL_PATTERN))) $(addprefix +,$(wordlist 2,$(words $(subst /,$(SEP),$(_MIMALLOC_LIB_INTERNAL_PATTERN))),$(subst /,$(SEP),$(_MIMALLOC_LIB_INTERNAL_PATTERN)))) lib
-	dir lib
+	for %%I in ($(subst /,$(SEP),$(_MIMALLOC_LIB_INTERNAL_PATTERN))) do copy %%I lib
 else
 	$(CP) $(subst /,$(SEP),$(_MIMALLOC_LIB_INTERNAL_PATTERN)) lib
 endif

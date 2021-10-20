@@ -7,6 +7,7 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
+    - Possibly integrate https://github.com/robinrowe/libunistd
     - Fix `genproc`
     - Async IO
         - Using `aio(7)` (`aio_read` `aio_write`)
@@ -83,6 +84,7 @@
     - Replace mentions of the nonexistent `KANNEX` with `ANNEXK`
     - Centralized toolchain management config (separate from `config.mk`)
         - Fetch (& Build) toolchain from remote (Not submodule!)
+        - Enforce toolchain on submodules
     - Review all tooling used in builds
         - `make`
         - `clang`
