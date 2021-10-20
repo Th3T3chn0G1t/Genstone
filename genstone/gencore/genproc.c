@@ -41,8 +41,8 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 
 	if(!pid) { // The child
 		// Take control of output
-		dup2(fileno(redirect), 1);
-		dup2(fileno(redirect), 2);
+		dup2(fileno(redirect), STDOUT_FILENO);
+		dup2(fileno(redirect), STDERR_FILENO);
 
 		execl("/bin/sh", "/bin/sh", "-c", exec, NULL);
 

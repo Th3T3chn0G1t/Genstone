@@ -310,10 +310,6 @@ ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_L_FLAGS += -flto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
-	ifneq ($(wildcard *.profraw),)
-		GLOBAL_C_FLAGS += -fprofile-instr-use=$(wildcard *.profraw)
-	endif
-
 	ifeq ($(PLATFORM),WIN)
 		GLOBAL_L_FLAGS += -llibcmt.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
@@ -339,11 +335,15 @@ else
 endif
 
 ifeq ($(TOOLING),ENABLED)
-	GLOBAL_C_FLAGS += -fprofile-instr-generate -fsanitize=undefined
-	GLOBAL_L_FLAGS += -fprofile-instr-generate -fsanitize=undefined
+	ifneq ($(PLATFORM),DWN) # macOS libc shits itself when you `fork` with UBSAN enabled
+		GLOBAL_C_FLAGS += -fsanitize=undefined
+		GLOBAL_L_FLAGS += -fsanitize=undefined
+	endif
 	ifneq ($(PLATFORM),WIN)
-		GLOBAL_C_FLAGS += --coverage -fsanitize=address
-		GLOBAL_L_FLAGS += --coverage -fsanitize=address
+		ifneq ($(PLATFORM),DWN) # macOS libc shits itself when you `fork` with ASAN enabled aswell
+			GLOBAL_C_FLAGS += -fsanitize=address
+			GLOBAL_L_FLAGS += -fsanitize=address
+		endif
 	endif
 endif
 

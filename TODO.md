@@ -7,6 +7,8 @@
         - Modules
         - General code examples (docstring tags `@example`)
 - Features
+    - Async IO `aio_read` `aio_write`
+    - Timers `timer_create` `setitimer` `alarm`
     - Validation on user-controllable macros
     - `genproc`
         - Signals/killing subprocesses
@@ -14,7 +16,8 @@
     - Add a way to determine the `config.mk` from the command line
         - Remove target scripts
     - Validate where neccesary with `gen_path_exists`
-    - `gendl` check valid *filenames* for dylibs
+    - `gendl`
+        - Check valid *filenames* for dylibs
     - Locales
         - Unicode
         - Time-formats

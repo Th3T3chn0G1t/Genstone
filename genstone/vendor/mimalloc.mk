@@ -5,7 +5,7 @@ MIMALLOC_LIB = lib/$(LIB_PREFIX)mimalloc$(DYNAMIC_LIB_SUFFIX)
 ifeq ($(BUILD_MODE),DEBUG)
 _MIMALLOC_LIB_TAGGED_OUTPUT = lib/$(LIB_PREFIX)mimalloc-secure-debug$(DYNAMIC_LIB_SUFFIX)
 else
-_MIMALLOC_LIB_TAGGED_OUTPUT = lib/$(LIB_PREFIX)mimalloc$(DYNAMIC_LIB_SUFFIX)
+_MIMALLOC_LIB_TAGGED_OUTPUT = lib/$(LIB_PREFIX)mimalloc-secure$(DYNAMIC_LIB_SUFFIX)
 endif
 _MIMALLOC_LIB_INTERNAL = genstone/vendor/tmp/mimalloc/$(LIB_PREFIX)mimalloc$(DYNAMIC_LIB_SUFFIX)
 _MIMALLOC_LIB_INTERNAL_PATTERN = $(wildcard genstone/vendor/tmp/mimalloc/$(LIB_PREFIX)mimalloc*$(DYNAMIC_LIB_SUFFIX)*)
