@@ -44,7 +44,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 		dup2(fileno(redirect), STDOUT_FILENO);
 		dup2(fileno(redirect), STDERR_FILENO);
 
-		execl("/bin/sh", "/bin/sh", "-c", exec, NULL);
+		execl("/bin/sh", "sh", "-c", exec, NULL);
 
 		errno_t error = errno;
 #if GEN_GLOGGIFY_EH == ENABLED
