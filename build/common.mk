@@ -268,7 +268,6 @@ ifeq ($(PLATFORM),LNX)
 	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC -D_DEFAULT_SOURCE
-	GLOBAL_L_FLAGS += -Wl,-O1
 
 	OBJECT_FORMAT = ELF
 
@@ -297,7 +296,6 @@ ifeq ($(PLATFORM),BSD)
 	OBJECT_SUFFIX = .o
 
 	GLOBAL_C_FLAGS += -fPIC
-	GLOBAL_L_FLAGS += -Wl,-O1
 
 	OBJECT_FORMAT = ELF
 
@@ -313,6 +311,14 @@ ifeq ($(BUILD_MODE),RELEASE)
 	ifeq ($(PLATFORM),WIN)
 		GLOBAL_L_FLAGS += -llibcmt.lib
 		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+	endif
+
+	ifeq ($(PLATFORM),LNX)
+		GLOBAL_L_FLAGS += -Wl,-O1
+	endif
+
+	ifeq ($(PLATFORM),BSD)
+		GLOBAL_L_FLAGS += -Wl,-O1
 	endif
 
 	ifeq ($(PLATFORM),DWN)
