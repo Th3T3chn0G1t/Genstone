@@ -8,7 +8,10 @@
         - General code examples (docstring tags `@example`)
 - Features
     - Fix `genproc`
-    - Async IO `aio_read` `aio_write`
+    - Async IO
+        - Using `aio(7)` (`aio_read` `aio_write`)
+            or
+        - Integrate https://github.com/libuv/libuv
     - Timers `timer_create` `setitimer` `alarm`
     - Validation on user-controllable macros
     - `genproc`

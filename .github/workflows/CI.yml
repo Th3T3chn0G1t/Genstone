@@ -14,8 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macOS-latest ]
-# windows-latest omitted due to fs permission errors
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
     steps:
       - uses: actions/checkout@v2
 
