@@ -18,7 +18,7 @@ genstone/vendor/tmp/mimalloc: | genstone/vendor/tmp
 	-mkdir $@
 
 $(_MIMALLOC_LIB_INTERNAL_MAKEFILE): | genstone/vendor/tmp/mimalloc
-	$(CMAKE) $(GLOBAL_CMAKE_MODULE_FLAGS) -DMI_SECURE=ON -Bgenstone/vendor/tmp/mimalloc genstone/vendor/mimalloc
+	$(CMAKE) $(GLOBAL_CMAKE_MODULE_FLAGS) -DCOMPILE_DEFINITIONS=_CRT_SECURE_NO_WARNINGS -DMI_SECURE=ON -Bgenstone/vendor/tmp/mimalloc genstone/vendor/mimalloc
 
 $(_MIMALLOC_LIB_INTERNAL): $(_MIMALLOC_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/tmp/mimalloc
