@@ -119,7 +119,6 @@ GEN_DIAG_IGNORE_ALL
 #include <wctype.h>
 #if PLATFORM != WIN
 #include <tgmath.h> // clang tgmath.h is broken under windows
-#include <unistd.h>
 #endif
 #include <stdnoreturn.h>
 
@@ -128,8 +127,9 @@ GEN_DIAG_IGNORE_ALL
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#if PLATFORM == WIN // Why just this one? Who knows
-#include <sys/wait.h>
+#if PLATFORM == WIN
+#include <sys/wait.h> // Why is this one of the sys/ headers missing? Who knows
+#include <unistd.h>
 #endif
 
 #include <mimalloc.h> // \[0]/
