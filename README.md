@@ -21,7 +21,7 @@ target: PREREQUISITES (Will be removed from output) ### @HighlightedThing The re
 
 ### Prerequisites
 
-The codebase will only build with `clang`. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`)
+The codebase will only build with `clang`. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`). At the moment the build system also uses `mingw` for windows targets in order to use `dlltool`, this is planned to be resolved in the future once automatically determining & fetching optimal toolchains is implemented.
 
 ### Building
 

@@ -128,7 +128,9 @@ GEN_DIAG_IGNORE_ALL
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#if PLATFORM == WIN // Why just this one? Who knows
 #include <sys/wait.h>
+#endif
 
 #include <mimalloc.h> // \[0]/
 

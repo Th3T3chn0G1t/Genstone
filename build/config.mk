@@ -86,7 +86,7 @@ STRIP_TOOL = strip
 ADDITIONAL_BUILD_MODULES =
 
 # A list of module names to exclude from the build
-DISABLED_MODULES =
+DISABLED_MODULES = genproc_test
 
 # Debugging for the build system
 # You probably don't need to enable this
