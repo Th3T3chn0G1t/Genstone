@@ -127,7 +127,7 @@ GEN_DIAG_IGNORE_ALL
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#if PLATFORM == WIN
+#if PLATFORM != WIN
 #include <sys/wait.h> // Why is this one of the sys/ headers missing? Who knows
 #include <unistd.h>
 #endif
