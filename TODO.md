@@ -12,7 +12,8 @@
         - Using `aio(7)` (`aio_read` `aio_write`)
             or
         - Integrate https://github.com/libuv/libuv
-    - Timers `timer_create` `setitimer` `alarm`
+    - Timers
+        - `timer_create` (https://linux.die.net/man/2/timer_create)
     - Validation on user-controllable macros
     - `genproc`
         - Signals/killing subprocesses
