@@ -9,13 +9,7 @@ gen_error_t galloc(void** const restrict out_address, const size_t size, const s
 
 	void* const allocated = mi_malloc(size * count);
 
-	if(!allocated) {
-		errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`mi_malloc` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`mi_malloc` failed");
-	}
+	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_malloc, errno);
 
 	*out_address = allocated;
 
@@ -31,13 +25,7 @@ gen_error_t gzalloc(void** const restrict out_address, const size_t size, const 
 
 	void* const allocated = mi_calloc(count, size);
 
-	if(!allocated) {
-		errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`mi_calloc` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`mi_calloc` failed");
-	}
+	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_calloc, errno);
 
 	*out_address = allocated;
 
@@ -53,13 +41,7 @@ gen_error_t grealloc(void** const restrict address, const size_t size, const siz
 
 	void* const allocated = mi_realloc(*address, count * size);
 
-	if(!allocated) {
-		errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`mi_realloc` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`mi_realloc` failed");
-	}
+	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_realloc, errno);
 
 	*address = allocated;
 

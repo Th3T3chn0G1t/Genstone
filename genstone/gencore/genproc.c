@@ -12,17 +12,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 	process_settings.hStdError = (HANDLE) _get_osfhandle(fileno(redirect));
 
 	PROCESS_INFORMATION process;
-	if(!CreateProcessA(NULL, exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process))) {
-			unsigned long winerror = GetLastError();
-#if GEN_GLOGGIFY_EH == ENABLED
-			size_t size = 0;
-			gen_winerr_as_string(NULL, &size, winerror);
-			char winerror_string[size];
-			gen_winerr_as_string(winerror_string, 0, winerror);
-			glogf(ERROR, "Failed to create process '%s': %s", exec, winerror_string);
-#endif
-			GEN_ERROR_OUT(winerror, "`CreateProcessA` failed");
-		}
+	if(!CreateProcessA(NULL, exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process))) GEN_ERROR_OUT_WINERR(CreateProcessA, GetLastError());
 	CloseHandle(process.hThread);
 
 	*process_out = process.hProcess;
@@ -31,13 +21,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 #else
 	gen_process_t pid = fork();
 
-	if(pid == -1) {
-		errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`fork` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`fork` failed");
-	}
+	if(pid == -1) GEN_ERROR_OUT_ERRNO(fork, errno);
 
 	if(!pid) { // The child
 		// Take control of output
@@ -46,13 +30,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 
 		execl("/bin/sh", "sh", "-c", exec, NULL);
 
-		errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`execl` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`execl` failed");
-
-		GEN_REQUIRE_NO_REACH;
+		GEN_ERROR_OUT_ERRNO(execl, errno);
 	}
 
 	*process_out = pid;

@@ -85,7 +85,7 @@ void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict o
 	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &locoutbuff, 0, NULL);
 
 	if(outsize) *outsize = size;
-	if(outbuff) strcpy(outbuff, outbuff);
+	if(outbuff) strcpy_s(outbuff, size, outbuff);
 
 	// Free the Win32's string's buffer.
 	LocalFree(locoutbuff);

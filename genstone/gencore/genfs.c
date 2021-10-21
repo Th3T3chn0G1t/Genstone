@@ -44,25 +44,9 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 	// Getting an error out of this function is very strange
 	// We just have to presume that GEN_PATH_MAX will always be enough storage
 	unsigned long error = GetFullPathNameA(path, GEN_PATH_MAX, output_path, NULL);
-	if(!error) {
-		unsigned long winerror = GetLastError();
-#if GEN_GLOGGIFY_EH == ENABLED
-		size_t size = 0;
-		gen_winerr_as_string(NULL, &size, winerror);
-		char winerror_string[size];
-		gen_winerr_as_string(winerror_string, 0, winerror);
-		glogf(ERROR, "Failed to load library '%s': %s", lib_file_name, winerror_string);
-#endif
-		GEN_ERROR_OUT(gen_convert_winerr(winerror), "`GetFullPathNameA` failed");
-	}
+	if(!error) GEN_ERROR_OUT_WINERR(GetFullPathNameA, GetLastError());
 #else
-	if(!realpath(path, output_path)) {
-		errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`realpath` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`realpath` failed");
-	}
+	if(!realpath(path, output_path)) GEN_ERROR_OUT_ERRNO(realpath, errno);
 #endif
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -75,13 +59,7 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	errno_t error = strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`strcpy_s` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`strcpy_s` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(strcpy_s, errno);
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
@@ -94,13 +72,7 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 
 	size_t mark = (size_t) ((strrchr(path, '/') + 1) - path);
 	errno_t error = strncpy_s(output_path, GEN_PATH_MAX, path, mark);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`strncpy_s` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`strncpy_s` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(strncpy_s, errno);
 	output_path[mark - 1] = '\0';
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -114,13 +86,7 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 
 	size_t mark = (size_t) (strchr(strrchr(path, '/'), '.') - path);
 	errno_t error = strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`strcpy_s` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`strcpy_s` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(strcpy_s, errno);
 	output_extension[mark - 1] = '\0';
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -174,21 +140,9 @@ gen_error_t gen_path_create_file(const char* const restrict path) {
 
 	FILE* stream;
 	errno_t error = fopen_s(&stream, path, "w+");
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`fopen_s` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`fopen_s` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(fopen_s, errno);
 	error = fclose(stream);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`fclose` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`fclose` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(fclose, errno);
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
@@ -200,26 +154,10 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 
 #if PLATFORM == WIN
 	int error = CreateDirectoryA(path, NULL);
-	if(error) {
-		unsigned long winerror = GetLastError();
-#if GEN_GLOGGIFY_EH == ENABLED
-		size_t size = 0;
-		gen_winerr_as_string(NULL, &size, winerror);
-		char winerror_string[size];
-		gen_winerr_as_string(winerror_string, 0, winerror);
-		glogf(ERROR, "Failed to load library '%s': %s", lib_file_name, winerror_string);
-#endif
-		GEN_ERROR_OUT(gen_convert_winerr(winerror), "`CreateDirectoryA` failed");
-	}
+	if(error) GEN_ERROR_OUT_WINERR(CreateDirectoryA, GetLastError());
 #else
 	errno_t error = mkdir(path, 0777);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`mkdir` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`mkdir` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(mkdir, errno);
 #endif
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -231,13 +169,7 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	errno_t error = remove(path);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`remove` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`remove` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(remove, errno);
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
@@ -250,52 +182,22 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 
 	errno_t error = 0;
 	error = strcpy_s(output_handle->path, GEN_PATH_MAX, path);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`strcpy_s` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`strcpy_s` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(strcpy_s, errno);
 
 	struct stat s;
 	error = stat(path, &s);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`stat` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(errno), "`stat` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(stat, errno);
 	if(S_ISDIR(s.st_mode)) {
 		output_handle->dir = true;
 		output_handle->directory_handle = opendir(path);
-		if(!output_handle->directory_handle) {
-			error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`opendir` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(errno), "`opendir` failed");
-		}
+		if(!output_handle->directory_handle) GEN_ERROR_OUT_ERRNO(opendir, errno);
 	}
 	else {
 		output_handle->dir = false;
 		error = fopen_s(&output_handle->file_handles[1], path, "w+");
-		if(error || !output_handle->file_handles[1]) {
-			error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`fopen_s` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(errno), "`fopen_s` failed");
-		}
+		if(error || !output_handle->file_handles[1]) GEN_ERROR_OUT_ERRNO(fopen_s, errno);
 		error = fopen_s(&output_handle->file_handles[0], path, "r");
-		if(error || !output_handle->file_handles[0]) {
-			error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`fopen_s` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(errno), "`fopen_s` failed");
-		}
+		if(error || !output_handle->file_handles[0]) GEN_ERROR_OUT_ERRNO(fopen_s, errno);
 	}
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -310,31 +212,13 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 
 	if(handle->dir) {
 		errno_t error = closedir(handle->directory_handle);
-		if(error) {
-			error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`closedir` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(error), "`closedir` failed");
-		}
+		if(error) GEN_ERROR_OUT_ERRNO(closedir, errno);
 	}
 	else {
 		errno_t error = fclose(handle->file_handles[0]);
-		if(error) {
-			error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`fclose` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(error), "`fclose` failed");
-		}
+		if(error) GEN_ERROR_OUT_ERRNO(fclose, errno);
 		error = fclose(handle->file_handles[1]);
-		if(error) {
-			error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`fclose` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(error), "`fclose` failed");
-		}
+		if(error) GEN_ERROR_OUT_ERRNO(fclose, errno);
 	}
 
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -347,21 +231,9 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 
 	int error = fseek(handle->file_handles[0], 0, SEEK_END);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`fseek` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`fseek` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(fseek, errno);
 	size_t mark = (size_t) ftell(handle->file_handles[0]);
-	if(mark == SIZE_MAX) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`ftell` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`ftell` failed");
-	}
+	if(mark == SIZE_MAX) GEN_ERROR_OUT_ERRNO(ftell, errno);
 
 	rewind(handle->file_handles[0]);
 
@@ -377,13 +249,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	if(!output_buffer) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_buffer` was NULL");
 
 	int error = fseek(handle->file_handles[0], (long) start, SEEK_SET);
-	if(error) {
-		error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-		glogf(ERROR, "`fseek` failed: %s", strerror(error));
-#endif
-		GEN_ERROR_OUT(gen_convert_errno(error), "`fseek` failed");
-	}
+	if(error) GEN_ERROR_OUT_ERRNO(fseek, errno);
 
 	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handles[0]);
 	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 0, error);
@@ -418,13 +284,7 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	struct dirent* entry;
 	errno = 0;
 	while((entry = readdir(handle->directory_handle))) {
-		if(!entry && errno) {
-			errno_t error = errno;
-#if GEN_GLOGGIFY_EH == ENABLED
-			glogf(ERROR, "`readdir` failed: %s", strerror(error));
-#endif
-			GEN_ERROR_OUT(gen_convert_errno(error), "`readdir` failed");
-		}
+		if(!entry && errno) GEN_ERROR_OUT_ERRNO(readdir, errno);
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '\0') continue;
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0') continue;
 

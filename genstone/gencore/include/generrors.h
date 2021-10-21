@@ -146,6 +146,45 @@ extern void* gen_error_handler_passthrough;
 #endif
 
 /**
+ * Horrible macro string manipulation to get some nice output on your errno
+ * @param proc the function which set errno
+ * @param native_errno the errno value
+ */
+#define GEN_ERROR_OUT_ERRNO(proc, native_errno) \
+    do { \
+        const errno_t gen_internal_error_out_native_errno_errno = native_errno; \
+        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(gen_internal_error_out_native_errno_errno); \
+        const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
+        const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(gen_internal_error_out_native_errno_errno); \
+        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
+        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+        strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_errno); \
+        GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
+        return gen_internal_error_out_native_errno_gen_error; \
+    } while(0)
+
+/**
+ * Horrible macro string manipulation to get some nice output on your winerror
+ * @param proc the function which set winerr
+ * @param native_errno the winerr value
+ */
+#define GEN_ERROR_OUT_WINERR(proc, native_errno) \
+    do { \
+        const unsigned long gen_internal_error_out_native_errno_errno = native_errno; \
+        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_winerr(gen_internal_error_out_native_errno_errno); \
+        const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
+        size_t gen_internal_error_out_native_errno_native_strerror_len = 0; \
+        gen_winerr_as_string(NULL, &gen_internal_error_out_native_errno_native_strerror_len, gen_internal_error_out_native_errno_errno); \
+        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
+        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+        gen_winerror_as_string(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), NULL, gen_internal_error_out_native_errno_errno); \
+        GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
+        return gen_internal_error_out_native_errno_gen_error; \
+    } while(0)
+
+/**
  * Converts an errno into a genstone error
  * @param error the errno value to convert
  * @return the converted error enumeration
