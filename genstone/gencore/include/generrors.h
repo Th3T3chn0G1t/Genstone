@@ -11,9 +11,6 @@
 #define GEN_ERRORS_H
 
 #include <errno.h>
-#ifndef __STDC_LIB_EXT1__
-typedef int errno_t;
-#endif
 
 /**
  * Return values for errorable functions
@@ -76,7 +73,11 @@ typedef enum {
     /**
      * The provided argument contains bad or invalid content
      */
-    GEN_BAD_CONTENT
+    GEN_BAD_CONTENT,
+    /**
+     * A bad or invalid operation was requested
+     */
+    GEN_BAD_OPERATION
 } gen_error_t;
 
 /**

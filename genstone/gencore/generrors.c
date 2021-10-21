@@ -11,6 +11,33 @@ gen_error_handler_t gen_error_handler = NULL;
 void* gen_error_handler_passthrough = NULL;
 #endif
 
+#ifndef GEN_FATAL_ANNEXK_CONSTRAINTS
+/**
+ * Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program
+ * @note 
+ */
+#define GEN_FATAL_ANNEXK_CONSTRAINTS ENABLED
+#endif
+
+static void gen_internal_annexk_constraint_callback(const char* restrict msg, __unused void* restrict passthrough, errno_t error) {
+	gen_error_t gen_error = gen_convert_errno(error);
+#if GEN_FATAL_ANNEXK_CONSTRAINTS == ENABLED
+	glogf(FATAL, "A constraint handler was tripped: %s: %s\nReason: %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
+#else
+	glogf(ERROR, "A constraint handler was tripped: %s: %s\nReason: %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
+#endif
+}
+
+
+__attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
+#if PLATFORM != WIN
+	set_mem_constraint_handler_s(gen_internal_annexk_constraint_callback);
+	set_str_constraint_handler_s(gen_internal_annexk_constraint_callback);
+#else
+	set_constraint_handler_s(gen_internal_annexk_constraint_callback);
+#endif
+}
+
 const char* gen_error_name(const gen_error_t error) {
 	switch(error) {
 		case GEN_OK: return "GEN_OK";
@@ -27,6 +54,7 @@ const char* gen_error_name(const gen_error_t error) {
 		case GEN_OUT_OF_HANDLES: return "GEN_OUT_OF_HANDLES";
 		case GEN_TOO_SHORT: return "GEN_TOO_SHORT";
 		case GEN_BAD_CONTENT: return "GEN_BAD_CONTENT";
+		case GEN_BAD_OPERATION: return "GEN_BAD_OPERATION";
 	}
 }
 
@@ -46,11 +74,13 @@ const char* gen_error_description(const gen_error_t error) {
 		case GEN_OUT_OF_HANDLES: return "Too many platform handles are open";
 		case GEN_TOO_SHORT: return "The provided argument is too short";
 		case GEN_BAD_CONTENT: return "The provided argument contains bad or invalid content";
+		case GEN_BAD_OPERATION: return "A bad or invalid operation was requested";
 	}
 }
 
 GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 	switch(error) {
+		case EOK: return GEN_OK;
 		case EACCES: return GEN_PERMISSION;
 		case EINVAL: return GEN_INVALID_PARAMETER;
 		case EIO: return GEN_IO;
@@ -70,6 +100,17 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 		case EMFILE: return GEN_OUT_OF_HANDLES;
 		case ENFILE: return GEN_OUT_OF_HANDLES;
 		case EBADF: return GEN_INVALID_PARAMETER;
+		case ESNULLP: return GEN_INVALID_PARAMETER;
+		case ESZEROL: return GEN_TOO_SHORT;
+		case ESLEMIN: return GEN_TOO_SHORT;
+		case ESLEMAX: return GEN_TOO_LONG;
+		case ESOVRLP: return GEN_BAD_OPERATION;
+		case ESEMPTY: return GEN_TOO_SHORT;
+		case ESNOSPC: return GEN_OUT_OF_SPACE;
+		case ESUNTERM: return GEN_TOO_LONG;
+		case ESNODIFF: return GEN_BAD_OPERATION;
+		case ESNOTFND: return GEN_NO_SUCH_OBJECT;
+		case ESLEWRNG: return GEN_INVALID_PARAMETER;
 		default: return GEN_UNKNOWN;
 	}
 }

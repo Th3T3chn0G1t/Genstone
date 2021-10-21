@@ -135,6 +135,8 @@ GEN_DIAG_IGNORE_ALL
 #include <mimalloc.h> // \[0]/
 
 #if PLATFORM != WIN
+#include <safe_lib_errno.h>
+#include <safe_types.h>
 #include <safe_lib.h>
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
