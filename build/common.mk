@@ -1,4 +1,8 @@
+ifneq ($(OVERRIDE_CONFIG),)
+include $(OVERRIDE_CONFIG)
+else
 include build/config.mk
+endif
 
 # We want make to use cmd.exe when the *host* is Windows
 ifeq ($(OS),Windows_NT)

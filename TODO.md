@@ -1,10 +1,6 @@
 # TODO
 
-- Meta
-    - Restructure `vendor` subdirectory locations
 - Features
-    - Possibly integrate https://github.com/robinrowe/libunistd
-    - Fix `genproc`
     - Native-IO
         - NT
         - Pipes
@@ -16,10 +12,9 @@
         - `timer_create` (https://linux.die.net/man/2/timer_create)
     - Validation on user-controllable macros
     - `genproc`
+        - Fix
         - Signals/killing subprocesses
         - Shitload of error checking
-    - Add a way to determine the `config.mk` from the command line
-        - Remove target scripts
     - Validate where neccesary with `gen_path_exists`
     - `gendl`
         - Check valid *filenames* for dylibs

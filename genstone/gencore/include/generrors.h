@@ -11,6 +11,7 @@
 #define GEN_ERRORS_H
 
 #include <errno.h>
+#include <safe_lib_errno.h>
 
 /**
  * Return values for errorable functions
