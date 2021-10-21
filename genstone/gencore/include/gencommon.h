@@ -417,6 +417,7 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
             fputc('\n', gen_internal_glog_streams_iterator_value); \
         } \
         if(gen_internal_glog_level_is_error) gtrace; \
+        if(level >= FATAL) abort(); \
         GEN_DIAG_REGION_END \
     } while(0) \
 

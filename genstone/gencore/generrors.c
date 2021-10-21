@@ -14,20 +14,29 @@ void* gen_error_handler_passthrough = NULL;
 #ifndef GEN_FATAL_ANNEXK_CONSTRAINTS
 /**
  * Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program
- * @note 
  */
 #define GEN_FATAL_ANNEXK_CONSTRAINTS ENABLED
 #endif
 
+GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 static void gen_internal_annexk_constraint_callback(const char* restrict msg, __unused void* restrict passthrough, errno_t error) {
 	gen_error_t gen_error = gen_convert_errno(error);
+
+	GEN_DISPATCH_ERROR_HANDLER(gen_error, "Annex K constraint handler was tripped");
+#if GEN_GLOGGIFY_EH == ENABLED
 #if GEN_FATAL_ANNEXK_CONSTRAINTS == ENABLED
-	glogf(FATAL, "A constraint handler was tripped: %s: %s\nReason: %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
+	glogf(FATAL, "Annex K constraint handler was tripped: %s: %s\n" GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) "Reason:" GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR) " %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
 #else
-	glogf(ERROR, "A constraint handler was tripped: %s: %s\nReason: %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
+	glogf(ERROR, "Annex K constraint handler was tripped: %s: %s\n" GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) "Reason:" GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR) " %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
+#endif
+#else
+#if GEN_FATAL_ANNEXK_CONSTRAINTS == ENABLED
+	GEN_REQUIRE_NO_REACH;
+#endif
 #endif
 }
-
+GEN_DIAG_REGION_END
 
 __attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
 #if PLATFORM != WIN

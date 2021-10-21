@@ -123,28 +123,46 @@ extern const char* gen_error_description(const gen_error_t error);
     } while(0)
 #endif
 
+/**
+ * Handler for library errors
+ * @note Only used if `GEN_CENTRALIZE_EH` is `ENABLED`
+ */
+typedef void (*gen_error_handler_t) (const gen_error_t, const char * const restrict, const char * const restrict, const char * const restrict, int, void* const restrict);
 #if GEN_CENTRALIZE_EH == ENABLED
-typedef void (*gen_error_handler_t) (const gen_error_t, const char * const restrict, const char * const restrict, const char * const restrict, int, void* const restrict)
+/**
+ * The currently installed error handler
+ */
 extern gen_error_handler_t gen_error_handler;
+/**
+ * Passthrough for the currently installed error handler
+ */
 extern void* gen_error_handler_passthrough;
 
-#define GEN_ERROR_OUT(error, msg) \
-    do { \
-        GEN_INTERNAL_MSG_EH(error, msg); \
-        if(error != GEN_OK) if(gen_error_handler) gen_error_handler(error, msg, __FILE__, __func__, __LINE__, gen_error_handler_passthrough); \
-        return error; \
-    } while(0)
+#define GEN_DISPATCH_ERROR_HANDLER(error, msg) if(error != GEN_OK && gen_error_handler) gen_error_handler(error, msg, __FILE__, __func__, __LINE__, gen_error_handler_passthrough);
 #else
+/**
+ * Runs the installed error handler if defined
+ * @note Only acts if `GEN_CENTRALIZE_EH` is `ENABLED`
+ */
+#define GEN_DISPATCH_ERROR_HANDLER(error, msg) \
+    do { \
+        (void) error; \
+        (void) msg; \
+    } while(0)
+#endif
+
 /**
  * Errors out of a function marked `GEN_ERRORABLE_RETURN`
  * Handles centralized vs. decentralized EH
+ * @param error an error code
+ * @param msg contextual error message
  */
 #define GEN_ERROR_OUT(error, msg) \
     do { \
         GEN_INTERNAL_MSG_EH(error, msg); \
+        GEN_DISPATCH_ERROR_HANDLER(error, msg); \
         return error; \
     } while(0)
-#endif
 
 /**
  * Horrible macro string manipulation to get some nice output on your errno
