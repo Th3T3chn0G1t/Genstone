@@ -30,7 +30,7 @@ On some versions of macOS, the provided `clang` version does not support some of
 
 The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions
 
-The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_c11compat_kannex`
+The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_c11compat_annexk`
 
 ### Special Targets
 

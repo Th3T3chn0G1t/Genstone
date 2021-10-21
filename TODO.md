@@ -2,17 +2,16 @@
 
 - Meta
     - Restructure `vendor` subdirectory locations
-    - Write examples
-        - Tests
-        - Modules
-        - General code examples (docstring tags `@example`)
 - Features
     - Possibly integrate https://github.com/robinrowe/libunistd
     - Fix `genproc`
-    - Async IO
-        - Using `aio(7)` (`aio_read` `aio_write`)
-            or
-        - Integrate https://github.com/libuv/libuv
+    - Native-IO
+        - NT
+        - Pipes
+        - Async IO
+            - Using `aio(7)` (`aio_read` `aio_write`)
+                or
+            - Integrate https://github.com/libuv/libuv
     - Timers
         - `timer_create` (https://linux.die.net/man/2/timer_create)
     - Validation on user-controllable macros
@@ -47,12 +46,6 @@
             - What does BSD use?
     - Memory tools
         - Measure usage
-        - Wrapped *alloc
-        - Integrate `mimalloc`
-            - Integrate into submodules
-        - Integrate `Annex K` EH
-            - `Annex K`-specific `errno` values
-            - Managed vs. user callbacks
     - Native UI
         - File dialogue
         - **Windowing**
@@ -77,11 +70,7 @@
         - OpenMP
         - `clang` mutex intrins
         - Thread-safety checker intrins
-        - Native-IO
-            - NT
-            - Pipes
 - Builds
-    - Replace mentions of the nonexistent `KANNEX` with `ANNEXK`
     - Centralized toolchain management config (separate from `config.mk`)
         - Fetch (& Build) toolchain from remote (Not submodule!)
         - Enforce toolchain on submodules
@@ -104,11 +93,10 @@
         - `make` `.ONESHELL`
     - Force `lld` on all targets
         - Re-enable ASAN on Windows
-    - Static builds
 - Tests
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
     - Write tests for generror for error callback
-    - Wrie tests for gentooling by capturing glog output
+    - Write tests for gentooling by capturing glog output
     - Test genfs directory iteration by filling a buffer with filenames from the callback
 - Optimization
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
@@ -116,12 +104,14 @@
     - XRay instrumentation
     - Apply `__likely` and `__unlikely`
     - Apply `hot` and `cold` function attributes
-    - MS `mimalloc`
 - Security
     - Checked C
     - `clang` thread safety intrinsics
-    - Annex K errno
-    - Annex K constraint handler callback into Genstone EH
 - Documentation
     - Tutorials
-    - Comprehensive `@example` tags
+    - Write examples
+        - General code examples (docstring tags `@example`)
+            - Comprehensive `@example` tags
+        - Tests
+        - Modules
+    

@@ -10,7 +10,7 @@ endif
 ifeq ($(C11_COMPAT_THREADS),1)
 IDECONF_INCLUDE_DIRS += genstone/vendor/c11compat/mesa/include
 endif
-ifeq ($(C11_COMPAT_KANNEX),1)
+ifeq ($(C11_COMPAT_ANNEXK),1)
 IDECONF_INCLUDE_DIRS += genstone/vendor/c11compat/safeclib/include
 endif
 ifeq ($(PLATFORM),WIN)
