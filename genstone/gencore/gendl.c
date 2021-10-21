@@ -4,7 +4,16 @@
 #include "include/gendl.h"
 
 #include "include/gencommon.h"
+#include "include/genfs.h"
 #include "include/gentooling.h"
+
+#ifndef GEN_PRESUMED_SYMBOL_MAX_LEN
+/**
+ * Presumed maximum length of a symbol to be imported from a dynamic library
+ * @note Default is taken from Annex B minimum symbol name reccommendations
+ */
+#define GEN_PRESUMED_SYMBOL_MAX_LEN 1024
+#endif
 
 gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
 	GEN_FRAME_BEGIN(gen_dylib_load);
@@ -15,7 +24,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	if(!output_dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_dylib` was NULL");
 	if(!lib_name) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`lib_name` was invalid");
 
-	const size_t lib_name_len = strlen(lib_name);
+	const size_t lib_name_len = strnlen_s(lib_name, GEN_PATH_MAX);
 
 #if PLATFORM == WIN
 	static const char lib_prefix[] = "";
@@ -63,7 +72,7 @@ gen_error_t gen_dylib_symbol(void* restrict * const restrict output_address, con
 	if(!output_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_address` was NULL");
 	if(!dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`dylib` was NULL");
 	if(!symname) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was NULL");
-	if(!strlen(symname)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`strlen(symname)` < 0)");
+	if(!strnlen_s(symname, GEN_PRESUMED_SYMBOL_MAX_LEN)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`strlen(symname)` < 0)");
 
 #if PLATFORM == WIN
 	GEN_DIAG_REGION_BEGIN

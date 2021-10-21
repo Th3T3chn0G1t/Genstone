@@ -37,8 +37,7 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict * restrict
 				GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
 					const size_t arg_len = long_arg_lens[j];
 
-					// Calculating inline instead of using strncmp to remove the
-					// stdlib dependency Also might be very slightly faster
+					// Calculating inline like this might be very slightly faster
 					// given the specific use-case
 					GEN_FOREACH_PTR(k, arg_char, arg_len, *long_arg) {
 						if(*arg_char != (*arg)[k + 2]) goto long_arg_continue;

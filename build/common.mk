@@ -382,6 +382,11 @@ tmp:
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
+ifneq ($(PLATFORM),WIN) # The windows CRT does this for us ;p
+	@echo "$(ACTION_PREFIX)genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
+	@genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<
+endif
+
 ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<

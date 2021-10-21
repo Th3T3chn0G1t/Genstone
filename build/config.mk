@@ -103,3 +103,11 @@ HAVE_STAT_REPORT = ENABLED
 
 # CMake exec to use for building CMake submodules
 CMAKE = cmake
+
+# Whether perl is available in the environment
+# Used for running unsafe API check from safeclib
+# Unneccesary on windows
+# Possible values are:
+# `ENABLED`: Have perl
+# `DISABLED`: Don't have perl
+HAVE_PERL = ENABLED
