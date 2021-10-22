@@ -1,5 +1,7 @@
 # TODO
 
+- Misc
+    - `generrors.h` line 174 hardcoded `100`
 - Features
     - Native-IO
         - NT
@@ -70,6 +72,8 @@
     - Centralized toolchain management config (separate from `config.mk`)
         - Fetch (& Build) toolchain from remote (Not submodule!)
         - Enforce toolchain on submodules
+        - Fetch `autotools`
+            - `safeclib` on Windows
     - Review all tooling used in builds
         - `make`
         - `clang`
@@ -103,6 +107,7 @@
 - Security
     - Checked C
     - `clang` thread safety intrinsics
+    - `_r` function variants
 - Documentation
     - Tutorials
     - Write examples

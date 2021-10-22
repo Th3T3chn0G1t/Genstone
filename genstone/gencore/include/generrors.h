@@ -168,6 +168,30 @@ extern void* gen_error_handler_passthrough;
         return error; \
     } while(0)
 
+#if PLATFORM == WIN
+#define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
+    const char* const gen_internal_error_out_native_errno_native_strerror = strerror(errno); \
+    const size_t gen_internal_error_out_native_errno_native_strerror_len = strnlen_s(gen_internal_error_out_native_errno_native_strerror, 100 /* No strerror *should* be longer than this */); \
+    const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
+    char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+    strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+    strcpy_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_native_strerror)
+#else
+/**
+ * Windows doesn't support `strerrorlen_s`
+ * End me quickly
+ * Gets the `strerror` of an errno value in the most platform-secure way possible
+ * @param errno the errno value to get `strerror` for
+ */
+#define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
+    /* Block needs to be inline (not `do-while`'d) so we can get the declarations into the main error-out block */ \
+    const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(gen_internal_error_out_native_errno_errno); \
+    const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
+    char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+    strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+    strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_errno)
+#endif
+
 /**
  * Horrible macro string manipulation to get some nice output on your errno
  * @param proc the function which set errno
@@ -178,11 +202,7 @@ extern void* gen_error_handler_passthrough;
         const errno_t gen_internal_error_out_native_errno_errno = native_errno; \
         const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(gen_internal_error_out_native_errno_errno); \
         const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
-        const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(gen_internal_error_out_native_errno_errno); \
-        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
-        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
-        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
-        strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_errno); \
+        GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR; \
         GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
         return gen_internal_error_out_native_errno_gen_error; \
     } while(0)
