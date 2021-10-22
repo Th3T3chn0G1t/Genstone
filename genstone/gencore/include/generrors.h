@@ -11,7 +11,10 @@
 #define GEN_ERRORS_H
 
 #include <errno.h>
+
+#if PLATFORM != WIN
 #include <safe_lib_errno.h>
+#endif
 
 /**
  * Return values for errorable functions

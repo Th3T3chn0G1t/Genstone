@@ -11,6 +11,7 @@
     - Timers
         - `timer_create` (https://linux.die.net/man/2/timer_create)
     - Validation on user-controllable macros
+        - `diagnose_if`
     - `genproc`
         - Fix
         - Signals/killing subprocesses
