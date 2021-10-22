@@ -174,10 +174,8 @@ extern void* gen_error_handler_passthrough;
 
 #if PLATFORM == WIN
 #define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
-    GEN_DIAG_REGION_BEGIN \
-    GEN_DIAG_IGNORE_DEPRECATION \
-    const char* const gen_internal_error_out_native_errno_native_strerror = strerror(errno); \
-    GEN_DIAG_REGION_END \
+    char const gen_internal_error_out_native_errno_native_strerror[100]; \
+    strerror(gen_internal_error_out_native_errno_native_strerror, 100, errno); \
     const size_t gen_internal_error_out_native_errno_native_strerror_len = strnlen_s(gen_internal_error_out_native_errno_native_strerror, 100 /* No strerror *should* be longer than this */); \
     const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
     char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
