@@ -16,6 +16,7 @@ GEN_DIAG_IGNORE_ALL
 
 #if PLATFORM != WIN
 #include <safe_lib_errno.h>
+#include <safe_types.h>
 #endif
 GEN_DIAG_REGION_END
 
@@ -225,7 +226,7 @@ extern void* gen_error_handler_passthrough;
         const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
         char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
         strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
-        gen_winerror_as_string(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), NULL, gen_internal_error_out_native_errno_errno); \
+        gen_winerr_as_string(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), NULL, gen_internal_error_out_native_errno_errno); \
         GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
         return gen_internal_error_out_native_errno_gen_error; \
     } while(0)

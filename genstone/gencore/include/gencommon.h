@@ -169,7 +169,6 @@ typedef long long ssize_t;
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH(iter, memb, len, container) \
     __typeof__((container)[0]) memb = (container)[0]; \
@@ -183,7 +182,6 @@ typedef long long ssize_t;
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
     __typeof__((container)[0])* memb = &(container)[0]; \
@@ -198,7 +196,6 @@ typedef long long ssize_t;
  * @param len the length of the container to iterate
  * @param container the container to iterate
  * @see GEN_DEBUG_FOREACH_REGISTER
- * @see GEN_INTERNAL_FOREACH_LOOP_QUALIFIERS
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
     __typeof__((container)) memb = (container); \
