@@ -38,6 +38,12 @@
  */
 #define GEN_DIAG_IGNORE_FP_EQ pragma("clang diagnostic ignored \"-Wfloat-equal\"")
 
+/**
+ * Ignores deprecation compiler warnings in a diagnostic region
+ * Pretty much solely for MS Secure CRT warnings
+ */
+#define GEN_DIAG_IGNORE_DEPRECATION pragma("clang diagnostic ingored \"-Wdeprecated-declarations\"")
+
 GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #ifndef __unused
