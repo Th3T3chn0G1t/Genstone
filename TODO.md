@@ -74,6 +74,7 @@
         - Enforce toolchain on submodules
         - Fetch `autotools`
             - `safeclib` on Windows
+                - Fix stupid `strerror` handling in `generror.h`
     - Review all tooling used in builds
         - `make`
         - `clang`

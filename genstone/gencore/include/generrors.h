@@ -10,11 +10,14 @@
 #ifndef GEN_ERRORS_H
 #define GEN_ERRORS_H
 
+GEN_DIAG_REGION_BEGIN
+GEN_DIAG_IGNORE_ALL
 #include <errno.h>
 
 #if PLATFORM != WIN
 #include <safe_lib_errno.h>
 #endif
+GEN_DIAG_REGION_END
 
 /**
  * Return values for errorable functions
@@ -202,7 +205,7 @@ extern void* gen_error_handler_passthrough;
         const errno_t gen_internal_error_out_native_errno_errno = native_errno; \
         const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(gen_internal_error_out_native_errno_errno); \
         const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
-        GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR; \
+        GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(gen_internal_error_out_native_errno_errno); \
         GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
         return gen_internal_error_out_native_errno_gen_error; \
     } while(0)
