@@ -11,6 +11,7 @@ gen_error_handler_t gen_error_handler = NULL;
 void* gen_error_handler_passthrough = NULL;
 #endif
 
+#if PLATFORM != WIN
 #ifndef GEN_FATAL_ANNEXK_CONSTRAINTS
 /**
  * Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program
@@ -18,7 +19,6 @@ void* gen_error_handler_passthrough = NULL;
 #define GEN_FATAL_ANNEXK_CONSTRAINTS ENABLED
 #endif
 
-#if PLATFORM != WIN
 GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 static void gen_internal_annexk_constraint_callback(const char* restrict msg, __unused void* restrict passthrough, errno_t error) {
