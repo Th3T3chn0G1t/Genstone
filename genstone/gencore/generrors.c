@@ -38,14 +38,13 @@ static void gen_internal_annexk_constraint_callback(const char* restrict msg, __
 }
 GEN_DIAG_REGION_END
 
-__attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
 #if PLATFORM != WIN
+// Windows doesn't support constraint handlers
+__attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
 	set_mem_constraint_handler_s(gen_internal_annexk_constraint_callback);
 	set_str_constraint_handler_s(gen_internal_annexk_constraint_callback);
-#else
-	set_constraint_handler_s(gen_internal_annexk_constraint_callback);
-#endif
 }
+#endif
 
 const char* gen_error_name(const gen_error_t error) {
 	switch(error) {
@@ -109,6 +108,10 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 		case EMFILE: return GEN_OUT_OF_HANDLES;
 		case ENFILE: return GEN_OUT_OF_HANDLES;
 		case EBADF: return GEN_INVALID_PARAMETER;
+
+#if PLATFORM != WIN
+		// Windows doesn't support Annex K specific errno values
+		// Go figure
 		case ESNULLP: return GEN_INVALID_PARAMETER;
 		case ESZEROL: return GEN_TOO_SHORT;
 		case ESLEMIN: return GEN_TOO_SHORT;
@@ -120,6 +123,8 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 		case ESNODIFF: return GEN_BAD_OPERATION;
 		case ESNOTFND: return GEN_NO_SUCH_OBJECT;
 		case ESLEWRNG: return GEN_INVALID_PARAMETER;
+#endif
+
 		default: return GEN_UNKNOWN;
 	}
 }
