@@ -23,10 +23,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Fetch Submodules
+      run: git submodule update --init
+
     - name: Initialize
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
+
+    - name: Build
+      run: make OVERRIDE_DISABLED_MODULES="genproc_test gencalc_test"
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
