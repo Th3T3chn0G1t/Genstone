@@ -88,7 +88,6 @@ const char* gen_error_description(const gen_error_t error) {
 
 GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 	switch(error) {
-		case EOK: return GEN_OK;
 		case EACCES: return GEN_PERMISSION;
 		case EINVAL: return GEN_INVALID_PARAMETER;
 		case EIO: return GEN_IO;
@@ -98,6 +97,7 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 		case ENOMEM: return GEN_OUT_OF_MEMORY;
 		case ENOTDIR: return GEN_WRONG_OBJECT_TYPE;
 #if PLATFORM != WIN // Bit random to be missing but okay
+		case EOK: return GEN_OK;
 		case EDQUOT: return GEN_OUT_OF_SPACE;
 #endif
 		case EEXIST: return GEN_ALREADY_EXISTS;
@@ -133,19 +133,17 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 // Returns the last Win32 error, in string format. Returns an empty string if there is no error.
 void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict outsize, const unsigned long error) {
 #if PLATFORM == WIN
-	char* locoutbuff = NULL;
+	char* message = NULL;
 
 	// Ask Win32 to give us the string version of that message ID.
 	// The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
-	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &locoutbuff, 0, NULL);
+	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), message, 0, NULL);
 
 	if(outsize) *outsize = size;
 	if(outbuff) strcpy_s(outbuff, size, outbuff);
 
 	// Free the Win32's string's buffer.
-	LocalFree(locoutbuff);
-
-	return message;
+	LocalFree(message);
 #else
 	(void) outbuff;
 	(void) outsize;

@@ -5,6 +5,7 @@
     - Social preview banner github
     - Github QL code analysis
 - Features
+    - `gen_winerr_as_string` pass in buffer size
     - Native-IO
         - NT
         - Pipes
