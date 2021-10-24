@@ -18,6 +18,7 @@ void* gen_error_handler_passthrough = NULL;
 #define GEN_FATAL_ANNEXK_CONSTRAINTS ENABLED
 #endif
 
+#if PLATFORM != WIN
 GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 static void gen_internal_annexk_constraint_callback(const char* restrict msg, __unused void* restrict passthrough, errno_t error) {
@@ -38,7 +39,6 @@ static void gen_internal_annexk_constraint_callback(const char* restrict msg, __
 }
 GEN_DIAG_REGION_END
 
-#if PLATFORM != WIN
 // Windows doesn't support constraint handlers
 __attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
 	set_mem_constraint_handler_s(gen_internal_annexk_constraint_callback);
