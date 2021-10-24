@@ -2,7 +2,8 @@
 
 - Misc
     - `generrors.h` line 174 hardcoded `100`
-    - 
+    - Social preview banner github
+    - Github QL code analysis
 - Features
     - Native-IO
         - NT

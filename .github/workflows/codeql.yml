@@ -32,7 +32,7 @@ jobs:
         languages: ${{ matrix.language }}
 
     - name: Build
-    - run: make OVERRIDE_DISABLED_MODULES="gencalc_test"
+      run: make OVERRIDE_DISABLED_MODULES="gencalc_test"
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
