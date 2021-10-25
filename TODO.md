@@ -112,6 +112,10 @@
     - Checked C
     - `clang` thread safety intrinsics
     - `_r` function variants
+    - QL Recommendations
+        - `fopen_s` -> `fdopen`
+            or
+        - Native IO underlying `gen_filesystem_handle_t`
 - Documentation
     - Tutorials
     - Write examples

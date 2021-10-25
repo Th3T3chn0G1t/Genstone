@@ -1,5 +1,9 @@
 #include "include/genproc.h"
 
+#if PLATFORM == WIN
+#define GEN_INTERNAL_WIN_EXEC_MAX 32767
+#endif
+
 gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect) {
 	GEN_FRAME_BEGIN(gen_proc_start_redirected);
 
@@ -8,11 +12,18 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 	process_settings.cb = sizeof(STARTUPINFO);
 	process_settings.wShowWindow = SW_HIDE;
 	process_settings.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-	process_settings.hStdOutput = (HANDLE) _get_osfhandle(fileno(redirect));
-	process_settings.hStdError = (HANDLE) _get_osfhandle(fileno(redirect));
+
+GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wbad-function-cast"
+	process_settings.hStdOutput = (HANDLE) _get_osfhandle(_fileno(redirect));
+	process_settings.hStdError = (HANDLE) _get_osfhandle(_fileno(redirect));
+GEN_DIAG_REGION_END
 
 	PROCESS_INFORMATION process;
-	if(!CreateProcessA(NULL, exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process))) GEN_ERROR_OUT_WINERR(CreateProcessA, GetLastError());
+	const size_t exec_size = strnlen_s(exec, GEN_INTERNAL_WIN_EXEC_MAX) + 1;
+	char local_exec[exec_size];
+	errno_t error = strcpy_s(local_exec, exec_size, exec);
+	if(!CreateProcessA(NULL, local_exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process)) GEN_ERROR_OUT_WINERR(CreateProcessA, GetLastError());
 	CloseHandle(process.hThread);
 
 	*process_out = process.hProcess;
@@ -45,11 +56,11 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 #if PLATFORM == WIN
 	unsigned char result;
 
-	while(result = GetexitcodeProcess(pid, out_result)) && *out_result == STILL_ACTIVE);
+	while((result = GetExitCodeProcess(process, out_result)) && *out_result == STILL_ACTIVE);
 
-	CloseHandle(pid);
+	CloseHandle(process);
 
-	if(!result) out_result = -1;
+	if(!result) *out_result = -1;
 
 	GEN_ERROR_OUT(GEN_OK, "");
 #else
@@ -69,22 +80,23 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 	HANDLE read;
 	HANDLE write;
 	SECURITY_ATTRIBUTES security = {0};
-	security.noutput_buffsize = sizeof(SECURITY_ATTRIBUTES);
-	security.bInheritHandle = true;
+	security.nLength = sizeof(SECURITY_ATTRIBUTES);
 	security.lpSecurityDescriptor = NULL;
+	security.bInheritHandle = true;
 
 	if(CreatePipe(&read, &write, &security, 0)) {
-		char* const output = NULL;
+		char* output = NULL;
 		size_t output_buffsize = 0;
 
 		FILE* const redirect_handle = _fdopen(_open_osfhandle((intptr_t) write, _O_APPEND), "w");
-		gen_process_t pid = gen_proc_start_redirected(exec, redirect_handle);
-		gen_proc_wait(out_result, pid);
+		gen_process_t pid
+		GEN_ERROR_OUT_IF(gen_proc_start_redirected(&pid, exec, redirect_handle), "`gen_proc_start_redirected` failed");
+		GEN_ERROR_OUT_IF(gen_proc_wait(out_result, pid), "`gen_proc_start_redirected` failed");
 
-		unsigned int n_readable;
+		unsigned long n_readable;
 		if(PeekNamedPipe(read, NULL, 0, NULL, &n_readable, NULL) && n_readable) {
 			output_buffsize += n_readable;
-			grealloc(&output, sizeof(char), output_buffsize);
+			grealloc((void**) &output, sizeof(char), output_buffsize);
 
 			ReadFile(read, output, n_readable, NULL, NULL);
 		}
@@ -105,15 +117,12 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 
 	FILE* redirect_handle = fdopen(fds[1], "w");
 	gen_process_t pid;
-	gen_error_t error;
-	if((error = gen_proc_start_redirected(&pid, exec, redirect_handle)))
-		GEN_ERROR_OUT(error, "`gen_proc_start_redirected` failed");
-	if((error = gen_proc_wait(out_result, pid)))
-		GEN_ERROR_OUT(error, "`gen_proc_wait` failed");
+	
+	GEN_ERROR_OUT_IF(gen_proc_start_redirected(&pid, exec, redirect_handle), "`gen_proc_start_redirected` failed");
+	GEN_ERROR_OUT_IF(gen_proc_wait(out_result, pid), "`gen_proc_wait` failed");
 
 	char* output = NULL;
-	if((error = gzalloc((void**) &output, sizeof(char), GEN_PROC_READ_BUFFER_CHUNK)))
-		GEN_ERROR_OUT(error, "`gzalloc` failed");
+	GEN_ERROR_OUT_IF(gzalloc((void**) &output, sizeof(char), GEN_PROC_READ_BUFFER_CHUNK), "`gzalloc` failed");
 	size_t output_buffsize = 0;
 
 	char read_data[GEN_PROC_READ_BUFFER_CHUNK] = {0};
@@ -121,8 +130,7 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 
 	while((read_size = read(fds[0], output, GEN_PROC_READ_BUFFER_CHUNK)) > 0) {
 		output_buffsize += (size_t) read_size;
-		if((error = grealloc((void**) &output, sizeof(char), output_buffsize)))
-			GEN_ERROR_OUT(error, "`grealloc` failed");
+		GEN_ERROR_OUT_IF(grealloc((void**) &output, sizeof(char), output_buffsize), "`grealloc` failed");
 
 		strcat_s(output, output_buffsize, read_data);
 	}

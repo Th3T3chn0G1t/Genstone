@@ -172,6 +172,21 @@ extern void* gen_error_handler_passthrough;
         return error; \
     } while(0)
 
+/**
+ * Errors out of a function marked `GEN_ERRORABLE_RETURN` if `error` is not `GEN_OK`
+ * Handles centralized vs. decentralized EH
+ * @param error an error code
+ * @param msg contextual error message
+ */
+#define GEN_ERROR_OUT_IF(error, msg) \
+    do { \
+        if(error != GEN_OK) { \
+            GEN_INTERNAL_MSG_EH(error, msg); \
+            GEN_DISPATCH_ERROR_HANDLER(error, msg); \
+            return error; \
+        } \
+    } while(0)
+
 #if PLATFORM == WIN
 #define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
     char gen_internal_error_out_native_errno_native_strerror[100]; \
