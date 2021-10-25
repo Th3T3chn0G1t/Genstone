@@ -23,6 +23,7 @@ GEN_DIAG_REGION_END
 	const size_t exec_size = strnlen_s(exec, GEN_INTERNAL_WIN_EXEC_MAX) + 1;
 	char local_exec[exec_size];
 	errno_t error = strcpy_s(local_exec, exec_size, exec);
+	if(error) GEN_ERROR_OUT_ERRNO(strcpy_s, error);
 	if(!CreateProcessA(NULL, local_exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process)) GEN_ERROR_OUT_WINERR(CreateProcessA, GetLastError());
 	CloseHandle(process.hThread);
 
@@ -54,9 +55,9 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 	GEN_FRAME_BEGIN(gen_proc_wait);
 
 #if PLATFORM == WIN
-	unsigned char result;
+	unsigned int result;
 
-	while((result = GetExitCodeProcess(process, out_result)) && *out_result == STILL_ACTIVE);
+	while((result = GetExitCodeProcess(process, (long* const) out_result)) && *out_result == STILL_ACTIVE);
 
 	CloseHandle(process);
 
@@ -89,14 +90,14 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 		size_t output_buffsize = 0;
 
 		FILE* const redirect_handle = _fdopen(_open_osfhandle((intptr_t) write, _O_APPEND), "w");
-		gen_process_t pid
+		gen_process_t pid;
 		GEN_ERROR_OUT_IF(gen_proc_start_redirected(&pid, exec, redirect_handle), "`gen_proc_start_redirected` failed");
 		GEN_ERROR_OUT_IF(gen_proc_wait(out_result, pid), "`gen_proc_start_redirected` failed");
 
 		unsigned long n_readable;
 		if(PeekNamedPipe(read, NULL, 0, NULL, &n_readable, NULL) && n_readable) {
 			output_buffsize += n_readable;
-			grealloc((void**) &output, sizeof(char), output_buffsize);
+			GEN_ERROR_OUT_IF(grealloc((void**) &output, sizeof(char), output_buffsize), "`grealloc` failed");
 
 			ReadFile(read, output, n_readable, NULL, NULL);
 		}

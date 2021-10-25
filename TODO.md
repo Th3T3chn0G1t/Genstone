@@ -5,6 +5,7 @@
     - Social preview banner github
     - Github QL code analysis
 - Features
+    - `GEN_ERROR_OUT_IF` for errno macros
     - `gen_winerr_as_string` pass in buffer size
     - Native-IO
         - NT
