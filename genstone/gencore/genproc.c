@@ -55,9 +55,9 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 	GEN_FRAME_BEGIN(gen_proc_wait);
 
 #if PLATFORM == WIN
-	unsigned int result;
+	int result;
 
-	while((result = GetExitCodeProcess(process, (long* const) out_result)) && *out_result == STILL_ACTIVE);
+	while((result = GetExitCodeProcess(process, (unsigned long* const) out_result)) && *out_result == STILL_ACTIVE);
 
 	CloseHandle(process);
 
