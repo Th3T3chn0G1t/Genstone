@@ -1,6 +1,6 @@
 # AlignConsecutiveAssignments: None
-AlignConsecutiveBitFields: None
-AlignConsecutiveDeclarations: None
+# AlignConsecutiveBitFields: None
+# AlignConsecutiveDeclarations: None
 # `clang-format` hates you with a passion
 # AlignConsecutiveMacros: None
 AlignEscapedNewlines: DontAlign

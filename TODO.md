@@ -3,6 +3,7 @@
 - Misc
     - Social preview banner github
 - Builds
+    - Cache `safeclib` in CI
     - Centralized toolchain management config (separate from `config.mk`)
         - Fetch (& Build) toolchain from remote (Not submodule!)
         - Enforce toolchain on submodules
