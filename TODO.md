@@ -9,19 +9,21 @@
         - Fetch `autotools`
             - `safeclib` on Windows
                 - Fix stupid `strerror` handling in `generror.h`
+        - Fix submodule toolchain management
     - Build Speed
         - `mold` linker
             - `mold` daemonisation
         - `ld64 -cache_path_lto`
         - Precompiled headers
-    - Force `lld` on all targets
-        - Re-enable ASAN on Windows
 - Tests
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
     - Write tests for generror for error callback
     - Write tests for gentooling by capturing glog output
     - Test genfs directory iteration by filling a buffer with filenames from the callback
 - Optimization
+    - Learn about alignment
+    - Learn about cache optimization
+    - Learn about SIMD and crap
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
     - OpenMP support
     - XRay instrumentation

@@ -229,9 +229,26 @@ ifeq ($(PLATFORM),DEFAULT)
 endif
 
 ifeq ($(LINKER),DEFAULT)
-CLINKER := $(COMPILER)
+	CLINKER := $(COMPILER)
 else
-CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
+	ifeq ($(LINKER),LLD)
+		ifeq ($(PLATFORM),WIN)
+			LLD = lld-link
+		endif
+		ifeq ($(PLATFORM),LNX)
+			LLD = ld.lld
+		endif
+		ifeq ($(PLATFORM),DWN)
+			# Default `ld` on macOS should be `ld64` (`lld`)
+			LLD = ld
+		endif
+		ifeq ($(PLATFORM),BSD)
+			LLD = ld.lld
+		endif
+		CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LLD))
+	else
+		CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
+	endif
 endif
 
 GLOBAL_C_FLAGS += -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
@@ -369,11 +386,9 @@ ifeq ($(TOOLING),ENABLED)
 		GLOBAL_C_FLAGS += -fsanitize=undefined
 		GLOBAL_L_FLAGS += -fsanitize=undefined
 	endif
-	ifneq ($(PLATFORM),WIN)
-		ifneq ($(PLATFORM),DWN) # macOS libc shits itself when you `fork` with ASAN enabled aswell
-			GLOBAL_C_FLAGS += -fsanitize=address
-			GLOBAL_L_FLAGS += -fsanitize=address
-		endif
+	ifneq ($(PLATFORM),DWN) # macOS libc shits itself when you `fork` with ASAN enabled aswell
+		GLOBAL_C_FLAGS += -fsanitize=address
+		GLOBAL_L_FLAGS += -fsanitize=address
 	endif
 endif
 

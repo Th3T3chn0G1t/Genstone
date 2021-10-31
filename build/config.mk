@@ -43,7 +43,8 @@ COMPILER = clang
 # The linker to use
 # Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
 # Set to `DEFAULT` to allow the compiler to select a linker
-LINKER = DEFAULT
+# Set to `LLD` to select an appropriate `lld` backend for the platform
+LINKER = LLD
 
 # The `ar` tool to use for creating static libraries
 AR = ar
