@@ -48,6 +48,11 @@ LINKER = DEFAULT
 # The `ar` tool to use for creating static libraries
 AR = ar
 
+# Using boring non-colourful output for boring non-colourful terminals
+# `ENABLED`: Boring output
+# `DISABLED`: Awesome output
+BORING_OUTPUT = DISABLED
+
 # Whether to apply `clang-format` changes to files directly
 # Possible values are:
 # `ENABLED`: Enables application of format changes

@@ -20,8 +20,9 @@ build_test: build_message_build_test $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXE
 	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_STATIC)$(ACTION_SUFFIX)"
 	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_DYNAMIC)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	@cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_STATIC))
-	@cd $(subst /,$(SEP),lib && ../$(BUILD_TEST_EXEC_DYNAMIC))
+	@cd lib
+	@$(subst /,$(SEP),../$(BUILD_TEST_EXEC_STATIC))
+	@$(subst /,$(SEP),../$(BUILD_TEST_EXEC_DYNAMIC))
 else
 	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
 	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)

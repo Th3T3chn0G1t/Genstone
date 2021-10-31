@@ -10,7 +10,8 @@ build_message_genfs_test:
 genfs_test: gencore build_message_genfs_test $(GEN_FS_TEST) ### @Test Builds and runs Genstone filesystem utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_FS_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	@cd $(subst /,$(SEP),lib && ../$(GEN_FS_TEST))
+	@cd lib
+	@$(subst /,$(SEP),../$(GEN_FS_TEST))
 else
 	@LD_LIBRARY_PATH=lib $(GEN_FS_TEST)
 endif

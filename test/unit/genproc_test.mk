@@ -10,7 +10,8 @@ build_message_genproc_test:
 genproc_test: gencore build_message_genproc_test $(GEN_PROC_TEST) ### @Test Builds and runs Genstone subprocess management utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_PROC_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	@cd $(subst /,$(SEP),lib && ../$(GEN_PROC_TEST))
+	@cd lib
+	@$(subst /,$(SEP),../$(GEN_PROC_TEST))
 else
 	@LD_LIBRARY_PATH=lib $(GEN_PROC_TEST)
 endif

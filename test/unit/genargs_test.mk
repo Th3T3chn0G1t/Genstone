@@ -10,7 +10,8 @@ build_message_genargs_test:
 genargs_test: gencore build_message_genargs_test $(GEN_ARGS_TEST) ### @Test Builds and runs Genstone argument parser tests
 	@echo "$(ACTION_PREFIX)$(GEN_ARGS_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	@cd $(subst /,$(SEP),lib && ../$(GEN_ARGS_TEST))
+	@cd lib
+	@$(subst /,$(SEP),../$(GEN_ARGS_TEST))
 else
 	@LD_LIBRARY_PATH=lib $(GEN_ARGS_TEST)
 endif

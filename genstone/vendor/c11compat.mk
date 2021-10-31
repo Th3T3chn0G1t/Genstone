@@ -96,8 +96,9 @@ clean_c11compat_annexk: | $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib clean
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE):
-	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib && ./build-aux/autogen.sh)
-	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib && ./configure --prefix=/usr)
+	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib)
+	$(subst /,$(SEP),./build-aux/autogen.sh)
+	$(subst /,$(SEP),./configure --prefix=/usr)
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL): $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib

@@ -10,7 +10,8 @@ build_message_genuine_test:
 genuine_test: genuine build_message_genuine_test $(GEN_UI_TEST) ### @Test Builds and runs Genstone user-interface utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_UI_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	@cd $(subst /,$(SEP),lib && ../$(GEN_UI_TEST))
+	@cd lib
+	@$(subst /,$(SEP),../$(GEN_UI_TEST))
 else
 	@LD_LIBRARY_PATH=lib $(GEN_UI_TEST)
 endif
