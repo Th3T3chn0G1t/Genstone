@@ -1,8 +1,8 @@
-AlignConsecutiveAssignments: None
+# AlignConsecutiveAssignments: None
 AlignConsecutiveBitFields: None
 AlignConsecutiveDeclarations: None
 # `clang-format` hates you with a passion
-#AlignConsecutiveMacros: None
+# AlignConsecutiveMacros: None
 AlignEscapedNewlines: DontAlign
 AlignOperands: DontAlign
 AlignTrailingComments: false
@@ -17,7 +17,7 @@ AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 
-AttributeMacros: [ '__unused' ]
+AttributeMacros: [ '__unused', '__inline', '__deprecated', '__nodiscard', '__likely', '__unlikely' ]
 
 BinPackArguments: true
 BinPackParameters: true
@@ -59,7 +59,7 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
 
 MacroBlockBegin: .+GEN_DIAG_REGION_BEGIN\n
-MacroBlockEnd: .+GEN_DIAG_REGION_BEGIN\n
+MacroBlockEnd: .+GEN_DIAG_REGION_END\n
 
 MaxEmptyLinesToKeep: 1
 
