@@ -1,7 +1,6 @@
 # TODO
 
 - Misc
-    - `generrors.h` line 174 hardcoded `100`
     - Social preview banner github
 - Builds
     - Centralized toolchain management config (separate from `config.mk`)

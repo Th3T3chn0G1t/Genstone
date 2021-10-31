@@ -187,11 +187,20 @@ extern void* gen_error_handler_passthrough;
         } \
     } while(0)
 
+#ifndef GEN_INTERNAL_FUCK_YOU_MICROSOFT_MAX_STRERROR
+/**
+ * It was warranted
+ * Windows CRT asks for `strerror_s` to be used in place of `strerror` but doesn't provide `strerrorlen_s`
+ * We use this to allocate a fixed size buffer to store `strerror_s` values
+ */
+#define GEN_INTERNAL_FUCK_YOU_MICROSOFT_MAX_STRERROR 100
+#endif
+
 #if PLATFORM == WIN
 #define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
-    char gen_internal_error_out_native_errno_native_strerror[100]; \
-    strerror_s(gen_internal_error_out_native_errno_native_strerror, 100, errno); \
-    const size_t gen_internal_error_out_native_errno_native_strerror_len = strnlen_s(gen_internal_error_out_native_errno_native_strerror, 100 /* No strerror *should* be longer than this */); \
+    char gen_internal_error_out_native_errno_native_strerror[GEN_INTERNAL_FUCK_YOU_MICROSOFT_MAX_STRERROR]; \
+    strerror_s(gen_internal_error_out_native_errno_native_strerror, GEN_INTERNAL_FUCK_YOU_MICROSOFT_MAX_STRERROR, errno); \
+    const size_t gen_internal_error_out_native_errno_native_strerror_len = strnlen_s(gen_internal_error_out_native_errno_native_strerror, GEN_INTERNAL_FUCK_YOU_MICROSOFT_MAX_STRERROR); \
     const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
     char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
     strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
