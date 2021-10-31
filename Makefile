@@ -33,6 +33,7 @@ MODULE_CLEAN_TARGETS += clean_tmpfile
 
 .DEFAULT_GOAL := all
 
+.ONESHELL:
 build_message_pre_build:
 	@echo "$(SECTION_PREFIX) Pre-Build"
 ifneq ($(DISABLED_MODULES),)
@@ -62,14 +63,17 @@ BUILD_TARGETS = \
 		clean_tmpfile \
 	)
 
+.ONESHELL:
 all: $(BUILD_TARGETS) ### @Default Builds all modules specified in `config.mk`
 	@echo "$(INFO_PREFIX) All built!"
 
+.ONESHELL:
 list: ### @Default Lists targets to be built for `all`
 	@echo "$(INFO_PREFIX) Targets to be built for \`all\`: $(addprefix \n - $(TARGET_PREFIX),$(addsuffix $(TARGET_SUFFIX),$(BUILD_TARGETS)))"
 	@echo "$(INFO_PREFIX) Excluded targets: $(addprefix \n - $(TARGET_PREFIX),$(addsuffix $(TARGET_SUFFIX),$(DISABLED_MODULES)))"
 	@echo "$(NOTE_PREFIX) For a list of available targets and their descriptions, see \`make help\`"
 
+.ONESHELL:
 help: ### @Default Generates this message
 ifeq ($(SHELL),cmd.exe)
 	@echo "$(ERROR_PREFIX) The self-documenting Makefile target does not work on Windows hosts"
@@ -77,13 +81,16 @@ else
 	@echo "$(INFO_PREFIX) Makefile help\n$(NOTE_PREFIX) This list only includes descriptions for user-desireable targets$(patsubst @%,$(NOTABLE_PREFIX)%$(NOTABLE_SUFFIX),$(patsubst %:,\n - $(TARGET_PREFIX)%$(TARGET_SUFFIX):,$(subst `,\`,$(shell grep -Eh '^\w+:.*\#\#\#.*' $(MAKEFILE_LIST) | sed 's|:.*\#\#\#|:|g'))))"
 endif
 
+.ONESHELL:
 build_message_clean:
 	@echo "$(SECTION_PREFIX) Clean"
 	@echo "$(INFO_PREFIX) Cleaning up build artifacts from all modules"
 	@echo "$(NOTE_PREFIX) To clean an individual module, use \`make clean_MODULE_NAME\`$(ACTION_PREFIX)"
 
+.ONESHELL:
 clean: build_message_clean $(MODULE_CLEAN_TARGETS) clean_clang_tooling_artifacts ### @Default Cleans the repository of most build artifacts
 	@echo "$(ACTION_SUFFIX)$(INFO_PREFIX) All clean!"
 
+.ONESHELL:
 lib:
 	-mkdir $@

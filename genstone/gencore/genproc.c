@@ -13,11 +13,11 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 	process_settings.wShowWindow = SW_HIDE;
 	process_settings.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
-GEN_DIAG_REGION_BEGIN
+	GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wbad-function-cast"
 	process_settings.hStdOutput = (HANDLE) _get_osfhandle(_fileno(redirect));
 	process_settings.hStdError = (HANDLE) _get_osfhandle(_fileno(redirect));
-GEN_DIAG_REGION_END
+	GEN_DIAG_REGION_END
 
 	PROCESS_INFORMATION process;
 	const size_t exec_size = strnlen_s(exec, GEN_INTERNAL_WIN_EXEC_MAX) + 1;
@@ -57,7 +57,8 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 #if PLATFORM == WIN
 	int result;
 
-	while((result = GetExitCodeProcess(process, (unsigned long* const) out_result)) && *out_result == STILL_ACTIVE);
+	while((result = GetExitCodeProcess(process, (unsigned long* const) out_result)) && *out_result == STILL_ACTIVE)
+		;
 
 	CloseHandle(process);
 
@@ -118,7 +119,7 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 
 	FILE* redirect_handle = fdopen(fds[1], "w");
 	gen_process_t pid;
-	
+
 	GEN_ERROR_OUT_IF(gen_proc_start_redirected(&pid, exec, redirect_handle), "`gen_proc_start_redirected` failed");
 	GEN_ERROR_OUT_IF(gen_proc_wait(out_result, pid), "`gen_proc_wait` failed");
 

@@ -3,7 +3,46 @@
 - Misc
     - `generrors.h` line 174 hardcoded `100`
     - Social preview banner github
-    - Github QL code analysis
+- Builds
+    - Centralized toolchain management config (separate from `config.mk`)
+        - Fetch (& Build) toolchain from remote (Not submodule!)
+        - Enforce toolchain on submodules
+        - Fetch `autotools`
+            - `safeclib` on Windows
+                - Fix stupid `strerror` handling in `generror.h`
+    - Build Speed
+        - `mold` linker
+            - `mold` daemonisation
+        - `ld64 -cache_path_lto`
+        - Precompiled headers
+    - Force `lld` on all targets
+        - Re-enable ASAN on Windows
+- Tests
+    - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
+    - Write tests for generror for error callback
+    - Write tests for gentooling by capturing glog output
+    - Test genfs directory iteration by filling a buffer with filenames from the callback
+- Optimization
+    - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
+    - OpenMP support
+    - XRay instrumentation
+    - Apply `__likely` and `__unlikely`
+    - Apply `hot` and `cold` function attributes
+- Security
+    - Checked C
+    - `clang` thread safety intrinsics
+    - `_r` function variants
+    - QL Recommendations
+        - `fopen_s` -> `fdopen`
+            or
+        - Native IO underlying `gen_filesystem_handle_t`
+- Documentation
+    - Tutorials
+    - Write examples
+        - General code examples (docstring tags `@example`)
+            - Comprehensive `@example` tags
+        - Tests
+        - Modules
 - Features
     - `GEN_ERROR_OUT_IF` for errno macros
     - `gen_winerr_as_string` pass in buffer size
@@ -72,56 +111,3 @@
         - OpenMP
         - `clang` mutex intrins
         - Thread-safety checker intrins
-- Builds
-    - Centralized toolchain management config (separate from `config.mk`)
-        - Fetch (& Build) toolchain from remote (Not submodule!)
-        - Enforce toolchain on submodules
-        - Fetch `autotools`
-            - `safeclib` on Windows
-                - Fix stupid `strerror` handling in `generror.h`
-    - Review all tooling used in builds
-        - `make`
-        - `clang`
-        - `ar`
-        - `clang-format`
-        - `strip`/CTU-strip capable linker
-        - `ld`/`ld64`/`mslink`
-            or
-        - `ld.lld` (or `mold`)/`ld64.lld` (or `mold` once MACHO support is done)/`lld-link`
-        - `cmake` for `mimalloc`
-        - `autotools` and associated junk for `safeclib`
-    - Build Speed
-        - `mold` linker
-            - `mold` daemonisation
-        - `ld64 -cache_path_lto`
-        - Precompiled headers
-        - `make` `.ONESHELL`
-    - Force `lld` on all targets
-        - Re-enable ASAN on Windows
-- Tests
-    - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
-    - Write tests for generror for error callback
-    - Write tests for gentooling by capturing glog output
-    - Test genfs directory iteration by filling a buffer with filenames from the callback
-- Optimization
-    - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
-    - OpenMP support
-    - XRay instrumentation
-    - Apply `__likely` and `__unlikely`
-    - Apply `hot` and `cold` function attributes
-- Security
-    - Checked C
-    - `clang` thread safety intrinsics
-    - `_r` function variants
-    - QL Recommendations
-        - `fopen_s` -> `fdopen`
-            or
-        - Native IO underlying `gen_filesystem_handle_t`
-- Documentation
-    - Tutorials
-    - Write examples
-        - General code examples (docstring tags `@example`)
-            - Comprehensive `@example` tags
-        - Tests
-        - Modules
-    

@@ -11,9 +11,11 @@ _MIMALLOC_LIB_INTERNAL = genstone/vendor/tmp/mimalloc/$(LIB_PREFIX)mimalloc$(DYN
 _MIMALLOC_LIB_INTERNAL_PATTERN = $(wildcard genstone/vendor/tmp/mimalloc/$(LIB_PREFIX)mimalloc*$(DYNAMIC_LIB_SUFFIX)*)
 _MIMALLOC_LIB_INTERNAL_MAKEFILE = genstone/vendor/tmp/mimalloc/Makefile
 
+.ONESHELL:
 genstone/vendor/tmp:
 	-mkdir $@
 
+.ONESHELL:
 genstone/vendor/tmp/mimalloc: | genstone/vendor/tmp
 	-mkdir $@
 
@@ -34,12 +36,15 @@ endif
 # On Unix platforms this copies the alias link, not the main lib
 	$(CP) $(subst /,$(SEP),$(_MIMALLOC_LIB_TAGGED_OUTPUT) $(MIMALLOC_LIB))
 
+.ONESHELL:
 build_message_mimalloc:
 	@echo "$(SECTION_PREFIX) Mimalloc"
 	@echo "$(INFO_PREFIX) The gods of Microsoft hath bestowed their memory magic on us"
 
+.ONESHELL:
 mimalloc: build_message_mimalloc $(MIMALLOC_LIB) ### @Vendor builds Microsoft `mimalloc` as a Genstone module
 
+.ONESHELL:
 clean_mimalloc:
 	-$(RMDIR) genstone/vendor/tmp/mimalloc
 	-$(RM) $(wildcard lib/*mimalloc*)

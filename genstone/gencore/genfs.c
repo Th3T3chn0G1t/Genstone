@@ -194,11 +194,11 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	}
 	else {
 		output_handle->dir = false;
-		
+
 		if((error = stat(path, &s))) GEN_ERROR_OUT_ERRNO(stat, errno);
 		error = fopen_s(&output_handle->file_handles[1], path, "w+");
 		if(error || !output_handle->file_handles[1]) GEN_ERROR_OUT_ERRNO(fopen_s, errno);
-		
+
 		if((error = stat(path, &s))) GEN_ERROR_OUT_ERRNO(stat, errno);
 		error = fopen_s(&output_handle->file_handles[0], path, "r");
 		if(error || !output_handle->file_handles[0]) GEN_ERROR_OUT_ERRNO(fopen_s, errno);

@@ -368,10 +368,12 @@ ifeq ($(TEST),BUILD)
 	TEST_BUILD = 1
 endif
 
+.ONESHELL:
 clean_tmpfile:
 	@echo "$(ACTION_PREFIX)$(RM) $(wildcard tmp/*.tmp)$(ACTION_SUFFIX)"
 	-@$(RM) $(wildcard tmp/*.tmp)
 
+.ONESHELL:
 clean_clang_tooling_artifacts:
 ifeq ($(HAVE_FIND),ENABLED)
 	-rm $(shell find . -name "*.gcda")
@@ -379,9 +381,11 @@ ifeq ($(HAVE_FIND),ENABLED)
 endif
 	-rm $(wildcard "*.profraw")
 
+.ONESHELL:
 tmp:
 	-mkdir $@
 
+.ONESHELL:
 %$(OBJECT_SUFFIX): %.c build/config.mk | tmp
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
@@ -426,6 +430,7 @@ else
 endif
 endif
 
+.ONESHELL:
 %$(STATIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(STATIC_LIB_TOOL)
@@ -450,6 +455,7 @@ endif
 endif
 
 
+.ONESHELL:
 %$(DYNAMIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(DYNAMIC_LIB_TOOL)
@@ -473,6 +479,7 @@ else
 endif
 endif
 
+.ONESHELL:
 %$(EXECUTABLE_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)$(ACTION_SUFFIX)"
 	@$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)
