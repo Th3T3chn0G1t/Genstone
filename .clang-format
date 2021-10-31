@@ -22,7 +22,7 @@ AttributeMacros: [ '__unused', '__inline', '__deprecated', '__nodiscard', '__lik
 BinPackArguments: true
 BinPackParameters: true
 
-BitFieldColonSpacing: After
+#BitFieldColonSpacing: After
 
 BreakBeforeBraces: Custom
 BraceWrapping:

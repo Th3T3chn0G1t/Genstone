@@ -5,6 +5,7 @@
 - Builds
     - Cache `safeclib` in CI
     - Centralized toolchain management config (separate from `config.mk`)
+        - Fix `.clang-format`
         - Fetch (& Build) toolchain from remote (Not submodule!)
         - Enforce toolchain on submodules
         - Fetch `autotools`
