@@ -71,7 +71,7 @@ SortIncludes: true
 
 SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
-SpaceAroundPointerQualifiers: Both
+#SpaceAroundPointerQualifiers: Both
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeCaseColon: false
 SpaceBeforeParens: Never
