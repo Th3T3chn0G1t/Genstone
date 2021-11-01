@@ -72,8 +72,8 @@ gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, cons
 #if PLATFORM == WIN
 	GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wpedantic"
-	*output_address = GetProcAddress(dylib, symname)
-		GEN_ERROR_OUT_IF_WINERR(GetProcAddress, GetLastError());
+	*output_address = GetProcAddress(dylib, symname);
+	GEN_ERROR_OUT_IF_WINERR(GetProcAddress, GetLastError());
 	GEN_DIAG_REGION_END
 #else
 	if(!(*output_address = dlsym(dylib, symname))) {
