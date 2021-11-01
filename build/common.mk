@@ -234,6 +234,8 @@ else
 	ifeq ($(LINKER),LLD)
 		ifneq ($(PLATFORM),DWN)
 			CLINKER := $(COMPILER) -fuse-ld=lld
+		else
+			CLINKER := $(COMPILER)
 		endif
 	else
 		CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
