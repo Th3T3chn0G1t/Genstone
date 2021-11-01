@@ -23,7 +23,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 	const size_t exec_size = strnlen_s(exec, GEN_INTERNAL_WIN_EXEC_MAX) + 1;
 	char local_exec[exec_size];
 	strcpy_s(local_exec, exec_size, exec);
-	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, error);
+	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 	CreateProcessA(NULL, local_exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process);
 	GEN_ERROR_OUT_IF_WINERR(CreateProcessA, GetLastError());
 	CloseHandle(process.hThread);
