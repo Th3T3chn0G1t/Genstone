@@ -10,8 +10,7 @@ build_message_gentooling_test:
 gentooling_test: gencore build_message_gentooling_test $(GEN_TOOLING_TEST) ### @Test Builds and runs Genstone tooling utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_TOOLING_TEST)$(ACTION_SUFFIX)"
 ifeq ($(PLATFORM),WIN)
-	@cd lib
-	@$(subst /,$(SEP),../$(GEN_TOOLING_TEST))
+	@cd lib && $(subst /,$(SEP),../$(GEN_TOOLING_TEST))
 else
 	@LD_LIBRARY_PATH=lib $(GEN_TOOLING_TEST)
 endif

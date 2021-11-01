@@ -46,7 +46,6 @@ ifeq ($(PLATFORM),BSD)
 	C11_COMPAT_LFLAGS = -pthread
 endif
 
-.ONESHELL:
 build_message_c11compat:
 	@echo "$(SECTION_PREFIX) C11 Compat"
 	@echo "$(INFO_PREFIX) C11 optional feature compatibility layers"
@@ -68,7 +67,6 @@ $(C11_COMPAT_UCHAR_LIB): CFLAGS = -Igenstone/vendor/c11compat/musl/include
 $(C11_COMPAT_UCHAR_LIB): LFLAGS = 	
 $(C11_COMPAT_UCHAR_LIB): $(C11_COMPAT_UCHAR_OBJECTS) | lib
 
-.ONESHELL:
 clean_c11compat_uchar:
 	-rm $(C11_COMPAT_UCHAR_OBJECTS)
 	-rm $(C11_COMPAT_UCHAR_LIB)
@@ -91,14 +89,12 @@ C11_COMPAT_LIB += $(C11_COMPAT_ANNEXK_LIB)
 # We could clean the submodule here for the base clean target, but we *really* want to avoid rebuilding this lib
 # (It takes forever)
 #C11_COMPAT_CLEAN_TARGETS += clean_c11compat_annexk
-.ONESHELL:
 clean_c11compat_annexk: | $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib clean
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE):
-	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib)
-	$(subst /,$(SEP),./build-aux/autogen.sh)
-	$(subst /,$(SEP),./configure --prefix=/usr)
+	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./build-aux/autogen.sh)
+	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./configure --prefix=/usr)
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL): $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib
@@ -111,7 +107,5 @@ endif
 endif
 endif
 
-.ONESHELL:
 c11compat: build_message_c11compat $(C11_COMPAT_LIB) 
-.ONESHELL:
 clean_c11compat: $(C11_COMPAT_CLEAN_TARGETS)
