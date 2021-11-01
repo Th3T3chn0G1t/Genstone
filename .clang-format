@@ -17,8 +17,6 @@ AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 
-AttributeMacros: [ '__unused', '__inline', '__deprecated', '__nodiscard', '__likely', '__unlikely' ]
-
 BinPackArguments: true
 BinPackParameters: true
 
