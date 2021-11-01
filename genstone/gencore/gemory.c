@@ -8,8 +8,7 @@ gen_error_t galloc(void** const restrict out_address, const size_t size, const s
 	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
 
 	void* const allocated = mi_malloc(size * count);
-
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_malloc, errno);
+	GEN_ERROR_OUT_IF_ERRNO(mi_malloc, errno);
 
 	*out_address = allocated;
 
@@ -24,8 +23,7 @@ gen_error_t gzalloc(void** const restrict out_address, const size_t size, const 
 	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
 
 	void* const allocated = mi_calloc(count, size);
-
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_calloc, errno);
+	GEN_ERROR_OUT_IF_ERRNO(mi_calloc, errno);
 
 	*out_address = allocated;
 
@@ -40,8 +38,7 @@ gen_error_t grealloc(void** const restrict address, const size_t size, const siz
 	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
 
 	void* const allocated = mi_realloc(*address, count * size);
-
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_realloc, errno);
+	GEN_ERROR_OUT_IF_ERRNO(mi_realloc, errno);
 
 	*address = allocated;
 

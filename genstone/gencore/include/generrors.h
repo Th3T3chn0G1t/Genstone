@@ -85,7 +85,11 @@ typedef enum {
     /**
      * A bad or invalid operation was requested
      */
-    GEN_BAD_OPERATION
+    GEN_BAD_OPERATION,
+    /**
+     * The specified target is in use elsewhere
+     */
+    GEN_IN_USE
 } gen_error_t;
 
 /**
@@ -237,6 +241,24 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
+ * Errors out of a function marked `GEN_ERRORABLE_RETURN` if `native_errno` is not `EOK` or equivalent
+ * Horrible macro string manipulation to get some nice output on your errno
+ * @param proc the function which set errno
+ * @param native_errno the errno value
+ */
+#define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) \
+    do { \
+        if(native_errno) { \
+            const errno_t gen_internal_error_out_native_errno_errno = native_errno; \
+            const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(gen_internal_error_out_native_errno_errno); \
+            const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
+            GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(gen_internal_error_out_native_errno_errno); \
+            GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
+            return gen_internal_error_out_native_errno_gen_error; \
+        } \
+    } while(0)
+
+/**
  * Horrible macro string manipulation to get some nice output on your winerror
  * @param proc the function which set winerr
  * @param native_errno the winerr value
@@ -254,6 +276,29 @@ extern void* gen_error_handler_passthrough;
         gen_winerr_as_string(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), NULL, gen_internal_error_out_native_errno_errno); \
         GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
         return gen_internal_error_out_native_errno_gen_error; \
+    } while(0)
+
+/**
+ * Errors out of a function marked `GEN_ERRORABLE_RETURN` if `native_errno` is not 0
+ * Horrible macro string manipulation to get some nice output on your winerror
+ * @param proc the function which set winerr
+ * @param native_errno the winerr value
+ */
+#define GEN_ERROR_OUT_IF_WINERR(proc, native_errno) \
+    do { \
+        if(native_errno) { \
+            const unsigned long gen_internal_error_out_native_errno_errno = native_errno; \
+            const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_winerr(gen_internal_error_out_native_errno_errno); \
+            const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
+            size_t gen_internal_error_out_native_errno_native_strerror_len = 0; \
+            gen_winerr_as_string(NULL, &gen_internal_error_out_native_errno_native_strerror_len, gen_internal_error_out_native_errno_errno); \
+            const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
+            char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+            strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+            gen_winerr_as_string(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), NULL, gen_internal_error_out_native_errno_errno); \
+            GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
+            return gen_internal_error_out_native_errno_gen_error; \
+        } \
     } while(0)
 
 /**

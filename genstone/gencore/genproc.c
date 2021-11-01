@@ -22,9 +22,10 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 	PROCESS_INFORMATION process;
 	const size_t exec_size = strnlen_s(exec, GEN_INTERNAL_WIN_EXEC_MAX) + 1;
 	char local_exec[exec_size];
-	errno_t error = strcpy_s(local_exec, exec_size, exec);
-	if(error) GEN_ERROR_OUT_ERRNO(strcpy_s, error);
-	if(!CreateProcessA(NULL, local_exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process)) GEN_ERROR_OUT_WINERR(CreateProcessA, GetLastError());
+	strcpy_s(local_exec, exec_size, exec);
+	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, error);
+	CreateProcessA(NULL, local_exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process);
+	GEN_ERROR_OUT_IF_WINERR(CreateProcessA, GetLastError());
 	CloseHandle(process.hThread);
 
 	*process_out = process.hProcess;

@@ -63,6 +63,7 @@ const char* gen_error_name(const gen_error_t error) {
 		case GEN_TOO_SHORT: return "GEN_TOO_SHORT";
 		case GEN_BAD_CONTENT: return "GEN_BAD_CONTENT";
 		case GEN_BAD_OPERATION: return "GEN_BAD_OPERATION";
+		case GEN_IN_USE: return "GEN_IN_USE";
 	}
 }
 
@@ -83,6 +84,7 @@ const char* gen_error_description(const gen_error_t error) {
 		case GEN_TOO_SHORT: return "The provided argument is too short";
 		case GEN_BAD_CONTENT: return "The provided argument contains bad or invalid content";
 		case GEN_BAD_OPERATION: return "A bad or invalid operation was requested";
+		case GEN_IN_USE: return "The specified target is in use elsewhere";
 	}
 }
 
@@ -108,6 +110,9 @@ GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error) {
 		case EMFILE: return GEN_OUT_OF_HANDLES;
 		case ENFILE: return GEN_OUT_OF_HANDLES;
 		case EBADF: return GEN_INVALID_PARAMETER;
+		case EBUSY: return GEN_IN_USE;
+		case EFAULT: return GEN_BAD_CONTENT;
+		case EISDIR: return GEN_WRONG_OBJECT_TYPE;
 
 #if PLATFORM != WIN
 		// Windows doesn't support Annex K specific errno values

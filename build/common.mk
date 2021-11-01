@@ -232,20 +232,7 @@ ifeq ($(LINKER),DEFAULT)
 	CLINKER := $(COMPILER)
 else
 	ifeq ($(LINKER),LLD)
-		ifeq ($(PLATFORM),WIN)
-			LLD = lld-link
-		endif
-		ifeq ($(PLATFORM),LNX)
-			LLD = ld.lld
-		endif
-		ifeq ($(PLATFORM),DWN)
-			# Default `ld` on macOS should be `ld64` (`lld`)
-			LLD = ld
-		endif
-		ifeq ($(PLATFORM),BSD)
-			LLD = ld.lld
-		endif
-		CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LLD))
+		CLINKER := $(COMPILER) -fuse-ld=lld
 	else
 		CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
 	endif

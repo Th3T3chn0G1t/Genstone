@@ -38,7 +38,7 @@
     - QL Recommendations
         - `fopen_s` -> `fdopen`
             or
-        - Native IO underlying `gen_filesystem_handle_t`
+        - *(prefer this) Native IO underlying `gen_filesystem_handle_t`
 - Documentation
     - Tutorials
     - Write examples
@@ -47,7 +47,6 @@
         - Tests
         - Modules
 - Features
-    - `GEN_ERROR_OUT_IF` for errno macros
     - `gen_winerr_as_string` pass in buffer size
     - Native-IO
         - NT
