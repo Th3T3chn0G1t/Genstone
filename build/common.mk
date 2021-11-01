@@ -374,8 +374,12 @@ endif
 
 ifeq ($(TOOLING),ENABLED)
 	ifneq ($(PLATFORM),DWN) # macOS libc shits itself when you `fork` with sanitizers enabled
-		GLOBAL_C_FLAGS += -fsanitize=undefined -fsanitize=address
-		GLOBAL_L_FLAGS += -fsanitize=undefined -fsanitize=address
+		GLOBAL_C_FLAGS += -fsanitize=undefined
+		GLOBAL_L_FLAGS += -fsanitize=undefined
+		ifneq ($(PLATFORM),WIN) # Windows debug CRT conflicts with `clang` ASAN
+			GLOBAL_C_FLAGS += -fsanitize=address
+			GLOBAL_L_FLAGS += -fsanitize=address
+		endif
 	endif
 endif
 

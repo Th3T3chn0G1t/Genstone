@@ -48,6 +48,7 @@
         - Modules
 - Features
     - `gen_winerr_as_string` pass in buffer size
+    - Switch Win32 to NT calls
     - Native-IO
         - NT
         - Pipes
