@@ -73,7 +73,7 @@ SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
 #SpaceAroundPointerQualifiers: Both
 SpaceBeforeAssignmentOperators: true
-SpaceBeforeCaseColon: false
+#SpaceBeforeCaseColon: false
 SpaceBeforeParens: Never
 SpaceBeforeSquareBrackets: false
 SpaceInEmptyBlock: false
