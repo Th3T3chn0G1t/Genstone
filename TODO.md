@@ -6,6 +6,12 @@
         - Security policy supported versions (SECURITY.md)
     - Organisation
         - Enable "Require a pull request before merging"
+    - CI
+        - Re-enable Windows CI
+        - Replace external actions with own implementations
+            - `egor-tensin/setup-clang@v1`
+            - `lyricwulf/abc@v1`
+            - Enable "Allow local actions only" at https://github.com/Th3T3chn0G1t/Genstone/settings/actions
 - Misc
     - Recondense and fix function outputs
         - Ensure all functions take a max buffer size
