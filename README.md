@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml/badge.svg?branch=trunk)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml)
 [![Documentation](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml/badge.svg)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml)
+[![Discord](https://img.shields.io/discord/906624261203058688?color=4e5d94&label=discord&logo=discord&logoColor=4e5d94)](https://discord.gg/7rG4ueJgX6)
 
 ### A personal C development framework which creates a consistent, configurable cross-platform abstraction layer for a variety of applications
 
