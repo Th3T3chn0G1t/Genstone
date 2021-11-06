@@ -369,7 +369,7 @@ else
 endif
 
 ifeq ($(TOOLING),ENABLED)
-	ifneq ($(PLATFORM),DWN) # macOS libc shits itself when you `fork` with sanitizers enabled
+	ifneq ($(PLATFORM),DWN) # macOS libc dies when you `fork` with sanitizers enabled
 		GLOBAL_C_FLAGS += -fsanitize=undefined
 		GLOBAL_L_FLAGS += -fsanitize=undefined
 		ifneq ($(PLATFORM),WIN) # Windows debug CRT conflicts with `clang` ASAN
