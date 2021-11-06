@@ -4,6 +4,12 @@ else
 include build/config.mk
 endif
 
+ifneq ($(OVERRIDE_TOOLCHAIN),)
+TOOLCHAIN = $(OVERRIDE_TOOLCHAIN)
+endif
+
+include $(TOOLCHAIN)
+
 # We want make to use cmd.exe when the *host* is Windows
 ifeq ($(OS),Windows_NT)
 SHELL := cmd.exe
@@ -108,9 +114,6 @@ endif
 ifneq ($(OVERRIDE_STATIC_ANALYSIS),)
 STATIC_ANALYSIS = $(OVERRIDE_STATIC_ANALYSIS)
 endif
-ifneq ($(OVERRIDE_HAVE_STAT_REPORT),)
-HAVE_STAT_REPORT = $(OVERRIDE_HAVE_STAT_REPORT)
-endif
 ifneq ($(OVERRIDE_TOOLING),)
 TOOLING = $(OVERRIDE_TOOLING)
 endif
@@ -183,12 +186,6 @@ ERROR += "$(ERROR_PREFIX) Invalid value for STATIC_ANALYSIS: \"$(STATIC_ANALYSIS
 endif
 endif
 
-ifneq ($(HAVE_STAT_REPORT),ENABLED)
-ifneq ($(HAVE_STAT_REPORT),DISABLED)
-ERROR += "$(ERROR_PREFIX) Invalid value for HAVE_STAT_REPORT: \"$(HAVE_STAT_REPORT)\"\n"
-endif
-endif
-
 ifneq ($(TOOLING),ENABLED)
 ifneq ($(TOOLING),DISABLED)
 ERROR += "$(ERROR_PREFIX) Invalid value for TOOLING: \"$(TOOLING)\"\n"
@@ -242,7 +239,7 @@ else
 	endif
 endif
 
-GLOBAL_C_FLAGS += -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -fopenmp -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
@@ -262,18 +259,17 @@ ifneq ($(PLATFORM),WIN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
 endif
 ifeq ($(PLATFORM),DWN)
+    - Checked C
+
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
 endif
 
-# Need to check clang version for this to work (12.0.1?)
 ifeq ($(BUILD_SYS_DEBUG),ENABLED)
 	ifeq ($(PLATFORM),DWN)
 		GLOBAL_L_FLAGS += -Wl,-why_load,-print_statistics
 	endif
-	ifeq ($(HAVE_STAT_REPORT),ENABLED)
-		GLOBAL_C_FLAGS += -fproc-stat-report
-		GLOBAL_L_FLAGS += -fproc-stat-report
-	endif
+	GLOBAL_C_FLAGS += -fproc-stat-report
+	GLOBAL_L_FLAGS += -fproc-stat-report
 endif
 
 ifeq ($(PLATFORM),WIN)
@@ -422,8 +418,13 @@ ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
+ifeq ($(PLATFORM),WIN)
+	@echo "$(CLANG_FORMAT) --style=file $<$(ACTION_SUFFIX)"
+	-$(CLANG_FORMAT) --style=file $<
+else
 	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
+endif
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"

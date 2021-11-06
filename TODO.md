@@ -3,7 +3,12 @@
 - Misc
     - Social preview banner github
 - Builds
+    - Portability
+        - Switching out/Disabling submodules
+        - Easier handling of adding new platforms in build system
+            - `build/platforms/*.mk`
     - Cache `safeclib` in CI
+    - Separate per-project and global config
     - Centralized toolchain management config (separate from `config.mk`)
         - Fix `.clang-format`
         - Fetch (& Build) toolchain from remote (Not submodule!)
@@ -12,9 +17,16 @@
             - `safeclib` on Windows
                 - Fix stupid `strerror` handling in `generror.h`
         - Fix submodule toolchain management
+        - Checked C
+            - https://api.github.com/repos/microsoft/checkedc-clang/releases/latest
+                - Returns a json
+                - Looking for **binaries** for Windows
+                    - Look for `https://github.com/microsoft/checkedc-clang/releases/download/.*win64.exe`
+                - Build tarball on Unixes
     - Build Speed
         - `mold` linker
             - `mold` daemonisation
+        - Disabling static analysis for fast builds
         - `ld64 -cache_path_lto`
         - Precompiled headers
 - Tests
@@ -27,12 +39,10 @@
     - Learn about cache optimization
     - Learn about SIMD and crap
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
-    - OpenMP support
     - XRay instrumentation
     - Apply `__likely` and `__unlikely`
     - Apply `hot` and `cold` function attributes
 - Security
-    - Checked C
     - `clang` thread safety intrinsics
     - `_r` function variants
     - QL Recommendations
@@ -111,6 +121,5 @@
     - Multiprocessing
         - Fibers intrins
         - Better threading interface
-        - OpenMP
         - `clang` mutex intrins
         - Thread-safety checker intrins

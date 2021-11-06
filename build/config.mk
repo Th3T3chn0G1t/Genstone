@@ -1,6 +1,9 @@
 # Path to the sandbox project module Makefile
 SANDBOX_PROJECT_MODULE = sandbox/sample.mk
 
+# Path to the toolchain config Makefile
+TOOLCHAIN = build/toolchain.mk
+
 # Set build optimization mode
 # Possible values are:
 # `DEBUG`: Include debug information, reduced/minimal optimization
@@ -36,19 +39,6 @@ GLOBAL_C_FLAGS =
 # In order to pass through direct linker flags, use `-Wl,-foo,--bar,value,option`
 GLOBAL_L_FLAGS =
 
-# The C compiler to use
-# This is unlikely to work with compilers other than clang
-COMPILER = clang
-
-# The linker to use
-# Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
-# Set to `DEFAULT` to allow the compiler to select a linker
-# Set to `LLD` to select an appropriate `lld` backend for the platform
-LINKER = LLD
-
-# The `ar` tool to use for creating static libraries
-AR = ar
-
 # Using boring non-colourful output for boring non-colourful terminals
 # `ENABLED`: Boring output
 # `DISABLED`: Awesome output
@@ -72,21 +62,12 @@ TOOLING = ENABLED
 # `DISABLED`: Disables static analysis
 STATIC_ANALYSIS = ENABLED
 
-# The clang-format command line to use
-CLANG_FORMAT = clang-format
-
 # Whether to strip binaries after building
 # Possible values are:
 # `DEBUG`: Strip debug symbols
 # `ENABLED`: Strip all symbols
 # `DISABLED`: Don't strip binaries
 STRIP_BINARIES = DISABLED
-
-# The tool to use for stripping binaries
-# Expected to have a command line interface similar to `llvm-strip`
-# If the target platform's linker should supports stripping, please set this to `LINKER` (the literal word *not* the value of the `LINKER` variable)
-# Stripping is more effective if the linker is responsible for stripping
-STRIP_TOOL = strip
 
 # Paths to extra module Makefiles
 ADDITIONAL_BUILD_MODULES =
@@ -100,15 +81,6 @@ DISABLED_MODULES = genproc_test
 # `ENABLED`: Enables build system debugging
 # `DISABLED`: Disables build system debugging
 BUILD_SYS_DEBUG = DISABLED
-
-# Whether the provided `clang` version has support for `-fproc-stat-report`
-# Possible values are:
-# `ENABLED`: Have `-fproc-stat-report`
-# `DISABLED`: Don't have `-fproc-stat-report`
-HAVE_STAT_REPORT = ENABLED
-
-# CMake exec to use for building CMake submodules
-CMAKE = cmake
 
 # Whether perl is available in the environment
 # Used for running unsafe API check from safeclib
