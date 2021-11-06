@@ -1,5 +1,8 @@
 ![Genstone Logo](brand/logo.svg)
 
+[![CI](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml/badge.svg?branch=trunk)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml)
+[![Documentation](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml/badge.svg)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml)
+
 # Genstone
 ### A personal C development framework which creates a consistent, configurable cross-platform abstraction layer for a variety of applications
 
