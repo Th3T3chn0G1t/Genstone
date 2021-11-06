@@ -119,6 +119,7 @@
         - Integrate a physics system
             - Rework to use matrix intrins instead of whatever it uses internally
     - Multiprocessing
+        - OpenMP
         - Fibers intrins
         - Better threading interface
         - `clang` mutex intrins

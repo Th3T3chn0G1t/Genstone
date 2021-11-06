@@ -65,7 +65,7 @@ GEN_DIAG_REGION_BEGIN
  * Defines `__deprecated` on platforms which do not support it by default
  * Marks a function as deprecated
  */
-#define __deprecated __attribute__((deprecated))
+#define __deprecated(msg) __attribute__((deprecated(msg)))
 #endif
 #ifndef __nodiscard
 /**
@@ -73,18 +73,6 @@ GEN_DIAG_REGION_BEGIN
  * Marks a function return value as not to be discarded
  */
 #define __nodiscard __attribute__((warn_unused_result))
-#endif
-#ifndef __likely
-/**
- * Specifies a control path as likely
- */
-#define __likely [[clang::likely]]  
-#endif
-#ifndef __unlikely
-/**
- * Specifies a control path as unlikely
- */
-#define __unlikely [[clang::unlikely]]
 #endif
 GEN_DIAG_REGION_END
 
