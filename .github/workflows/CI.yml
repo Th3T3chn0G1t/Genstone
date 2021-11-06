@@ -16,9 +16,11 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macOS-latest ] #, windows-latest ]
     steps:
-      - name: Fetch Latest
-        run: git clone --recursive https://github.com/Th3T3chn0G1t/Genstone
+      - uses: actions/checkout@v2
 
+      - name: Fetch Submodules
+        run: git submodule update --init
+        
       - name: Install Clang
         if: ${{ runner.os != 'macOS' }}
         uses: egor-tensin/setup-clang@v1
