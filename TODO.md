@@ -90,7 +90,7 @@
     - `genproc`
         - Fix
         - Signals/killing subprocesses
-        - Shitload of error checking
+        - Add loads of error checking
     - Validate where neccesary with `gen_path_exists`
     - `gendl`
         - Check valid *filenames* for dylibs
