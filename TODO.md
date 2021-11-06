@@ -1,9 +1,18 @@
 # TODO
 
+- Github
+    - Social preview banner
+    - Releases
+        - Semantic versioning
+        - Security policy supported versions (SECURITY.md)
+    - Organisation
 - Misc
-    - Social preview banner github
     - Recondense and fix function outputs
         - Ensure all functions take a max buffer size
+    - Use proper punctuation in documentation
+        - Fullstops in README.md
+        - Fullstops in docstrings
+        - Newlines in docstrings
 - Builds
     - Portability
         - Switching out/Disabling submodules
