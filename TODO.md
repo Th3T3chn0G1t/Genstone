@@ -11,14 +11,18 @@
         - Replace external actions with own implementations
             - `egor-tensin/setup-clang@v1`
             - `lyricwulf/abc@v1`
-            - Enable "Allow local actions only" at https://github.com/Th3T3chn0G1t/Genstone/settings/actions
+            - Remove whitelisted actions from https://github.com/Th3T3chn0G1t/Genstone/settings/actions
 - Misc
+    - Add `strndup_s` to Gemory
+    - Replace submodule invocation where neccesary
+    - Prioritise `ifneq` and `else` instead of `ifeq` and `elifeq` for platform specific codepath selection
     - Recondense and fix function outputs
         - Ensure all functions take a max buffer size
     - Use proper punctuation in documentation
         - Fullstops in README.md
         - Fullstops in docstrings
         - Newlines in docstrings
+    - `__has_include()` for transiently included files
 - Builds
     - Portability
         - Switching out/Disabling submodules
@@ -50,6 +54,7 @@
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
     - Write tests for generror for error callback
     - Write tests for gentooling by capturing glog output
+    - Write tests for gemory
     - Test genfs directory iteration by filling a buffer with filenames from the callback
 - Optimization
     - Learn about alignment

@@ -38,6 +38,13 @@ extern GEN_ERRORABLE_RETURN gzalloc(void** const restrict out_address, const siz
  */
 extern GEN_ERRORABLE_RETURN grealloc(void** const restrict address, const size_t size, const size_t count);
 /**
+ * Duplicates a string onto the heap
+ * @param out_address pointer to storage for a pointer into the allocated heap block
+ * @param str the string to duplicate
+ * @param max the maximum number of characters to duplicate
+ */
+extern GEN_ERRORABLE_RETURN gstrndup(char** const restrict out_address, const char* const restrict str, const size_t max);
+/**
  * Frees a block of heap memory
  * @param address the heap pointer to free
  * @note Contents of the block become undefined after freeing
