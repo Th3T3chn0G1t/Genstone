@@ -1,11 +1,11 @@
 # TODO
 
 - Github
-    - Social preview banner
     - Releases
         - Semantic versioning
         - Security policy supported versions (SECURITY.md)
     - Organisation
+        - Enable "Require a pull request before merging"
 - Misc
     - Recondense and fix function outputs
         - Ensure all functions take a max buffer size
