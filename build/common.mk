@@ -260,6 +260,8 @@ ifneq ($(PLATFORM),WIN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
 endif
 
+ifeq ($(PLATFORM),DWN)
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
 endif
 

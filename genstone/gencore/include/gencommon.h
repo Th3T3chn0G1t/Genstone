@@ -67,6 +67,13 @@ GEN_DIAG_REGION_BEGIN
  */
 #define __deprecated(msg) __attribute__((deprecated(msg)))
 #endif
+#ifndef __unavailable
+/**
+ * Defines `__deprecated` on platforms which do not support it by default
+ * Marks a function as unavailable
+ */
+#define __unavailable(msg) __attribute__((unavailable(msg)))
+#endif
 #ifndef __nodiscard
 /**
  * Defines `__nodiscard` on platforms which do not support it by default

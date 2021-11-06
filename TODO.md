@@ -2,6 +2,8 @@
 
 - Misc
     - Social preview banner github
+    - Recondense and fix function outputs
+        - Ensure all functions take a max buffer size
 - Builds
     - Portability
         - Switching out/Disabling submodules
@@ -40,9 +42,9 @@
     - Learn about SIMD and crap
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
     - XRay instrumentation
-    - Apply `__likely` and `__unlikely`
-    - Apply `hot` and `cold` function attributes
+    - `hot` and `cold` functions & `likely` and `unlikely` branches
 - Security
+    - Always check errno even when its inconvenient
     - `clang` thread safety intrinsics
     - `_r` function variants
     - QL Recommendations
