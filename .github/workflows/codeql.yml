@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ trunk ]
 
+  workflow_dispatch:
+
 jobs:
   analyze:
     name: Analyze
