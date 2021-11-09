@@ -63,6 +63,8 @@
     - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
     - XRay instrumentation
     - `hot` and `cold` functions & `likely` and `unlikely` branches
+    - Apply `__builtin_assume` to make the static analyser stop having an aneurism
+    - Nontemporal load/store for non-hot data `__builtin_nontemporal_load` `__builtin_nontemporal_store`
 - Security
     - Always check errno even when its inconvenient
     - `clang` thread safety intrinsics
@@ -79,6 +81,11 @@
         - Tests
         - Modules
 - Features
+    - Gencalc fixed point https://gcc.gnu.org/onlinedocs/gcc/Fixed-Point.html#Fixed-Point
+    - Nice wrapper API for constructing calls https://gcc.gnu.org/onlinedocs/gcc/Constructing-Calls.html#Constructing-Calls
+    - Apply `#pragma clang final(MACRO)` to prevent random redeffing of config macros
+    - `__builtin_readcyclecounter` for high precision clock
+    - `__builtin_dump_struct` wrapper
     - `gen_winerr_as_string` pass in buffer size
     - Switch Win32 to NT calls
     - Native-IO
@@ -142,7 +149,11 @@
             - Rework to use matrix intrins instead of whatever it uses internally
     - Multiprocessing
         - OpenMP
+        - `__sync_swap` wrapper
         - Fibers intrins
+        - Coroutines
+            - `__builtin_coro_resume` `__builtin_coro_destroy` `__builtin_coro_done` `__builtin_coro_promise` `__builtin_coro_size` `__builtin_coro_frame` `__builtin_coro_free` `__builtin_coro_id` `__builtin_coro_alloc` `__builtin_coro_begin` `__builtin_coro_end` `__builtin_coro_suspend` `__builtin_coro_param`
+            - https://llvm.org/docs/Coroutines.html
         - Better threading interface
         - `clang` mutex intrins
         - Thread-safety checker intrins
