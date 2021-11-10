@@ -10,15 +10,12 @@
 #ifndef GEN_MEMORY_H
 #define GEN_MEMORY_H
 
-
 /**
- * Allocates memory on the heap
- * @param out_address pointer to storage for a pointer into the allocated heap block
- * @param size the size of the unit being allocated for
- * @param count the number of units being allocated for
- * @return an error code
+ * Gemory does not permit the allocation of non-zeroed memory due to potential for security relevant bugs to arise from improperly initialized memory
+ * Also can help prevent UB if the programmer is careless :^)
  */
-extern GEN_ERRORABLE_RETURN galloc(void** const restrict out_address, const size_t size, const size_t count);
+#define galloc gzalloc
+
 /**
  * Allocates memory on the heap
  * Ensures memory is zeroed before returning
@@ -27,7 +24,7 @@ extern GEN_ERRORABLE_RETURN galloc(void** const restrict out_address, const size
  * @param count the number of units being allocated for
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gzalloc(void** const restrict out_address, const size_t size, const size_t count);
+extern GEN_ERRORABLE_RETURN gzalloc(void* restrict * const restrict out_address, const size_t size, const size_t count);
 /**
  * Resizes a memory block on the heap
  * May move items if new size is bigger than the old block allows
@@ -36,14 +33,14 @@ extern GEN_ERRORABLE_RETURN gzalloc(void** const restrict out_address, const siz
  * @param count the number of units being allocated for
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN grealloc(void** const restrict address, const size_t size, const size_t count);
+extern GEN_ERRORABLE_RETURN grealloc(void* restrict * const restrict address, const size_t size, const size_t count);
 /**
  * Duplicates a string onto the heap
  * @param out_address pointer to storage for a pointer into the allocated heap block
  * @param str the string to duplicate
  * @param max the maximum number of characters to duplicate
  */
-extern GEN_ERRORABLE_RETURN gstrndup(char** const restrict out_address, const char* const restrict str, const size_t max);
+extern GEN_ERRORABLE_RETURN gstrndup(char* restrict * const restrict out_address, const char* const restrict str, const size_t max);
 /**
  * Frees a block of heap memory
  * @param address the heap pointer to free

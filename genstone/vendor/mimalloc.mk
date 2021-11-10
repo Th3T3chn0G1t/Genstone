@@ -24,6 +24,11 @@ ifeq ($(PLATFORM),WIN)
 _MIMALLOC_LIB_WINDOWS_STATIC_LINK_LIB = lib/$(LIB_PREFIX)mimalloc$(STATIC_LIB_SUFFIX)
 endif
 
+_MIMALLOC_CMAKE_FLAGS = -DMI_SECURE=ON -DMI_OVERRIDE=OFF
+ifeq ($(BUILD_MODE),DEBUG)
+_MIMALLOC_CMAKE_FLAGS += -DMI_DEBUG_FULL=ON
+endif
+
 genstone/vendor/tmp:
 	-mkdir $@
 
@@ -31,7 +36,7 @@ genstone/vendor/tmp/mimalloc: | genstone/vendor/tmp
 	-mkdir $@
 
 $(_MIMALLOC_LIB_INTERNAL_MAKEFILE): | genstone/vendor/tmp/mimalloc
-	$(CMAKE) $(GLOBAL_CMAKE_MODULE_FLAGS) -DCOMPILE_DEFINITIONS=_CRT_SECURE_NO_WARNINGS -DMI_SECURE=ON -Bgenstone/vendor/tmp/mimalloc genstone/vendor/mimalloc
+	$(CMAKE) $(GLOBAL_CMAKE_MODULE_FLAGS) $(_MIMALLOC_CMAKE_FLAGS) -DCOMPILE_DEFINITIONS=_CRT_SECURE_NO_WARNINGS  -Bgenstone/vendor/tmp/mimalloc genstone/vendor/mimalloc
 
 $(_MIMALLOC_LIB_INTERNAL): $(_MIMALLOC_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/tmp/mimalloc

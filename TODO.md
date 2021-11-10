@@ -13,7 +13,7 @@
             - `lyricwulf/abc@v1`
             - Remove whitelisted actions from https://github.com/Th3T3chn0G1t/Genstone/settings/actions
 - Misc
-    - Add `strndup_s` to Gemory
+    - Document *why* functions will give certain error codes
     - Replace submodule invocation where neccesary
     - Prioritise `ifneq` and `else` instead of `ifeq` and `elifeq` for platform specific codepath selection
     - Recondense and fix function outputs

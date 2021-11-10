@@ -133,7 +133,16 @@ GEN_DIAG_IGNORE_ALL
 #include <unistd.h>
 #endif
 
+#ifndef GEN_USE_MIMALLOC
+/**
+ * Whether to use mimalloc as the allocator
+ */
+#define GEN_USE_MIMALLOC ENABLED
+#endif
+
+#if GEN_USE_MIMALLOC == ENABLED
 #include <mimalloc.h> // \[0]/
+#endif
 
 #if PLATFORM != WIN
 #include <safe_types.h>

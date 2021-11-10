@@ -137,6 +137,7 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
  */
 #define GEN_FRAME_BEGIN(func) \
     __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar; \
+    GEN_REQUIRE_EQUAL_STRING(#func, __func__); \
     gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
 
 /**
