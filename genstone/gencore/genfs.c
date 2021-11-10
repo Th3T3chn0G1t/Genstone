@@ -85,7 +85,10 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 	if(!output_extension) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_extension` was NULL");
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	size_t mark = (size_t) (strchr(strrchr(path, '/'), '.') - path);
+	const char* final_pathseg_terminator = strrchr(path, '/');
+	if(!final_pathseg_terminator) final_pathseg_terminator = path;
+	const char* const ext_start = strchr(final_pathseg_terminator, '.');
+	size_t mark = ext_start ? (size_t) (ext_start - path) : 0;
 	strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 	output_extension[mark - 1] = '\0';
@@ -200,6 +203,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	if(!output_handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_handle` was NULL");
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
+	if(!output_handle->path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_handle->path` was NULL");
 	strcpy_s(output_handle->path, GEN_PATH_MAX, path);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 
@@ -216,7 +220,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 
 		stat(path, &s);
 		GEN_ERROR_OUT_IF_ERRNO(stat, errno);
-		fopen_s(&output_handle->file_handles[1], path, "w+");
+		fopen_s(&output_handle->file_handles[1], path, "a");
 		GEN_ERROR_OUT_IF_ERRNO(fopen_s, errno);
 
 		stat(path, &s);

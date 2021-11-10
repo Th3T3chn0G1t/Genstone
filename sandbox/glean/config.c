@@ -76,31 +76,22 @@ void config_init(void) {
 		(void) galloc((void**) &buffer, needed, sizeof(char));
 		sprintf(buffer, "%s/%s", "sandbox/glean/usr/templates", entry->d_name);
 
-		// Read the contents of the file
-		FILE* file = fopen(buffer, "r");
-		if(!file)
-			glogf(ERROR, "Failed to open file %s: %s", buffer, strerror(errno));
-		else {
-			if(fseek(file, 0, SEEK_END))
-				glogf(ERROR, "Failed to seek in file %s: %s", buffer, strerror(errno));
-			long file_buffer_size = ftell(file);
-			if(file_buffer_size == -1)
-				glogf(ERROR, "Failed to get position in file %s: %s", buffer, strerror(errno));
-			char* file_buffer;
-			(void) galloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
-			if(fseek(file, 0, SEEK_SET))
-				glogf(ERROR, "Failed to seek in file %s: %s", buffer, strerror(errno));
-			fread(file_buffer, sizeof(char), (size_t) file_buffer_size, file);
-			if(ferror(file))
-				glogf(ERROR, "Something went wrong in reading file %s: %s", buffer, strerror(errno));
-			fclose(file);
-			file_buffer[file_buffer_size] = '\0';
+		gen_filesystem_handle_t handle;
+		(void) galloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+		(void) gen_handle_open(&handle, buffer);
+		size_t file_buffer_size;
+		(void) gen_handle_size(&file_buffer_size, &handle);
+		char* file_buffer;
+		(void) galloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
+		(void) gen_file_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
+		file_buffer[file_buffer_size] = '\0';
 
-			vector_append(file_templates, file_buffer);
-			char* name = get_extensionless_filename(buffer);
-			(void) gfree(buffer);
-			vector_append(file_template_names, name);
-		}
+		(void) gen_handle_close(&handle);
+
+		vector_append(file_templates, file_buffer);
+		char* name = get_extensionless_filename(buffer);
+		(void) gfree(buffer);
+		vector_append(file_template_names, name);
 	}
 
 	// Don't forget to clean up

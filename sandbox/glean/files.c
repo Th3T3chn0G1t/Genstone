@@ -64,20 +64,6 @@ static GtkTreeView* tree_view = NULL;
 static int inotify_fd;
 
 /**
- * Gets the file extension from the end of a path
- * @param path the path to get the extension from
- * @return the file extension
- */
-char* get_file_extension(char* path) {
-	GEN_FRAME_BEGIN(get_file_extension);
-
-	char* base = basename(path);
-	char* dot = strchr(base, '.');
-	if(!dot || dot == base) return "";
-	return dot + 1;
-}
-
-/**
  * Gets the base filename without the extension
  * @param path the path to get the name from
  * @return the filename, allocated on the heap
@@ -170,10 +156,14 @@ static void _tree_view_populate(GtkTreeStore* store, GtkTreeIter* parent, tree_n
 					break;
 				}
 				case EXTENSION: {
-					if(!strcmp(icon_map->keys[j].data, get_file_extension(title))) {
+					char* ext;
+					(void) galloc((void**) &ext, GEN_PATH_MAX, sizeof(char));
+					(void) gen_path_extension(ext, title);
+					if(!strcmp(icon_map->keys[j].data, ext)) {
 						gtk_tree_store_set(store, &current, 0, icon_map->icons[j], 1, title, -1);
 						break;
 					}
+					(void) gfree(ext);
 					break;
 				}
 			}
@@ -325,7 +315,7 @@ static void directory_tree_populate(char* directory_path, tree_node_T* upper_nod
 
 		if(S_ISDIR(file_info.st_mode)) {
 			child->dir = true;
-			child->children = calloc(1, sizeof(vector_T));
+			(void) gzalloc((void**) &child->children, 1, sizeof(vector_T));
 			directory_tree_populate(buffer, child);
 		}
 	}
@@ -367,7 +357,7 @@ void directory_tree_refresh(char* directory) {
 
 	// Populate the tree with POSIX magic
 	(void) gstrndup(&root->data, canonical_path, strlen(canonical_path));
-	root->children = calloc(1, sizeof(vector_T));
+	(void) gzalloc((void**) &root->children, 1, sizeof(vector_T));
 	directory_tree_populate(directory, root);
 
 	// Don't forget to clean up

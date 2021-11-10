@@ -189,11 +189,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 					break;
 				}
 				else {
-					FILE* file = fopen(name, "w+");
-					if(!file)
-						glogf(ERROR, "Failed to open file %s for creation: %s", name, strerror(errno));
-					else
-						fclose(file);
+					(void) gen_path_create_file(name);
 				}
 				break;
 			}
@@ -205,83 +201,86 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 			}
 			case NEW_TEMPLATE: {
 				glogf(DEBUG, "Creating new file %s from template %s...", name, (char*) file_template_names->members[gtk_combo_box_get_active(template_combo)]);
-				FILE* file = fopen(name, "w+");
-				if(!file)
-					glogf(ERROR, "Failed to open file %s for creation: %s", name, strerror(errno));
-				else {
-					char* buffer;
-					char* str1 = file_templates->members[gtk_combo_box_get_active(template_combo)];
-					(void) gstrndup(&buffer, str1, strlen(str));
-					size_t buffer_len = strlen(buffer);
 
-					// Keep a reference to all `\$` to replace with `$` at the end
-					vector_T* escaped_marks = calloc(1, sizeof(vector_T));
+				(void) gen_path_create_file(name);
+				gen_filesystem_handle_t handle;
+				(void) galloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+				(void) gen_handle_open(&handle, name);
 
-					char* extless_name = get_extensionless_filename(name);
-					char* EXTLESS_NAME = strmkupper(extless_name);
+				char* buffer;
+				char* str1 = file_templates->members[gtk_combo_box_get_active(template_combo)];
+				(void) gstrndup(&buffer, str1, strlen(str));
+				size_t buffer_len = strlen(buffer);
 
-					char* path = name;
-					char* PATH = strmkupper(path);
+				// Keep a reference to all `\$` to replace with `$` at the end
+				vector_T* escaped_marks;
+				(void) gzalloc((void**) &escaped_marks, 1, sizeof(vector_T));
 
-					char* parent = basename(dirname(name));
-					char* PARENT = strmkupper(parent);
+				char* extless_name = get_extensionless_filename(name);
+				char* EXTLESS_NAME = strmkupper(extless_name);
 
-					char* project = basename(root->data);
-					char* PROJECT = strmkupper(project);
+				char* path = name;
+				char* PATH = strmkupper(path);
 
-					// Find the first `$` in the buffer
-					char* next_marker = strchr(buffer, '$');
-					do {
-						if(!next_marker || (next_marker == buffer && buffer[0] != '$')) break;
-						if(next_marker != buffer && next_marker[-1] == '\\') {
-							next_marker[0] = '~';
-							vector_append(escaped_marks, (void*) ((uintptr_t) next_marker - (uintptr_t) buffer));
-							continue;
-						}
+				char* parent = basename(dirname(name));
+				char* PARENT = strmkupper(parent);
 
-						// Big 'ol WoT to replace tags with the proper data
+				char* project = basename(root->data);
+				char* PROJECT = strmkupper(project);
 
-						if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_name], template_tag_compare_lengths[TEMPLATE_TAG_name]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_name], extless_name);
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_NAME], template_tag_compare_lengths[TEMPLATE_TAG_NAME]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_NAME], EXTLESS_NAME);
-
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_path], template_tag_compare_lengths[TEMPLATE_TAG_path]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_path], path);
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PATH], template_tag_compare_lengths[TEMPLATE_TAG_PATH]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PATH], PATH);
-
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_parent], template_tag_compare_lengths[TEMPLATE_TAG_parent]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_parent], parent);
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PARENT], template_tag_compare_lengths[TEMPLATE_TAG_PARENT]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PARENT], PARENT);
-
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_project], template_tag_compare_lengths[TEMPLATE_TAG_project]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_project], project);
-						else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PROJECT], template_tag_compare_lengths[TEMPLATE_TAG_PROJECT]))
-							_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PROJECT], PROJECT);
-					} while((next_marker = strchr(buffer, '$')));
-
-					// Cleaning up all our garbage
-
-					(void) gfree(extless_name);
-					(void) gfree(EXTLESS_NAME);
-
-					(void) gfree(PATH);
-
-					(void) gfree(PARENT);
-
-					(void) gfree(PROJECT);
-
-					for(size_t i = 0; i < escaped_marks->n_members; i++) {
-						buffer[(size_t) escaped_marks->members[i]] = '$';
+				// Find the first `$` in the buffer
+				char* next_marker = strchr(buffer, '$');
+				do {
+					if(!next_marker || (next_marker == buffer && buffer[0] != '$')) break;
+					if(next_marker != buffer && next_marker[-1] == '\\') {
+						next_marker[0] = '~';
+						vector_append(escaped_marks, (void*) ((uintptr_t) next_marker - (uintptr_t) buffer));
+						continue;
 					}
-					(void) gfree(escaped_marks);
 
-					fputs(buffer, file);
-					fclose(file);
-					(void) gfree(buffer);
+					// Big 'ol WoT to replace tags with the proper data
+
+					if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_name], template_tag_compare_lengths[TEMPLATE_TAG_name]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_name], extless_name);
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_NAME], template_tag_compare_lengths[TEMPLATE_TAG_NAME]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_NAME], EXTLESS_NAME);
+
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_path], template_tag_compare_lengths[TEMPLATE_TAG_path]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_path], path);
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PATH], template_tag_compare_lengths[TEMPLATE_TAG_PATH]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PATH], PATH);
+
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_parent], template_tag_compare_lengths[TEMPLATE_TAG_parent]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_parent], parent);
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PARENT], template_tag_compare_lengths[TEMPLATE_TAG_PARENT]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PARENT], PARENT);
+
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_project], template_tag_compare_lengths[TEMPLATE_TAG_project]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_project], project);
+					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PROJECT], template_tag_compare_lengths[TEMPLATE_TAG_PROJECT]))
+						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PROJECT], PROJECT);
+				} while((next_marker = strchr(buffer, '$')));
+
+				// Cleaning up all our garbage
+
+				(void) gfree(extless_name);
+				(void) gfree(EXTLESS_NAME);
+
+				(void) gfree(PATH);
+
+				(void) gfree(PARENT);
+
+				(void) gfree(PROJECT);
+
+				for(size_t i = 0; i < escaped_marks->n_members; i++) {
+					buffer[(size_t) escaped_marks->members[i]] = '$';
 				}
+				(void) gfree(escaped_marks);
+
+				(void) gen_file_write(&handle, strlen(buffer), (uint8_t*) buffer);
+				(void) gen_handle_close(&handle);
+
+				(void) gfree(buffer);
 				break;
 			}
 		}
@@ -647,28 +646,29 @@ void editor_tab_save_as(editor_tab_T* tab, char* path) {
 	GtkTextView* text_view = GTK_TEXT_VIEW(tab->tab_view);
 	// Get the contents of the text buffer and write it to disk
 	GtkTextBuffer* text_buffer = gtk_text_view_get_buffer(text_view);
-	FILE* file = fopen(path, "w+");
-	if(!file)
-		glogf(ERROR, "Failed to open file %s: %s", path, strerror(errno));
-	else {
-		if(tab->edited) {
-			tab->edited = false;
-			GtkGrid* grid = GTK_GRID(gtk_notebook_get_tab_label(editor_notebook, gtk_widget_get_parent(GTK_WIDGET(text_view))));
-			gtk_container_remove(GTK_CONTAINER(grid), gtk_grid_get_child_at(grid, 2, 0));
-		}
 
-		GtkTextIter start;
-		gtk_text_buffer_get_start_iter(text_buffer, &start);
-		GtkTextIter end;
-		gtk_text_buffer_get_end_iter(text_buffer, &end);
-		char* buffer = gtk_text_buffer_get_text(text_buffer, &start, &end, false);
+	(void) gen_path_create_file(path);
+	gen_filesystem_handle_t handle;
+	(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+	(void) gen_handle_open(&handle, path);
 
-		fputs(buffer, file);
-		(void) gfree(buffer);
-
-		// Don't forget to clean up
-		fclose(file);
+	if(tab->edited) {
+		tab->edited = false;
+		GtkGrid* grid = GTK_GRID(gtk_notebook_get_tab_label(editor_notebook, gtk_widget_get_parent(GTK_WIDGET(text_view))));
+		gtk_container_remove(GTK_CONTAINER(grid), gtk_grid_get_child_at(grid, 2, 0));
 	}
+
+	GtkTextIter start;
+	gtk_text_buffer_get_start_iter(text_buffer, &start);
+	GtkTextIter end;
+	gtk_text_buffer_get_end_iter(text_buffer, &end);
+	char* buffer = gtk_text_buffer_get_text(text_buffer, &start, &end, false);
+
+	(void) gen_file_write(&handle, strlen(buffer), (uint8_t*) buffer);
+	(void) gfree(buffer);
+
+	// Don't forget to clean up
+	(void) gen_handle_close(&handle);
 
 	// Finish blocking FS operations
 	tab->internal_update = false;
@@ -685,33 +685,23 @@ void editor_tab_update_contents_from_file(editor_tab_T* tab, char* path) {
 	// You can't update non-editable/non-text tabs
 	if(!GTK_IS_TEXT_VIEW(tab->tab_view)) return;
 
-	// Read the contents of the file accociated with the tab
-	FILE* file = fopen(path, "r");
-	if(!file)
-		glogf(ERROR, "Failed to open file %s: %s", path, strerror(errno));
-	else {
-		if(fseek(file, 0, SEEK_END))
-			glogf(ERROR, "Failed to seek in file %s: %s", path, strerror(errno));
-		long file_buffer_size = ftell(file);
-		if(file_buffer_size == -1)
-			glogf(ERROR, "Failed to get position in file %s: %s", path, strerror(errno));
-		char* file_buffer;
-		(void) galloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
-		if(fseek(file, 0, SEEK_SET))
-			glogf(ERROR, "Failed to seek in file %s: %s", path, strerror(errno));
-		fread(file_buffer, sizeof(char), (size_t) file_buffer_size, file);
-		if(ferror(file))
-			glogf(ERROR, "Something went wrong in reading file %s: %s", path, strerror(errno));
-		fclose(file);
-		file_buffer[file_buffer_size] = '\0';
+	gen_filesystem_handle_t handle;
+	(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+	(void) gen_handle_open(&handle, path);
+	size_t file_buffer_size;
+	(void) gen_handle_size(&file_buffer_size, &handle);
+	char* file_buffer;
+	(void) galloc((void**) &file_buffer, file_buffer_size + 1, sizeof(char));
+	(void) gen_file_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
+	file_buffer[file_buffer_size] = '\0';
+	(void) gen_handle_close(&handle);
 
-		tab->internal_update = true;
+	tab->internal_update = true;
 
-		// Set the buffer to the updated data
-		gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(tab->tab_view)), file_buffer, (int) file_buffer_size);
+	// Set the buffer to the updated data
+	gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(tab->tab_view)), file_buffer, (int) file_buffer_size);
 
-		(void) gfree(file_buffer);
-	}
+	(void) gfree(file_buffer);
 }
 
 /**
@@ -849,7 +839,6 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 			running_addition_sequence_pos = (size_t) gtk_text_iter_get_offset(location);
 
 		(void) grealloc((void**) &running_addition_sequence, ++running_addition_sequence_len + 1, sizeof(char)); // Catch the NULL-terminator
-		memset(running_addition_sequence, 0, running_addition_sequence_len + 1);
 		running_addition_sequence[running_addition_sequence_len - 1] = *text;
 		if(running_addition_sequence_len == MAX_RUNNING_ADDITION_SEQUENCE || *text == '\n' || *text == '\t' || *text == ' ') {
 			// Pushes back a new undo stack node for the sequence
@@ -959,6 +948,7 @@ void editor_tab_undo_stack_move_back(editor_tab_T* tab) {
 		(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 		seq_node->position = running_addition_sequence_pos;
 		seq_node->n_changed = (long) running_addition_sequence_len;
+		glogf(DEBUG, "Running addition sequence: %s", running_addition_sequence);
 		(void) gstrndup(&seq_node->data, running_addition_sequence, strlen(running_addition_sequence));
 		editor_tab_undo_stack_push(tab, seq_node);
 		running_addition_sequence_len = 0;

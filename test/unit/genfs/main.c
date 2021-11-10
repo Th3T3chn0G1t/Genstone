@@ -61,7 +61,8 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
-	file_handle.path = malloc(GEN_PATH_MAX);
+	error = galloc((void**) &file_handle.path, GEN_PATH_MAX, sizeof(char));
+	GEN_REQUIRE_NO_ERROR(error);
 	error = gen_handle_open(&file_handle, "./testfile");
 
 	GEN_REQUIRE_NO_ERROR(error);

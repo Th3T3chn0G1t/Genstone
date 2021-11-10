@@ -81,6 +81,9 @@
         - Tests
         - Modules
 - Features
+    - Fix `errno` string conversion truncates with `...`
+    - `gen_path_extension` lookin' mighty sketch
+    - Genfs inotify
     - Gencalc fixed point https://gcc.gnu.org/onlinedocs/gcc/Fixed-Point.html#Fixed-Point
     - Nice wrapper API for constructing calls https://gcc.gnu.org/onlinedocs/gcc/Constructing-Calls.html#Constructing-Calls
     - Apply `#pragma clang final(MACRO)` to prevent random redeffing of config macros

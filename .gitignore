@@ -30,6 +30,8 @@ tmp/*
 
 genstone/vendor/tmp/*
 
+filename
+
 .vscode
 .vs
 

@@ -32,6 +32,7 @@
 #include <linux/limits.h>
 
 #include <gencommon.h>
+#include <genfs.h>
 
 #pragma GCC diagnostic pop
 
@@ -253,7 +254,6 @@ extern void           vector_remove				               (vector_T* vector, size_t 
 
 /// Path operations
 
-extern char*          get_file_extension                       (char* path                                                                                                                );
 extern char*          get_extensionless_filename               (const char* path                                                                                                          );
 extern char*          get_home_relative_path                   (char* path                                                                                                                );
 extern char*          get_path_from_home_relative              (char* path                                                                                                                );
