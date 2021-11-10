@@ -237,8 +237,6 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 
 	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
 
-	free(handle->path);
-
 	if(handle->dir) {
 		closedir(handle->directory_handle);
 		GEN_ERROR_OUT_IF_ERRNO(closedir, errno);

@@ -18,6 +18,8 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t siz
 
 	*out_address = allocated;
 
+	errno = 0; // mimalloc does weirdness with NUMA
+
 	GEN_ERROR_OUT(GEN_OK, "");
 }
 
@@ -39,6 +41,8 @@ gen_error_t grealloc(void* restrict* const restrict address, const size_t size, 
 
 	*address = allocated;
 
+	errno = 0; // mimalloc does weirdness with NUMA
+
 	GEN_ERROR_OUT(GEN_OK, "");
 }
 
@@ -59,6 +63,8 @@ gen_error_t gstrndup(char* restrict* const restrict out_address, const char* con
 
 	*out_address = allocated;
 
+	errno = 0; // mimalloc does weirdness with NUMA
+
 	GEN_ERROR_OUT(GEN_OK, "");
 }
 
@@ -72,6 +78,8 @@ gen_error_t gfree(void* const restrict address) {
 #else
 	free(address);
 #endif
+
+	errno = 0; // mimalloc does weirdness with NUMA
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }

@@ -96,7 +96,7 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (directory)...");
 	gen_filesystem_handle_t dir_handle;
-	dir_handle.path = malloc(GEN_PATH_MAX);
+	(void) galloc((void**) &dir_handle.path, GEN_PATH_MAX, sizeof(char));
 	error = gen_handle_open(&dir_handle, "./testdir");
 
 	GEN_REQUIRE_NO_ERROR(error);
