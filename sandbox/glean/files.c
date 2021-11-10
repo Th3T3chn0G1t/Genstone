@@ -263,6 +263,46 @@ void tree_view_populate(GtkTreeView* view, bool refill) {
 	glean_signal_connect(G_OBJECT(view), "button-press-event", G_CALLBACK(file_tree_view_button_pressed), NULL);
 }
 
+typedef struct {
+	char* path;
+	tree_node_T* upper_node;
+	char* directory_path;
+} directory_tree_populate_listdir_handler_passthrough_T;
+
+static void directory_tree_populate(char* directory_path, tree_node_T* upper_node);
+
+static void directory_tree_populate_listdir_handler(const char* const restrict path, void* const restrict passthrough) {
+	directory_tree_populate_listdir_handler_passthrough_T* pass = passthrough;
+
+	// If the file is the current directory (`.`) or the parent directory (`..`), skip the current iteration
+	if(strncmp(path, "..", 3) == 0 || strncmp(path, ".", 2) == 0) return;
+
+	// Concatonate the two paths with a path delimiter (`/`) in between
+	size_t needed = (size_t) snprintf(NULL, 0, "%s/%s", pass->path, path) + 1ul;
+	char* buffer;
+	(void) galloc((void**) &buffer, needed, sizeof(char));
+	sprintf(buffer, "%s/%s", pass->path, path);
+
+	// Push back a new node into the children of the parent
+	tree_node_T* child;
+	(void) gzalloc((void**) &child, 1, sizeof(tree_node_T));
+	child->data = buffer;
+	vector_append(pass->upper_node->children, child);
+
+	// If child is a directory, mark it as such and recurse another call
+	struct stat file_info;
+	if(stat(buffer, &file_info) == -1) {
+		glogf(ERROR, "Failed to get file info %s: %s", buffer, strerror(errno));
+		return;
+	}
+
+	if(S_ISDIR(file_info.st_mode)) {
+		child->dir = true;
+		(void) gzalloc((void**) &child->children, 1, sizeof(vector_T));
+		directory_tree_populate(buffer, child);
+	}
+}
+
 /**
  * Populates a directory tree (`tree_node_T`) from disk
  * Does not affect global state
@@ -277,53 +317,13 @@ static void directory_tree_populate(char* directory_path, tree_node_T* upper_nod
 	if(!(path = get_path_from_home_relative(directory_path)))
 		(void) gstrndup(&path, directory_path, strlen(directory_path));
 
-	// Iterate over files in `path`
-	DIR* folder = opendir(path);
-	if(!folder) {
-		glogf(ERROR, "Failed to open directory %s: %s", path, strerror(errno));
-		return;
-	}
+	gen_filesystem_handle_t handle;
+	(void) galloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+	(void) gen_handle_open(&handle, path);
+	directory_tree_populate_listdir_handler_passthrough_T passthrough = {path, upper_node, directory_path};
+	(void) gen_directory_list(&handle, directory_tree_populate_listdir_handler, &passthrough);
 
-	struct dirent* entry;
-	errno = 0;
-	while((entry = readdir(folder))) {
-		if(errno) {
-			glogf(ERROR, "Failed to read from directory %s: %s", path, strerror(errno));
-			continue;
-		}
-		// If the file is the current directory (`.`) or the parent directory (`..`), skip the current iteration
-		if(strncmp(entry->d_name, "..", 3) == 0 || strncmp(entry->d_name, ".", 2) == 0) continue;
-
-		// Concatonate the two paths with a path delimiter (`/`) in between
-		size_t needed = (size_t) snprintf(NULL, 0, "%s/%s", path, entry->d_name) + 1ul;
-		char* buffer;
-		(void) galloc((void**) &buffer, needed, sizeof(char));
-		sprintf(buffer, "%s/%s", path, entry->d_name);
-
-		// Push back a new node into the children of the parent
-		tree_node_T* child;
-		(void) gzalloc((void**) &child, 1, sizeof(tree_node_T));
-		child->data = buffer;
-		vector_append(upper_node->children, child);
-
-		// If child is a directory, mark it as such and recurse another call
-		struct stat file_info;
-		if(stat(buffer, &file_info) == -1) {
-			glogf(ERROR, "Failed to get file info %s: %s", buffer, strerror(errno));
-			continue;
-		}
-
-		if(S_ISDIR(file_info.st_mode)) {
-			child->dir = true;
-			(void) gzalloc((void**) &child->children, 1, sizeof(vector_T));
-			directory_tree_populate(buffer, child);
-		}
-	}
-
-	// Don't forget to clean up
-	if(closedir(folder))
-		glogf(ERROR, "Failed to close directory %s: %s", path, strerror(errno));
-
+	(void) gen_handle_close(&handle);
 	(void) gfree(path);
 }
 

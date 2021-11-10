@@ -184,7 +184,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 			case NEW_FILE: {
 				glogf(DEBUG, "Creating new file %s...", name);
 				struct stat buf;
-				if(stat(name, &buf)) {
+				if(stat(name, &buf) == 0) {
 					editor_show_prompt("Error", GTK_WIDGET(gtk_label_new("File already exists")), 0, NULL, NULL, G_CALLBACK(editor_prompt_new_file_exists_response_handler), NULL);
 					break;
 				}
