@@ -41,4 +41,4 @@ The `GEN_REQUIRE_*` and `glog/f` macros are untested because they are ubiquitous
 
 ## Ettiquette
 
-Common sense applies here: don't be rude, don't be a code-snob, don't harrass people
+See `CODE_OF_CONDUCT.md` in the project root
