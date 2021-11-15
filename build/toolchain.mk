@@ -2,6 +2,10 @@
 # This is unlikely to work with compilers other than clang
 COMPILER = clang
 
+# The C++ compiler to use
+# This is unlikely to work with compilers other than clang++
+COMPILERXX = clang++
+
 # The linker to use
 # Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
 # Set to `DEFAULT` to allow the compiler to select a linker

@@ -87,11 +87,17 @@ endif
 ifneq ($(OVERRIDE_GLOBAL_C_FLAGS),)
 GLOBAL_C_FLAGS = $(OVERRIDE_GLOBAL_C_FLAGS)
 endif
+ifneq ($(OVERRIDE_GLOBAL_CXX_FLAGS),)
+GLOBAL_C_FLAGS = $(OVERRIDE_GLOBAL_CXX_FLAGS)
+endif
 ifneq ($(OVERRIDE_GLOBAL_L_FLAGS),)
 GLOBAL_L_FLAGS = $(OVERRIDE_GLOBAL_L_FLAGS)
 endif
 ifneq ($(OVERRIDE_COMPILER),)
 COMPILER = $(OVERRIDE_COMPILER)
+endif
+ifneq ($(OVERRIDE_COMPILERXX),)
+COMPILERXX = $(OVERRIDE_COMPILERXX)
 endif
 ifneq ($(OVERRIDE_LINKER),)
 LINKER = $(OVERRIDE_LINKER)
@@ -226,19 +232,21 @@ ifeq ($(PLATFORM),DEFAULT)
 endif
 
 ifeq ($(LINKER),DEFAULT)
-	CLINKER := $(COMPILER)
+	CLINKER := $(COMPILERXX)
 else
 	ifeq ($(LINKER),LLD)
 		ifneq ($(PLATFORM),DWN)
-			CLINKER := $(COMPILER) -fuse-ld=lld
+			CLINKER := $(COMPILERXX) -fuse-ld=lld
 		else
-			CLINKER := $(COMPILER)
+			CLINKER := $(COMPILERXX)
 		endif
 	else
-		CLINKER := $(COMPILER) -fuse-ld=$(realpath $(LINKER))
+		CLINKER := $(COMPILERXX) -fuse-ld=$(realpath $(LINKER))
 	endif
 endif
 
+CXX_UNSUPPORTED_CFLAGS += -std=c20
+GLOBAL_CXX_FLAGS += -std=c++20 -stdlib=libc++ -Wno-c++98-compat-pedantic -Wno-old-style-cast
 GLOBAL_C_FLAGS += -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
@@ -451,6 +459,36 @@ else
 	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
 	@$(STRIP_TOOL) -S -D -o $@ $@
 endif
+endif
+
+%$(OBJECT_SUFFIX): %.cpp build/config.mk | tmp
+	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
+
+ifneq ($(PLATFORM),WIN) # The windows CRT does this for us ;p
+	@echo "$(ACTION_PREFIX)genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
+	@genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<
+endif
+
+ifeq ($(STATIC_ANALYSIS),ENABLED)
+	@echo "$(ACTION_PREFIX)$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
+endif
+
+ifeq ($(PLATFORM),WIN)
+	@echo "$(CLANG_FORMAT) --style=file $<$(ACTION_SUFFIX)"
+	-$(CLANG_FORMAT) --style=file $<
+else
+	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
+endif
+
+ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
+	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+	-@$(CLANG_FORMAT) -i $<
+else
+	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
+	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 
 %$(STATIC_LIB_SUFFIX):
