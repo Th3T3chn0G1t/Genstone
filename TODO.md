@@ -114,8 +114,6 @@
         - Time-formats
     - Integrate `notcurses` for terminal stuff
     - More Date & Time utils
-    - Centralised & safer heap management
-        - Replace minimal existing heap calls in genfs (& submodules?)
     - generator (editor)
         - Visual build tool
     - Work on GenUIne with binary partitioning

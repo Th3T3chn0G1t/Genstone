@@ -35,6 +35,9 @@ IDE =
 # Flags to be provided to the compiler at every call
 GLOBAL_C_FLAGS =
 
+# Flags to be provided to the C++ compiler at every call
+GLOBAL_CXX_FLAGS =
+
 # Flags to be provided to the linker through the compiler at every call
 # In order to pass through direct linker flags, use `-Wl,-foo,--bar,value,option`
 GLOBAL_L_FLAGS =
