@@ -4,6 +4,8 @@
 #ifndef GLEAN_H
 #define GLEAN_H
 
+#include <gendiag.h>
+
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
 

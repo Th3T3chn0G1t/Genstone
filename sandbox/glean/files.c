@@ -3,6 +3,9 @@
 
 #include "include/glean.h"
 
+GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+
 /**
  * A message to an inotify watcher thread
  */
@@ -689,3 +692,5 @@ void file_stop_inotify_root(void) {
 
 	file_send_inotify_message(&message);
 }
+
+GEN_DIAG_REGION_END

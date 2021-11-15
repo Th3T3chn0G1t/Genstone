@@ -3,6 +3,9 @@
 
 #include "include/glean.h"
 
+GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+
 /**
  * The current state of the tab list
  * Order reflects the order in the Notebook
@@ -1284,3 +1287,5 @@ editor_tab_T* editor_tab_open_from_file_with_id(char* path, char* name, char* id
 
 	return NULL;
 }
+
+GEN_DIAG_REGION_END

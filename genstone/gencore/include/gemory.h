@@ -19,7 +19,7 @@
 /**
  * Allocates memory on the heap
  * Ensures memory is zeroed before returning
- * @param address pointer to storage for a pointer into the allocated heap block
+ * @param out_address pointer to storage for a pointer into the allocated heap block
  * @param size the size of the unit being allocated for
  * @param count the number of units being allocated for
  * @return an error code
@@ -36,7 +36,7 @@ extern GEN_ERRORABLE_RETURN gzalloc(void* restrict * const restrict out_address,
 extern GEN_ERRORABLE_RETURN grealloc(void* restrict * const restrict address, const size_t size, const size_t count);
 /**
  * Duplicates a string onto the heap
- * @param address pointer to storage for a pointer into the allocated heap block
+ * @param out_address pointer to storage for a pointer into the allocated heap block
  * @param str the string to duplicate
  * @param max the maximum number of characters to duplicate
  */
