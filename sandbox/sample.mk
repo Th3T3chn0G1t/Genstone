@@ -7,7 +7,7 @@ build_message_sample:
 	@echo "$(SECTION_PREFIX) Sample Project"
 	@echo "$(INFO_PREFIX) Genstone sandbox sample project!"
 
-sample: gencore $(SAMPLE_EXEC) ### @User Builds a sample sandbox project
+sample: build_message_sample gencore $(SAMPLE_EXEC) ### @User Builds a sample sandbox project
 
 $(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)
 $(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

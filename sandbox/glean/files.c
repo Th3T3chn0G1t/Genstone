@@ -452,7 +452,7 @@ static int main_thread_fd = -1;
 /**
  * Thread "callback" function which watches the current project root for changes
  */
-static void* inotify_watcher_func(void* vargp) {
+static int inotify_watcher_func(void* vargp) {
 	GEN_FRAME_BEGIN(inotify_watcher_func);
 
 	(void) vargp;
@@ -571,7 +571,7 @@ thread_exit:
 	(void) gfree(callbacks);
 	(void) gfree(passthroughs);
 
-	return NULL;
+	return 0;
 }
 
 /**
@@ -595,7 +595,7 @@ static void root_modified(struct inotify_event* event, int main_comm_fd, void* p
  * @param comm_pipe an fd for communicating with the main thread
  * @return a handle to the created thread
  */
-pthread_t file_begin_inotify_watcher(int comm_pipe) {
+thrd_t file_begin_inotify_watcher(int comm_pipe) {
 	GEN_FRAME_BEGIN(file_begin_inotify_watcher);
 
 	main_thread_fd = comm_pipe;
@@ -606,8 +606,8 @@ pthread_t file_begin_inotify_watcher(int comm_pipe) {
 		glogf(ERROR, "Failed to create thread communication pipe: %s", strerror(errno));
 	else {
 		// Create the watcher thread
-		pthread_t thread = 0;
-		if(pthread_create(&thread, NULL, inotify_watcher_func, NULL))
+		thrd_t thread = 0;
+		if(thrd_create(&thread, inotify_watcher_func, NULL))
 			glogf(ERROR, "Failed to create watcher thread: %s", strerror(errno));
 		else {
 			// Add a watcher for directory root
