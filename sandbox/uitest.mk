@@ -13,6 +13,6 @@ $(UI_TEST_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_UI_CFLAGS) $(shell pkg-config
 $(UI_TEST_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_UI_LFLAGS) $(shell pkg-config --libs sdl2) $(shell pkg-config --libs SDL2_image) $(shell pkg-config --libs SDL2_ttf)
 $(UI_TEST_EXEC): $(UI_TEST_OBJECTS)
 
-clean_sample:
+clean_uitest:
 	-$(RM) $(subst /,$(SEP),$(UI_TEST_OBJECTS))
 	-$(RM) $(subst /,$(SEP),$(UI_TEST_EXEC))

@@ -96,10 +96,10 @@ static gen_ui_extent_t ui_scale = 16;
 static void dir_list_callback(const char* const restrict path, void* const restrict passthrough) {
 	SDL_Surface* text_r = TTF_RenderText_Blended((TTF_Font*) passthrough, path, color);
 	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
+	SDL_Rect dest = {(int) ui_scale, (int) dir_list_height++ * 2 * (int) ui_scale + 4 * (int) ui_scale, text_r->w, text_r->h};
 	SDL_FreeSurface(text_r);
-
-	SDL_Rect dest = {(int) ui_scale, (int) dir_list_height++ * 2 * (int) ui_scale + 4 * (int) ui_scale, 0, 0};
 	SDL_RenderCopy(renderer, text, NULL, &dest);
+	SDL_DestroyTexture(text);
 }
 
 int main(void) {
@@ -167,9 +167,8 @@ int main(void) {
 
 			SDL_Surface* text_r = TTF_RenderText_Blended(font_16, labels[i], color);
 			SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
+			SDL_Rect dest = {(int) (i * TOOLBAR_BUTTON_STRIDE) + ((int) TOOLBAR_BUTTON_WIDTH / 2) - (text_r->w / 2) + (int) ui_scale / 2, (int) (TOOLBAR_HEIGHT / 2) - (text_r->h / 2) + (int) (ui_scale / 2), text_r->w, text_r->h};
 			SDL_FreeSurface(text_r);
-
-			SDL_Rect dest = {(int) (i * TOOLBAR_BUTTON_STRIDE + ui_scale), (int) ui_scale / 2, 0, 0};
 			SDL_RenderCopy(renderer, text, NULL, &dest);
 			SDL_DestroyTexture(text);
 		}

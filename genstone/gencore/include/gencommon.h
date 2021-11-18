@@ -50,7 +50,6 @@ GEN_DIAG_IGNORE_ALL
 #if PLATFORM != WIN
 #include <tgmath.h> // clang tgmath.h is broken under windows
 #endif
-#include <stdnoreturn.h>
 
 #include <dirent.h> // Emulation layer provided on Windows by https://github.com/tronkko/dirent
 
@@ -80,6 +79,8 @@ GEN_DIAG_IGNORE_ALL
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
 #endif
+
+#include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
 #if PLATFORM == WIN
