@@ -66,35 +66,40 @@ static GEN_ERRORABLE_RETURN gen_ui_draw_ninepatch_direct(void* const restrict ni
 	GEN_ERROR_OUT(GEN_OK, "");
 }
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <genfs.h>
+GEN_DIAG_REGION_BEGIN
+GEN_DIAG_IGNORE_ALL
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+GEN_DIAG_REGION_END
 
-#define SCREEN_WIDTH 1900
-#define SCREEN_HEIGHT 1000
+#include <genfs.h>
 
 #define MILLIS_PER_SECOND 1000
 #define FPS 60
 
 #define NINEPATCH_SCALE 16
-#define UI_SCALE 16
 
-static SDL_Surface* screen_surface;
+static SDL_Renderer* renderer = NULL;
 
 static void rect_callback(void* const restrict ninepatch, const gen_ui_rect_t src, const gen_ui_rect_t dest, __unused void* const restrict passthrough) {
 	SDL_Rect src_r = {(int) src.x, (int) src.y, (int) src.w, (int) src.h};
 	SDL_Rect dest_r = {(int) dest.x, (int) dest.y, (int) dest.w, (int) dest.h};
-	SDL_BlitScaled((SDL_Surface*) ninepatch, &src_r, screen_surface, &dest_r);
+
+	SDL_RenderCopy(renderer, (SDL_Texture*) ninepatch, &src_r, &dest_r);
 }
 
 static const SDL_Color color = {255, 176, 223, 255};
 static gen_ui_extent_t dir_list_height = 0;
+static gen_ui_extent_t ui_scale = 16;
 
 static void dir_list_callback(const char* const restrict path, void* const restrict passthrough) {
-	SDL_Surface* text = TTF_RenderText_Blended((TTF_Font*) passthrough, path, color);
-	SDL_Rect dest = {UI_SCALE, (int) dir_list_height++ * 2 * UI_SCALE + 4 * UI_SCALE, 0, 0};
-	SDL_BlitSurface(text, NULL, screen_surface, &dest);
+	SDL_Surface* text_r = TTF_RenderText_Blended((TTF_Font*) passthrough, path, color);
+	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
+	SDL_FreeSurface(text_r);
+
+	SDL_Rect dest = {(int) ui_scale, (int) dir_list_height++ * 2 * (int) ui_scale + 4 * (int) ui_scale, 0, 0};
+	SDL_RenderCopy(renderer, text, NULL, &dest);
 }
 
 int main(void) {
@@ -106,15 +111,21 @@ int main(void) {
 	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
 	TTF_Init();
 
-	SDL_Window* window = SDL_CreateWindow("Genuine Test", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	screen_surface = SDL_GetWindowSurface(window);
+	gen_ui_extent_t screen_width = 1280;
+	gen_ui_extent_t screen_height = 780;
 
-	SDL_Surface* texture = IMG_Load("sandbox/uitest/ninepatch.png");
-	SDL_Surface* viewport_texture = IMG_Load("sandbox/uitest/ninepatch_viewport.png");
-	TTF_Font* font_32 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", 2 * UI_SCALE);
-	TTF_Font* font_16 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", UI_SCALE);
+	SDL_Window* window = SDL_CreateWindow("Genuine Test", 0, 0, (int) screen_width, (int) screen_height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	SDL_Surface* text = NULL;
+	SDL_Surface* texture_r = IMG_Load("sandbox/uitest/ninepatch.png");
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, texture_r);
+	SDL_FreeSurface(texture_r);
+	SDL_Surface* viewport_texture_r = IMG_Load("sandbox/uitest/ninepatch_viewport.png");
+	SDL_Texture* viewport_texture = SDL_CreateTextureFromSurface(renderer, viewport_texture_r);
+	SDL_FreeSurface(viewport_texture_r);
+
+	TTF_Font* font_32 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", 2 * (int) ui_scale);
+	TTF_Font* font_16 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", (int) ui_scale);
 
 	while(true) {
 		SDL_Event e;
@@ -122,25 +133,52 @@ int main(void) {
 			if(e.type == SDL_QUIT) goto cleanup;
 		}
 
-		const SDL_Rect screen_dimensions = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-		SDL_FillRect(screen_surface, &screen_dimensions, 0xFF000000);
+		int screen_width_r = 0;
+		int screen_height_r = 0;
+		SDL_GetWindowSize(window, &screen_width_r, &screen_height_r);
+		SDL_Rect viewport = {0, 0, screen_width_r, screen_height_r};
+		SDL_RenderSetViewport(renderer, &viewport);
+		ui_scale = (gen_ui_extent_t) screen_width_r / 80;
+		screen_width = (gen_ui_extent_t) screen_width_r;
+		screen_height = (gen_ui_extent_t) screen_height_r;
 
-		const char* labels[] = {"File", "Edit", "View", "Run", "Help"};
+		SDL_RenderClear(renderer);
 
-		for(register gen_ui_extent_t i = 0; i < (gen_ui_extent_t) (sizeof(labels) / sizeof(labels[0])); ++i) {
-			(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){5 * i * UI_SCALE, 0, 4 * UI_SCALE, UI_SCALE + UI_SCALE / 2}, NINEPATCH_SCALE, UI_SCALE, screen_surface);
+		static const char* const labels[] = {"File", "Edit", "View", "Run", "Help"};
 
-			text = TTF_RenderText_Blended(font_16, labels[i], color);
-			SDL_Rect dest = {(int) (UI_SCALE + 5 * i * UI_SCALE), UI_SCALE / 2, 0, 0};
-			SDL_BlitSurface(text, NULL, screen_surface, &dest);
+		gen_ui_extent_t TOOLBAR_N_BUTTONS = sizeof(labels) / sizeof(labels[0]);
+		gen_ui_extent_t TOOLBAR_HEIGHT = ui_scale + ui_scale / 2;
+		gen_ui_extent_t TOOLBAR_BUTTON_WIDTH = 4 * ui_scale;
+		gen_ui_extent_t TOOLBAR_BUTTON_STRIDE = 5 * ui_scale;
+
+		gen_ui_extent_t SIDEBAR_Y = TOOLBAR_HEIGHT + ui_scale;
+		gen_ui_extent_t SIDEBAR_WIDTH = 16 * ui_scale;
+
+		gen_ui_extent_t EXPLORER_Y = (screen_height - ui_scale) - (8 * ui_scale);
+		gen_ui_extent_t EXPLORER_HEIGHT = (screen_height - ui_scale) - EXPLORER_Y;
+
+		gen_ui_extent_t HIERARCHY_WIDTH = (12 * ui_scale);
+		gen_ui_extent_t HIERARCHY_X = (screen_width - ui_scale) - HIERARCHY_WIDTH;
+
+		gen_ui_extent_t VIEWPORT_X = SIDEBAR_WIDTH + ui_scale;
+
+		for(register gen_ui_extent_t i = 0; i < TOOLBAR_N_BUTTONS; ++i) {
+			(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){i * TOOLBAR_BUTTON_STRIDE, 0, TOOLBAR_BUTTON_WIDTH, TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
+
+			SDL_Surface* text_r = TTF_RenderText_Blended(font_16, labels[i], color);
+			SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
+			SDL_FreeSurface(text_r);
+
+			SDL_Rect dest = {(int) (i * TOOLBAR_BUTTON_STRIDE + ui_scale), (int) ui_scale / 2, 0, 0};
+			SDL_RenderCopy(renderer, text, NULL, &dest);
+			SDL_DestroyTexture(text);
 		}
-		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){(5 * UI_SCALE * (sizeof(labels) / sizeof(labels[0]))), 0, (SCREEN_WIDTH - UI_SCALE) - (5 * UI_SCALE * (sizeof(labels) / sizeof(labels[0]))), UI_SCALE + UI_SCALE / 2}, NINEPATCH_SCALE, UI_SCALE, screen_surface);
 
-		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){0, 2 * UI_SCALE + UI_SCALE / 2, 16 * UI_SCALE, (SCREEN_HEIGHT - UI_SCALE) - (2 * UI_SCALE + UI_SCALE / 2)}, NINEPATCH_SCALE, UI_SCALE, screen_surface);
-		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){16 * UI_SCALE + UI_SCALE, 44 * UI_SCALE + UI_SCALE, (SCREEN_WIDTH - UI_SCALE) - (16 * UI_SCALE + UI_SCALE), (SCREEN_HEIGHT - UI_SCALE) - (44 * UI_SCALE + UI_SCALE)}, NINEPATCH_SCALE, UI_SCALE, screen_surface);
-		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){(SCREEN_WIDTH - UI_SCALE) - (16 * UI_SCALE), 2 * UI_SCALE + UI_SCALE / 2, 16 * UI_SCALE, (SCREEN_HEIGHT - UI_SCALE) - (2 * UI_SCALE + UI_SCALE / 2) - ((SCREEN_HEIGHT - UI_SCALE) - (44 * UI_SCALE + UI_SCALE) + UI_SCALE)}, NINEPATCH_SCALE, UI_SCALE, screen_surface);
-
-		(void) gen_ui_draw_ninepatch_direct(viewport_texture, rect_callback, (gen_ui_rect_t){16 * UI_SCALE + UI_SCALE, 2 * UI_SCALE + UI_SCALE / 2, (SCREEN_WIDTH - UI_SCALE) - 2 * (16 * UI_SCALE + UI_SCALE), (SCREEN_HEIGHT - UI_SCALE) - (2 * UI_SCALE + UI_SCALE / 2) - ((SCREEN_HEIGHT - UI_SCALE) - (44 * UI_SCALE + UI_SCALE)) - UI_SCALE}, NINEPATCH_SCALE, UI_SCALE, screen_surface);
+		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){(TOOLBAR_BUTTON_STRIDE * TOOLBAR_N_BUTTONS), 0, (screen_width - ui_scale) - (TOOLBAR_BUTTON_STRIDE * TOOLBAR_N_BUTTONS), TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
+		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){0, SIDEBAR_Y, SIDEBAR_WIDTH, (screen_height - ui_scale) - SIDEBAR_Y}, NINEPATCH_SCALE, ui_scale, NULL);
+		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){SIDEBAR_WIDTH + ui_scale, EXPLORER_Y, (screen_width - ui_scale) - (SIDEBAR_WIDTH + ui_scale), EXPLORER_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
+		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){HIERARCHY_X, SIDEBAR_Y, HIERARCHY_WIDTH, (screen_height - ui_scale) - (SIDEBAR_Y + EXPLORER_HEIGHT + ui_scale)}, NINEPATCH_SCALE, ui_scale, NULL);
+		(void) gen_ui_draw_ninepatch_direct(viewport_texture, rect_callback, (gen_ui_rect_t){VIEWPORT_X, SIDEBAR_Y, (screen_width - ui_scale) - (VIEWPORT_X + HIERARCHY_WIDTH + ui_scale), (screen_height - ui_scale) - (SIDEBAR_Y + EXPLORER_HEIGHT + ui_scale)}, NINEPATCH_SCALE, ui_scale, NULL);
 
 		dir_list_height = 0;
 		gen_filesystem_handle_t dir;
@@ -149,14 +187,14 @@ int main(void) {
 		(void) gen_directory_list(&dir, dir_list_callback, font_16);
 		(void) gen_handle_close(&dir);
 
-		SDL_UpdateWindowSurface(window);
+		SDL_RenderPresent(renderer);
 		SDL_Delay(MILLIS_PER_SECOND / FPS);
 	}
 cleanup:
-	SDL_FreeSurface(text);
 	TTF_CloseFont(font_32);
 	TTF_CloseFont(font_16);
-	SDL_FreeSurface(texture);
+	SDL_DestroyTexture(texture);
+	SDL_DestroyTexture(viewport_texture);
 	SDL_DestroyWindow(window);
 
 	TTF_Quit();
