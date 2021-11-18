@@ -61,7 +61,7 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
-	error = galloc((void**) &file_handle.path, GEN_PATH_MAX, sizeof(char));
+	error = gzalloc((void**) &file_handle.path, GEN_PATH_MAX, sizeof(char));
 	GEN_REQUIRE_NO_ERROR(error);
 	error = gen_handle_open(&file_handle, "./testfile");
 
@@ -96,7 +96,7 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (directory)...");
 	gen_filesystem_handle_t dir_handle;
-	(void) galloc((void**) &dir_handle.path, GEN_PATH_MAX, sizeof(char));
+	(void) gzalloc((void**) &dir_handle.path, GEN_PATH_MAX, sizeof(char));
 	error = gen_handle_open(&dir_handle, "./testdir");
 
 	GEN_REQUIRE_NO_ERROR(error);
@@ -110,11 +110,17 @@ int main() {
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_handle_close() (file)...");
+	error = gfree(file_handle.path);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	error = gen_handle_close(&file_handle);
 
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_handle_close() (directory)...");
+	error = gfree(dir_handle.path);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	error = gen_handle_close(&dir_handle);
 
 	GEN_REQUIRE_NO_ERROR(error);

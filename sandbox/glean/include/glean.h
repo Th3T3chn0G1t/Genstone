@@ -4,6 +4,8 @@
 #ifndef GLEAN_H
 #define GLEAN_H
 
+#include <gendiag.h>
+
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
 
@@ -252,7 +254,7 @@ extern void directory_tree_free(void);
 
 /// Inotify thread operations
 
-extern pthread_t file_begin_inotify_watcher(int comm_pipe);
+extern thrd_t file_begin_inotify_watcher(int comm_pipe);
 extern int file_add_inotify_handle(char* path, uint32_t mask, inotify_watch_callback_T callback, void* pass 	);
 extern void file_remove_inotify_handle(int wd);
 extern void file_stop_inotify_root(void);

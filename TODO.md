@@ -81,6 +81,16 @@
         - Tests
         - Modules
 - Features
+    - Add `GEN_RETURN_OK` to replace `GEN_ERROR_OUT(GEN_OK, "")`
+    - Add warning reporting
+        - New `gen_ui_draw_ninepatch_direct` needs warning reporting
+            - Texture is NULL
+            - extent or scales are 0
+        - Add warning reporting across the codebase
+            - `gen_parse_args`
+        - Warning reports to centralized EH callback
+        - Add centralized warning values etc. like with errors
+        - Add Werror-like mode
     - Fix `errno` string conversion truncates with `...`
     - `gen_path_extension` lookin' mighty sketch
     - Genfs inotify

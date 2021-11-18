@@ -162,7 +162,7 @@ int main(int argc, char* argv[], char* envp[]) {
 	g_io_add_watch(channel, G_IO_IN, inotify_watcher_message, NULL);
 
 	// Start watching root for changes, and refresh the directory tree on changes
-	pthread_t inotify_watch_thread = file_begin_inotify_watcher(inotify_watch_thread_pipe_inward[PIPE_WRITE]);
+	thrd_t inotify_watch_thread = file_begin_inotify_watcher(inotify_watch_thread_pipe_inward[PIPE_WRITE]);
 
 	// Start the inline terminal
 	char* args[] = {getenv("SHELL"), NULL};
@@ -178,5 +178,5 @@ int main(int argc, char* argv[], char* envp[]) {
 
 	// Stop the inotify watcher thread and wait for it to terminate
 	file_stop_inotify_root();
-	pthread_join(inotify_watch_thread, NULL);
+	thrd_join(inotify_watch_thread, NULL);
 }
