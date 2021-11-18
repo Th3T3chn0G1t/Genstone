@@ -29,7 +29,7 @@ gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const si
 	if(!out_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`address` was NULL");
 	if(!size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was 0");
 	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
-  	if(!align) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was 0");
+	if(!align) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was 0");
 	if(align & (align - 1)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was not a power of 2");
 	if(size == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
 	if(count == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
