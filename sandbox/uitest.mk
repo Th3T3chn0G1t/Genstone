@@ -9,8 +9,8 @@ build_message_uitest:
 
 uitest: build_message_uitest gencore genuine $(UI_TEST_EXEC) ### @User Builds a UI test sandbox project
 
-$(UI_TEST_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_UI_CFLAGS) $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags SDL2_image)
-$(UI_TEST_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_UI_LFLAGS) $(shell pkg-config --libs sdl2) $(shell pkg-config --libs SDL2_image)
+$(UI_TEST_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_UI_CFLAGS) $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags SDL2_image) $(shell pkg-config --cflags SDL2_ttf)
+$(UI_TEST_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_UI_LFLAGS) $(shell pkg-config --libs sdl2) $(shell pkg-config --libs SDL2_image) $(shell pkg-config --libs SDL2_ttf)
 $(UI_TEST_EXEC): $(UI_TEST_OBJECTS)
 
 clean_sample:
