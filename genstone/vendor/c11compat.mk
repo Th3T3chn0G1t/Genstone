@@ -91,10 +91,12 @@ C11_COMPAT_LIB += $(C11_COMPAT_ANNEXK_LIB)
 #C11_COMPAT_CLEAN_TARGETS += clean_c11compat_annexk
 clean_c11compat_annexk: | $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib clean
+	$(MAKE) -Cgenstone/vendor/c11compat/safeclib distclean
+	-$(RM) $(wildcard lib/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE):
 	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./build-aux/autogen.sh)
-	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./configure --prefix=/usr)
+	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./configure --prefix=/usr --enable-unsafe)
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL): $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib
