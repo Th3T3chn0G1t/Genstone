@@ -1,70 +1,6 @@
 #include <gencommon.h>
-
-typedef ssize_t gen_ui_extent_t;
-
-typedef struct {
-	gen_ui_extent_t x;
-	gen_ui_extent_t y;
-	gen_ui_extent_t w;
-	gen_ui_extent_t h;
-} const gen_ui_rect_t;
-
-typedef void (*gen_ui_draw_handler_t)(void* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void* const restrict);
-
-static GEN_ERRORABLE_RETURN gen_ui_draw_ninepatch_direct(void* const restrict ninepatch, const gen_ui_draw_handler_t draw_handler, const gen_ui_rect_t extent, const gen_ui_extent_t src_scale, const gen_ui_extent_t dest_scale, void* const restrict passthrough) {
-	GEN_FRAME_BEGIN(gen_ui_draw_ninepatch_direct);
-
-	if(!draw_handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`draw_handler` was NULL");
-	if(!extent.w || !extent.h || !src_scale || !dest_scale) GEN_ERROR_OUT(GEN_OK, ""); // No work can be done but its not technically an error
-
-	// Top Left
-	draw_handler(ninepatch, (gen_ui_rect_t){0, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y, dest_scale, dest_scale}, passthrough);
-
-	// Top Right
-	draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y, dest_scale, dest_scale}, passthrough);
-
-	// Bottom Left
-	draw_handler(ninepatch, (gen_ui_rect_t){0, 2 * src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y + (extent.h - dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
-
-	// Bottom Right
-	draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, 2 * src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y + (extent.h - dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
-
-	// Top
-	for(register gen_ui_extent_t i = 0; i < (extent.w - dest_scale) / dest_scale; ++i) {
-		draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y, dest_scale, dest_scale}, passthrough);
-	}
-	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 0, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), src_scale}, (gen_ui_rect_t){extent.x + (((extent.w - dest_scale) / dest_scale) * dest_scale) + dest_scale, extent.y, (extent.w - dest_scale) % dest_scale, dest_scale}, passthrough);
-
-	// Bottom
-	for(register gen_ui_extent_t i = 0; i < (extent.w - dest_scale) / dest_scale; ++i) {
-		draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 2 * src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y + (extent.h - dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
-	}
-	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 2 * src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), src_scale}, (gen_ui_rect_t){extent.x + (((extent.w - dest_scale) / dest_scale) * dest_scale) + dest_scale, extent.y + (extent.h - dest_scale) + dest_scale, (extent.w - dest_scale) % dest_scale, dest_scale}, passthrough);
-
-	// Left
-	for(register gen_ui_extent_t i = 0; i < (extent.h - dest_scale) / dest_scale; ++i) {
-		draw_handler(ninepatch, (gen_ui_rect_t){0, src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y + (i * dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
-	}
-	draw_handler(ninepatch, (gen_ui_rect_t){0, src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x, extent.y + (((extent.h - dest_scale) / dest_scale) * dest_scale) + dest_scale, dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
-
-	// Right
-	for(register gen_ui_extent_t i = 0; i < (extent.h - dest_scale) / dest_scale; ++i) {
-		draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y + (i * dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
-	}
-	draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y + (((extent.h - dest_scale) / dest_scale) * dest_scale) + dest_scale, dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
-
-	// Centre
-	for(register gen_ui_extent_t i = 0; i < (extent.w - dest_scale) / dest_scale; ++i) {
-		for(register gen_ui_extent_t j = 0; j < (extent.h - dest_scale) / dest_scale; ++j) {
-			draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y + (j * dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
-			draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), src_scale}, (gen_ui_rect_t){extent.x + (extent.w / dest_scale) * dest_scale, extent.y + (j * dest_scale) + dest_scale, (extent.w - dest_scale) % dest_scale, dest_scale}, passthrough);
-		}
-		draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y + (extent.h / dest_scale) * dest_scale, dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
-	}
-	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (extent.w / dest_scale) * dest_scale, extent.y + (extent.h / dest_scale) * dest_scale, (extent.w - dest_scale) % dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
-
-	GEN_ERROR_OUT(GEN_OK, "");
-}
+#include <genuine.h>
+#include <genfs.h>
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
@@ -72,8 +8,6 @@ GEN_DIAG_IGNORE_ALL
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 GEN_DIAG_REGION_END
-
-#include <genfs.h>
 
 #define MILLIS_PER_SECOND 1000
 #define FPS 60
@@ -96,7 +30,7 @@ static gen_ui_extent_t ui_scale = 16;
 static void dir_list_callback(const char* const restrict path, void* const restrict passthrough) {
 	SDL_Surface* text_r = TTF_RenderText_Blended((TTF_Font*) passthrough, path, color);
 	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
-	SDL_Rect dest = {(int) ui_scale, (int) dir_list_height++ * 2 * (int) ui_scale + 4 * (int) ui_scale, text_r->w, text_r->h};
+	SDL_Rect dest = {(int) ui_scale, (int) dir_list_height++ * (int) (ui_scale + ui_scale / 2) + 4 * (int) ui_scale, text_r->w, text_r->h};
 	SDL_FreeSurface(text_r);
 	SDL_RenderCopy(renderer, text, NULL, &dest);
 	SDL_DestroyTexture(text);
@@ -124,9 +58,6 @@ int main(void) {
 	SDL_Texture* viewport_texture = SDL_CreateTextureFromSurface(renderer, viewport_texture_r);
 	SDL_FreeSurface(viewport_texture_r);
 
-	TTF_Font* font_32 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", 2 * (int) ui_scale);
-	TTF_Font* font_16 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", (int) ui_scale);
-
 	while(true) {
 		SDL_Event e;
 		while(SDL_PollEvent(&e) != 0) {
@@ -141,6 +72,9 @@ int main(void) {
 		ui_scale = (gen_ui_extent_t) screen_width_r / 80;
 		screen_width = (gen_ui_extent_t) screen_width_r;
 		screen_height = (gen_ui_extent_t) screen_height_r;
+
+		TTF_Font* font = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", (int) ui_scale);
+		TTF_Font* font_x2 = TTF_OpenFont("sandbox/uitest/8-bit-operator/8bitOperatorPlusSC-Bold.ttf", 2 * (int) ui_scale);
 
 		SDL_RenderClear(renderer);
 
@@ -165,7 +99,7 @@ int main(void) {
 		for(register gen_ui_extent_t i = 0; i < TOOLBAR_N_BUTTONS; ++i) {
 			(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){i * TOOLBAR_BUTTON_STRIDE, 0, TOOLBAR_BUTTON_WIDTH, TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
 
-			SDL_Surface* text_r = TTF_RenderText_Blended(font_16, labels[i], color);
+			SDL_Surface* text_r = TTF_RenderText_Blended(font, labels[i], color);
 			SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
 			SDL_Rect dest = {(int) (i * TOOLBAR_BUTTON_STRIDE) + ((int) TOOLBAR_BUTTON_WIDTH / 2) - (text_r->w / 2) + (int) ui_scale / 2, (int) (TOOLBAR_HEIGHT / 2) - (text_r->h / 2) + (int) (ui_scale / 2), text_r->w, text_r->h};
 			SDL_FreeSurface(text_r);
@@ -183,15 +117,15 @@ int main(void) {
 		gen_filesystem_handle_t dir;
 		(void) gzalloc((void**) &dir.path, GEN_PATH_MAX, sizeof(char));
 		(void) gen_handle_open(&dir, ".");
-		(void) gen_directory_list(&dir, dir_list_callback, font_16);
+		(void) gen_directory_list(&dir, dir_list_callback, font);
 		(void) gen_handle_close(&dir);
 
 		SDL_RenderPresent(renderer);
+		TTF_CloseFont(font);
+		TTF_CloseFont(font_x2);
 		SDL_Delay(MILLIS_PER_SECOND / FPS);
 	}
 cleanup:
-	TTF_CloseFont(font_32);
-	TTF_CloseFont(font_16);
 	SDL_DestroyTexture(texture);
 	SDL_DestroyTexture(viewport_texture);
 	SDL_DestroyWindow(window);

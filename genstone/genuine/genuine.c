@@ -2,44 +2,57 @@
 
 #include <gentooling.h>
 
-const static gen_ui_rect_t ninepatch_source_rects[9] =
-	{
-		{.xywh = {0, 0, 1, 1}},
-		{.xywh = {1, 0, 1, 1}},
-		{.xywh = {2, 0, 1, 1}},
-		{.xywh = {0, 1, 1, 1}},
-		{.xywh = {1, 1, 1, 1}},
-		{.xywh = {2, 1, 1, 1}},
-		{.xywh = {0, 2, 1, 1}},
-		{.xywh = {1, 2, 1, 1}},
-		{.xywh = {2, 2, 1, 1}}};
+gen_error_t gen_ui_draw_ninepatch_direct(void* const restrict ninepatch, const gen_ui_draw_handler_t draw_handler, const gen_ui_rect_t extent, const gen_ui_extent_t src_scale, const gen_ui_extent_t dest_scale, void* const restrict passthrough) {
+	GEN_FRAME_BEGIN(gen_ui_draw_ninepatch_direct);
 
-#define GEN_INTERNAL_UI_ELEMENT_RECTS(index, w_mul, h_mul, x_mod, y_mod, w_mod, h_mod, x_w_mod_mul, y_h_mod_mul) \
-	do { \
-		source.x = ninepatch_source_rects[index].x * element->ninepatch->source_scale; \
-		source.y = ninepatch_source_rects[index].y * element->ninepatch->source_scale; \
-		source.w = ninepatch_source_rects[index].w * element->ninepatch->source_scale; \
-		source.h = ninepatch_source_rects[index].h * element->ninepatch->source_scale; \
-		destination.x = destination_scale * (element->rect.x + (x_w_mod_mul * (element->rect.w - (uint16_t) 1)) + x_mod); \
-		destination.y = destination_scale * (element->rect.y + (y_h_mod_mul * (element->rect.h - (uint16_t) 1)) + y_mod); \
-		destination.w = destination_scale * ((w_mul * element->rect.w) + (w_mod ? (uint16_t) 1 : (uint16_t) -2)); \
-		destination.h = destination_scale * ((h_mul * element->rect.h) + (h_mod ? (uint16_t) 1 : (uint16_t) -2)); \
-		handler(element->ninepatch, source, destination, passthrough); \
-	} while(0)
+	if(!draw_handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`draw_handler` was NULL");
+	if(!extent.w || !extent.h || !src_scale || !dest_scale) GEN_ERROR_OUT(GEN_OK, ""); // No work can be done but its not technically an error
 
-void gen_ui_draw_element(const gen_ui_render_handler_t handler, const gen_ui_element_t* const restrict element, const uint16_t destination_scale, void* const restrict passthrough) {
-	GEN_FRAME_BEGIN(gen_ui_draw_element);
+	// Top Left
+	draw_handler(ninepatch, (gen_ui_rect_t){0, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y, dest_scale, dest_scale}, passthrough);
 
-	gen_ui_rect_t source;
-	gen_ui_rect_t destination;
+	// Top Right
+	draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y, dest_scale, dest_scale}, passthrough);
 
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_TL, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_T, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_TR, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_L, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_C, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_R, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_BL, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_B, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 0, (uint16_t) 1);
-	GEN_INTERNAL_UI_ELEMENT_RECTS(GEN_UI_SOURCE_RECT_BR, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 0, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1, (uint16_t) 1);
+	// Bottom Left
+	draw_handler(ninepatch, (gen_ui_rect_t){0, 2 * src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y + (extent.h - dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
+
+	// Bottom Right
+	draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, 2 * src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y + (extent.h - dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
+
+	// Top
+	for(register gen_ui_extent_t i = 0; i < (extent.w - dest_scale) / dest_scale; ++i) {
+		draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y, dest_scale, dest_scale}, passthrough);
+	}
+	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 0, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), src_scale}, (gen_ui_rect_t){extent.x + (((extent.w - dest_scale) / dest_scale) * dest_scale) + dest_scale, extent.y, (extent.w - dest_scale) % dest_scale, dest_scale}, passthrough);
+
+	// Bottom
+	for(register gen_ui_extent_t i = 0; i < (extent.w - dest_scale) / dest_scale; ++i) {
+		draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 2 * src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y + (extent.h - dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
+	}
+	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, 2 * src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), src_scale}, (gen_ui_rect_t){extent.x + (((extent.w - dest_scale) / dest_scale) * dest_scale) + dest_scale, extent.y + (extent.h - dest_scale) + dest_scale, (extent.w - dest_scale) % dest_scale, dest_scale}, passthrough);
+
+	// Left
+	for(register gen_ui_extent_t i = 0; i < (extent.h - dest_scale) / dest_scale; ++i) {
+		draw_handler(ninepatch, (gen_ui_rect_t){0, src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y + (i * dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
+	}
+	draw_handler(ninepatch, (gen_ui_rect_t){0, src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x, extent.y + (((extent.h - dest_scale) / dest_scale) * dest_scale) + dest_scale, dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
+
+	// Right
+	for(register gen_ui_extent_t i = 0; i < (extent.h - dest_scale) / dest_scale; ++i) {
+		draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y + (i * dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
+	}
+	draw_handler(ninepatch, (gen_ui_rect_t){2 * src_scale, src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (extent.w - dest_scale) + dest_scale, extent.y + (((extent.h - dest_scale) / dest_scale) * dest_scale) + dest_scale, dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
+
+	// Centre
+	for(register gen_ui_extent_t i = 0; i < (extent.w - dest_scale) / dest_scale; ++i) {
+		for(register gen_ui_extent_t j = 0; j < (extent.h - dest_scale) / dest_scale; ++j) {
+			draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, src_scale, src_scale}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y + (j * dest_scale) + dest_scale, dest_scale, dest_scale}, passthrough);
+			draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), src_scale}, (gen_ui_rect_t){extent.x + (extent.w / dest_scale) * dest_scale, extent.y + (j * dest_scale) + dest_scale, (extent.w - dest_scale) % dest_scale, dest_scale}, passthrough);
+		}
+		draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (i * dest_scale) + dest_scale, extent.y + (extent.h / dest_scale) * dest_scale, dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
+	}
+	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (extent.w / dest_scale) * dest_scale, extent.y + (extent.h / dest_scale) * dest_scale, (extent.w - dest_scale) % dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
+
+	GEN_ERROR_OUT(GEN_OK, "");
 }

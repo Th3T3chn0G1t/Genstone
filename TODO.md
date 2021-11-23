@@ -74,6 +74,7 @@
             or
         - *(prefer this) Native IO underlying `gen_filesystem_handle_t`
 - Documentation
+    - Document GenUIne
     - Tutorials
     - Write examples
         - General code examples (docstring tags `@example`)
@@ -81,6 +82,7 @@
         - Tests
         - Modules
 - Features
+    - Add https://github.com/kcat/openal-soft for audio support
     - Add `GEN_RETURN_OK` to replace `GEN_ERROR_OUT(GEN_OK, "")`
     - Add warning reporting
         - New `gen_ui_draw_ninepatch_direct` needs warning reporting
@@ -130,14 +132,7 @@
     - Networking
         - Debugger ports (Pretty much the only reason networking is here already)
             - Visual debugger connection
-    - Audio
-        - Compression
-        - Native audio interface
-            - ALSA
-            - PulseAudio
-            - CoreAudio
-            - Windows stuff?
-            - What does BSD use?
+    - Compression
     - Memory tools
         - Measure usage
     - Native UI
