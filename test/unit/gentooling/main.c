@@ -35,7 +35,11 @@ int main() {
 
 	const gen_tooling_freq_profile_t* const profile = &gen_tooling_freq_profiles[gen_tooling_freq_profile_next - 1];
 
-	const long double total = GEN_TIMEVAL_AS_SECONDS(profile->running) / (long double) GEN_MILLISECONDS_PER_SECOND;
-	const long double average = (total / profile->n_calls) / (long double) GEN_MILLISECONDS_PER_SECOND;
-	glogf(PERFORMANCE, "%s: av. %Lf ms tot. %Lf ms", profile->name, average, total);
+	// const long double total = GEN_TIMEVAL_AS_SECONDS(profile->running) / (long double) GEN_MILLISECONDS_PER_SECOND;
+	// const long double average = (total / profile->n_calls) / (long double) GEN_MILLISECONDS_PER_SECOND;
+	// glogf(PERFORMANCE, "%s: av. %Lf ms tot. %Lf ms", profile->name, average, total);
+
+	const double total = (double) GEN_TIMEVAL_AS_SECONDS(profile->running) / (double) GEN_MILLISECONDS_PER_SECOND;
+	const double average = (double) (total / (double) profile->n_calls) / (double) GEN_MILLISECONDS_PER_SECOND;
+	glogf(PERFORMANCE, "%s: av. %lf ms tot. %lf ms", profile->name, average, total);
 }

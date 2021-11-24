@@ -210,6 +210,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	struct stat s;
 	stat(path, &s);
 	GEN_ERROR_OUT_IF_ERRNO(stat, errno);
+
 	if(S_ISDIR(s.st_mode)) {
 		output_handle->dir = true;
 		output_handle->directory_handle = opendir(path);
@@ -218,13 +219,9 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	else {
 		output_handle->dir = false;
 
-		stat(path, &s);
-		GEN_ERROR_OUT_IF_ERRNO(stat, errno);
 		fopen_s(&output_handle->file_handles[1], path, "a");
 		GEN_ERROR_OUT_IF_ERRNO(fopen_s, errno);
 
-		stat(path, &s);
-		GEN_ERROR_OUT_IF_ERRNO(stat, errno);
 		fopen_s(&output_handle->file_handles[0], path, "r");
 		GEN_ERROR_OUT_IF_ERRNO(fopen_s, errno);
 	}
