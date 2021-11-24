@@ -171,28 +171,29 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_delete);
 
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
-
+#if PLATFORM == WIN
 	struct stat s;
 	stat(path, &s);
 	GEN_ERROR_OUT_IF_ERRNO(stat, errno);
 	if(S_ISDIR(s.st_mode)) {
-#if PLATFORM == WIN
 		RemoveDirectoryA(path);
 		GEN_ERROR_OUT_IF_WINERR(RemoveDirectoryA, GetLastError());
-#else
-		rmdir(path);
-		GEN_ERROR_OUT_IF_ERRNO(rmdir, errno);
-#endif
 	}
 	else {
-#if PLATFORM == WIN
 		DeleteFileA(path);
 		GEN_ERROR_OUT_IF_WINERR(DeleteFileA, GetLastError());
+	}
 #else
+	if(rmdir(path) == -1 && errno == ENOTDIR) {
+		errno = EOK;
+
 		unlink(path);
 		GEN_ERROR_OUT_IF_ERRNO(unlink, errno);
-#endif
+
+		GEN_ERROR_OUT(GEN_OK, "");
 	}
+	GEN_ERROR_OUT_IF_ERRNO(rmdir, errno);
+#endif
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
