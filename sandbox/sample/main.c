@@ -4,16 +4,6 @@
 #include <gencommon.h>
 #include <genlocale.h>
 
-__attribute__((constructor)) static void gen_internal_initialize_locales(void) {
-	const char* locale = getenv("LANG");
-	if(locale)
-		setlocale(LC_ALL, locale);
-	else {
-		locale = getenv("LC_ALL");
-		if(locale) setlocale(LC_ALL, locale);
-	}
-}
-
 int main() {
 	glog(INFO, "Hello, Genstone!");
 

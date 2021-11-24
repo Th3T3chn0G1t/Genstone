@@ -15,7 +15,6 @@
 - Misc
     - Document *why* functions will give certain error codes
     - Replace submodule invocation where neccesary
-    - Prioritise `ifneq` and `else` instead of `ifeq` and `elifeq` for platform specific codepath selection
     - Recondense and fix function outputs
         - Ensure all functions take a max buffer size
     - Use proper punctuation in documentation
@@ -27,9 +26,7 @@
     - Portability
         - Switching out/Disabling submodules
         - Easier handling of adding new platforms in build system
-            - `build/platforms/*.mk`
-    - Cache `safeclib` in CI
-    - Separate per-project and global config
+            - `build/platforms.mk`
     - Centralized toolchain management config (separate from `config.mk`)
         - Fix `.clang-format`
         - Fetch (& Build) toolchain from remote (Not submodule!)
@@ -44,12 +41,6 @@
                 - Looking for **binaries** for Windows
                     - Look for `https://github.com/microsoft/checkedc-clang/releases/download/.*win64.exe`
                 - Build tarball on Unixes
-    - Build Speed
-        - `mold` linker
-            - `mold` daemonisation
-        - Disabling static analysis for fast builds
-        - `ld64 -cache_path_lto`
-        - Precompiled headers
 - Tests
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
     - Write tests for generror for error callback
@@ -60,19 +51,15 @@
     - Learn about alignment
     - Learn about cache optimization
     - Learn about SIMD and crap
-    - LLVM Coroutines in C (https://llvm.org/docs/Coroutines.html#intrinsics) (https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins)
     - XRay instrumentation
     - `hot` and `cold` functions & `likely` and `unlikely` branches
     - Apply `__builtin_assume` to make the static analyser stop having an aneurism
     - Nontemporal load/store for non-hot data `__builtin_nontemporal_load` `__builtin_nontemporal_store`
 - Security
     - Always check errno even when its inconvenient
+    - Always get proper buffer bounds even when its inconvenient
     - `clang` thread safety intrinsics
     - `_r` function variants
-    - QL Recommendations
-        - `fopen_s` -> `fdopen`
-            or
-        - *(prefer this) Native IO underlying `gen_filesystem_handle_t`
 - Documentation
     - Document GenUIne
     - Tutorials
@@ -82,6 +69,7 @@
         - Tests
         - Modules
 - Features
+    - `gen_path_delete` Windows side still has time-of-check time-of-use issue
     - Add https://github.com/kcat/openal-soft for audio support
     - Add `GEN_RETURN_OK` to replace `GEN_ERROR_OUT(GEN_OK, "")`
     - Add warning reporting
@@ -100,19 +88,13 @@
     - Nice wrapper API for constructing calls https://gcc.gnu.org/onlinedocs/gcc/Constructing-Calls.html#Constructing-Calls
     - Apply `#pragma clang final(MACRO)` to prevent random redeffing of config macros
     - `__builtin_readcyclecounter` for high precision clock
-    - `__builtin_dump_struct` wrapper
-    - `gen_winerr_as_string` pass in buffer size
-    - Switch Win32 to NT calls
-    - Native-IO
-        - NT
-        - Pipes
-        - Async IO
-            - Using `aio(7)` (`aio_read` `aio_write`)
-                or
-            - Integrate https://github.com/libuv/libuv
+    - Async IO
+        - Using `aio(7)` (`aio_read` `aio_write`)
+            or
+        - Integrate https://github.com/libuv/libuv
     - Timers
         - `timer_create` (https://linux.die.net/man/2/timer_create)
-    - Validation on user-controllable macros
+    - Validation on user-controllable config
         - `diagnose_if`
     - `genproc`
         - Fix
@@ -160,6 +142,7 @@
         - Coroutines
             - `__builtin_coro_resume` `__builtin_coro_destroy` `__builtin_coro_done` `__builtin_coro_promise` `__builtin_coro_size` `__builtin_coro_frame` `__builtin_coro_free` `__builtin_coro_id` `__builtin_coro_alloc` `__builtin_coro_begin` `__builtin_coro_end` `__builtin_coro_suspend` `__builtin_coro_param`
             - https://llvm.org/docs/Coroutines.html
+            - https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins
         - Better threading interface
         - `clang` mutex intrins
         - Thread-safety checker intrins
