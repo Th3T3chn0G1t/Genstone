@@ -41,10 +41,9 @@ typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* c
 typedef struct {
     union {
         /**
-         * Handles for a file if dir is false
-         * @note A handle is opened for each mode (`r` & `w`) as-needed
+         * Handle for a file if dir is false
          */
-        FILE* file_handles[2];
+        FILE* file_handle;
         /**
          * Handle for a directory if dir is true
          */

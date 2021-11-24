@@ -22,14 +22,14 @@
 #define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) (void) path
 #endif
 
-#define GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, fhandle_index, error) \
+#define GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error) \
 	do { \
 		if(!error) { \
-			if(ferror(handle->file_handles[fhandle_index])) \
+			if(ferror(handle->file_handle)) \
 				error = errno; \
 			else \
 				error = 0; \
-			clearerr(handle->file_handles[fhandle_index]); \
+			clearerr(handle->file_handle); \
 			if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "Filesystem error"); \
 		} \
 	} while(0)
@@ -207,24 +207,23 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	strcpy_s(output_handle->path, GEN_PATH_MAX, path);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 
-	struct stat s;
-	stat(path, &s);
-	GEN_ERROR_OUT_IF_ERRNO(stat, errno);
+	int fd = open(path, O_DIRECTORY | O_RDONLY);
+	if(fd == -1 && errno == ENOTDIR) {
+		errno = EOK;
 
-	if(S_ISDIR(s.st_mode)) {
-		output_handle->dir = true;
-		output_handle->directory_handle = opendir(path);
-		GEN_ERROR_OUT_IF_ERRNO(opendir, errno);
-	}
-	else {
+		fd = open(path, O_RDWR);
+
 		output_handle->dir = false;
+		output_handle->file_handle = fdopen(fd, "r+");
+		GEN_ERROR_OUT_IF_ERRNO(fdopen, errno);
 
-		fopen_s(&output_handle->file_handles[1], path, "a");
-		GEN_ERROR_OUT_IF_ERRNO(fopen_s, errno);
-
-		fopen_s(&output_handle->file_handles[0], path, "r");
-		GEN_ERROR_OUT_IF_ERRNO(fopen_s, errno);
+		GEN_ERROR_OUT(GEN_OK, "");
 	}
+
+	GEN_ERROR_OUT_IF_ERRNO(open, errno);
+	output_handle->dir = true;
+	output_handle->directory_handle = fdopendir(fd);
+	GEN_ERROR_OUT_IF_ERRNO(opendir, errno);
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
@@ -239,9 +238,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 		GEN_ERROR_OUT_IF_ERRNO(closedir, errno);
 	}
 	else {
-		fclose(handle->file_handles[0]);
-		GEN_ERROR_OUT_IF_ERRNO(fclose, errno);
-		fclose(handle->file_handles[1]);
+		fclose(handle->file_handle);
 		GEN_ERROR_OUT_IF_ERRNO(fclose, errno);
 	}
 
@@ -254,12 +251,12 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 
-	fseek(handle->file_handles[0], 0, SEEK_END);
+	fseek(handle->file_handle, 0, SEEK_END);
 	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
-	size_t mark = (size_t) ftell(handle->file_handles[0]);
+	size_t mark = (size_t) ftell(handle->file_handle);
 	if(mark == SIZE_MAX) GEN_ERROR_OUT_ERRNO(ftell, errno);
 
-	rewind(handle->file_handles[0]);
+	rewind(handle->file_handle);
 
 	*out_size = mark;
 	GEN_ERROR_OUT(GEN_OK, "");
@@ -272,13 +269,13 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 	if(!output_buffer) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_buffer` was NULL");
 
-	int error = fseek(handle->file_handles[0], (long) start, SEEK_SET);
+	int error = fseek(handle->file_handle, (long) start, SEEK_SET);
 	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
 
-	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handles[0]);
-	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 0, error);
+	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handle);
+	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
 
-	rewind(handle->file_handles[0]);
+	rewind(handle->file_handle);
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
@@ -290,10 +287,10 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 	if(!buffer) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`buffer` was NULL");
 
-	int error = (int) fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handles[1]);
-	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, 1, error);
+	int error = (int) fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handle);
+	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
 
-	rewind(handle->file_handles[1]);
+	rewind(handle->file_handle);
 
 	GEN_ERROR_OUT(GEN_OK, "");
 }
