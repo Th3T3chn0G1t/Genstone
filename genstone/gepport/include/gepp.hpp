@@ -5,7 +5,9 @@ extern "C" {
     #include "gendiag.h"
 
     GEN_DIAG_REGION_BEGIN
+    #pragma clang diagnostic ignored "-Wreserved-id-macro"
     #pragma clang diagnostic ignored "-Wreserved-macro-identifier"
+
     #define _LIBCPP_COMPLEX_H
     #define _LIBCPP_COMPLEX
     #define _COMPLEX_H
