@@ -1,6 +1,6 @@
 #include "include/genlocale.h"
 
-#define GEN_INTERNAL_CURRENCY_FORMAT "%s%llu%s%02llu"
+#define GEN_INTERNAL_CURRENCY_FORMAT "%s%" PRIu64 "%s%02" PRIu64
 
 gen_error_t gen_locale_convert_currency(char* const restrict out_string, size_t* const restrict out_size, const uint64_t units, const uint64_t cents) {
 	const struct lconv* const restrict locale_info = localeconv();
