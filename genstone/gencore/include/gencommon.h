@@ -47,19 +47,13 @@ GEN_DIAG_IGNORE_ALL
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
-#if PLATFORM != WIN
-#include <tgmath.h> // clang tgmath.h is broken under windows
-#endif
-
-#include <dirent.h> // Emulation layer provided on Windows by https://github.com/tronkko/dirent
-
+#include <tgmath.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#if PLATFORM != WIN
-#include <sys/wait.h> // Why is this one of the sys/ headers missing? Who knows
+#include <sys/wait.h>
 #include <unistd.h>
-#endif
 
 #ifndef GEN_USE_MIMALLOC
 /**
@@ -72,25 +66,14 @@ GEN_DIAG_IGNORE_ALL
 #include <mimalloc.h> // \[0]/
 #endif
 
-#if PLATFORM != WIN
 #include <safe_types.h>
 #include <safe_lib.h>
 #include <safe_lib_errno.h>
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
-#endif
 
 #include <stdnoreturn.h>
 GEN_DIAG_REGION_END
-
-#if PLATFORM == WIN
-/**
- * Provide `ssize_t` on Windows
- */
-typedef long long ssize_t;
-#include <Windows.h> // Grumble
-#include <corecrt_io.h>
-#endif
 
 #if GEN_DEBUG_FOREACH_REGISTER == ENABLED
 #define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
@@ -222,11 +205,6 @@ typedef long long ssize_t;
  * The ASCII code `BEL`
  */
 #define GEN_ASCII_BELL '\a'
-
-#if PLATFORM == WIN
-/* How do you solve a problem like win32.... */
-#undef ERROR
-#endif
 
 /**
  * Logging levels for logging functions
@@ -450,16 +428,7 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 #define GEN_MICROSECONDS_PER_SECOND 1000000
 #define GEN_MILLISECONDS_PER_SECOND 1000
 
-#if PLATFORM == WIN
-#include <winsock.h>
-/**
- * @see https://pubs.opengroup.org/onlinepubs/000095399/functions/gettimeofday.html
- * @see https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows/26085827#26085827
- */
-extern int gettimeofday(struct timeval* const restrict tp, __unused const void* const restrict tzp);
-#else
 #include <sys/time.h>
-#endif
 
 /**
  * Converts a timeval to seconds as a `long double`

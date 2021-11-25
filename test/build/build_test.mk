@@ -19,13 +19,8 @@ build_message_build_test:
 build_test: build_message_build_test $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib ### @Test Builds and runs build-system tests
 	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_STATIC)$(ACTION_SUFFIX)"
 	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_DYNAMIC)$(ACTION_SUFFIX)"
-ifeq ($(PLATFORM),WIN)
-	@cd lib && $(subst /,$(SEP),../$(BUILD_TEST_EXEC_STATIC))
-	@cd lib && $(subst /,$(SEP),../$(BUILD_TEST_EXEC_DYNAMIC))
-else
 	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
 	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
-endif
 
 $(BUILD_TEST_EXEC_DYNAMIC): LFLAGS = -Llib -ltest_dynamic
 $(BUILD_TEST_EXEC_DYNAMIC): $(BUILD_TEST_EXEC_OBJECTS) $(BUILD_TEST_LIB_DYNAMIC)

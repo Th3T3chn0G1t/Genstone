@@ -1,37 +1,8 @@
 #include "include/genproc.h"
 
-#if PLATFORM == WIN
-#define GEN_INTERNAL_WIN_EXEC_MAX 32767
-#endif
-
 gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect) {
 	GEN_FRAME_BEGIN(gen_proc_start_redirected);
 
-#if PLATFORM == WIN
-	STARTUPINFOA process_settings = {0};
-	process_settings.cb = sizeof(STARTUPINFO);
-	process_settings.wShowWindow = SW_HIDE;
-	process_settings.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-
-	GEN_DIAG_REGION_BEGIN
-#pragma clang diagnostic ignored "-Wbad-function-cast"
-	process_settings.hStdOutput = (HANDLE) _get_osfhandle(_fileno(redirect));
-	process_settings.hStdError = (HANDLE) _get_osfhandle(_fileno(redirect));
-	GEN_DIAG_REGION_END
-
-	PROCESS_INFORMATION process;
-	const size_t exec_size = strnlen_s(exec, GEN_INTERNAL_WIN_EXEC_MAX) + 1;
-	char local_exec[exec_size];
-	strcpy_s(local_exec, exec_size, exec);
-	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
-	CreateProcessA(NULL, local_exec, NULL, NULL, true, 0, NULL, NULL, &process_settings, &process);
-	GEN_ERROR_OUT_IF_WINERR(CreateProcessA, GetLastError());
-	CloseHandle(process.hThread);
-
-	*process_out = process.hProcess;
-
-	GEN_ALL_OK;
-#else
 	gen_process_t pid = fork();
 
 	if(pid == -1) GEN_ERROR_OUT_ERRNO(fork, errno);
@@ -49,28 +20,14 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 	*process_out = pid;
 
 	GEN_ALL_OK;
-#endif
 }
 
 gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process) {
 	GEN_FRAME_BEGIN(gen_proc_wait);
 
-#if PLATFORM == WIN
-	int result;
-
-	while((result = GetExitCodeProcess(process, (unsigned long* const) out_result)) && *out_result == STILL_ACTIVE)
-		;
-
-	CloseHandle(process);
-
-	if(!result) *out_result = -1;
-
-	GEN_ALL_OK;
-#else
 	waitpid(process, out_result, 0);
 
 	GEN_ALL_OK;
-#endif
 }
 
 gen_error_t gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec) {
@@ -79,41 +36,6 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 	if(!out_output) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_output` was NULL");
 	if(!out_result) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_result` was NULL");
 
-#if PLATFORM == WIN
-	HANDLE read;
-	HANDLE write;
-	SECURITY_ATTRIBUTES security = {0};
-	security.nLength = sizeof(SECURITY_ATTRIBUTES);
-	security.lpSecurityDescriptor = NULL;
-	security.bInheritHandle = true;
-
-	if(CreatePipe(&read, &write, &security, 0)) {
-		char* output = NULL;
-		size_t output_buffsize = 0;
-
-		FILE* const redirect_handle = _fdopen(_open_osfhandle((intptr_t) write, _O_APPEND), "w");
-		gen_process_t pid;
-		GEN_ERROR_OUT_IF(gen_proc_start_redirected(&pid, exec, redirect_handle), "`gen_proc_start_redirected` failed");
-		GEN_ERROR_OUT_IF(gen_proc_wait(out_result, pid), "`gen_proc_start_redirected` failed");
-
-		unsigned long n_readable;
-		if(PeekNamedPipe(read, NULL, 0, NULL, &n_readable, NULL) && n_readable) {
-			output_buffsize += n_readable;
-			GEN_ERROR_OUT_IF(grealloc((void**) &output, sizeof(char), output_buffsize), "`grealloc` failed");
-
-			ReadFile(read, output, n_readable, NULL, NULL);
-		}
-
-		fclose(redirect_handle);
-		CloseHandle(read);
-
-		*out_output = output;
-
-		GEN_ALL_OK;
-	}
-
-	GEN_ERROR_OUT(GEN_UNKNOWN, "Something went wrong in `gen_proc_get_output`");
-#else
 	int fds[2];
 	pipe(fds);
 	fcntl(fds[0], F_SETFL, O_NONBLOCK); // Don't want to block on read
@@ -144,5 +66,4 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 	*out_output = output;
 
 	GEN_ALL_OK;
-#endif
 }

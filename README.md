@@ -24,7 +24,7 @@ target: PREREQUISITES (Will be removed from output) ### @HighlightedThing The re
 
 ### Prerequisites
 
-The codebase will only build with `clang`. You will also need `make` installed in some form (not compatible with Microsoft's `nmake`). At the moment the build system also uses `mingw` for windows targets in order to use `dlltool`, this is planned to be resolved in the future once automatically determining & fetching optimal toolchains is implemented.
+The codebase will only build with `clang`. You will also need `make` installed in some form.
 
 ### Building
 
@@ -66,7 +66,7 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 
 |Name|Values|Default|Description|Notes|
 |---|---|---|---|---|
-|`PLATFORM`|`WIN` `DWN` `LNX` `BSD`|Determined by Makefile|The target platform for the compilation|Do not mix platforms in a binary|
+|`PLATFORM`|`DWN` `LNX` `BSD`|Determined by Makefile|The target platform for the compilation|Do not mix platforms in a binary|
 |`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|
 |`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a stateful buffer|
 |`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a stateful buffer|
@@ -78,7 +78,6 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |`GEN_PROC_READ_BUFFER_CHUNK`|Any valid array size greater than 0|128|The size of chunk to read at once while storing output in `gen_proc_get_output`|Increasing this if you have large amounts of output in subprocesses may improve performance|
 |`GEN_PRESUMED_SYMBOL_MAX_LEN`|Any valid array size|1024|Presumed maximum length of a symbol to be imported from a dynamic library|Default is taken from Annex B minimum symbol name limitation reccommendations|
 |`GEN_FATAL_ANNEXK_CONSTRAINTS`|`ENABLED` `DISABLED`|`ENABLED`|Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program|You may want to disable this if you are getting false Annex K constraint hits or are using unsafe string manipulation code|
-|`GEN_INTERNAL_MICROSOFT_MAX_STRERROR`|Any valid array size|100|It was warranted. Windows CRT asks for `strerror_s` to be used in place of `strerror` but doesn't provide `strerrorlen_s`. We use this to allocate a fixed size buffer to store `strerror_s` values|You hopefully don't need to modify this|
 |`GEN_USE_MIMALLOC`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use mimalloc as the allocator|Disabling mimalloc may be detrimental to performance and is not as well tested nor as secure|
 |`GEN_CALC_COMMON_TYPES`|`ENABLED` `DISABLED`|`ENABLED`|Enables the default definition of common vector and matrix types in gencalc||
 

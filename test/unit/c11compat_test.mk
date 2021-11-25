@@ -9,11 +9,7 @@ build_message_c11compat_test:
 
 c11compat_test: gencore build_message_c11compat_test $(C11_COMPAT_TEST) ### @Test Builds and runs C11 compatibility layer tests
 	@echo "$(ACTION_PREFIX)$(C11_COMPAT_TEST)$(ACTION_SUFFIX)"
-ifeq ($(PLATFORM),WIN)
-	@cd lib && $(subst /,$(SEP),../$(C11_COMPAT_TEST))
-else
 	@LD_LIBRARY_PATH=lib $(C11_COMPAT_TEST)
-endif
 
 $(C11_COMPAT_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(C11_COMPAT_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

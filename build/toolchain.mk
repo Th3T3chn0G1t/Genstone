@@ -27,14 +27,4 @@ STRIP_TOOL = strip
 # CMake exec to use for building CMake submodules
 CMAKE = cmake
 
-# ifeq ($(PLATFORM),WIN)
-# CHECKED_CLANG_CURL_TARGET_PATTERN = https://github.com/microsoft/checkedc/releases/download/*win64.exe
-# else
 # CHECKED_CLANG_CURL_TARGET_PATTERN = https://github.com/microsoft/checkedc/releases/download/*.tar.gz
-# endif
-
-# checkedc_clang:
-# 	echo 
-# ifeq ($(PLATFORM),WIN)
-# else
-# endif

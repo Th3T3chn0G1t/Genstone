@@ -40,15 +40,8 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 	if(!output_path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_path` was NULL");
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-#if PLATFORM == WIN
-	// Getting an error out of this function is very strange
-	// We just have to presume that GEN_PATH_MAX will always be enough storage
-	GetFullPathNameA(path, GEN_PATH_MAX, output_path, NULL);
-	GEN_ERROR_OUT_IF_WINERR(GetFullPathNameA, GetLastError());
-#else
 	realpath(path, output_path);
 	GEN_ERROR_OUT_IF_ERRNO(realpath, errno);
-#endif
 
 	GEN_ALL_OK;
 }
@@ -101,11 +94,7 @@ bool gen_path_exists(const char* const restrict path) {
 
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-#if PLATFORM == WIN
-	return PathFileExistsA(path);
-#else
 	return !access(path, F_OK);
-#endif
 }
 
 gen_error_t gen_path_validate(const char* const restrict path) {
@@ -114,27 +103,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	if(!path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`path` was NULL");
 	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`strlen(path)` < 1)");
 
-		// macOS apparently has no restrictions on file names?
-		// (might have to do black magic voodoo for filenames containing `/`)
-		// Linux/BSD apparently only prevent using /
-		// In practise its probably more complicated, but this will do for now
-#if PLATFORM == WIN
-	const size_t len = strlen(path);
-
-	if(len > GEN_PATH_MAX) {
-		GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`strlen(path)` > GEN_PATH_MAX)");
-	}
-	GEN_FOREACH_PTR(i, path_char, len, path) {
-		const static char invalid_chars[] = ":*?\"<>|";
-		GEN_FOREACH_PTR(j, invalid, sizeof(invalid_chars), invalid_chars) {
-			if(*path_char == *invalid) {
-				GEN_ERROR_OUT(GEN_BAD_CONTENT, "`path` contained an invalid character");
-			}
-		}
-	}
-#else
 	if(strlen(path) > GEN_PATH_MAX) GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`strlen(path)` > GEN_PATH_MAX)");
-#endif
 
 	GEN_ALL_OK;
 }
@@ -156,13 +125,8 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-#if PLATFORM == WIN
-	CreateDirectoryA(path, NULL);
-	GEN_ERROR_OUT_IF_WINERR(CreateDirectoryA, GetLastError());
-#else
 	mkdir(path, 0777);
 	GEN_ERROR_OUT_IF_ERRNO(mkdir, errno);
-#endif
 
 	GEN_ALL_OK;
 }
@@ -171,19 +135,6 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_delete);
 
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
-#if PLATFORM == WIN
-	struct stat s;
-	stat(path, &s);
-	GEN_ERROR_OUT_IF_ERRNO(stat, errno);
-	if(S_ISDIR(s.st_mode)) {
-		RemoveDirectoryA(path);
-		GEN_ERROR_OUT_IF_WINERR(RemoveDirectoryA, GetLastError());
-	}
-	else {
-		DeleteFileA(path);
-		GEN_ERROR_OUT_IF_WINERR(DeleteFileA, GetLastError());
-	}
-#else
 	if(rmdir(path) == -1 && errno == ENOTDIR) {
 		errno = EOK;
 
@@ -193,7 +144,6 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 		GEN_ALL_OK;
 	}
 	GEN_ERROR_OUT_IF_ERRNO(rmdir, errno);
-#endif
 
 	GEN_ALL_OK;
 }

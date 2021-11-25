@@ -11,15 +11,11 @@
 
 #include "gencommon.h"
 
-#if PLATFORM == WIN
-typedef HANDLE gen_process_t;
-#else
 /**
  * Handle type for a process
  * @note Size and type may vary across systems
  */
 typedef pid_t gen_process_t;
-#endif
 
 #ifndef GEN_PROC_READ_BUFFER_CHUNK
 /**

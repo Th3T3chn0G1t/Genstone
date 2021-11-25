@@ -11,22 +11,14 @@
 
 #include "gencommon.h"
 
-#if PLATFORM == WIN
-#include <Windows.h>
-#include "Shlwapi.h" // Apparently this required according to MSDN
-#define GEN_PATH_MAX MAX_PATH
-#else
 #include <unistd.h>
 #ifndef PATH_MAX
 /**
  * The OS library's maximum length of a path
- * @note Does not support Windows 10 1607 long paths
- * @note Does not represent the maximum length of a path supported by every filesystem
  */
 #define GEN_PATH_MAX 1024
 #else
 #define GEN_PATH_MAX PATH_MAX
-#endif
 #endif
 
 /**
@@ -63,7 +55,6 @@ typedef struct {
  * Gets the canonical representation of a path
  * @param output_path storage for the output path. Should be `GEN_PATH_MAX` in size if length is unknown
  * @param path the path to get a canonical representation for
- * @note Under Windows, `GEN_PATH_MAX` will be provided to `GetFullPathNameA` `nBufferLength` in all cases
  * @return an error code
  */
 GEN_ERRORABLE gen_path_canonical(char* restrict output_path, const char* const restrict path);

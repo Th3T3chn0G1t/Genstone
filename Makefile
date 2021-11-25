@@ -71,11 +71,7 @@ list: ### @Default Lists targets to be built for `all`
 	@echo "$(NOTE_PREFIX) For a list of available targets and their descriptions, see \`make help\`"
 
 help: ### @Default Generates this message
-ifeq ($(SHELL),cmd.exe)
-	@echo "$(ERROR_PREFIX) The self-documenting Makefile target does not work on Windows hosts"
-else
 	@echo "$(INFO_PREFIX) Makefile help\n$(NOTE_PREFIX) This list only includes descriptions for user-desireable targets$(patsubst @%,$(NOTABLE_PREFIX)%$(NOTABLE_SUFFIX),$(patsubst %:,\n - $(TARGET_PREFIX)%$(TARGET_SUFFIX):,$(subst `,\`,$(shell grep -Eh '^\w+:.*\#\#\#.*' $(MAKEFILE_LIST) | sed 's|:.*\#\#\#|:|g'))))"
-endif
 
 build_message_clean:
 	@echo "$(SECTION_PREFIX) Clean"

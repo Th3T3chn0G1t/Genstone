@@ -21,7 +21,6 @@ TEST = ALL
 # Set build target platform
 # Possible values are:
 # `DEFAULT`: Detect host OS. Sets to the respective value
-# `WIN`: Windows
 # `DWN`: macOS
 # `LNX`: Linux
 # `BSD`: BSD
@@ -87,7 +86,6 @@ BUILD_SYS_DEBUG = DISABLED
 
 # Whether perl is available in the environment
 # Used for running unsafe API check from safeclib
-# Unneccesary on windows
 # Possible values are:
 # `ENABLED`: Have perl
 # `DISABLED`: Don't have perl

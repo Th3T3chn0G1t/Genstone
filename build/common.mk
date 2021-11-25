@@ -10,14 +10,6 @@ endif
 
 include $(TOOLCHAIN)
 
-# We want make to use cmd.exe when the *host* is Windows
-ifeq ($(OS),Windows_NT)
-SHELL := cmd.exe
-HAVE_FIND = DISABLED
-else
-HAVE_FIND = ENABLED
-endif
-
 SEP = /
 CP = cp -r
 RM = rm
@@ -137,12 +129,10 @@ CMAKE = $(OVERRIDE_CMAKE)
 endif
 
 ifneq ($(PLATFORM),DEFAULT)
-ifneq ($(PLATFORM),WIN)
 ifneq ($(PLATFORM),DWN)
 ifneq ($(PLATFORM),LNX)
 ifneq ($(PLATFORM),BSD)
 ERROR += "$(ERROR_PREFIX) Invalid value for PLATFORM: \"$(PLATFORM)\"\n"
-endif
 endif
 endif
 endif
@@ -209,26 +199,22 @@ endif
 
 
 ifeq ($(PLATFORM),DEFAULT)
-	ifeq ($(OS),Windows_NT)
-		PLATFORM = WIN
-	else
-		UNAME = $(shell uname -s)
-		ifeq ($(UNAME),Linux)
-			PLATFORM = LNX
-		endif
-		ifeq ($(UNAME),Darwin)
-			PLATFORM = DWN
-		endif
-		ifeq ($(UNAME),FreeBSD)
-			PLATFORM = BSD
-		endif
-		ifeq ($(UNAME),OpenBSD)
-			PLATFORM = BSD
-		endif
-		ifeq ($(UNAME),NetBSD)
-			PLATFORM = BSD
-		endif
-    endif
+	UNAME = $(shell uname -s)
+	ifeq ($(UNAME),Linux)
+		PLATFORM = LNX
+	endif
+	ifeq ($(UNAME),Darwin)
+		PLATFORM = DWN
+	endif
+	ifeq ($(UNAME),FreeBSD)
+		PLATFORM = BSD
+	endif
+	ifeq ($(UNAME),OpenBSD)
+		PLATFORM = BSD
+	endif
+	ifeq ($(UNAME),NetBSD)
+		PLATFORM = BSD
+	endif
 endif
 
 ifeq ($(LINKER),DEFAULT)
@@ -254,18 +240,14 @@ CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
 
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=deadcode
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=optin -Xanalyzer -analyzer-checker=security
-ifneq ($(PLATFORM),WIN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=unix
-endif
 ifeq ($(PLATFORM),DWN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 endif
 
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.clone -Xanalyzer -analyzer-checker=alpha.core
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.deadcode -Xanalyzer -analyzer-checker=alpha.security
-ifneq ($(PLATFORM),WIN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
-endif
 
 ifeq ($(PLATFORM),DWN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
@@ -280,22 +262,6 @@ ifeq ($(BUILD_SYS_DEBUG),ENABLED)
 	GLOBAL_L_FLAGS += -fproc-stat-report
 endif
 
-ifeq ($(PLATFORM),WIN)
-	LIB_PREFIX =
-	DYNAMIC_LIB_SUFFIX = .dll
-	STATIC_LIB_SUFFIX = .lib
-	EXECUTABLE_SUFFIX = .exe
-	OBJECT_SUFFIX = .obj
-
-	# Presume windows targets are x86 for now
-	GLOBAL_C_FLAGS += -D_MT
-	GLOBAL_L_FLAGS += -lshlwapi.lib
-
-	OBJECT_FORMAT = PE
-
-	DYNAMIC_LIB_TOOL = dlltool --export-all-symbols -z $(subst $(DYNAMIC_LIB_SUFFIX),.def,$@) -D $(notdir $@) $(filter %$(OBJECT_SUFFIX),$^) && $(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) -shared $(GLOBAL_L_FLAGS) $(LFLAGS) -Wl,-def:$(subst $(DYNAMIC_LIB_SUFFIX),.def,$@),-implib:$(subst $(DYNAMIC_LIB_SUFFIX),$(STATIC_LIB_SUFFIX),$@)
-	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
-endif
 ifeq ($(PLATFORM),LNX)
 	LIB_PREFIX = lib
 	DYNAMIC_LIB_SUFFIX = .so
@@ -344,11 +310,6 @@ ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_L_FLAGS += -flto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
-	ifeq ($(PLATFORM),WIN)
-		GLOBAL_L_FLAGS += -llibcmt.lib
-		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
-	endif
-
 	ifeq ($(PLATFORM),LNX)
 		GLOBAL_L_FLAGS += -Wl,-O1
 	endif
@@ -365,26 +326,14 @@ else
 	GLOBAL_L_FLAGS += -fno-lto
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
-	ifeq ($(PLATFORM),WIN)
-		GLOBAL_C_FLAGS += -D_DEBUG
-		GLOBAL_L_FLAGS += -Wl,-nodefaultlib:libcmt.lib -llibcmtd.lib
-		GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug
-	endif
-
 	ifeq ($(PLATFORM),DWN)
 		GLOBAL_L_FLAGS += -Wl,-random_uuid,-warn_stabs,-warn_commons
 	endif
 endif
 
 ifeq ($(TOOLING),ENABLED)
-	ifneq ($(PLATFORM),DWN) # macOS libc dies when you `fork` with sanitizers enabled
-		GLOBAL_C_FLAGS += -fsanitize=undefined
-		GLOBAL_L_FLAGS += -fsanitize=undefined
-		ifneq ($(PLATFORM),WIN) # Windows debug CRT conflicts with `clang` ASAN
-			GLOBAL_C_FLAGS += -fsanitize=address
-			GLOBAL_L_FLAGS += -fsanitize=address
-		endif
-	endif
+	GLOBAL_C_FLAGS += -fsanitize=undefined,address
+	GLOBAL_L_FLAGS += -fsanitize=undefined,address
 endif
 
 ifeq ($(TEST),ALL)
@@ -403,10 +352,8 @@ clean_tmpfile:
 	-@$(RM) $(wildcard tmp/*.tmp)
 
 clean_clang_tooling_artifacts:
-ifeq ($(HAVE_FIND),ENABLED)
 	-rm $(shell find . -name "*.gcda")
 	-rm $(shell find . -name "*.gcno")
-endif
 	-rm $(wildcard "*.profraw")
 
 tmp:
@@ -416,23 +363,16 @@ tmp:
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
-ifneq ($(PLATFORM),WIN) # The windows CRT does this for us ;p
 	@echo "$(ACTION_PREFIX)genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
 	@genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<
-endif
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
-ifeq ($(PLATFORM),WIN)
-	@echo "$(CLANG_FORMAT) --style=file $<$(ACTION_SUFFIX)"
-	-$(CLANG_FORMAT) --style=file $<
-else
 	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
-endif
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
@@ -465,23 +405,16 @@ endif
 	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
 
-ifneq ($(PLATFORM),WIN) # The windows CRT does this for us ;p
 	@echo "$(ACTION_PREFIX)genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
 	@genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<
-endif
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@echo "$(ACTION_PREFIX)$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
-ifeq ($(PLATFORM),WIN)
-	@echo "$(CLANG_FORMAT) --style=file $<$(ACTION_SUFFIX)"
-	-$(CLANG_FORMAT) --style=file $<
-else
 	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
-endif
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"

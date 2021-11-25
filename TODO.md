@@ -24,16 +24,11 @@
         - Fix `.clang-format`
         - Fetch (& Build) toolchain from remote (Not submodule!)
         - Enforce toolchain on submodules
-        - Fetch `autotools`
-            - `safeclib` on Windows
-                - Fix stupid `strerror` handling in `generror.h`
         - Fix submodule toolchain management
         - Checked C
             - https://api.github.com/repos/microsoft/checkedc-clang/releases/latest
                 - Returns a json
-                - Looking for **binaries** for Windows
-                    - Look for `https://github.com/microsoft/checkedc-clang/releases/download/.*win64.exe`
-                - Build tarball on Unixes
+                - Build tarball
 - Tests
     - Write tests for glog by setting stream-buffer to a FILE* to be read into a buffer
     - Write tests for generror for error callback
@@ -60,7 +55,6 @@
         - Tests
         - Modules
 - Features
-    - `gen_path_delete` Windows side still has time-of-check time-of-use issue
     - Add https://github.com/kcat/openal-soft for audio support
     - Add warning reporting
         - New `gen_ui_draw_ninepatch_direct` needs warning reporting

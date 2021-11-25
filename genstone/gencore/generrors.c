@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
-#if PLATFORM == WIN
-#include <Windows.h>
-#endif
 #include "include/gencommon.h"
 
 #if GEN_CENTRALIZE_EH == ENABLED
@@ -11,13 +8,11 @@ gen_error_handler_t gen_error_handler = NULL;
 void* gen_error_handler_passthrough = NULL;
 #endif
 
-#if PLATFORM != WIN
 #ifndef GEN_FATAL_ANNEXK_CONSTRAINTS
 /**
  * Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program
  */
 #define GEN_FATAL_ANNEXK_CONSTRAINTS ENABLED
-#endif
 
 GEN_DIAG_REGION_BEGIN
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -39,7 +34,6 @@ static void gen_internal_annexk_constraint_callback(const char* restrict msg, __
 }
 GEN_DIAG_REGION_END
 
-// Windows doesn't support constraint handlers
 __attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
 	set_mem_constraint_handler_s(gen_internal_annexk_constraint_callback);
 	set_str_constraint_handler_s(gen_internal_annexk_constraint_callback);
@@ -98,10 +92,8 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case ENOENT: return GEN_NO_SUCH_OBJECT;
 		case ENOMEM: return GEN_OUT_OF_MEMORY;
 		case ENOTDIR: return GEN_WRONG_OBJECT_TYPE;
-#if PLATFORM != WIN // Bit random to be missing but okay
 		case EOK: return GEN_OK;
 		case EDQUOT: return GEN_OUT_OF_SPACE;
-#endif
 		case EEXIST: return GEN_ALREADY_EXISTS;
 		case EMLINK: return GEN_TOO_LONG;
 		case ENOSPC: return GEN_OUT_OF_SPACE;
@@ -113,10 +105,6 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case EBUSY: return GEN_IN_USE;
 		case EFAULT: return GEN_BAD_CONTENT;
 		case EISDIR: return GEN_WRONG_OBJECT_TYPE;
-
-#if PLATFORM != WIN
-		// Windows doesn't support Annex K specific errno values
-		// Go figure
 		case ESNULLP: return GEN_INVALID_PARAMETER;
 		case ESZEROL: return GEN_TOO_SHORT;
 		case ESLEMIN: return GEN_TOO_SHORT;
@@ -128,45 +116,6 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case ESNODIFF: return GEN_BAD_OPERATION;
 		case ESNOTFND: return GEN_NO_SUCH_OBJECT;
 		case ESLEWRNG: return GEN_INVALID_PARAMETER;
-#endif
-
 		default: return GEN_UNKNOWN;
 	}
-}
-
-// https://stackoverflow.com/questions/1387064/how-to-get-the-error-message-from-the-error-code-returned-by-getlasterror/17387176#17387176
-// Returns the last Win32 error, in string format. Returns an empty string if there is no error.
-void gen_winerr_as_string(char* const restrict outbuff, size_t* const restrict outsize, const unsigned long error) {
-#if PLATFORM == WIN
-	char* message = NULL;
-
-	// Ask Win32 to give us the string version of that message ID.
-	// The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
-	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), message, 0, NULL);
-
-	if(outsize) *outsize = size;
-	if(outbuff) strcpy_s(outbuff, size, outbuff);
-
-	// Free the Win32's string's buffer.
-	LocalFree(message);
-#else
-	(void) outbuff;
-	(void) outsize;
-	(void) error;
-	glog(WARNING, "Calling gen_winerr_as_string() on non-Windows platform");
-#endif
-}
-
-gen_error_t gen_convert_winerr(unsigned long error) {
-#if PLATFORM == WIN
-	switch(error) {
-		case ERROR_ALREADY_EXISTS: return GEN_ALREADY_EXISTS;
-		case ERROR_PATH_NOT_FOUND: return GEN_NO_SUCH_OBJECT;
-		default: return GEN_UNKNOWN;
-	}
-#else
-	(void) error;
-	glog(WARNING, "Calling gen_convert_winerr() on non-Windows platform");
-	return GEN_UNKNOWN;
-#endif
 }

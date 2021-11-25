@@ -1,8 +1,5 @@
 GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-c++98-compat -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories -Wno-unknown-warning-option
 GEN_CORE_CFLAGS = -Igenstone/gencore/include $(C11_COMPAT_CFLAGS) $(MIMALLOC_CFLAGS) $(GEN_CORE_DIAGNOSTIC_FLAGS)
-ifeq ($(PLATFORM),WIN)
-GEN_CORE_CFLAGS += -Igenstone/vendor/dirent/include
-endif
 GEN_CORE_LFLAGS = -lgencore $(C11_COMPAT_LFLAGS) $(MIMALLOC_LFLAGS)
 ifeq ($(PLATFORM),LNX)
 GEN_CORE_LFLAGS += -ldl
@@ -23,9 +20,6 @@ build_message_gencore:
 gencore: c11compat mimalloc build_message_gencore $(GEN_CORE_LIB) ### @Genstone Builds core Genstone utilities
 
 _GEN_CORE_CFLAGS = $(GEN_CORE_DIAGNOSTIC_FLAGS)
-ifeq ($(PLATFORM),WIN)
-_GEN_CORE_CFLAGS += -Igenstone/vendor/dirent/include # This is kind of annoying but whatever
-endif
 
 ifeq ($(PLATFORM),LNX)
 _GEN_CORE_LFLAGS = -ldl
