@@ -34,7 +34,7 @@ jobs:
         languages: ${{ matrix.language }}
 
     - name: Build
-      run: make OVERRIDE_DISABLED_MODULES="genproc_test gencalc_test"
+      run: make OVERRIDE_DISABLED_MODULES="genproc_test gencalc_test" OVERRIDE_TEST=NONE
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
