@@ -16,7 +16,8 @@
  */
 #define galloc gzalloc
 /**
- * @see galloc
+ * Gemory does not permit the allocation of non-zeroed memory due to potential for security relevant bugs to arise from improperly initialized memory
+ * Also can help prevent UB if the programmer is careless :^)
  */
 #define galloc_aligned gzalloc_aligned
 

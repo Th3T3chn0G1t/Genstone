@@ -50,7 +50,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 	GEN_ERROR_OUT_IF_ERRNO(realpath, errno);
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
@@ -62,7 +62,7 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
 	strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path) {
@@ -76,7 +76,7 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 	GEN_ERROR_OUT_IF_ERRNO(strncpy_s, errno);
 	output_path[mark - 1] = '\0';
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path) {
@@ -93,7 +93,7 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 	output_extension[mark - 1] = '\0';
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 bool gen_path_exists(const char* const restrict path) {
@@ -136,7 +136,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	if(strlen(path) > GEN_PATH_MAX) GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`strlen(path)` > GEN_PATH_MAX)");
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_create_file(const char* const restrict path) {
@@ -148,7 +148,7 @@ gen_error_t gen_path_create_file(const char* const restrict path) {
 	fclose(stream);
 	GEN_ERROR_OUT_IF_ERRNO(fclose, errno);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_create_dir(const char* const restrict path) {
@@ -164,7 +164,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 	GEN_ERROR_OUT_IF_ERRNO(mkdir, errno);
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_delete(const char* const restrict path) {
@@ -190,12 +190,12 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 		unlink(path);
 		GEN_ERROR_OUT_IF_ERRNO(unlink, errno);
 
-		GEN_ERROR_OUT(GEN_OK, "");
+		GEN_ALL_OK;
 	}
 	GEN_ERROR_OUT_IF_ERRNO(rmdir, errno);
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
@@ -218,7 +218,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 		output_handle->file_handle = fdopen(fd, "r+");
 		GEN_ERROR_OUT_IF_ERRNO(fdopen, errno);
 
-		GEN_ERROR_OUT(GEN_OK, "");
+		GEN_ALL_OK;
 	}
 
 	GEN_ERROR_OUT_IF_ERRNO(open, errno);
@@ -226,7 +226,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	output_handle->directory_handle = fdopendir(fd);
 	GEN_ERROR_OUT_IF_ERRNO(opendir, errno);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
@@ -243,7 +243,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 		GEN_ERROR_OUT_IF_ERRNO(fclose, errno);
 	}
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle) {
@@ -260,7 +260,7 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	rewind(handle->file_handle);
 
 	*out_size = mark;
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
@@ -278,7 +278,7 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 
 	rewind(handle->file_handle);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
@@ -293,7 +293,7 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
 
 	rewind(handle->file_handle);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough) {
@@ -316,5 +316,5 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	}
 	rewinddir(handle->directory_handle);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }

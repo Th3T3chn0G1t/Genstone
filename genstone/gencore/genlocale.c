@@ -26,7 +26,7 @@ gen_error_t gen_locale_convert_currency(char* const restrict out_string, size_t*
 		GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
 	}
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 // const static uint64_t month_lens = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -56,5 +56,5 @@ gen_error_t gen_locale_convert_currency(char* const restrict out_string, size_t*
 // 		GEN_ERROR_OUT_IF_ERRNO(asctime_s, errno);
 // 	}
 
-// 	GEN_ERROR_OUT(GEN_OK, "");
+// 	GEN_ALL_OK;
 // }

@@ -6,14 +6,7 @@
         - Security policy supported versions (SECURITY.md)
     - Organisation
         - Enable "Require a pull request before merging"
-    - CI
-        - Re-enable Windows CI
-        - Replace external actions with own implementations
-            - `egor-tensin/setup-clang@v1`
-            - `lyricwulf/abc@v1`
-            - Remove whitelisted actions from https://github.com/Th3T3chn0G1t/Genstone/settings/actions
 - Misc
-    - Document *why* functions will give certain error codes
     - Replace submodule invocation where neccesary
     - Recondense and fix function outputs
         - Ensure all functions take a max buffer size
@@ -48,14 +41,12 @@
     - Write tests for gemory
     - Test genfs directory iteration by filling a buffer with filenames from the callback
 - Optimization
-    - Learn about alignment
-    - Learn about cache optimization
-    - Learn about SIMD and crap
     - XRay instrumentation
     - `hot` and `cold` functions & `likely` and `unlikely` branches
     - Apply `__builtin_assume` to make the static analyser stop having an aneurism
     - Nontemporal load/store for non-hot data `__builtin_nontemporal_load` `__builtin_nontemporal_store`
 - Security
+    - Gentooling has major buffer overflow issues
     - Always check errno even when its inconvenient
     - Always get proper buffer bounds even when its inconvenient
     - `clang` thread safety intrinsics
@@ -71,7 +62,6 @@
 - Features
     - `gen_path_delete` Windows side still has time-of-check time-of-use issue
     - Add https://github.com/kcat/openal-soft for audio support
-    - Add `GEN_RETURN_OK` to replace `GEN_ERROR_OUT(GEN_OK, "")`
     - Add warning reporting
         - New `gen_ui_draw_ninepatch_direct` needs warning reporting
             - Texture is NULL

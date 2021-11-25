@@ -20,7 +20,7 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t siz
 
 	errno = 0; // mimalloc does weirdness with NUMA
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align) {
@@ -45,7 +45,7 @@ gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const si
 
 	errno = 0; // mimalloc does weirdness with NUMA
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t grealloc(void* restrict* const restrict address, const size_t size, const size_t count) {
@@ -68,7 +68,7 @@ gen_error_t grealloc(void* restrict* const restrict address, const size_t size, 
 
 	errno = 0; // mimalloc does weirdness with NUMA
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gstrndup(char* restrict* const restrict out_address, const char* const restrict str, const size_t max) {
@@ -90,7 +90,7 @@ gen_error_t gstrndup(char* restrict* const restrict out_address, const char* con
 
 	errno = 0; // mimalloc does weirdness with NUMA
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gfree(void* const restrict address) {
@@ -106,5 +106,5 @@ gen_error_t gfree(void* const restrict address) {
 
 	errno = 0; // mimalloc does weirdness with NUMA
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }

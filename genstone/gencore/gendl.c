@@ -60,7 +60,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	}
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
@@ -84,7 +84,7 @@ gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, cons
 	}
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
@@ -102,5 +102,5 @@ gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
 	}
 #endif
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }

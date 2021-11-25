@@ -6,7 +6,7 @@ gen_error_t gen_ui_draw_ninepatch_direct(void* const restrict ninepatch, const g
 	GEN_FRAME_BEGIN(gen_ui_draw_ninepatch_direct);
 
 	if(!draw_handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`draw_handler` was NULL");
-	if(!extent.w || !extent.h || !src_scale || !dest_scale) GEN_ERROR_OUT(GEN_OK, ""); // No work can be done but its not technically an error
+	if(!extent.w || !extent.h || !src_scale || !dest_scale) GEN_ALL_OK; // No work can be done but its not technically an error
 
 	// Top Left
 	draw_handler(ninepatch, (gen_ui_rect_t){0, 0, src_scale, src_scale}, (gen_ui_rect_t){extent.x, extent.y, dest_scale, dest_scale}, passthrough);
@@ -54,5 +54,5 @@ gen_error_t gen_ui_draw_ninepatch_direct(void* const restrict ninepatch, const g
 	}
 	draw_handler(ninepatch, (gen_ui_rect_t){src_scale, src_scale, (gen_ui_extent_t) ((double) ((extent.w - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale)), (gen_ui_extent_t) ((double) ((extent.h - dest_scale) % dest_scale) * ((double) src_scale / (double) dest_scale))}, (gen_ui_rect_t){extent.x + (extent.w / dest_scale) * dest_scale, extent.y + (extent.h / dest_scale) * dest_scale, (extent.w - dest_scale) % dest_scale, (extent.h - dest_scale) % dest_scale}, passthrough);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }

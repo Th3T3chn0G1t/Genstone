@@ -1,3 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
+
+/**
+ * @file gepp.hpp
+ * Includes C++ backporting utilities
+ */
+
 #ifndef GEN_PORT_H
 #define GEN_PORT_H
 

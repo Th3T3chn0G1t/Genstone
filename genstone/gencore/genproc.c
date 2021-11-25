@@ -30,7 +30,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 
 	*process_out = process.hProcess;
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 #else
 	gen_process_t pid = fork();
 
@@ -48,7 +48,7 @@ gen_error_t gen_proc_start_redirected(gen_process_t* const restrict process_out,
 
 	*process_out = pid;
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 #endif
 }
 
@@ -65,11 +65,11 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 
 	if(!result) *out_result = -1;
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 #else
 	waitpid(process, out_result, 0);
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 #endif
 }
 
@@ -109,7 +109,7 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 
 		*out_output = output;
 
-		GEN_ERROR_OUT(GEN_OK, "");
+		GEN_ALL_OK;
 	}
 
 	GEN_ERROR_OUT(GEN_UNKNOWN, "Something went wrong in `gen_proc_get_output`");
@@ -143,6 +143,6 @@ gen_error_t gen_proc_get_output(char** const restrict out_output, int* const res
 
 	*out_output = output;
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 #endif
 }

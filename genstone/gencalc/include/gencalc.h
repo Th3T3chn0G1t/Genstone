@@ -60,6 +60,14 @@ typedef __fp16 gfloat16;
  */
 #define GEN_TRANSPOSE_MATRIX(mat) __builtin_matrix_transpose(mat)
 
+#ifndef GEN_CALC_COMMON_TYPES
+/**
+ * Enables the default definition of common vector and matrix types in gencalc
+ */
+#define GEN_CALC_COMMON_TYPES ENABLED
+#endif
+
+#if GEN_CALC_COMMON_TYPES == ENABLED
 /**
  * A 2-component vector of floats
  */
@@ -103,5 +111,6 @@ GEN_INTERNAL_MATRIX_TYPE(int, 3, 3);
  * A 4x4 matrix of ints
  */
 GEN_INTERNAL_MATRIX_TYPE(int, 4, 4);
+#endif
 
 #endif

@@ -8,7 +8,7 @@
 gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict const argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* restrict short_args, const size_t n_long_args, const char* const restrict* const restrict long_args, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_parse_args);
 
-	if(!argc) GEN_ERROR_OUT(GEN_OK, "");
+	if(!argc) GEN_ALL_OK;
 
 	if(!argv) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`argv` was NULL");
 	if(argc < 0) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`argc` was invalid (`argc` < 0)");
@@ -77,5 +77,5 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 		handler(type, argn, value, passthrough);
 	}
 
-	GEN_ERROR_OUT(GEN_OK, "");
+	GEN_ALL_OK;
 }

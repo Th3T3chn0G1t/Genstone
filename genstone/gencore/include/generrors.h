@@ -177,6 +177,11 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
+ * Returns from a function marked `GEN_ERRORABLE`
+ */
+#define GEN_ALL_OK return GEN_OK
+
+/**
  * Errors out of a function marked `GEN_ERRORABLE` if `error` is not `GEN_OK`
  * Handles centralized vs. decentralized EH
  * @param error an error code
