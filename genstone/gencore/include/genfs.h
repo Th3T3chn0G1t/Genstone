@@ -66,7 +66,7 @@ typedef struct {
  * @note Under Windows, `GEN_PATH_MAX` will be provided to `GetFullPathNameA` `nBufferLength` in all cases
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_path_canonical(char* restrict output_path, const char* const restrict path);
+GEN_ERRORABLE gen_path_canonical(char* restrict output_path, const char* const restrict path);
 
 /**
  * Gets the filename of a path
@@ -74,7 +74,7 @@ extern GEN_ERRORABLE_RETURN gen_path_canonical(char* restrict output_path, const
  * @param path the path to get a filename from
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_path_filename(char* restrict output_filename, const char* const restrict path);
+GEN_ERRORABLE gen_path_filename(char* restrict output_filename, const char* const restrict path);
 
 /**
  * Gets the pathname of a path
@@ -82,7 +82,7 @@ extern GEN_ERRORABLE_RETURN gen_path_filename(char* restrict output_filename, co
  * @param path the path to get a pathname from
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_path_pathname(char* restrict output_path, const char* const restrict path);
+GEN_ERRORABLE gen_path_pathname(char* restrict output_path, const char* const restrict path);
 
 /**
  * Gets the file extension of a path
@@ -90,7 +90,7 @@ extern GEN_ERRORABLE_RETURN gen_path_pathname(char* restrict output_path, const 
  * @param path the path to get an extension from
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_path_extension(char* restrict output_extension, const char* const restrict path);
+GEN_ERRORABLE gen_path_extension(char* restrict output_extension, const char* const restrict path);
 
 /**
  * Returns whether a filesystem object exists at a path
@@ -104,14 +104,14 @@ extern bool gen_path_exists(const char* const restrict path);
  * @param path the path to validate
  * @return an error code. `GEN_TOO_LONG` or `GEN_TOO_SHORT` if a path is an invalid length. `GEN_WRONG_OBJECT_TYPE` if an invalid character is encountered in the path
  */
-extern GEN_ERRORABLE_RETURN gen_path_validate(const char* const restrict path);
+GEN_ERRORABLE gen_path_validate(const char* const restrict path);
 
 /**
  * Creates a file
  * @param path the file path to create
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_path_create_file(const char* const restrict path);
+GEN_ERRORABLE gen_path_create_file(const char* const restrict path);
 
 /**
  * Creates a directory
@@ -119,14 +119,14 @@ extern GEN_ERRORABLE_RETURN gen_path_create_file(const char* const restrict path
  * @return an error code
  * @note Will create with the default access flags for the platform, or a reasonable default if not applicable
  */
-extern GEN_ERRORABLE_RETURN gen_path_create_dir(const char* const restrict path);
+GEN_ERRORABLE gen_path_create_dir(const char* const restrict path);
 
 /**
  * Deletes a filesystem object
  * @param path a path to the object to destroy
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_path_delete(const char* const restrict path);
+GEN_ERRORABLE gen_path_delete(const char* const restrict path);
 
 /**
  * Opens a path as a filesystem object handle for use by filesystem operations
@@ -135,7 +135,7 @@ extern GEN_ERRORABLE_RETURN gen_path_delete(const char* const restrict path);
  * @param path the path to open
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path);
+GEN_ERRORABLE gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path);
 
 /**
  * Closes a filesystem object handle
@@ -143,7 +143,7 @@ extern GEN_ERRORABLE_RETURN gen_handle_open(gen_filesystem_handle_t* restrict ou
  * @param handle pointer to the handle to close
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_handle_close(gen_filesystem_handle_t* const restrict handle);
+GEN_ERRORABLE gen_handle_close(gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets the size of a handle's object's content
@@ -151,7 +151,7 @@ extern GEN_ERRORABLE_RETURN gen_handle_close(gen_filesystem_handle_t* const rest
  * @param handle a handle to an object whose size to get. Must not be a directory
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle);
+GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets a file's content
@@ -163,7 +163,7 @@ extern GEN_ERRORABLE_RETURN gen_handle_size(size_t* const restrict out_size, con
  * @note Does not add a null terminator to the buffer
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
+GEN_ERRORABLE gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file
@@ -172,7 +172,7 @@ extern GEN_ERRORABLE_RETURN gen_file_read(uint8_t* restrict output_buffer, const
  * @param buffer the buffer to source bytes from for writing
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer);
+GEN_ERRORABLE gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer);
 
 /**
  * Lists the contents of a directory
@@ -181,6 +181,6 @@ extern GEN_ERRORABLE_RETURN gen_file_write(const gen_filesystem_handle_t* const 
  * @param passthrough a passthrough to the handler
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough);
+GEN_ERRORABLE gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough);
 
 #endif

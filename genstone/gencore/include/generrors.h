@@ -105,7 +105,7 @@ extern const char* gen_error_description(const gen_error_t error);
 /**
  * Return value specification for functions which use `generror` for error reporting
  */
-#define GEN_ERRORABLE_RETURN __nodiscard gen_error_t
+#define GEN_ERRORABLE extern __nodiscard gen_error_t
 
 #ifndef GEN_GLOGGIFY_EH
 /**
@@ -164,7 +164,7 @@ extern void* gen_error_handler_passthrough;
 #endif
 
 /**
- * Errors out of a function marked `GEN_ERRORABLE_RETURN`
+ * Errors out of a function marked `GEN_ERRORABLE`
  * Handles centralized vs. decentralized EH
  * @param error an error code
  * @param msg contextual error message
@@ -177,7 +177,7 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
- * Errors out of a function marked `GEN_ERRORABLE_RETURN` if `error` is not `GEN_OK`
+ * Errors out of a function marked `GEN_ERRORABLE` if `error` is not `GEN_OK`
  * Handles centralized vs. decentralized EH
  * @param error an error code
  * @param msg contextual error message
@@ -241,7 +241,7 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
- * Errors out of a function marked `GEN_ERRORABLE_RETURN` if `native_errno` is not `EOK` or equivalent
+ * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not `EOK` or equivalent
  * Horrible macro string manipulation to get some nice output on your errno
  * @param proc the function which set errno
  * @param native_errno the errno value
@@ -279,7 +279,7 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
- * Errors out of a function marked `GEN_ERRORABLE_RETURN` if `native_errno` is not 0
+ * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not 0
  * Horrible macro string manipulation to get some nice output on your winerror
  * @param proc the function which set winerr
  * @param native_errno the winerr value
@@ -306,13 +306,13 @@ extern void* gen_error_handler_passthrough;
  * @param error the errno value to convert
  * @return the converted error enumeration
  */
-extern GEN_ERRORABLE_RETURN gen_convert_errno(errno_t error);
+GEN_ERRORABLE gen_convert_errno(errno_t error);
 
 /**
  * Converts a win32 error into a genstone error
  * @param error the win32 error value to convert
  * @return the converted error enumeration
  */
-extern GEN_ERRORABLE_RETURN gen_convert_winerr(unsigned long error);
+GEN_ERRORABLE gen_convert_winerr(unsigned long error);
 
 #endif

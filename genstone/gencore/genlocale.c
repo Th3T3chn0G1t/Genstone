@@ -29,28 +29,32 @@ gen_error_t gen_locale_convert_currency(char* const restrict out_string, size_t*
 	GEN_ERROR_OUT(GEN_OK, "");
 }
 
-gen_error_t gen_locale_convert_date_and_time(__unused char* const out_string, __unused size_t* const restrict out_size, __unused const uint64_t year, __unused const gen_month_t month, __unused const uint8_t day, __unused const uint8_t hours, __unused const uint8_t minutes, __unused const uint8_t seconds) {
-	// year month day hours minutes seconds
-	// struct tm time = {
-	// 	.tm_sec = seconds,
-	// 	.tm_min = minutes,
-	// 	.tm_hour = hours,
-	// 	.tm_mday = day,
-	// 	.tm_mon =
-	// 	.tm_year =
-	// 	.tm_wday =
-	// 	.tm_yday =
-	// 	.tm_isdst =
-	// 	.tm_gmtoff =
-	// 	.tm_zone =
-	// 	.tm_zone =
-	// }
+// const static uint64_t month_lens = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	// printf("UTC:       %s", asctime(gmtime(&t)));
-	// printf("local:     %s", asctime(localtime(&t)));
-	// // POSIX-specific
-	// putenv("TZ=Asia/Singapore");
-	// printf("Singapore: %s", asctime(localtime(&t)));
+// gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds) {
+// 	if(seconds > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`seconds` exceeded 59");
+// 	if(minutes > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`minutes` exceeded 59");
+// 	if(hours > 23) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`hours` exceeded 23");
 
-	GEN_ERROR_OUT(GEN_OK, "");
-}
+// 	if(day > month_lens[month]) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`day` exceeded the number of days in `month`");
+
+// 	// year month day hours minutes seconds
+// 	const struct tm time = {
+// 		.tm_sec = seconds,
+// 		.tm_min = minutes,
+// 		.tm_hour = hours,
+// 		.tm_mday = day,
+// 		.tm_mon = month,
+// 		.tm_year = year - 1900
+// 	};
+
+// 	if(out_string) {
+// 		*out_size = strnlen_s()
+// 	}
+// 	if(out_string) {
+// 		asctime_s(out_string);
+// 		GEN_ERROR_OUT_IF_ERRNO(asctime_s, errno);
+// 	}
+
+// 	GEN_ERROR_OUT(GEN_OK, "");
+// }

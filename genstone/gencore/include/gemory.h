@@ -28,7 +28,7 @@
  * @param count the number of units being allocated for
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gzalloc(void* restrict* const restrict out_address, const size_t size, const size_t count);
+GEN_ERRORABLE gzalloc(void* restrict* const restrict out_address, const size_t size, const size_t count);
 /**
  * Allocates memory on the heap
  * Ensures memory is zeroed before returning
@@ -39,7 +39,7 @@ extern GEN_ERRORABLE_RETURN gzalloc(void* restrict* const restrict out_address, 
  * @param align the alignment to align allocation to
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align);
+GEN_ERRORABLE gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align);
 /**
  * Resizes a memory block on the heap
  * May move items if new size is bigger than the old block allows
@@ -48,20 +48,20 @@ extern GEN_ERRORABLE_RETURN gzalloc_aligned(void* restrict* const restrict out_a
  * @param count the number of units being allocated for
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN grealloc(void* restrict* const restrict address, const size_t size, const size_t count);
+GEN_ERRORABLE grealloc(void* restrict* const restrict address, const size_t size, const size_t count);
 /**
  * Duplicates a string onto the heap
  * @param out_address pointer to storage for a pointer into the allocated heap block
  * @param str the string to duplicate
  * @param max the maximum number of characters to duplicate
  */
-extern GEN_ERRORABLE_RETURN gstrndup(char* restrict* const restrict out_address, const char* const restrict str, const size_t max);
+GEN_ERRORABLE gstrndup(char* restrict* const restrict out_address, const char* const restrict str, const size_t max);
 /**
  * Frees a block of heap memory
  * @param address the heap pointer to free
  * @note Contents of the block become undefined after freeing
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gfree(void* const restrict address);
+GEN_ERRORABLE gfree(void* const restrict address);
 
 #endif

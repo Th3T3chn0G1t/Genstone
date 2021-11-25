@@ -36,7 +36,7 @@ typedef pid_t gen_process_t;
  * @param redirect the stream to redirect output to
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect);
+GEN_ERRORABLE gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect);
 /**
  * Blocks the current thread until the specified process returns
  * Provides exit code after return
@@ -44,7 +44,7 @@ extern GEN_ERRORABLE_RETURN gen_proc_start_redirected(gen_process_t* const restr
  * @param process the process to wait on
  * @return an error code
  */
-extern GEN_ERRORABLE_RETURN gen_proc_wait(int* const restrict out_result, gen_process_t process);
+GEN_ERRORABLE gen_proc_wait(int* const restrict out_result, gen_process_t process);
 /**
  * Blocks the current thread until the specified process returns
  * Provides exit code and console output after return
@@ -54,6 +54,6 @@ extern GEN_ERRORABLE_RETURN gen_proc_wait(int* const restrict out_result, gen_pr
  * @return an error code
  * @note `out_output` will be assigned a heap pointer which will need to be `gfree`'d
  */
-extern GEN_ERRORABLE_RETURN gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec);
+GEN_ERRORABLE gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec);
 
 #endif
