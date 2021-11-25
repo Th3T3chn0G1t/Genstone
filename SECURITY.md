@@ -4,6 +4,8 @@
 
 TODO: Once we start doing releases
 
+At the moment the only supported version is latest on trunk
+
 ## Reporting a Vulnerability
 
 Genstone handles security vulnerabilities through GitHub issues. [A template is available for security bugs](https://github.com/Th3T3chn0G1t/Genstone/issues/new?assignees=Th3T3chn0G1t&labels=bug%2C+security&template=security.md&title=%5BVULNERABILITY%5D).

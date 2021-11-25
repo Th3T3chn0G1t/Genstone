@@ -134,6 +134,18 @@ extern const char* gen_error_description(const gen_error_t error);
 #endif
 
 /**
+ * Dispatches error handling and aborts the program with a fatal error
+ * @param error an error code
+ * @param msg contextual error message
+ */
+#define GEN_FATAL_ERROR(error, msg) \
+    do { \
+        glogf(FATAL, "%s: %s", gen_error_name(error), msg); \
+        GEN_DISPATCH_ERROR_HANDLER(error, msg); \
+        GEN_REQUIRE_NO_REACH; \
+    } while(0)
+
+/**
  * Handler for library errors
  * @note Only used if `GEN_CENTRALIZE_EH` is `ENABLED`
  */

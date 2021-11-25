@@ -111,7 +111,7 @@ extern gen_tooling_stack_pop_handler_t gen_tooling_pop_handler;
  * @param address the address of the frame
  * @param file the source file containing the frame
  */
-extern void gen_tooling_stack_push(const char* restrict frame, const uintptr_t address, const char* restrict file);
+extern void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file);
 /**
  * Pops the last frame from the tooled call stack
  */
@@ -136,7 +136,7 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
  * @note For non-function frames use `gen_tooling_stack_push` directly
  */
 #define GEN_FRAME_BEGIN(func) \
-    __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar; \
+    __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar = '\0'; \
     GEN_REQUIRE_EQUAL_STRING(#func, __func__); \
     gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
 

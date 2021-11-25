@@ -408,11 +408,7 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 /**
  * Pretty assertion for bad control paths
  */
-#define GEN_REQUIRE_NO_REACH \
-    do { \
-        glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s", __LINE__, __FILE__); \
-        abort(); \
-    } while(0)
+#define GEN_REQUIRE_NO_REACH glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s", __LINE__, __FILE__)
 
 /**
  * Pretty assertion for `result == GEN_OK`
