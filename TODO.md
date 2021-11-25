@@ -46,7 +46,7 @@
     - Apply `__builtin_assume` to make the static analyser stop having an aneurism
     - Nontemporal load/store for non-hot data `__builtin_nontemporal_load` `__builtin_nontemporal_store`
 - Security
-    - Gentooling has major buffer overflow issues
+    - Gentooling has major potential buffer overflow issues
     - Always check errno even when its inconvenient
     - Always get proper buffer bounds even when its inconvenient
     - `clang` thread safety intrinsics
