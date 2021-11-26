@@ -14,7 +14,7 @@
  */
 #define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) \
 	do { \
-		if(!path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`" #path "` was NULL"); \
+		GEN_INTERNAL_BASIC_PARAM_CHECK(path); \
 		gen_error_t path_error = gen_path_validate(path); \
 		if(path_error) GEN_ERROR_OUT(path_error, "`" #path "` was invalid"); \
 	} while(0)
@@ -37,7 +37,7 @@
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_canonical);
 
-	if(!output_path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_path` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_path);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	realpath(path, output_path);
@@ -49,7 +49,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_filename);
 
-	if(!output_filename) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_filename` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_filename);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
@@ -61,7 +61,7 @@ gen_error_t gen_path_filename(char* restrict output_filename, const char* const 
 gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_pathname);
 
-	if(!output_path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_path` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_path);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	size_t mark = (size_t) ((strrchr(path, '/') + 1) - path);
@@ -75,7 +75,7 @@ gen_error_t gen_path_pathname(char* restrict output_path, const char* const rest
 gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_extension);
 
-	if(!output_extension) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_extension` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_extension);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	const char* final_pathseg_terminator = strrchr(path, '/');
@@ -84,6 +84,7 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 	size_t mark = ext_start ? (size_t) (ext_start - path) : 0;
 	strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
+	if(mark == 0) GEN_ERROR_OUT(GEN_UNKNOWN, "`mark` became invalid for some reason");
 	output_extension[mark - 1] = '\0';
 
 	GEN_ALL_OK;
@@ -100,7 +101,7 @@ bool gen_path_exists(const char* const restrict path) {
 gen_error_t gen_path_validate(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_validate);
 
-	if(!path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`path` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(path);
 	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`strlen(path)` < 1)");
 
 	if(strlen(path) > GEN_PATH_MAX) GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`strlen(path)` > GEN_PATH_MAX)");
@@ -151,10 +152,10 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_handle_open);
 
-	if(!output_handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_handle` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	if(!output_handle->path) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_handle->path` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle->path);
 	strcpy_s(output_handle->path, GEN_PATH_MAX, path);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
 
@@ -182,7 +183,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 	GEN_FRAME_BEGIN(gen_handle_close);
 
-	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
 	if(handle->dir) {
 		closedir(handle->directory_handle);
@@ -199,7 +200,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle) {
 	GEN_FRAME_BEGIN(gen_handle_size);
 
-	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 
 	fseek(handle->file_handle, 0, SEEK_END);
@@ -216,15 +217,17 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
 	GEN_FRAME_BEGIN(gen_file_read);
 
-	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
-	if(!output_buffer) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_buffer` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_buffer);
 
 	int error = fseek(handle->file_handle, (long) start, SEEK_SET);
+	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
 	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
 
 	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handle);
 	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
+	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
 
 	rewind(handle->file_handle);
 
@@ -234,9 +237,9 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
 	GEN_FRAME_BEGIN(gen_file_write);
 
-	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
-	if(!buffer) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`buffer` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(buffer);
 
 	int error = (int) fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handle);
 	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
@@ -249,9 +252,9 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
 gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_directory_list);
 
-	if(!handle) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handle` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(!handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
-	if(!handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handler` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handler);
 
 	struct dirent* entry;
 	errno = 0;

@@ -1,13 +1,21 @@
 #include "include/gencommon.h"
 
+/**
+ * This is to make the static analyzer happy
+ */
+#define GEN_INTERNAL_GEMORY_PARAM_CHECK \
+	do { \
+		GEN_INTERNAL_BASIC_PARAM_CHECK(out_address); \
+		if(!size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was 0"); \
+		if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0"); \
+		if(size == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`"); \
+		if(count == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`"); \
+	} while(0)
+
 gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t size, const size_t count) {
 	GEN_FRAME_BEGIN(gzalloc);
 
-	if(!out_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`address` was NULL");
-	if(!size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was 0");
-	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
-	if(size == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
+	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
 #if GEN_USE_MIMALLOC == ENABLED
 	void* const allocated = mi_calloc(count, size);
@@ -26,13 +34,10 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t siz
 gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align) {
 	GEN_FRAME_BEGIN(gzalloc);
 
-	if(!out_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`address` was NULL");
-	if(!size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was 0");
-	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
+	GEN_INTERNAL_GEMORY_PARAM_CHECK;
+
 	if(!align) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was 0");
 	if(align & (align - 1)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was not a power of 2");
-	if(size == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
 
 #if GEN_USE_MIMALLOC == ENABLED
 	void* const allocated = mi_calloc_aligned(count, size, align);
@@ -48,23 +53,19 @@ gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const si
 	GEN_ALL_OK;
 }
 
-gen_error_t grealloc(void* restrict* const restrict address, const size_t size, const size_t count) {
+gen_error_t grealloc(void* restrict* const restrict out_address, const size_t size, const size_t count) {
 	GEN_FRAME_BEGIN(grealloc);
 
-	if(!address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`address` was NULL");
-	if(!size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was 0");
-	if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0");
-	if(size == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
+	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
 #if GEN_USE_MIMALLOC == ENABLED
-	void* const allocated = mi_recalloc(*address, count, size);
+	void* const allocated = mi_recalloc(*out_address, count, size);
 #else
-	void* const allocated = realloc(*address, count * size);
+	void* const allocated = realloc(*out_address, count * size);
 #endif
 	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_recalloc, errno);
 
-	*address = allocated;
+	*out_address = allocated;
 
 	errno = 0; // mimalloc does weirdness with NUMA
 
@@ -74,8 +75,9 @@ gen_error_t grealloc(void* restrict* const restrict address, const size_t size, 
 gen_error_t gstrndup(char* restrict* const restrict out_address, const char* const restrict str, const size_t max) {
 	GEN_FRAME_BEGIN(gstrndup);
 
-	if(!out_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`address` was NULL");
-	if(!str) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`str` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_address);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(str);
+
 	if(!max) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`max` was 0");
 	if(max == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`max` was SIZE_MAX");
 
@@ -96,7 +98,7 @@ gen_error_t gstrndup(char* restrict* const restrict out_address, const char* con
 gen_error_t gfree(void* const restrict address) {
 	GEN_FRAME_BEGIN(gfree);
 
-	if(!address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`address` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(address);
 
 #if GEN_USE_MIMALLOC == ENABLED
 	mi_free(address);

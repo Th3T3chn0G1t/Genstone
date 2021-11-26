@@ -21,7 +21,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	// The static analyser has a bit of an aneurism about this function
 	// Just ignore it for now
 
-	if(!output_dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_dylib` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_dylib);
 	if(!lib_name) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`lib_name` was invalid");
 
 	const size_t lib_name_len = strnlen_s(lib_name, GEN_PATH_MAX);
@@ -56,9 +56,9 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 }
 
 gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
-	if(!output_address) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`output_address` was NULL");
-	if(!dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`dylib` was NULL");
-	if(!symname) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(output_address);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(dylib);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(symname);
 	if(!strnlen_s(symname, GEN_PRESUMED_SYMBOL_MAX_LEN)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`strlen(symname)` < 0)");
 
 	if(!(*output_address = dlsym(dylib, symname))) {
@@ -72,7 +72,7 @@ gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, cons
 }
 
 gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
-	if(!dylib) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`dylib` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(dylib);
 
 	if(dlclose(dylib)) {
 #if GEN_GLOGGIFY_EH == ENABLED

@@ -10,9 +10,9 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 
 	if(!argc) GEN_ALL_OK;
 
-	if(!argv) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`argv` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(argv);
 	if(argc < 0) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`argc` was invalid (`argc` < 0)");
-	if(!handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`handler` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handler);
 	if(n_short_args && !short_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`short_args` was NULL but `n_short_args` > 0");
 	if(n_long_args && !long_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`long_args` was NULL but `n_long_args` > 0");
 

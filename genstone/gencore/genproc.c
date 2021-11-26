@@ -33,15 +33,15 @@ gen_error_t gen_proc_wait(int* const restrict out_result, gen_process_t process)
 gen_error_t gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec) {
 	GEN_FRAME_BEGIN(gen_proc_get_output);
 
-	if(!out_output) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_output` was NULL");
-	if(!out_result) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_result` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_output);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_result);
 
 	int fds[2];
 	pipe(fds);
 	fcntl(fds[0], F_SETFL, O_NONBLOCK); // Don't want to block on read
 
 	FILE* redirect_handle = fdopen(fds[1], "w");
-	gen_process_t pid;
+	gen_process_t pid = 0;
 
 	GEN_ERROR_OUT_IF(gen_proc_start_redirected(&pid, exec, redirect_handle), "`gen_proc_start_redirected` failed");
 	GEN_ERROR_OUT_IF(gen_proc_wait(out_result, pid), "`gen_proc_wait` failed");

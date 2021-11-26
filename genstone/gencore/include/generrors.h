@@ -252,6 +252,11 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
+ * This is to make the static analyzer happy
+ */
+#define GEN_INTERNAL_BASIC_PARAM_CHECK(param) if(!param) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`"#param"` was NULL")
+
+/**
  * Converts an errno into a genstone error
  * @param error the errno value to convert
  * @return the converted error enumeration

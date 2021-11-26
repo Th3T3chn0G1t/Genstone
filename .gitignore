@@ -18,6 +18,8 @@
 *.dSYM
 
 *.tmp
+*.log
+
 *.plist
 
 *.gcda

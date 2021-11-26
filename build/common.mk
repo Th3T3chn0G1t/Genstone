@@ -228,7 +228,7 @@ ifeq ($(PLATFORM),DWN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 endif
 
-CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.clone -Xanalyzer -analyzer-checker=alpha.core
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.core # This one kinda sucks -Xanalyzer -analyzer-checker=alpha.clone
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.deadcode -Xanalyzer -analyzer-checker=alpha.security
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
 
@@ -257,7 +257,7 @@ ifeq ($(PLATFORM),LNX)
 	OBJECT_FORMAT = ELF
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) -shared $(GLOBAL_L_FLAGS) $(LFLAGS)
-	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),DWN)
 	LIB_PREFIX = lib
@@ -271,7 +271,7 @@ ifeq ($(PLATFORM),DWN)
 	OBJECT_FORMAT = MACHO
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) -dynamiclib $(GLOBAL_L_FLAGS) $(LFLAGS) -install_name "@rpath/$(notdir $@)"
-	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 ifeq ($(PLATFORM),BSD)
 	LIB_PREFIX = lib
@@ -285,7 +285,7 @@ ifeq ($(PLATFORM),BSD)
 	OBJECT_FORMAT = ELF
 
 	DYNAMIC_LIB_TOOL = $(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) -shared $(GLOBAL_L_FLAGS) $(LFLAGS)
-	STATIC_LIB_TOOL = $(AR) -r $@ $(filter %$(OBJECT_SUFFIX),$^)
+	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)

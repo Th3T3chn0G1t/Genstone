@@ -44,12 +44,12 @@ GEN_ERRORABLE gzalloc_aligned(void* restrict* const restrict out_address, const 
 /**
  * Resizes a memory block on the heap
  * May move items if new size is bigger than the old block allows
- * @param address the heap pointer to resize. May be modified if block needs to be moved
+ * @param out_address the heap pointer to resize. May be modified if block needs to be moved
  * @param size the size of the unit being allocated for
  * @param count the number of units being allocated for
  * @return an error code
  */
-GEN_ERRORABLE grealloc(void* restrict* const restrict address, const size_t size, const size_t count);
+GEN_ERRORABLE grealloc(void* restrict* const restrict out_address, const size_t size, const size_t count);
 /**
  * Duplicates a string onto the heap
  * @param out_address pointer to storage for a pointer into the allocated heap block

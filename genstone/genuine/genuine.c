@@ -5,7 +5,7 @@
 gen_error_t gen_ui_draw_ninepatch_direct(void* const restrict ninepatch, const gen_ui_draw_handler_t draw_handler, const gen_ui_rect_t extent, const gen_ui_extent_t src_scale, const gen_ui_extent_t dest_scale, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_ui_draw_ninepatch_direct);
 
-	if(!draw_handler) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`draw_handler` was NULL");
+	GEN_INTERNAL_BASIC_PARAM_CHECK(draw_handler);
 	if(!extent.w || !extent.h || !src_scale || !dest_scale) GEN_ALL_OK; // No work can be done but its not technically an error
 
 	// Top Left

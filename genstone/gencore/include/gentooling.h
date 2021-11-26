@@ -8,6 +8,8 @@
 #ifndef GEN_TOOLING_H
 #define GEN_TOOLING_H
 
+#include "genutil.h"
+
 #ifndef GEN_TOOLING_DEPTH
 /**
  * The maximum depth of a tooled call stack
