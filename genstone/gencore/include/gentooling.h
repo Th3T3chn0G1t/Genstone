@@ -109,9 +109,9 @@ extern gen_tooling_stack_pop_handler_t gen_tooling_pop_handler;
 
 /**
  * Pushes a new entry onto the tooled call stack.
- * @param frame the name of the frame.
- * @param address the address of the frame.
- * @param file the source file containing the frame.
+ * @param[in] frame the name of the frame.
+ * @param[in] address the address of the frame.
+ * @param[in] file the source file containing the frame.
  */
 extern void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file);
 /**
@@ -134,7 +134,7 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 /**
  * Begins a tooled frame with an automatic lifetime.
- * @param func the address of this frame.
+ * @param[in] func the address of this frame.
  * @note For non-function frames use `gen_tooling_stack_push` directly.
  */
 #define GEN_FRAME_BEGIN(func) \

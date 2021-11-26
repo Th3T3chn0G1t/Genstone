@@ -27,36 +27,36 @@ typedef __fp16 gfloat16;
 
 /**
  * Performs fuzzy comparison of floating point types.
- * @param a the first number.
- * @param b the second number.
- * @param epsilon the error or "fuzziness" for the comparison. Set to -1 to use the machine epsilon for the provided precision of `a`.
+ * @param[in] a the first number.
+ * @param[in] b the second number.
+ * @param[in] epsilon the error or "fuzziness" for the comparison. Set to -1 to use the machine epsilon for the provided precision of `a`.
  */
 #define GEN_FUZZY_COMPARE_FP(a, b, epsilon) GEN_DIAG_REGION_BEGIN GEN_DIAG_IGNORE_FP_EQ (((a) == (b)) ||(fabs((a) - (b)) < (generic((a), float: (((epsilon) == -1.0f) ? FLT_EPSILON : (epsilon)), double: (((epsilon) == -1.0) ? DBL_EPSILON : (epsilon)), long double: (((epsilon) == -1.0L) ? LDBL_EPSILON : (epsilon)))))) GEN_DIAG_REGION_END
 
 /**
  * Internal type declarator for clang vectors (OpenCL-style).
- * @param base the base type of the vector.
- * @param n the number of elements in the vector.
+ * @param[in] base the base type of the vector.
+ * @param[in] n the number of elements in the vector.
  */
 #define GEN_INTERNAL_VECTOR_TYPE(base, n) typedef base g##base##n __attribute__((ext_vector_type(n)))
 /**
  * Internal type declarator for clang matrices.
- * @param base the base type of the matrix.
- * @param i the number of elements along the matrix's x dimension.
- * @param j the number of elements along the matrix's y dimension.
+ * @param[in] base the base type of the matrix.
+ * @param[in] i the number of elements along the matrix's x dimension.
+ * @param[in] j the number of elements along the matrix's y dimension.
  */
 #define GEN_INTERNAL_MATRIX_TYPE(base, i, j) typedef base g##base##i##x##j __attribute__((matrix_type(i, j)))
 
 /**
  * Reasonably converts a vector between vector types.
- * @param vector the vector to convert.
- * @param new_type the vector type to convert to.
+ * @param[in] vector the vector to convert.
+ * @param[in] new_type the vector type to convert to.
  */
 #define GEN_CONVERT_VECTOR(vector, new_type) __builtin_convertvector(vector, new_type)
 
 /**
  * Transposes a matrix.
- * @param mat the matrix to transpose.
+ * @param[in] mat the matrix to transpose.
  */
 #define GEN_TRANSPOSE_MATRIX(mat) __builtin_matrix_transpose(mat)
 

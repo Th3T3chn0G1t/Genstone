@@ -135,8 +135,8 @@ extern const char* gen_error_description(const gen_error_t error);
 
 /**
  * Dispatches error handling and aborts the program with a fatal error.
- * @param error an error code.
- * @param msg contextual error message.
+ * @param[in] error an error code.
+ * @param[in] msg contextual error message.
  */
 #define GEN_FATAL_ERROR(error, msg) \
     do { \
@@ -176,8 +176,8 @@ extern void* gen_error_handler_passthrough;
 /**
  * Errors out of a function marked `GEN_ERRORABLE`.
  * Handles centralized vs. decentralized EH.
- * @param error an error code.
- * @param msg contextual error message.
+ * @param[in] error an error code.
+ * @param[in] msg contextual error message.
  */
 #define GEN_ERROR_OUT(error, msg) \
     do { \
@@ -194,8 +194,8 @@ extern void* gen_error_handler_passthrough;
 /**
  * Errors out of a function marked `GEN_ERRORABLE` if `error` is not `GEN_OK`.
  * Handles centralized vs. decentralized EH.
- * @param error an error code.
- * @param msg contextual error message.
+ * @param[in] error an error code.
+ * @param[in] msg contextual error message.
  */
 #define GEN_ERROR_OUT_IF(error, msg) \
     do { \
@@ -208,7 +208,7 @@ extern void* gen_error_handler_passthrough;
 
 /**
  * Gets the `strerror_s` of an errno value.
- * @param errno the errno value to get `strerror` for.
+ * @param[in] errno the errno value to get `strerror` for.
  */
 #define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
     /* Block needs to be inline (not `do-while`'d) so we can get the declarations into the main error-out block */ \
@@ -220,8 +220,8 @@ extern void* gen_error_handler_passthrough;
 
 /**
  * Horrible macro string manipulation to get some nice output on your errno.
- * @param proc the function which set errno.
- * @param native_errno the errno value.
+ * @param[in] proc the function which set errno.
+ * @param[in] native_errno the errno value.
  */
 #define GEN_ERROR_OUT_ERRNO(proc, native_errno) \
     do { \
@@ -236,8 +236,8 @@ extern void* gen_error_handler_passthrough;
 /**
  * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not `EOK` or equivalent.
  * Horrible macro string manipulation to get some nice output on your errno.
- * @param proc the function which set errno.
- * @param native_errno the errno value.
+ * @param[in] proc the function which set errno.
+ * @param[in] native_errno the errno value.
  */
 #define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) \
     do { \
@@ -258,14 +258,14 @@ extern void* gen_error_handler_passthrough;
 
 /**
  * Converts an errno into a genstone error.
- * @param error the errno value to convert.
+ * @param[in] error the errno value to convert.
  * @return the converted error enumeration.
  */
 GEN_ERRORABLE gen_convert_errno(errno_t error);
 
 /**
  * Converts a win32 error into a genstone error.
- * @param error the win32 error value to convert.
+ * @param[in] error the win32 error value to convert.
  * @return the converted error enumeration.
  */
 GEN_ERRORABLE gen_convert_winerr(unsigned long error);

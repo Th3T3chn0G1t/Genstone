@@ -9,7 +9,7 @@
 #if GEN_DEBUG_PATH_VALIDATION == ENABLED
 /**
  * Validates the path parameter to filesystem functions
- * @param path the path to validate
+ * @param[in] path the path to validate
  * @see GEN_DEBUG_PATH_VALIDATION
  */
 #define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) \

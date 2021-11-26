@@ -71,18 +71,18 @@
 
 /**
  * Applies ANSI sequence prefix and suffix.
- * @param code the ANSI code to apply the prefix and suffix to.
+ * @param[in] code the ANSI code to apply the prefix and suffix to.
  */
 #define GEN_ANSI_SEQUENCE(code) GEN_INTERNAL_ANSI_SEQUENCE_PREFIX code GEN_INTERNAL_ANSI_SEQUENCE_SUFFIX
 
 /**
  * Applies dark color modifier prefix.
- * @param color the ANSI color code to apply the prefix to.
+ * @param[in] color the ANSI color code to apply the prefix to.
  */
 #define GEN_ANSI_COLOR_DARK(color) GEN_ANSI_SEQUENCE(GEN_INTERNAL_ANSI_COLOR_DARK_PREFIX color)
 /**
  * Applies light color modifier prefix to ANSI color code.
- * @param color the ANSI color code to apply the prefix to.
+ * @param[in] color the ANSI color code to apply the prefix to.
  */
 #define GEN_ANSI_COLOR_LIGHT(color) GEN_ANSI_SEQUENCE(GEN_INTERNAL_ANSI_COLOR_LIGHT_PREFIX color)
 
@@ -179,8 +179,8 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 
 /**
  * Basic string logging function.
- * @param level a `gen_logging_level_t` to determine the prefix from.
- * @param string the string to print.
+ * @param[in] level a `gen_logging_level_t` to determine the prefix from.
+ * @param[in] string the string to print.
  * @see gen_glog_out_streams
  * @see gen_glog_err_streams
  */
@@ -199,9 +199,9 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 
 /**
  * `printf`-style formatted logging function.
- * @param level a `gen_logging_level_t` to determine the prefix from.
- * @param format a format string.
- * @param ... the format arguments to print.
+ * @param[in] level a `gen_logging_level_t` to determine the prefix from.
+ * @param[in] format a format string.
+ * @param[in] ... the format arguments to print.
  * @see gen_glog_out_streams
  * @see gen_glog_err_streams
  */

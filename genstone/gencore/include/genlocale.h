@@ -17,11 +17,11 @@ typedef enum {
 
 /**
  * Converts a currency amount to a locale-formatted string.
- * @param out_string pointer to storage for the formatted string. Nullable.
- * @param buffer_size the size of the output buffer.
- * @param out_size pointer for storage for the required size of the formatted string. Nullable.
- * @param units the units part of the currency amount.
- * @param cents the cents part of the currency amount.
+ * @param[out] out_string pointer to storage for the formatted string. Nullable.
+ * @param[in] buffer_size the size of the output buffer.
+ * @param[out] out_size pointer for storage for the required size of the formatted string. Nullable.
+ * @param[in] units the units part of the currency amount.
+ * @param[in] cents the cents part of the currency amount.
  * @return an error code.
  */
 GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const size_t buffer_size, size_t* const restrict out_size, const uint64_t units, const uint64_t cents);

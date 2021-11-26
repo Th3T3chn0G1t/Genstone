@@ -38,14 +38,14 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char
 /**
  * Parses UNIX-style arguments into an easy-to-interpret format for a handler.
  * Similar to the argp parsing library.
- * @param argc the number of arguments to parse.
- * @param argv an array of arguments.
- * @param handler the handler to be called for each parsed argument.
- * @param n_short_args the number of short arguments.
- * @param short_args an array of short arguments.
- * @param n_long_args the number of long arguments.
- * @param long_args an array of long arguments.
- * @param passthrough a passthrough argument for the handler.
+ * @param[in] argc the number of arguments to parse.
+ * @param[in] argv an array of arguments.
+ * @param[in] handler the handler to be called for each parsed argument.
+ * @param[in] n_short_args the number of short arguments.
+ * @param[in] short_args an array of short arguments.
+ * @param[in] n_long_args the number of long arguments.
+ * @param[in] long_args an array of long arguments.
+ * @param[in] passthrough a passthrough argument for the handler.
  * @return an error code.
  */
 GEN_ERRORABLE gen_parse_args(const int argc, const char* const restrict * const restrict argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* const restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough);

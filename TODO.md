@@ -26,7 +26,6 @@
     - `clang` thread safety intrinsics
 - Documentation
     - Tutorials
-    - Use `@param[in]` and `@param[out]`
     - Write examples
         - Comprehensive `@example` tags
         - Tests
