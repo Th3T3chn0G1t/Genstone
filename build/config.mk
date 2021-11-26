@@ -83,10 +83,3 @@ DISABLED_MODULES = genproc_test
 # `ENABLED`: Enables build system debugging
 # `DISABLED`: Disables build system debugging
 BUILD_SYS_DEBUG = DISABLED
-
-# Whether perl is available in the environment
-# Used for running unsafe API check from safeclib
-# Possible values are:
-# `ENABLED`: Have perl
-# `DISABLED`: Don't have perl
-HAVE_PERL = ENABLED

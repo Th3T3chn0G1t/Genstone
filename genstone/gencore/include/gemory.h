@@ -44,7 +44,7 @@ GEN_ERRORABLE gzalloc_aligned(void* restrict* const restrict out_address, const 
 /**
  * Resizes a memory block on the heap.
  * May move items if new size is bigger than the old block allows.
- * @param[inout] out_address the heap pointer to resize. May be modified if block needs to be moved.
+ * @param[in,out] out_address the heap pointer to resize. May be modified if block needs to be moved.
  * @param[in] size the size of the unit being allocated for.
  * @param[in] count the number of units being allocated for.
  * @return an error code.

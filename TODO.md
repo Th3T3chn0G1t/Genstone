@@ -21,8 +21,6 @@
                 - Returns a json
                 - Build tarball
 - Security
-    - Always check errno even when its inconvenient
-    - Always get proper buffer bounds even when its inconvenient
     - `clang` thread safety intrinsics
 - Documentation
     - Tutorials
