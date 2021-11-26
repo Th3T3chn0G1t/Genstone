@@ -59,7 +59,7 @@ gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, cons
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_address);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(dylib);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(symname);
-	if(!strnlen_s(symname, GEN_PRESUMED_SYMBOL_MAX_LEN)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`strlen(symname)` < 0)");
+	if(!strnlen_s(symname, GEN_PRESUMED_SYMBOL_MAX_LEN)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`len(symname)` < 0)");
 
 	if(!(*output_address = dlsym(dylib, symname))) {
 #if GEN_GLOGGIFY_EH == ENABLED

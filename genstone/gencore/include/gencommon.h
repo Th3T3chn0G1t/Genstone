@@ -3,9 +3,9 @@
 
 /**
  * @file gencommon.h
- * Includes common helpers and utilities for across the codebase
- * Includes the stdlib and helpers to provide missing headers on noncompliant platforms
- * Defines helper macros for pretty keywords and diagnostic info
+ * Includes common helpers and utilities for across the codebase.
+ * Includes the stdlib and helpers to provide missing headers on noncompliant platforms.
+ * Defines helper macros for pretty keywords and diagnostic info.
  */
 
 #ifndef GEN_COMMON_H
@@ -56,7 +56,7 @@ GEN_DIAG_IGNORE_ALL
 
 #ifndef GEN_USE_MIMALLOC
 /**
- * Whether to use mimalloc as the allocator
+ * Whether to use mimalloc as the allocator.
  */
 #define GEN_USE_MIMALLOC ENABLED
 #endif

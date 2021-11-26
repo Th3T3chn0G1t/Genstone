@@ -3,7 +3,7 @@
 
 /**
  * @file gendbg.h
- * Provides debug configuration
+ * Provides debug configuration.
  */
 
 #ifndef GEN_DEBUG_H
@@ -12,15 +12,15 @@
 #if MODE == DEBUG
 #ifndef GEN_DEBUG_PATH_VALIDATION
 /**
- * Whether to validate paths passed to `genfs` functions with `gen_path_validate`
- * @note Does not affect the presence of `gen_path_validate`
+ * Whether to validate paths passed to `genfs` functions with `gen_path_validate`.
+ * @note Does not affect the presence of `gen_path_validate`.
  */
 #define GEN_DEBUG_PATH_VALIDATION ENABLED
 #endif
 #ifndef GEN_DEBUG_FOREACH_REGISTER
 /**
- * Whether to use register variables for iteration in `GEN_FOREACH` statements
- * @note Disabling this can sometimes help with printing iterator values from a debugger
+ * Whether to use register variables for iteration in `GEN_FOREACH` statements.
+ * @note Disabling this can sometimes help with printing iterator values from a debugger.
  */
 #define GEN_DEBUG_FOREACH_REGISTER DISABLED
 #endif

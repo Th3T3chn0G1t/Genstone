@@ -4,16 +4,10 @@
     - Releases
         - Semantic versioning
         - Security policy supported versions (SECURITY.md)
-- Misc
-    - Recondense and fix function outputs
-        - Ensure all functions take a max buffer size
-    - Use proper punctuation in documentation
-        - Fullstops in README.md
-        - Fullstops in docstrings
-    - `__has_include()` for transiently included files
 - Builds
     - Bundles
       - Integrate https://github.com/create-dmg/create-dmg
+      - https://appimage.org
     - Portability
         - Easier handling of adding new platforms in build system
             - `build/platforms.mk`
@@ -30,9 +24,9 @@
     - Always check errno even when its inconvenient
     - Always get proper buffer bounds even when its inconvenient
     - `clang` thread safety intrinsics
-    - `_r` function variants
 - Documentation
     - Tutorials
+    - Use `@param[in]` and `@param[out]`
     - Write examples
         - Comprehensive `@example` tags
         - Tests

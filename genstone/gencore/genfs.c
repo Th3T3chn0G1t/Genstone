@@ -78,9 +78,23 @@ gen_error_t gen_path_extension(char* restrict output_extension, const char* cons
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_extension);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	const char* final_pathseg_terminator = strrchr(path, '/');
-	if(!final_pathseg_terminator) final_pathseg_terminator = path;
-	const char* const ext_start = strchr(final_pathseg_terminator, '.');
+	char* final_pathseg_terminator = NULL;
+	strrchr_s(path, GEN_PATH_MAX, '/', &final_pathseg_terminator);
+	if(!final_pathseg_terminator) {
+		// We need to duplicate like this because `strrchr_s` doesn't take a `const char*`
+
+		char* ext_start = NULL;
+		strchr_s(path, GEN_PATH_MAX, '.', &ext_start);
+		size_t mark = ext_start ? (size_t) (ext_start - path) : 0;
+		strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
+		GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
+		if(mark == 0) GEN_ERROR_OUT(GEN_UNKNOWN, "`mark` became invalid for some reason");
+		output_extension[mark - 1] = '\0';
+
+		GEN_ALL_OK;
+	}
+	char* ext_start = NULL;
+	strchr_s(final_pathseg_terminator, GEN_PATH_MAX, '.', &ext_start);
 	size_t mark = ext_start ? (size_t) (ext_start - path) : 0;
 	strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
 	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
@@ -102,9 +116,10 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_validate);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(path);
-	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`strlen(path)` < 1)");
+	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`len(path)` was 0)");
 
-	if(strlen(path) > GEN_PATH_MAX) GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`strlen(path)` > GEN_PATH_MAX)");
+	// This is a kinda nonsensical test but it feels like the best way to do this
+	if(strnlen_s(path, GEN_PATH_MAX) > GEN_PATH_MAX) GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`len(path)` > GEN_PATH_MAX)");
 
 	GEN_ALL_OK;
 }

@@ -3,7 +3,7 @@
 
 /**
  * @file genutil.h
- * Includes general Genstone utils which don't belong elsewhere
+ * Includes general Genstone utils which don't belong elsewhere.
  */
 
 #ifndef GEN_UTIL_H
@@ -13,18 +13,18 @@
 #define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
 #else
 /**
- * The type used when declaring an iterator in `GEN_FOREACH`
+ * The type used when declaring an iterator in `GEN_FOREACH`.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_INTERNAL_FOREACH_ITER_DECL size_t
 #endif
 
 /**
- * Iterates over a container with explicit length
- * @param iter the identifier to use for the iterating index
- * @param memb the identifier to use for the indexed member
- * @param len the length of the container to iterate
- * @param container the container to iterate
+ * Iterates over a container with explicit length.
+ * @param iter the identifier to use for the iterating index.
+ * @param memb the identifier to use for the indexed member.
+ * @param len the length of the container to iterate.
+ * @param container the container to iterate.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH(iter, memb, len, container) \
@@ -32,12 +32,12 @@
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
 
 /**
- * Iterates over a container with explicit length
- * `memb` is a pointer to the indexed member
- * @param iter the identifier to use for the iterating index
- * @param memb the identifier to use for the indexed member
- * @param len the length of the container to iterate
- * @param container the container to iterate
+ * Iterates over a container with explicit length.
+ * `memb` is a pointer to the indexed member.
+ * @param iter the identifier to use for the iterating index.
+ * @param memb the identifier to use for the indexed member.
+ * @param len the length of the container to iterate.
+ * @param container the container to iterate.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
@@ -45,13 +45,13 @@
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
 /**
- * Iterates over a container with explicit length
- * `memb` is a pointer to the indexed member
- * Uses the container type as the member type directly
- * @param iter the identifier to use for the iterating index
- * @param memb the identifier to use for the indexed member
- * @param len the length of the container to iterate
- * @param container the container to iterate
+ * Iterates over a container with explicit length.
+ * `memb` is a pointer to the indexed member.
+ * Uses the container type as the member type directly.
+ * @param iter the identifier to use for the iterating index.
+ * @param memb the identifier to use for the indexed member.
+ * @param len the length of the container to iterate.
+ * @param container the container to iterate.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
@@ -60,8 +60,8 @@
 
 
 /**
- * Gets the require message from the expected expressions type
- * @param b the expected expression
+ * Gets the require message from the expected expressions type.
+ * @param b the expected expression.
  */
 #define GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b) \
     generic((b), \
@@ -84,11 +84,11 @@
     )
     
 /**
- * Pretty assertion for equality
- * @param a the expected expression
- * @param b the recieved expression
- * @note Determines type to use correct comparison using `generic` on second argument, this is to avoid having cases for `const`
- * @note Only works for trivial types
+ * Pretty assertion for equality.
+ * @param a the expected expression.
+ * @param b the recieved expression.
+ * @note Determines type to use correct comparison using `generic` on second argument, this is to avoid having cases for `const`.
+ * @note Only works for trivial types.
  */
 #define GEN_REQUIRE_EQUAL(a, b) \
     do { \
@@ -100,10 +100,10 @@
     } while(0)
  
 /**
- * Pretty assertion for equality of strings
- * @param a the expected string
- * @param b the recieved string
- * @note Use `GEN_REQUIRE_EQUAL_MEMREGION` for non-constant expected values
+ * Pretty assertion for equality of strings.
+ * @param a the expected string.
+ * @param b the recieved string.
+ * @note Use `GEN_REQUIRE_EQUAL_MEMREGION` for non-constant expected values.
  */
 #define GEN_REQUIRE_EQUAL_STRING(a, b) \
     do { \
@@ -115,10 +115,10 @@
     } while(0)
 
 /**
- * Pretty assertion for equality of memory regions
- * @param a the expected data
- * @param b the recieved data
- * @param s the amount of data in bytes to compare
+ * Pretty assertion for equality of memory regions.
+ * @param a the expected data.
+ * @param b the recieved data.
+ * @param s the amount of data in bytes to compare.
  */
 #define GEN_REQUIRE_EQUAL_MEMREGION(a, b, s) \
     do { \
@@ -129,12 +129,12 @@
     } while(0)
 
 /**
- * Pretty assertion for bad control paths
+ * Pretty assertion for bad control paths.
  */
 #define GEN_REQUIRE_NO_REACH glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s", __LINE__, __FILE__)
 
 /**
- * Pretty assertion for `result == GEN_OK`
+ * Pretty assertion for `result == GEN_OK`.
  */
 #define GEN_REQUIRE_NO_ERROR(result) \
     do { \
@@ -150,25 +150,25 @@
 #include <sys/time.h>
 
 /**
- * Converts a timeval to seconds as a `long double`
- * @param timeval the `struct timeval` to convert
+ * Converts a timeval to seconds as a `long double`.
+ * @param timeval the `struct timeval` to convert.
  */
 #define GEN_TIMEVAL_AS_SECONDS(timeval) ((long double) (timeval).tv_usec + ((long double) (timeval).tv_sec * (long double) GEN_MICROSECONDS_PER_SECOND))
 
 /**
- * Adds two timevals
- * @param a the first value
- * @param b the second value
- * @param result pointer to storage for the result
- * @see https://gist.github.com/vchernov/4774682#file-timeval_add-cpp
+ * Adds two timevals.
+ * https://gist.github.com/vchernov/4774682#file-timeval_add-cpp
+ * @param a the first value.
+ * @param b the second value.
+ * @param result pointer to storage for the result.
  */
 extern void gen_timeval_add(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result);
 /**
- * Subtracts two timevals
- * @param a the first value
- * @param b the second value
- * @param result pointer to storage for the result
- * @see https://gist.github.com/vchernov/4774682#file-timeval_sub-cpp
+ * Subtracts two timevals.
+ * https://gist.github.com/vchernov/4774682#file-timeval_sub-cpp
+ * @param a the first value.
+ * @param b the second value.
+ * @param result pointer to storage for the result.
  */
 extern void gen_timeval_sub(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result);
 

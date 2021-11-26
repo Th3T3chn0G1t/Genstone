@@ -3,7 +3,7 @@
 
 /**
  * @file gentooling.h
- * Provides utilities for tooling and profiling
+ * Provides utilities for tooling and profiling.
  */
 #ifndef GEN_TOOLING_H
 #define GEN_TOOLING_H
@@ -12,130 +12,130 @@
 
 #ifndef GEN_TOOLING_DEPTH
 /**
- * The maximum depth of a tooled call stack
+ * The maximum depth of a tooled call stack.
  */
 #define GEN_TOOLING_DEPTH 64
 #endif
 
 #ifndef GEN_FREQ_PROFILE_MAX
 /**
- * The maximum number of frequency profilers
+ * The maximum number of frequency profilers.
  */
 #define GEN_FREQ_PROFILE_MAX 64
 #endif
 
 /**
- * A tooled call stack
+ * A tooled call stack.
  */
 typedef struct {
     /**
-     * Offset of the next free space in the stack
+     * Offset of the next free space in the stack.
      */
     size_t next;
     /**
-     * A buffer of function names
+     * A buffer of function names.
      */
     const char* functions[GEN_TOOLING_DEPTH];
     /**
-     * A buffer of function addresses
+     * A buffer of function addresses.
      */
     uintptr_t addresses[GEN_TOOLING_DEPTH]; 
     /**
-     * A buffer of source files for functions
+     * A buffer of source files for functions.
      */
     const char* files[GEN_TOOLING_DEPTH];
 } gen_tooling_stack_t;
 
 /**
- * A frequency profile
+ * A frequency profile.
  */
 typedef struct {
     /**
-     * The name of the profile 
+     * The name of the profile.
      */
     const char* name;
     /**
-     * The number of calls the profile has had
+     * The number of calls the profile has had.
      */
     uintmax_t n_calls;
     /**
-     * The running total time for all calls
+     * The running total time for all calls.
      */
     struct timeval running;
     /**
-     * The time of the first call
+     * The time of the first call.
      */
     struct timeval first;
     /**
-     * The time of the last call
+     * The time of the last call.
      */
     struct timeval last;
 } gen_tooling_freq_profile_t;
 
 /**
- * Handler for call stack push events
+ * Handler for call stack push events.
  */
 typedef void (*gen_tooling_stack_push_handler_t) (void);
 /**
- * Handler for call stack pop events
+ * Handler for call stack pop events.
  */
 typedef void (*gen_tooling_stack_pop_handler_t) (void);
 
 /**
- * The global tooled call stack
+ * The global tooled call stack.
  */
 extern gen_tooling_stack_t gen_tooling_call_stack;
 
 /**
- * The global frequency profile pool
+ * The global frequency profile pool.
  */
 extern gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX];
 
 /**
- * The offset of the next free space in the global frequency profile pool
+ * The offset of the next free space in the global frequency profile pool.
  * @see gen_tooling_freq_profiles
  */
 extern size_t gen_tooling_freq_profile_next;
 
 /**
- * The global pre-push handler for the tooled call stack
+ * The global pre-push handler for the tooled call stack.
  */
 extern gen_tooling_stack_push_handler_t gen_tooling_push_handler;
 
 /**
- * The global pre-pop handler for the tooled call stack
+ * The global pre-pop handler for the tooled call stack.
  */
 extern gen_tooling_stack_pop_handler_t gen_tooling_pop_handler;
 
 /**
- * Pushes a new entry onto the tooled call stack
- * @param frame the name of the frame
- * @param address the address of the frame
- * @param file the source file containing the frame
+ * Pushes a new entry onto the tooled call stack.
+ * @param frame the name of the frame.
+ * @param address the address of the frame.
+ * @param file the source file containing the frame.
  */
 extern void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file);
 /**
- * Pops the last frame from the tooled call stack
+ * Pops the last frame from the tooled call stack.
  */
 extern void gen_tooling_stack_pop(void);
 
 /**
- * Cleanup attribute wrapper for `gen_tooling_stack_pop`
- * @see GEN_FRAME_BEGIN
+ * Cleanup attribute wrapper for `gen_tooling_stack_pop`.
+ * @see GEN_FRAME_END
  */
 extern void gen_internal_tooling_frame_scope_end(const char* const restrict passthrough);
 
 /**
- * Updates or adds a frequency profile
+ * Updates or adds a frequency profile.
  */
 extern void gen_tooling_freq_profile_ping(const char* const restrict name);
 
 
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 /**
- * Begins a tooled frame with an automatic lifetime
- * @param func the address of this frame
- * @note For non-function frames use `gen_tooling_stack_push` directly
+ * Begins a tooled frame with an automatic lifetime.
+ * @param func the address of this frame.
+ * @note For non-function frames use `gen_tooling_stack_push` directly.
  */
 #define GEN_FRAME_BEGIN(func) \
     __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar = '\0'; \
@@ -143,12 +143,12 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
     gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
 
 /**
- * Frequency profiling for calls to the current function
+ * Frequency profiling for calls to the current function.
  */
 #define GEN_FREQ_PROFILE gen_tooling_freq_profile_ping(__func__) /* `__func__` is fine to compare against numerically without being constant */
 
 /**
- * Frequency profiling for the call site
+ * Frequency profiling for the call site.
  */
 #define GEN_NAMED_FREQ_PROFILE(name) \
     do { \
@@ -159,7 +159,7 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
 extern void gen_tooling_print_backtrace(void);
 
 /**
- * Outputs backtrace information
+ * Outputs backtrace information.
  */
 #define gtrace gen_tooling_print_backtrace()
 
