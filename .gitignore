@@ -11,6 +11,7 @@
 
 *.out
 *.exe
+*.app
 
 *.def
 *.exp
@@ -33,6 +34,7 @@ tmp/*
 genstone/vendor/tmp/*
 
 filename
+test.c
 
 .vscode
 .vs
