@@ -14,5 +14,5 @@ $(GLEAN_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) -lpthread $(shell pkg-config --
 $(GLEAN_EXEC): $(GLEAN_OBJECTS)
 
 clean_glean:
-	-$(RM) $(subst /,$(SEP),$(GLEAN_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(GLEAN_EXEC))
+	-rm $(GLEAN_OBJECTS)
+	-rm $(GLEAN_EXEC)

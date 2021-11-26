@@ -16,5 +16,5 @@ $(GEN_CALC_TEST): LFLAGS = -Llib $(GEN_CALC_LFLAGS)
 $(GEN_CALC_TEST): $(GEN_CALC_TEST_OBJECTS)
 
 clean_gencalc_test:
-	-$(RM) $(subst /,$(SEP),$(GEN_CALC_TEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(GEN_CALC_TEST))
+	-rm $(GEN_CALC_TEST_OBJECTS)
+	-rm $(GEN_CALC_TEST)

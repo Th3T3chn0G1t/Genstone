@@ -19,5 +19,5 @@ $(GEN_UI_LIB): $(GEN_UI_OBJECTS) | lib
 $(GEN_UI_OBJECTS): $(wildcard genstone/genuine/include/*.h)
 
 clean_genuine:
-	-$(RM) $(GEN_UI_OBJECTS)
-	-$(RM) $(GEN_UI_LIB)
+	-rm $(GEN_UI_OBJECTS)
+	-rm $(GEN_UI_LIB)

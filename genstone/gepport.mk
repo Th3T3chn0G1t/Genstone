@@ -19,5 +19,5 @@ $(GEN_PORT_LIB): $(GEN_PORT_OBJECTS) | lib
 $(GEN_PORT_OBJECTS): $(wildcard genstone/gepport/include/*.hpp)
 
 clean_gepport:
-	-$(RM) $(GEN_PORT_OBJECTS)
-	-$(RM) $(GEN_PORT_LIB)
+	-rm $(GEN_PORT_OBJECTS)
+	-rm $(GEN_PORT_LIB)

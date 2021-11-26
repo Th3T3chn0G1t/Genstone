@@ -16,5 +16,5 @@ $(GEN_TOOLING_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_TOOLING_TEST): $(GEN_TOOLING_TEST_OBJECTS)
 
 clean_gentooling_test:
-	-$(RM) $(subst /,$(SEP),$(GEN_TOOLING_TEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(GEN_TOOLING_TEST))
+	-rm $(GEN_TOOLING_TEST_OBJECTS)
+	-rm $(GEN_TOOLING_TEST)

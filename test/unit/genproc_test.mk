@@ -20,6 +20,6 @@ $(GEN_PROC_TEST_LIB): LFLAGS =
 $(GEN_PROC_TEST_LIB): $(GEN_PROC_TEST_LIB_OBJECTS)
 
 clean_genproc_test:
-	-$(RM) $(subst /,$(SEP),$(GEN_PROC_TEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(GEN_PROC_TEST))
+	-rm $(GEN_PROC_TEST_OBJECTS)
+	-rm $(GEN_PROC_TEST)
 

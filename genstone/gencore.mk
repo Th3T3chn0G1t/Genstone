@@ -35,5 +35,5 @@ $(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) | lib
 $(GEN_CORE_OBJECTS): $(wildcard genstone/gencore/include/*.h)
 
 clean_gencore:
-	-$(RM) $(GEN_CORE_OBJECTS)
-	-$(RM) $(GEN_CORE_LIB)
+	-rm $(GEN_CORE_OBJECTS)
+	-rm $(GEN_CORE_LIB)

@@ -35,10 +35,10 @@ $(BUILD_TEST_LIB_STATIC): $(BUILD_TEST_LIB_OBJECTS)
 $(BUILD_TEST_LIB_OBJECTS): Makefile build/common.mk build/config.mk
 
 clean_build_test:
-	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_LIB_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_LIB_DYNAMIC))
-	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_LIB_STATIC))
+	-rm $(BUILD_TEST_LIB_OBJECTS)
+	-rm $(BUILD_TEST_LIB_DYNAMIC)
+	-rm $(BUILD_TEST_LIB_STATIC)
 
-	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_EXEC_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_EXEC_DYNAMIC))
-	-$(RM) $(subst /,$(SEP),$(BUILD_TEST_EXEC_STATIC))
+	-rm $(BUILD_TEST_EXEC_OBJECTS)
+	-rm $(BUILD_TEST_EXEC_DYNAMIC)
+	-rm $(BUILD_TEST_EXEC_STATIC)

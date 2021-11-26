@@ -10,23 +10,6 @@ endif
 
 include $(TOOLCHAIN)
 
-SEP = /
-CP = cp -r
-RM = rm
-RMDIR = rm -rf
-DIFF = diff
-CAT = cat
-MV = mv
-ifeq ($(SHELL),cmd.exe)
-	SEP = \\
-	CP = copy /b /y
-	RM = del
-	RMDIR = rmdir
-	DIFF = fc
-	CAT = type
-	MV = move
-endif
-
 ifneq ($(OVERRIDE_BORING_OUTPUT),)
 BORING_OUTPUT = $(OVERRIDE_BORING_OUTPUT)
 endif
@@ -348,8 +331,8 @@ ifeq ($(TEST),BUILD)
 endif
 
 clean_tmpfile:
-	@echo "$(ACTION_PREFIX)$(RM) $(wildcard tmp/*.tmp)$(ACTION_SUFFIX)"
-	-@$(RM) $(wildcard tmp/*.tmp)
+	@echo "$(ACTION_PREFIX)rm $(wildcard tmp/*.tmp)$(ACTION_SUFFIX)"
+	-@rm $(wildcard tmp/*.tmp)
 
 clean_clang_tooling_artifacts:
 	-rm $(shell find . -name "*.gcda")
@@ -371,8 +354,8 @@ ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
-	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
-	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
+	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
@@ -413,8 +396,8 @@ ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
-	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
-	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && ($(DIFF) $< tmp/$(notdir $<)-format.tmp)
+	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
 	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"

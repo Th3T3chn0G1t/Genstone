@@ -12,6 +12,8 @@
         - Fullstops in docstrings
     - `__has_include()` for transiently included files
 - Builds
+    - Bundles
+      - Integrate https://github.com/create-dmg/create-dmg
     - Portability
         - Easier handling of adding new platforms in build system
             - `build/platforms.mk`

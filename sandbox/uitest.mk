@@ -14,5 +14,5 @@ $(UI_TEST_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_UI_LFLAGS) $(shell pkg-
 $(UI_TEST_EXEC): $(UI_TEST_OBJECTS)
 
 clean_uitest:
-	-$(RM) $(subst /,$(SEP),$(UI_TEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(UI_TEST_EXEC))
+	-rm $(UI_TEST_OBJECTS)
+	-rm $(UI_TEST_EXEC)

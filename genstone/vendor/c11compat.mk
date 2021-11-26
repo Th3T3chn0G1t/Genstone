@@ -82,17 +82,17 @@ C11_COMPAT_LIB += $(C11_COMPAT_ANNEXK_LIB)
 clean_c11compat_annexk: | $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib clean
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib distclean
-	-$(RM) $(wildcard lib/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
+	-rm $(wildcard lib/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE):
-	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./build-aux/autogen.sh)
-	cd $(subst /,$(SEP),genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./configure --prefix=/usr --enable-unsafe)
+	cd genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./build-aux/autogen.sh
+	cd genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./configure --prefix=/usr --enable-unsafe
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL): $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib
 
 $(C11_COMPAT_ANNEXK_LIB): $(_C11_COMPAT_ANNEXK_LIB_INTERNAL) | lib
-	$(CP) $(subst /,$(SEP),$(_C11_COMPAT_ANNEXK_LIB_INTERNAL_PATTERN) lib)
+	cp -r $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_PATTERN) lib
 ifeq ($(PLATFORM),DWN)
 	install_name_tool -id @rpath/$(notdir $(wildcard genstone/vendor/c11compat/safeclib/src/.libs/$(LIB_PREFIX)safec.*$(DYNAMIC_LIB_SUFFIX))) $(C11_COMPAT_ANNEXK_LIB)
 endif

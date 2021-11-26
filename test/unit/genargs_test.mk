@@ -16,5 +16,5 @@ $(GEN_ARGS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_ARGS_TEST): $(GEN_ARGS_TEST_OBJECTS)
 
 clean_genargs_test:
-	-$(RM) $(subst /,$(SEP),$(GEN_ARGS_TEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(GEN_ARGS_TEST))
+	-rm $(GEN_ARGS_TEST_OBJECTS)
+	-rm $(GEN_ARGS_TEST)

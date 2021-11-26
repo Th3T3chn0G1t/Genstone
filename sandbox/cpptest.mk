@@ -14,5 +14,5 @@ $(CPPTEST_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_PORT_LFLAGS)
 $(CPPTEST_EXEC): $(CPPTEST_OBJECTS)
 
 clean_cpptest:
-	-$(RM) $(subst /,$(SEP),$(CPPTEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(CPPTEST_EXEC))
+	-rm $(CPPTEST_OBJECTS)
+	-rm $(CPPTEST_EXEC)

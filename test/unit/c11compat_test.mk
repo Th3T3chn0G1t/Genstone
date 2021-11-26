@@ -16,5 +16,5 @@ $(C11_COMPAT_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(C11_COMPAT_TEST): $(C11_COMPAT_TEST_OBJECTS)
 
 clean_c11compat_test:
-	-$(RM) $(subst /,$(SEP),$(C11_COMPAT_TEST_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(C11_COMPAT_TEST))
+	-rm $(C11_COMPAT_TEST_OBJECTS)
+	-rm $(C11_COMPAT_TEST)

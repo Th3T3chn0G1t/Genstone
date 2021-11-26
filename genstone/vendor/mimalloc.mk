@@ -29,9 +29,9 @@ $(_MIMALLOC_LIB_INTERNAL): $(_MIMALLOC_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/tmp/mimalloc
 
 $(MIMALLOC_LIB): $(_MIMALLOC_LIB_INTERNAL) | lib
-	$(CP) $(subst /,$(SEP),$(_MIMALLOC_LIB_INTERNAL_PATTERN)) lib
+	cp -r $(_MIMALLOC_LIB_INTERNAL_PATTERN) lib
 # We want a basename mimalloc lib for linkage
-	$(CP) $(subst /,$(SEP),$(_MIMALLOC_LIB_TAGGED_OUTPUT) $(MIMALLOC_LIB))
+	cp -r $(_MIMALLOC_LIB_TAGGED_OUTPUT) $(MIMALLOC_LIB)
 
 build_message_mimalloc:
 	@echo "$(SECTION_PREFIX) Mimalloc"
@@ -40,5 +40,5 @@ build_message_mimalloc:
 mimalloc: build_message_mimalloc $(MIMALLOC_LIB) ### @Vendor builds Microsoft `mimalloc` as a Genstone module
 
 clean_mimalloc:
-	-$(RMDIR) genstone/vendor/tmp/mimalloc
-	-$(RM) $(wildcard lib/*mimalloc*)
+	-rm -rf genstone/vendor/tmp/mimalloc
+	-rm $(wildcard lib/*mimalloc*)

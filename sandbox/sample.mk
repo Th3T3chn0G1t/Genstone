@@ -14,5 +14,5 @@ $(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(SAMPLE_EXEC): $(SAMPLE_OBJECTS)
 
 clean_sample:
-	-$(RM) $(subst /,$(SEP),$(SAMPLE_OBJECTS))
-	-$(RM) $(subst /,$(SEP),$(SAMPLE_EXEC))
+	-rm $(SAMPLE_OBJECTS)
+	-rm $(SAMPLE_EXEC)
