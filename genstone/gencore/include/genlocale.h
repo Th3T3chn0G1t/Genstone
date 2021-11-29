@@ -11,9 +11,25 @@
 
 #include "gencommon.h"
 
-typedef enum {
-    GEN_JAN = 0, GEN_FEB, GEN_MAR, GEN_APR, GEN_JUN, GEN_JLY, GEN_AUG, GEN_SEP, GEN_OCT, GEN_NOV, GEN_DEC
-} gen_month_t;
+// /**
+//  * Enumeration of months for locale-based date conversion
+//  */
+// typedef enum {
+//     GEN_JAN = 0, GEN_FEB, GEN_MAR, GEN_APR, GEN_JUN, GEN_JLY, GEN_AUG, GEN_SEP, GEN_OCT, GEN_NOV, GEN_DEC
+// } gen_month_t;
+
+// /**
+//  * Flags for selecting conversions in locale-based date and time conversion
+//  * @see gen_locale_convert_date_and_time
+//  */
+// typedef enum {
+//     GEN_DT_FMT_NONE = 0,
+//     GEN_DT_FMT_TIME = 1,
+//     GEN_DT_FMT_TIMEZONE = 2,
+//     GEN_DT_FMT_WEEKDAY = 4,
+//     GEN_DT_FMT_DATE = 8,
+//     GEN_DT_FMT_ALL = GEN_DT_FMT_TIME | GEN_DT_FMT_TIMEZONE | GEN_DT_FMT_WEEKDAY | GEN_DT_FMT_DATE
+// } gen_dt_fmt_flags_t;
 
 /**
  * Converts a currency amount to a locale-formatted string.
@@ -27,7 +43,7 @@ typedef enum {
 GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const size_t buffer_size, size_t* const restrict out_size, const uint64_t units, const uint64_t cents);
 
 // /**
-//  * Converts a date and time to a locale-formatted string.
+//  * Converts a date and time to a locale-formatted string based on selection flags.
 //  * @param out_string pointer to storage for the formatted string. Nullable.
 //  * @param out_size pointer for storage for the required size of the formatted string. Nullable.
 //  * @param year the year part of the date.
@@ -36,8 +52,9 @@ GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const
 //  * @param hours the hours part of the time.
 //  * @param minutes the minutes part of the time.
 //  * @param seconds the seconds part of the time.
+//  * @param flags the aspects of the string to generate, or'd together
 //  * @return an error code.
 //  */
-// GEN_ERRORABLE gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds);
+// GEN_ERRORABLE gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds, const gen_dt_fmt_flags_t flags);
 
 #endif

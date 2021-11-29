@@ -22,18 +22,6 @@
 #define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) (void) path
 #endif
 
-#define GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error) \
-	do { \
-		if(!error) { \
-			if(ferror(handle->file_handle)) \
-				error = errno; \
-			else \
-				error = 0; \
-			clearerr(handle->file_handle); \
-			if(error) GEN_ERROR_OUT(gen_convert_errno(errno), "Filesystem error"); \
-		} \
-	} while(0)
-
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_canonical);
 
@@ -127,11 +115,10 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 gen_error_t gen_path_create_file(const char* const restrict path) {
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	FILE* stream;
-	fopen_s(&stream, path, "w+");
-	GEN_ERROR_OUT_IF_ERRNO(fopen_s, errno);
-	fclose(stream);
-	GEN_ERROR_OUT_IF_ERRNO(fclose, errno);
+	int descriptor = open(path, O_RDWR | O_CREAT, 0777);
+	GEN_ERROR_OUT_IF_ERRNO(open, errno);
+	close(descriptor);
+	GEN_ERROR_OUT_IF_ERRNO(close, errno);
 
 	GEN_ALL_OK;
 }
@@ -170,25 +157,21 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle->path);
-	strcpy_s(output_handle->path, GEN_PATH_MAX, path);
-	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
-
 	int fd = open(path, O_DIRECTORY | O_RDONLY);
 	if(fd == -1 && errno == ENOTDIR) {
 		errno = EOK;
 
 		fd = open(path, O_RDWR);
+		GEN_ERROR_OUT_IF_ERRNO(open, errno);
 
-		output_handle->dir = false;
-		output_handle->file_handle = fdopen(fd, "r+");
-		GEN_ERROR_OUT_IF_ERRNO(fdopen, errno);
+		output_handle->is_directory = false;
+		output_handle->file_handle = fd;
 
 		GEN_ALL_OK;
 	}
 
 	GEN_ERROR_OUT_IF_ERRNO(open, errno);
-	output_handle->dir = true;
+	output_handle->is_directory = true;
 	output_handle->directory_handle = fdopendir(fd);
 	GEN_ERROR_OUT_IF_ERRNO(opendir, errno);
 
@@ -200,13 +183,13 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
-	if(handle->dir) {
+	if(handle->is_directory) {
 		closedir(handle->directory_handle);
 		GEN_ERROR_OUT_IF_ERRNO(closedir, errno);
 	}
 	else {
-		fclose(handle->file_handle);
-		GEN_ERROR_OUT_IF_ERRNO(fclose, errno);
+		close(handle->file_handle);
+		GEN_ERROR_OUT_IF_ERRNO(close, errno);
 	}
 
 	GEN_ALL_OK;
@@ -216,16 +199,16 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	GEN_FRAME_BEGIN(gen_handle_size);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 
-	fseek(handle->file_handle, 0, SEEK_END);
-	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
-	size_t mark = (size_t) ftell(handle->file_handle);
-	if(mark == SIZE_MAX) GEN_ERROR_OUT_ERRNO(ftell, errno);
+	size_t mark = (size_t) lseek(handle->file_handle, 0, SEEK_END);
+	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
 
-	rewind(handle->file_handle);
+	lseek(handle->file_handle, 0, SEEK_SET);
+	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
 
 	*out_size = mark;
+
 	GEN_ALL_OK;
 }
 
@@ -233,18 +216,18 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	GEN_FRAME_BEGIN(gen_file_read);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(start >= end) GEN_ERROR_OUT(GEN_TOO_SHORT, "`start` >= `end`");
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_buffer);
 
-	int error = fseek(handle->file_handle, (long) start, SEEK_SET);
-	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
-	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
+	lseek(handle->file_handle, (long) start, SEEK_SET);
+	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
 
-	error = (int) fread(output_buffer, sizeof(uint8_t), end - start, handle->file_handle);
-	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
-	GEN_ERROR_OUT_IF_ERRNO(fseek, errno);
+	read(handle->file_handle, output_buffer, end - start);
+	GEN_ERROR_OUT_IF_ERRNO(read, errno);
 
-	rewind(handle->file_handle);
+	lseek(handle->file_handle, 0, SEEK_SET);
+	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
 
 	GEN_ALL_OK;
 }
@@ -253,13 +236,14 @@ gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle,
 	GEN_FRAME_BEGIN(gen_file_write);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	if(handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 	GEN_INTERNAL_BASIC_PARAM_CHECK(buffer);
 
-	int error = (int) fwrite(buffer, sizeof(uint8_t), n_bytes, handle->file_handle);
-	GEN_INTERNAL_FS_FP_HANDLE_ERR(handle, error);
+	write(handle->file_handle, buffer, n_bytes);
+	GEN_ERROR_OUT_IF_ERRNO(write, errno);
 
-	rewind(handle->file_handle);
+	lseek(handle->file_handle, 0, SEEK_SET);
+	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
 
 	GEN_ALL_OK;
 }
@@ -268,7 +252,7 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	GEN_FRAME_BEGIN(gen_directory_list);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	if(!handle->dir) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(!handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handler);
 
 	struct dirent* entry;

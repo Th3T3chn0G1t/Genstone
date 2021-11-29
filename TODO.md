@@ -1,9 +1,5 @@
 # TODO
 
-- Github
-    - Releases
-        - Semantic versioning
-        - Security policy supported versions (SECURITY.md)
 - Builds
     - Bundles
       - Integrate https://github.com/create-dmg/create-dmg
@@ -20,8 +16,6 @@
             - https://api.github.com/repos/microsoft/checkedc-clang/releases/latest
                 - Returns a json
                 - Build tarball
-- Security
-    - `clang` thread safety intrinsics
 - Documentation
     - Tutorials
     - Write examples
@@ -29,16 +23,6 @@
         - Tests
         - Modules
 - Features
-    - Add warning reporting
-        - New `gen_ui_draw_ninepatch_direct` needs warning reporting
-            - Texture is NULL
-            - extent or scales are 0
-        - Add warning reporting across the codebase
-            - `gen_parse_args`
-            - `gen_internal_tooling_frame_scope_end` for if passthrough is not `'\0'`
-        - Warning reports to centralized EH callback
-        - Add centralized warning values etc. like with errors
-        - Add Werror-like mode
     - Fix `errno` string conversion truncates with `...`
     - `gen_path_extension` lookin' mighty sketch
     - Genfs inotify
@@ -47,20 +31,15 @@
     - Apply `#pragma clang final(MACRO)` to prevent random redeffing of config macros
     - `__builtin_readcyclecounter` for high precision clock
     - Async IO using `aio(7)` (`aio_read` `aio_write`)
-    - Timers
-        - `timer_create` (https://linux.die.net/man/2/timer_create)
-    - Validation on user-controllable config
-        - `diagnose_if`
+    - `timer_create` (https://linux.die.net/man/2/timer_create)
+    - `diagnose_if`
     - `genproc`
         - Fix
         - Signals/killing subprocesses
         - Add loads of error checking
     - Validate where neccesary with `gen_path_exists`
-    - `gendl`
-        - Check valid *filenames* for dylibs
-    - Locales
-        - Unicode
-        - Time-formats
+    - wchar support lib
+    - Time-formats
     - Integrate `notcurses` for terminal stuff
     - generator (editor)
         - Visual build tool
@@ -77,10 +56,10 @@
     - Database stuff
     - Cryptography
         - Hashing
+            - Hash loaded shared libs to avoid shared lib injection
         - Secure-rand
     - Integrate a renderer (Probably need to port back from C++)
         - Figure out yer' scene format
-        - More floating-point stuff (more performance-focused than stdlib)
         - More matrix/vector operations
             - ~~Steal~~ Borrow stuff from `cglm` and adapt to `clang` matrix intrins
             - Rework renderer to use matrix intrins instead of whatever it uses internally

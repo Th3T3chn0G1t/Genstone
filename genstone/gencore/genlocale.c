@@ -27,7 +27,7 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 	const size_t size = (size_t) size_r + 1;
 	if(out_size) *out_size = size;
 	if(out_string) {
-		if(!out_size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`out_size` was 0");
+		if(!buffer_size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`buffer_size` was 0");
 		snprintf_s(out_string, buffer_size, GEN_INTERNAL_CURRENCY_FORMAT, locale_info->currency_symbol, units, locale_info->decimal_point, cents);
 		GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
 	}
@@ -35,14 +35,24 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 	GEN_ALL_OK;
 }
 
-// const static uint64_t month_lens = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+// const time_t now = time(NULL);
+// // size_t sz = strftime(NULL, 0, "%X %Z%z %a %d %b %Y", localtime(&now));
+// char strtv[1024];
+// strftime(strtv, 1024, "%X %Z%z %a %d %b %Y", localtime(&now));
+// printf("%s", strtv);
 
-// gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds) {
-// 	if(seconds > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`seconds` exceeded 59");
-// 	if(minutes > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`minutes` exceeded 59");
-// 	if(hours > 23) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`hours` exceeded 23");
+// const static uint64_t month_lens[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-// 	if(day > month_lens[month]) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`day` exceeded the number of days in `month`");
+// gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds, const gen_dt_fmt_flags_t flags) {
+// 	if(flags & GEN_DT_FMT_TIME) {
+// 		if(seconds > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`seconds` exceeded 59");
+// 		if(minutes > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`minutes` exceeded 59");
+// 		if(hours > 23) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`hours` exceeded 23");
+// 	}
+
+// 	if(flags & GEN_DT_FMT_DATE) {
+// 		if(day > month_lens[month]) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`day` exceeded the number of days in `month`");
+// 	}
 
 // 	// year month day hours minutes seconds
 // 	const struct tm time = {
@@ -54,7 +64,12 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 // 		.tm_year = year - 1900
 // 	};
 
-// 	if(out_string) {
+// GEN_DT_FMT_TIME %X
+// GEN_DT_FMT_TIMEZONE %Z%z
+// GEN_DT_FMT_WEEKDAY %a
+// GEN_DT_FMT_DATE %d %b %Y
+
+// 	if(out_size) {
 // 		*out_size = strnlen_s()
 // 	}
 // 	if(out_string) {

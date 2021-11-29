@@ -207,16 +207,12 @@ extern void* gen_error_handler_passthrough;
     } while(0)
 
 /**
- * Gets the `strerror_s` of an errno value.
- * @param[in] errno the errno value to get `strerror` for.
+ * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not `EOK` or equivalent.
+ * Horrible macro string manipulation to get some nice output on your errno.
+ * @param[in] proc the function which set errno.
+ * @param[in] native_errno the errno value.
  */
-#define GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(errno) \
-    /* Block needs to be inline (not `do-while`'d) so we can get the declarations into the main error-out block */ \
-    const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(gen_internal_error_out_native_errno_errno); \
-    const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len; \
-    char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
-    strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
-    strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) - 1, gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), gen_internal_error_out_native_errno_errno)
+#define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) if(native_errno) GEN_ERROR_OUT_ERRNO(proc, native_errno)
 
 /**
  * Horrible macro string manipulation to get some nice output on your errno.
@@ -225,30 +221,15 @@ extern void* gen_error_handler_passthrough;
  */
 #define GEN_ERROR_OUT_ERRNO(proc, native_errno) \
     do { \
-        const errno_t gen_internal_error_out_native_errno_errno = native_errno; \
-        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(gen_internal_error_out_native_errno_errno); \
+        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(native_errno); \
         const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
-        GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(gen_internal_error_out_native_errno_errno); \
+        const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(native_errno); \
+        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len + 1; \
+        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+        strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) - 1, gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), native_errno); \
         GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
         return gen_internal_error_out_native_errno_gen_error; \
-    } while(0)
-
-/**
- * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not `EOK` or equivalent.
- * Horrible macro string manipulation to get some nice output on your errno.
- * @param[in] proc the function which set errno.
- * @param[in] native_errno the errno value.
- */
-#define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) \
-    do { \
-        if(native_errno) { \
-            const errno_t gen_internal_error_out_native_errno_errno = native_errno; \
-            const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(gen_internal_error_out_native_errno_errno); \
-            const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
-            GEN_INTERNAL_ERROR_OUT_ERRNO_GET_STRERROR(gen_internal_error_out_native_errno_errno); \
-            GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
-            return gen_internal_error_out_native_errno_gen_error; \
-        } \
     } while(0)
 
 /**

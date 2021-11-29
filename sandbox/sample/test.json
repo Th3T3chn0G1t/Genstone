@@ -1,0 +1,11 @@
+{
+    "foo": "bar",
+    "fizz": {
+        "buzz": [
+            0, 1, 2
+        ],
+        "bazz": {
+            "fazz": [ true, false ]
+        }
+    }
+}

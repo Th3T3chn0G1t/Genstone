@@ -58,12 +58,10 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
-	error = gzalloc((void**) &file_handle.path, GEN_PATH_MAX, sizeof(char));
-	GEN_REQUIRE_NO_ERROR(error);
 	error = gen_handle_open(&file_handle, "./testfile");
 
 	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL(false, file_handle.dir);
+	GEN_REQUIRE_EQUAL(false, file_handle.is_directory);
 
 	glog(INFO, "Testing gen_file_write()...");
 	error = gen_file_write(&file_handle, sizeof(file_data), (const uint8_t*) file_data);
@@ -93,11 +91,10 @@ int main() {
 
 	glog(INFO, "Testing gen_handle_open() (directory)...");
 	gen_filesystem_handle_t dir_handle;
-	(void) gzalloc((void**) &dir_handle.path, GEN_PATH_MAX, sizeof(char));
 	error = gen_handle_open(&dir_handle, "./testdir");
 
 	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL(true, dir_handle.dir);
+	GEN_REQUIRE_EQUAL(true, dir_handle.is_directory);
 
 	// We can't effectively test this because the test run directory will be different on some
 	// platforms
@@ -107,19 +104,13 @@ int main() {
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_handle_close() (file)...");
-	error = gfree(file_handle.path);
-	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_handle_close(&file_handle);
-
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_handle_close() (directory)...");
-	error = gfree(dir_handle.path);
-	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_handle_close(&dir_handle);
-
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_path_delete() (file)...");

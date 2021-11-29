@@ -35,20 +35,16 @@ typedef struct {
         /**
          * Handle for a file if dir is false.
          */
-        FILE* file_handle;
+        int file_handle;
         /**
          * Handle for a directory if dir is true.
          */
         DIR* directory_handle;
     };
     /**
-     * A path to the object this handle is for.
-     */
-    char* path;
-    /**
      * Whether this handle is for a directory.
      */
-    bool dir;
+    bool is_directory;
 } gen_filesystem_handle_t;
 
 /**
