@@ -6,6 +6,8 @@
 #include "include/gendbg.h"
 #include "include/gentooling.h"
 
+#include <sys/inotify.h>
+
 #if GEN_DEBUG_PATH_VALIDATION == ENABLED
 /**
  * Validates the path parameter to filesystem functions
@@ -115,7 +117,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 gen_error_t gen_path_create_file(const char* const restrict path) {
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	int descriptor = open(path, O_RDWR | O_CREAT, 0777);
+	int descriptor = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0777);
 	GEN_ERROR_OUT_IF_ERRNO(open, errno);
 	close(descriptor);
 	GEN_ERROR_OUT_IF_ERRNO(close, errno);
@@ -157,11 +159,11 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	int fd = open(path, O_DIRECTORY | O_RDONLY);
+	int fd = open(path, O_DIRECTORY | O_RDONLY | O_CLOEXEC);
 	if(fd == -1 && errno == ENOTDIR) {
 		errno = EOK;
 
-		fd = open(path, O_RDWR);
+		fd = open(path, O_RDWR | O_CLOEXEC);
 		GEN_ERROR_OUT_IF_ERRNO(open, errno);
 
 		output_handle->is_directory = false;
@@ -173,7 +175,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	GEN_ERROR_OUT_IF_ERRNO(open, errno);
 	output_handle->is_directory = true;
 	output_handle->directory_handle = fdopendir(fd);
-	GEN_ERROR_OUT_IF_ERRNO(opendir, errno);
+	GEN_ERROR_OUT_IF_ERRNO(fdopendir, errno);
 
 	GEN_ALL_OK;
 }
@@ -270,3 +272,27 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 
 	GEN_ALL_OK;
 }
+
+// gen_error_t gen_filewatch_create(const gen_filewatch_handle_t* handle) {
+// 	#if PLATFORM == LNX
+// 	#elif PLATFORM == DWN
+// 	#endif
+// }
+
+// gen_error_t gen_filewatch_add_path(const gen_filewatch_handle_t* handle, const char* const restrict path) {
+// 	#if PLATFORM == LNX
+// 	#elif PLATFORM == DWN
+// 	#endif
+// }
+
+// gen_error_t gen_filewatch_poll(const gen_filewatch_handle_t* handle, bool* const restrict out_modified) {
+// 	#if PLATFORM == LNX
+// 	#elif PLATFORM == DWN
+// 	#endif
+// }
+
+// gen_error_t gen_filewatch_destroy(const gen_filewatch_handle_t* handle) {
+// 	#if PLATFORM == LNX
+// 	#elif PLATFORM == DWN
+// 	#endif
+// }

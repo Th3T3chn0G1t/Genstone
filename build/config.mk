@@ -23,7 +23,6 @@ TEST = ALL
 # `DEFAULT`: Detect host OS. Sets to the respective value
 # `DWN`: macOS
 # `LNX`: Linux
-# `BSD`: BSD
 PLATFORM = DEFAULT
 
 # The IDE to generate IDE configuration for with `ideconf` target

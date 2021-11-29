@@ -63,7 +63,7 @@ Configuration macro:
     Use pthread_mutex_timedlock() for `mtx_timedlock()'
     Otherwise use mtx_trylock() + *busy loop* emulation.
 */
-#if !defined(__CYGWIN__) && !defined(__APPLE__) && !defined(__NetBSD__)
+#if PLATFORM != DWN
 #define EMULATED_THREADS_USE_NATIVE_TIMEDLOCK
 #endif
 
@@ -199,7 +199,7 @@ mtx_destroy(mtx_t *mtx)
  * Thus the linker will be happy and things don't clash when building
  * with -O1 or greater.
  */
-#if defined(HAVE_FUNC_ATTRIBUTE_WEAK) && !defined(__CYGWIN__)
+#if defined(HAVE_FUNC_ATTRIBUTE_WEAK)
 __attribute__((weak))
 int pthread_mutexattr_init(pthread_mutexattr_t *attr);
 

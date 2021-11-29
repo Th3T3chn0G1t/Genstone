@@ -114,9 +114,7 @@ endif
 ifneq ($(PLATFORM),DEFAULT)
 ifneq ($(PLATFORM),DWN)
 ifneq ($(PLATFORM),LNX)
-ifneq ($(PLATFORM),BSD)
 ERROR += "$(ERROR_PREFIX) Invalid value for PLATFORM: \"$(PLATFORM)\"\n"
-endif
 endif
 endif
 endif
@@ -189,15 +187,6 @@ ifeq ($(PLATFORM),DEFAULT)
 	ifeq ($(UNAME),Darwin)
 		PLATFORM = DWN
 	endif
-	ifeq ($(UNAME),FreeBSD)
-		PLATFORM = BSD
-	endif
-	ifeq ($(UNAME),OpenBSD)
-		PLATFORM = BSD
-	endif
-	ifeq ($(UNAME),NetBSD)
-		PLATFORM = BSD
-	endif
 endif
 
 ifeq ($(LINKER),DEFAULT)
@@ -214,9 +203,9 @@ else
 	endif
 endif
 
-CXX_UNSUPPORTED_CFLAGS += -std=c20
+CXX_UNSUPPORTED_CFLAGS += -std=gnu2x
 GLOBAL_CXX_FLAGS += -std=gnu++17 -Wno-c++98-compat-pedantic -Wno-old-style-cast
-GLOBAL_C_FLAGS += -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=c2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DWIN=1 -DDWN=2 -DLNX=3 -DBSD=4 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=gnu2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
@@ -273,20 +262,6 @@ ifeq ($(PLATFORM),DWN)
 	DYNAMIC_LIB_TOOL = $(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) -dynamiclib $(GLOBAL_L_FLAGS) $(LFLAGS) -install_name "@rpath/$(notdir $@)"
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
-ifeq ($(PLATFORM),BSD)
-	LIB_PREFIX = lib
-	DYNAMIC_LIB_SUFFIX = .so
-	STATIC_LIB_SUFFIX = .a
-	EXECUTABLE_SUFFIX = .out
-	OBJECT_SUFFIX = .o
-
-	GLOBAL_C_FLAGS += -fPIC
-
-	OBJECT_FORMAT = ELF
-
-	DYNAMIC_LIB_TOOL = $(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) -shared $(GLOBAL_L_FLAGS) $(LFLAGS)
-	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
-endif
 
 ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -DNDEBUG -flto
@@ -294,10 +269,6 @@ ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
 
 	ifeq ($(PLATFORM),LNX)
-		GLOBAL_L_FLAGS += -Wl,-O1
-	endif
-
-	ifeq ($(PLATFORM),BSD)
 		GLOBAL_L_FLAGS += -Wl,-O1
 	endif
 

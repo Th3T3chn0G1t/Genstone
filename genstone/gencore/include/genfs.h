@@ -21,6 +21,16 @@
 #define GEN_PATH_MAX PATH_MAX
 #endif
 
+#if PLATFORM == LNX
+/**
+ * File watcher handle
+ */
+typedef int gen_filewatch_handle_t;
+#elif PLATFORM == DWN
+#include <CoreServices/CoreServices.h>
+typedef FSEventStreamRef gen_filewatch_handle_t;
+#endif
+
 /**
  * Handler for directory listing.
  */
@@ -169,5 +179,10 @@ GEN_ERRORABLE gen_file_write(const gen_filesystem_handle_t* const restrict handl
  * @return an error code.
  */
 GEN_ERRORABLE gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough);
+
+// GEN_ERRORABLE gen_filewatch_create(const gen_filewatch_handle_t* handle);
+// GEN_ERRORABLE gen_filewatch_add_path(const gen_filewatch_handle_t* handle, const char* const restrict path);
+// GEN_ERRORABLE gen_filewatch_poll(const gen_filewatch_handle_t* handle, bool* const restrict out_modified);
+// GEN_ERRORABLE gen_filewatch_destroy(const gen_filewatch_handle_t* handle);
 
 #endif

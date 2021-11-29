@@ -23,7 +23,7 @@
         - Tests
         - Modules
 - Features
-    - Fix `errno` string conversion truncates with `...`
+    - Phase out stdlib usage for syscalls where possible and reasonable
     - `gen_path_extension` lookin' mighty sketch
     - Genfs inotify
     - Gencalc fixed point https://gcc.gnu.org/onlinedocs/gcc/Fixed-Point.html#Fixed-Point

@@ -4,9 +4,6 @@ GEN_CORE_LFLAGS = -lgencore $(C11_COMPAT_LFLAGS) $(MIMALLOC_LFLAGS)
 ifeq ($(PLATFORM),LNX)
 GEN_CORE_LFLAGS += -ldl
 endif
-ifeq ($(PLATFORM),BSD)
-GEN_CORE_LFLAGS += -ldl
-endif
 
 GEN_CORE_SOURCES = $(wildcard genstone/gencore/*.c)
 GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))
@@ -22,9 +19,6 @@ gencore: c11compat mimalloc build_message_gencore $(GEN_CORE_LIB) ### @Genstone 
 _GEN_CORE_CFLAGS = $(GEN_CORE_DIAGNOSTIC_FLAGS)
 
 ifeq ($(PLATFORM),LNX)
-_GEN_CORE_LFLAGS = -ldl
-endif
-ifeq ($(PLATFORM),BSD)
 _GEN_CORE_LFLAGS = -ldl
 endif
 
