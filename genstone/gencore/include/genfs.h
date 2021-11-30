@@ -23,13 +23,40 @@
 
 #if PLATFORM == LNX
 /**
- * File watcher handle
+ * File watcher instance handle
  */
 typedef int gen_filewatch_handle_t;
 #elif PLATFORM == DWN
 #include <CoreServices/CoreServices.h>
 typedef FSEventStreamRef gen_filewatch_handle_t;
 #endif
+
+/**
+ * Bitmasks for filewatch event reporting
+ * @see gen_filewatch_poll
+ */
+typedef enum {
+    /**
+     * No event occurred
+     */
+    GEN_FILEWATCH_NONE = 0,
+    /**
+     * A file was created
+     */
+    GEN_FILEWATCH_CREATED = 1,
+    /**
+     * A file was modified
+     */
+    GEN_FILEWATCH_MODIFIED = 2,
+    /**
+     * A file was deleted
+     */
+    GEN_FILEWATCH_DELETED = 4,
+    /**
+     * A file was moved
+     */
+    GEN_FILEWATCH_MOVED = 8
+} gen_filewatch_event_t;
 
 /**
  * Handler for directory listing.
@@ -180,9 +207,8 @@ GEN_ERRORABLE gen_file_write(const gen_filesystem_handle_t* const restrict handl
  */
 GEN_ERRORABLE gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough);
 
-// GEN_ERRORABLE gen_filewatch_create(const gen_filewatch_handle_t* handle);
-// GEN_ERRORABLE gen_filewatch_add_path(const gen_filewatch_handle_t* handle, const char* const restrict path);
-// GEN_ERRORABLE gen_filewatch_poll(const gen_filewatch_handle_t* handle, bool* const restrict out_modified);
-// GEN_ERRORABLE gen_filewatch_destroy(const gen_filewatch_handle_t* handle);
+GEN_ERRORABLE gen_filewatch_create(gen_filewatch_handle_t* const restrict handle, const char* const restrict path);
+GEN_ERRORABLE gen_filewatch_poll(const gen_filewatch_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event);
+GEN_ERRORABLE gen_filewatch_destroy(const gen_filewatch_handle_t* const restrict handle);
 
 #endif

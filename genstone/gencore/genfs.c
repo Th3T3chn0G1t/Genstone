@@ -273,26 +273,75 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	GEN_ALL_OK;
 }
 
-// gen_error_t gen_filewatch_create(const gen_filewatch_handle_t* handle) {
-// 	#if PLATFORM == LNX
-// 	#elif PLATFORM == DWN
-// 	#endif
-// }
+gen_error_t gen_filewatch_create(gen_filewatch_handle_t* const restrict handle, const char* const restrict path) {
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-// gen_error_t gen_filewatch_add_path(const gen_filewatch_handle_t* handle, const char* const restrict path) {
-// 	#if PLATFORM == LNX
-// 	#elif PLATFORM == DWN
-// 	#endif
-// }
+#if PLATFORM == LNX
+	*handle = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+	GEN_ERROR_OUT_IF_ERRNO(inotify_init1, errno);
+	inotify_add_watch(*handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
+	GEN_ERROR_OUT_IF_ERRNO(inotify_add_watch, errno);
+#elif PLATFORM == DWN
+#endif
 
-// gen_error_t gen_filewatch_poll(const gen_filewatch_handle_t* handle, bool* const restrict out_modified) {
-// 	#if PLATFORM == LNX
-// 	#elif PLATFORM == DWN
-// 	#endif
-// }
+	GEN_ALL_OK;
+}
 
-// gen_error_t gen_filewatch_destroy(const gen_filewatch_handle_t* handle) {
-// 	#if PLATFORM == LNX
-// 	#elif PLATFORM == DWN
-// 	#endif
-// }
+gen_error_t gen_filewatch_poll(const gen_filewatch_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_event);
+
+	*out_event = GEN_FILEWATCH_NONE;
+
+#if PLATFORM == LNX
+	struct pollfd fd = {*handle, POLLIN, 0};
+
+	fd.revents = 0;
+	poll(&fd, 1, 0);
+	GEN_ERROR_OUT_IF_ERRNO(poll, errno);
+
+	if(fd.revents & POLLIN) {
+		unsigned int events_size;
+		ioctl(*handle, FIONREAD, &events_size);
+		GEN_ERROR_OUT_IF_ERRNO(ioctl, errno);
+
+		alignas(struct inotify_event) unsigned char raw_events[events_size];
+		read(*handle, raw_events, events_size);
+		GEN_ERROR_OUT_IF_ERRNO(read, errno);
+
+		unsigned int offset = 0;
+		while(offset < events_size) {
+			GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wcast-align"
+			// https://stackoverflow.com/questions/28516413/c11-alignas-vs-clang-wcast-align
+			// Clang fails to check alignment properly when delivering -Wcast-align
+			struct inotify_event* const event = (struct inotify_event*) (raw_events + offset);
+			GEN_DIAG_REGION_END
+
+			if(event->mask & IN_ATTRIB || event->mask & IN_MODIFY) *out_event |= GEN_FILEWATCH_MODIFIED;
+			if(event->mask & IN_CREATE) *out_event |= GEN_FILEWATCH_CREATED;
+			if(event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) *out_event |= GEN_FILEWATCH_DELETED;
+			if(event->mask & IN_MOVE_SELF || event->mask & IN_MOVED_FROM || event->mask & IN_MOVED_TO) *out_event |= GEN_FILEWATCH_MOVED;
+
+			offset += sizeof(struct inotify_event) + event->len;
+		}
+	}
+
+#elif PLATFORM == DWN
+#endif
+
+	GEN_ALL_OK;
+}
+
+gen_error_t gen_filewatch_destroy(const gen_filewatch_handle_t* const restrict handle) {
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+
+#if PLATFORM == LNX
+	close(*handle);
+	GEN_ERROR_OUT_IF_ERRNO(close, errno);
+#elif PLATFORM == DWN
+#endif
+
+	GEN_ALL_OK;
+}

@@ -116,6 +116,7 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case ESNODIFF: return GEN_BAD_OPERATION;
 		case ESNOTFND: return GEN_NO_SUCH_OBJECT;
 		case ESLEWRNG: return GEN_INVALID_PARAMETER;
+		case EAGAIN: return GEN_BAD_OPERATION;
 		default: return GEN_UNKNOWN;
 	}
 }

@@ -49,6 +49,8 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <poll.h>
 #include <unistd.h>
 
 #ifndef GEN_USE_MIMALLOC
