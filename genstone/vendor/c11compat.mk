@@ -52,8 +52,8 @@ clean_c11compat_annexk: | $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	-rm $(wildcard lib/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE):
-	cd genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./build-aux/autogen.sh
-	cd genstone/vendor/c11compat/safeclib) && $(subst /,$(SEP),./configure --prefix=/usr --enable-unsafe
+	cd genstone/vendor/c11compat/safeclib && ./build-aux/autogen.sh
+	cd genstone/vendor/c11compat/safeclib && ./configure --prefix=/usr --enable-unsafe
 
 $(_C11_COMPAT_ANNEXK_LIB_INTERNAL): $(_C11_COMPAT_ANNEXK_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/c11compat/safeclib
