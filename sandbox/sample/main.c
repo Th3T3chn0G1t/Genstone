@@ -47,7 +47,7 @@ int main() {
 
 	gen_filewatch_handle_t handle;
 	(void) gen_filewatch_create(&handle, ".");
-	glogf(INFO, "Handle: %i", handle);
+	// glogf(INFO, "Handle: %i", handle);
 	gen_filewatch_event_t event = false;
 	while(true) {
 		gen_error_t error = gen_filewatch_poll(&handle, &event);

@@ -6,8 +6,6 @@
 #include "include/gendbg.h"
 #include "include/gentooling.h"
 
-#include <sys/inotify.h>
-
 #if GEN_DEBUG_PATH_VALIDATION == ENABLED
 /**
  * Validates the path parameter to filesystem functions

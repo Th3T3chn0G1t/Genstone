@@ -22,6 +22,7 @@
 #endif
 
 #if PLATFORM == LNX
+#include <sys/inotify.h>
 /**
  * File watcher instance handle
  */
