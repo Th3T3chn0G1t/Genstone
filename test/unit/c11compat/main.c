@@ -22,7 +22,7 @@ static int thread_func(__unused void* pass) {
 	return 0;
 }
 
-int main() {
+int main(void) {
 	GEN_FRAME_BEGIN(main);
 
 	mtx_init(&ticks_mtx, mtx_plain);

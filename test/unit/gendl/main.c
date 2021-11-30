@@ -4,7 +4,7 @@
 #include <gencommon.h>
 #include <gendl.h>
 
-int main() {
+int main(void) {
 	GEN_FRAME_BEGIN(main);
 
 	gen_error_t error;

@@ -86,6 +86,12 @@ typedef struct {
 } gen_filesystem_handle_t;
 
 /**
+ * @example{lineno} example/gencore/gen_path.c
+ * Example for how to use the `gen_path*` family of functions.
+ * The `gen_path*` family of functions is used for manipulating paths in a better way than the libc provides.
+ */
+
+/**
  * Gets the canonical representation of a path.
  * @param[out] output_path storage for the output path. Should be `GEN_PATH_MAX` in size if length is unknown.
  * @param[in] path the path to get a canonical representation for.
@@ -122,7 +128,7 @@ GEN_ERRORABLE gen_path_extension(char* restrict output_extension, const char* co
  * @param[in] path the path to check.
  * @return whether an object exists at path.
  */
-extern bool gen_path_exists(const char* const restrict path);
+extern __nodiscard bool gen_path_exists(const char* const restrict path);
 
 /**
  * Checks whether a path is valid.
@@ -152,6 +158,12 @@ GEN_ERRORABLE gen_path_create_dir(const char* const restrict path);
  * @return an error code.
  */
 GEN_ERRORABLE gen_path_delete(const char* const restrict path);
+
+/**
+ * @example{lineno} example/gencore/gen_filesystem_handle.c
+ * Example for how to use `gen_handle_open` `gen_handle_size` `gen_handle_read` `gen_handle_write` and `gen_directory_list`.
+ * The `gen_handle*` family of functions is used for managing files and directories in a better way than the libc provides.
+ */
 
 /**
  * Opens a path as a filesystem object handle for use by filesystem operations.
@@ -188,7 +200,7 @@ GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesys
  * @note Does not add a null terminator to the buffer.
  * @return an error code.
  */
-GEN_ERRORABLE gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
+GEN_ERRORABLE gen_handle_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file.
@@ -197,7 +209,7 @@ GEN_ERRORABLE gen_file_read(uint8_t* restrict output_buffer, const gen_filesyste
  * @param[in] buffer the buffer to source bytes from for writing.
  * @return an error code.
  */
-GEN_ERRORABLE gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer);
+GEN_ERRORABLE gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer);
 
 /**
  * Lists the contents of a directory.
@@ -208,8 +220,33 @@ GEN_ERRORABLE gen_file_write(const gen_filesystem_handle_t* const restrict handl
  */
 GEN_ERRORABLE gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough);
 
-GEN_ERRORABLE gen_filewatch_create(gen_filewatch_handle_t* const restrict handle, const char* const restrict path);
+/**
+ * @example{lineno} example/gencore/gen_filewatch.c
+ * Example for how to use `gen_filewatch_create` `gen_filewatch_poll` and `gen_filewatch_destroy`.
+ * The `gen_filewatch*` family of functions is used for watching files and directories for changes in a platform agnostic way.
+ */
+
+/**
+ * Creates a filesystem watcher for a file or directory.
+ * @param[out] out_handle a pointer to storage for the created handle.
+ * @param[in] path path to the file to watch.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_filewatch_create(gen_filewatch_handle_t* const restrict out_handle, const char* const restrict path);
+
+/**
+ * Checks a filesystem watcher for events.
+ * @param[in] handle the handle to the filesystem watcher to check.
+ * @param[out] out_event pointer to storage for events which have occurred. Bitmask of `gen_filewatch_event_t` values.
+ * @return an error code.
+ */
 GEN_ERRORABLE gen_filewatch_poll(const gen_filewatch_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event);
+
+/**
+ * Destroys a filesystem watcher.
+ * @param[in] handle the handle to the filesystem watcher to destroy.
+ * @return an error code.
+ */
 GEN_ERRORABLE gen_filewatch_destroy(const gen_filewatch_handle_t* const restrict handle);
 
 #endif

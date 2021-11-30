@@ -42,13 +42,12 @@
 // 	}
 // }
 
-int main() {
+int main(void) {
 	glog(INFO, "Hello, Genstone!");
 
 	gen_filewatch_handle_t handle;
 	(void) gen_filewatch_create(&handle, ".");
-	// glogf(INFO, "Handle: %i", handle);
-	gen_filewatch_event_t event = false;
+	gen_filewatch_event_t event = GEN_FILEWATCH_NONE;
 	while(true) {
 		gen_error_t error = gen_filewatch_poll(&handle, &event);
 		if(event) {
@@ -68,7 +67,7 @@ int main() {
 	// size_t len;
 	// (void) gen_handle_size(&len, &handle);
 	// uint8_t source[len + 1];
-	// (void) gen_file_read(source, &handle, 0, len);
+	// (void) gen_handle_read(source, &handle, 0, len);
 	// source[len] = 0;
 
 	// gen_json_t json;

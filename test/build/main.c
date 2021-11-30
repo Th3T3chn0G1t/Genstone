@@ -4,7 +4,7 @@
 extern void foo(void);
 extern void bar(void);
 
-int main() {
+int main(void) {
 	foo();
 	bar();
 }

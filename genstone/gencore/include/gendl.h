@@ -19,6 +19,12 @@
 typedef void* gen_dylib_t;
 
 /**
+ * @example{lineno} example/gencore/gen_dylib.c
+ * Example for how to use `gen_dylib_load` `gen_dylib_symbol` and `gen_dylib_unload`.
+ * The `gen_dylib*` family of functions is used to manage dynamic libraries in a platform agnostic way.
+ */
+
+/**
  * Loads a dynamic library.
  * @param[out] output_dylib a pointer to storage for the loaded dylib handle.
  * @param[in] lib_name the name of the library to load.

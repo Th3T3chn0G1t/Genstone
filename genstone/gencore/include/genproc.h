@@ -26,6 +26,12 @@ typedef pid_t gen_process_t;
 #endif
 
 /**
+ * @example{lineno} example/gencore/gen_proc.c
+ * Example for how to use the `gen_proc*` family of functions.
+ * The `gen_proc*` family of functions is used for managing subprocesses in a platform agnostic way.
+ */
+
+/**
  * Creates a new subprocess whose output is redirected to a `FILE*`.
  * @param[out] process_out pointer to storage for the `gen_process_t`.
  * @param[in] exec the command line to execute.
@@ -33,6 +39,7 @@ typedef pid_t gen_process_t;
  * @return an error code.
  */
 GEN_ERRORABLE gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect);
+
 /**
  * Blocks the current thread until the specified process returns.
  * Provides exit code after return.
@@ -41,6 +48,7 @@ GEN_ERRORABLE gen_proc_start_redirected(gen_process_t* const restrict process_ou
  * @return an error code.
  */
 GEN_ERRORABLE gen_proc_wait(int* const restrict out_result, gen_process_t process);
+
 /**
  * Blocks the current thread until the specified process returns.
  * Provides exit code and console output after return.

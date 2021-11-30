@@ -178,6 +178,12 @@ extern FILE* gen_glog_out_streams[GEN_GLOG_STREAM_COUNT + 1];
 extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
 
 /**
+ * @example{lineno} example/gencore/glog.c
+ * Example for how to use `glog` and `glogf`.
+ * The `glog*` family of macros is intended as a simple logger for use throughout Genstone primarily, and so is missing some features a more general logger may have such as sinks.
+ */
+
+/**
  * Basic string logging function.
  * @param[in] level a `gen_logging_level_t` to determine the prefix from.
  * @param[in] string the string to print.
@@ -195,7 +201,7 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
         } \
         if(gen_internal_glog_level_is_error) gtrace; \
         GEN_DIAG_REGION_END \
-    } while(0) \
+    } while(0)
 
 /**
  * `printf`-style formatted logging function.
@@ -219,6 +225,6 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
         if(gen_internal_glog_level_is_error) gtrace; \
         if(level >= FATAL) abort(); \
         GEN_DIAG_REGION_END \
-    } while(0) \
+    } while(0)
 
 #endif

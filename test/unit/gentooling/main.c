@@ -24,7 +24,7 @@ static void freq_prof_test(void) {
 	GEN_FREQ_PROFILE;
 }
 
-int main() {
+int main(void) {
 	GEN_FRAME_BEGIN(main);
 
 	tooling_test();

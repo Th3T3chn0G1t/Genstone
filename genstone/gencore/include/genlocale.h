@@ -41,6 +41,11 @@
  * @return an error code.
  */
 GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const size_t buffer_size, size_t* const restrict out_size, const uint64_t units, const uint64_t cents);
+/**
+ * @example{lineno} example/gencore/gen_locale_convert_currency.c
+ * Example for how to use `gen_locale_convert_currency`.
+ * `gen_locale_convert_currency` is used for managing locale-based data conversion in a better way than the libc provides.
+ */
 
 // /**
 //  * Converts a date and time to a locale-formatted string based on selection flags.

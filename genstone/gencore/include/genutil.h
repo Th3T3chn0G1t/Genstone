@@ -20,6 +20,13 @@
 #endif
 
 /**
+ * @example{lineno} example/gencore/GEN_FOREACH.c
+ * Example for how to use `GEN_FOREACH`.
+ * The `GEN_FOREACH*` family of macros is intended as a way to centralize container iteration for the purpose of introspection and micro-optimization.
+ * The `GEN_FOREACH*` family of macros is intended as a Genstone internal utility primarily, but is part of the public API if a program decides to use it.
+ */
+
+/**
  * Iterates over a container with explicit length.
  * @param[in] iter the identifier to use for the iterating index.
  * @param[in] memb the identifier to use for the indexed member.
@@ -48,6 +55,7 @@
  * Iterates over a container with explicit length.
  * `memb` is a pointer to the indexed member.
  * Uses the container type as the member type directly.
+ * `GEN_FOREACH_DIRECT_PTR` is a variant of `GEN_FOREACH_PTR` added for diagnostic reasons and probably shouldn't be used.
  * @param[in] iter the identifier to use for the iterating index.
  * @param[in] memb the identifier to use for the indexed member.
  * @param[in] len the length of the container to iterate.
@@ -57,7 +65,6 @@
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
     __typeof__((container)) memb = (container); \
     for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
-
 
 /**
  * Gets the require message from the expected expressions type.
@@ -84,6 +91,13 @@
     )
     
 /**
+ * @example{lineno} example/gencore/GEN_REQUIRE.c
+ * Example for how to use the `GEN_REQUIRE*` family of macros.
+ * The `GEN_REQUIRE*` family of macros are intended to provide a nice output and interface for tests.
+ * The `GEN_REQUIRE*` family of macros are intended as a Genstone internal utility primarily, but is part of the public API if a program decides to use it.
+ */
+
+/**
  * Pretty assertion for equality.
  * @param[in] a the expected expression.
  * @param[in] b the recieved expression.
@@ -98,7 +112,7 @@
             abort(); \
         } \
     } while(0)
- 
+
 /**
  * Pretty assertion for equality of strings.
  * @param[in] a the expected string.
@@ -159,7 +173,7 @@
 
 /**
  * Adds two timevals.
- * https://gist.github.com/vchernov/4774682#file-timeval_add-cpp
+ * @see https://gist.github.com/vchernov/4774682#file-timeval_add-cpp
  * @param[in] a the first value.
  * @param[in] b the second value.
  * @param[out] result pointer to storage for the result.
@@ -167,7 +181,7 @@
 extern void gen_timeval_add(const struct timeval* const restrict a, const struct timeval* const restrict b, struct timeval* const restrict result);
 /**
  * Subtracts two timevals.
- * https://gist.github.com/vchernov/4774682#file-timeval_sub-cpp
+ * @see https://gist.github.com/vchernov/4774682#file-timeval_sub-cpp
  * @param[in] a the first value.
  * @param[in] b the second value.
  * @param[out] result pointer to storage for the result.

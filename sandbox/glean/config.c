@@ -83,7 +83,7 @@ void config_init(void) {
 		(void) gen_handle_size(&file_buffer_size, &handle);
 		char* file_buffer;
 		(void) galloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
-		(void) gen_file_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
+		(void) gen_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
 		file_buffer[file_buffer_size] = '\0';
 
 		(void) gen_handle_close(&handle);

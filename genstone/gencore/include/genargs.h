@@ -49,5 +49,10 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char
  * @return an error code.
  */
 GEN_ERRORABLE gen_parse_args(const int argc, const char* const restrict * const restrict argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* const restrict short_args, const size_t n_long_args, const char* const restrict * const restrict long_args, void* const restrict passthrough);
+/**
+ * @example{lineno} example/gencore/gen_parse_args.c
+ * Example for how to use `gen_parse_args`.
+ * `gen_parse_args` is used to manage arguments using a nicer API than manual string manipulation, using a similar API to the argp argument parser.
+ */
 
 #endif

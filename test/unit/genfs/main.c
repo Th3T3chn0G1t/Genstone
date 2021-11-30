@@ -8,7 +8,7 @@ static void dir_handler(__unused const char* file, __unused void* passthrough) {
 // This is to make sure the test value is constant for require
 #define file_data "foobarfizzbuzz123"
 
-int main() {
+int main(void) {
 	GEN_FRAME_BEGIN(main);
 
 	gen_error_t error = GEN_OK;
@@ -63,8 +63,8 @@ int main() {
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(false, file_handle.is_directory);
 
-	glog(INFO, "Testing gen_file_write()...");
-	error = gen_file_write(&file_handle, sizeof(file_data), (const uint8_t*) file_data);
+	glog(INFO, "Testing gen_handle_write()...");
+	error = gen_handle_write(&file_handle, sizeof(file_data), (const uint8_t*) file_data);
 
 	GEN_REQUIRE_NO_ERROR(error);
 
@@ -75,9 +75,9 @@ int main() {
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(sizeof(file_data), file_size);
 
-	glog(INFO, "Testing gen_file_read()...");
+	glog(INFO, "Testing gen_handle_read()...");
 	uint8_t file_read_buffer[file_size + 1];
-	error = gen_file_read(file_read_buffer, &file_handle, 0, file_size);
+	error = gen_handle_read(file_read_buffer, &file_handle, 0, file_size);
 	file_read_buffer[file_size] = '\0';
 
 	GEN_REQUIRE_NO_ERROR(error);

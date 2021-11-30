@@ -1,6 +1,6 @@
 #include <gencalc.h>
 
-int main() {
+int main(void) {
 	GEN_FRAME_BEGIN(main);
 
 	glog(INFO, "Testing vector support...");

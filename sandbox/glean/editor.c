@@ -280,7 +280,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 				}
 				(void) gfree(escaped_marks);
 
-				(void) gen_file_write(&handle, strlen(buffer), (uint8_t*) buffer);
+				(void) gen_handle_write(&handle, strlen(buffer), (uint8_t*) buffer);
 				(void) gen_handle_close(&handle);
 
 				(void) gfree(buffer);
@@ -667,7 +667,7 @@ void editor_tab_save_as(editor_tab_T* tab, char* path) {
 	gtk_text_buffer_get_end_iter(text_buffer, &end);
 	char* buffer = gtk_text_buffer_get_text(text_buffer, &start, &end, false);
 
-	(void) gen_file_write(&handle, strlen(buffer), (uint8_t*) buffer);
+	(void) gen_handle_write(&handle, strlen(buffer), (uint8_t*) buffer);
 	(void) gfree(buffer);
 
 	// Don't forget to clean up
@@ -695,7 +695,7 @@ void editor_tab_update_contents_from_file(editor_tab_T* tab, char* path) {
 	(void) gen_handle_size(&file_buffer_size, &handle);
 	char* file_buffer;
 	(void) galloc((void**) &file_buffer, file_buffer_size + 1, sizeof(char));
-	(void) gen_file_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
+	(void) gen_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
 	file_buffer[file_buffer_size] = '\0';
 	(void) gen_handle_close(&handle);
 

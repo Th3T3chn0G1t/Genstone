@@ -212,8 +212,8 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
-	GEN_FRAME_BEGIN(gen_file_read);
+gen_error_t gen_handle_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
+	GEN_FRAME_BEGIN(gen_handle_read);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
@@ -232,8 +232,8 @@ gen_error_t gen_file_read(uint8_t* restrict output_buffer, const gen_filesystem_
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_file_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
-	GEN_FRAME_BEGIN(gen_file_write);
+gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
+	GEN_FRAME_BEGIN(gen_handle_write);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
@@ -271,14 +271,14 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_filewatch_create(gen_filewatch_handle_t* const restrict handle, const char* const restrict path) {
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+gen_error_t gen_filewatch_create(gen_filewatch_handle_t* const restrict out_handle, const char* const restrict path) {
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_handle);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 #if PLATFORM == LNX
-	*handle = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+	*out_handle = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
 	GEN_ERROR_OUT_IF_ERRNO(inotify_init1, errno);
-	inotify_add_watch(*handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
+	inotify_add_watch(*out_handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
 	GEN_ERROR_OUT_IF_ERRNO(inotify_add_watch, errno);
 #elif PLATFORM == DWN
 #endif

@@ -141,18 +141,30 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
     __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar = '\0'; \
     GEN_REQUIRE_EQUAL_STRING(#func, __func__); \
     gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
+/**
+ * @example{lineno} example/gencore/GEN_FRAME_BEGIN.c
+ * Example for how to use `GEN_FRAME_BEGIN`.
+ * `GEN_FRAME_BEGIN` is used for tooling functions for nice backtraces and possibly performance introspection.
+ * `GEN_FRAME_BEGIN` is intended as a Genstone internal utility primarily, but is part of the public API if a program decides to use it.
+ */
 
 /**
  * Frequency profiling for calls to the current function.
  */
 #define GEN_FREQ_PROFILE gen_tooling_freq_profile_ping(__func__) /* `__func__` is fine to compare against numerically without being constant */
+/**
+ * @example{lineno} example/gencore/GEN_FREQ_PROFILE.c
+ * Example for how to use `GEN_FREQ_PROFILE` and `GEN_NAMED_FREQ_PROFILE`.
+ * `GEN_FREQ_PROFILE` and `GEN_NAMED_FREQ_PROFILE` are used for tooling functions for performance introspection.
+ * `GEN_FREQ_PROFILE` and `GEN_NAMED_FREQ_PROFILE` are intended as a Genstone internal utility primarily, but is part of the public API if a program decides to use it.
+ */
 
 /**
  * Frequency profiling for the call site.
  */
 #define GEN_NAMED_FREQ_PROFILE(name) \
     do { \
-        if(!__builtin_constant_p(name)) glogf(ERROR, "Non-constant frequency profile name %s (%s)", #name, name); \
+        if(!__builtin_constant_p(name)) glogf(WARNING, "Non-constant frequency profile name %s (%s)", #name, name); \
         gen_tooling_freq_profile_ping(__func__); \
     } while(0)
 
@@ -162,5 +174,10 @@ extern void gen_tooling_print_backtrace(void);
  * Outputs backtrace information.
  */
 #define gtrace gen_tooling_print_backtrace()
+/**
+ * @example{lineno} example/gencore/gtrace.c
+ * Example for how to use `gtrace`.
+ * `gtrace` is used for getting backtraces in error handling.
+ */
 
 #endif

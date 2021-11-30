@@ -54,5 +54,11 @@ typedef void (*gen_ui_draw_handler_t)(void* const restrict, const gen_ui_rect_t,
  * @return an error code.
  */
 GEN_ERRORABLE gen_ui_draw_ninepatch_direct(void* const restrict ninepatch, const gen_ui_draw_handler_t draw_handler, const gen_ui_rect_t extent, const gen_ui_extent_t src_scale, const gen_ui_extent_t dest_scale, void* const restrict passthrough);
+/**
+ * @example{lineno} example/genuine/gen_ui_draw_ninepatch_direct.c
+ * Example for how to use `gen_ui_draw_ninepatch_direct`.
+ * Since GenUIne is backend-agnostic this example is a general representation of how you *might* use it.
+ * Feel free to ask for help if there is a problem getting your backend to work.
+ */
 
 #endif

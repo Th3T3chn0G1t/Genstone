@@ -94,11 +94,21 @@ typedef enum {
  * Gets the name of a `gen_error_t`.
  */
 extern const char* gen_error_name(const gen_error_t error);
+/**
+ * @example{lineno} example/gencore/gen_error_name.c
+ * Example for how to use `gen_error_name`.
+ * `gen_error_name` is used for getting the name of a Genstone error.
+ */
 
 /**
  * Gets the generic description of a `gen_error_t`.
  */
 extern const char* gen_error_description(const gen_error_t error);
+/**
+ * @example{lineno} example/gencore/gen_error_description.c
+ * Example for how to use `gen_error_description`.
+ * `gen_error_description` is used for getting the description of a Genstone error.
+ */
 
 /**
  * Return value specification for functions which use `generror` for error reporting.
@@ -112,13 +122,16 @@ extern const char* gen_error_description(const gen_error_t error);
  */
 #define GEN_GLOGGIFY_EH ENABLED
 #endif
+
 #ifndef GEN_CENTRALIZE_EH
+
 /**
  * Whether to define `gen_error_handler_t` and call `gen_error_handler` at error sites in Genstone modules.
  * @note Creates global state if enabled. Set `gen_error_handler_passthrough` to get a passthrough pointer in `gen_error_handler`.
  */
 #define GEN_CENTRALIZE_EH DISABLED
 #endif
+
 
 #if GEN_GLOGGIFY_EH == ENABLED
 #define GEN_INTERNAL_MSG_EH(error, msg) if(error != GEN_OK) glogf(ERROR, "%s: %s", gen_error_name(error), msg)
@@ -132,6 +145,7 @@ extern const char* gen_error_description(const gen_error_t error);
         (void) msg; \
     } while(0)
 #endif
+
 
 /**
  * Dispatches error handling and aborts the program with a fatal error.
@@ -243,12 +257,10 @@ extern void* gen_error_handler_passthrough;
  * @return the converted error enumeration.
  */
 GEN_ERRORABLE gen_convert_errno(errno_t error);
-
 /**
- * Converts a win32 error into a genstone error.
- * @param[in] error the win32 error value to convert.
- * @return the converted error enumeration.
+ * @example{lineno} example/gencore/gen_convert_errno.c
+ * Example for how to use `gen_convert_errno`.
+ * `gen_convert_errno` is used for getting a libc errno error as a Genstone error.
  */
-GEN_ERRORABLE gen_convert_winerr(unsigned long error);
 
 #endif
