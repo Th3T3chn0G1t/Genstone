@@ -1,7 +1,7 @@
 ![Genstone Logo](brand/banner.png)
 
 [![CI](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml/badge.svg?branch=trunk)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml)
-[![Documentation](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml/badge.svg)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml)
+[![Documentation](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/docs.yml/badge.svg)](https://th3t3chn0g1t.github.io/Genstone/)
 [![Discord](https://img.shields.io/discord/906624261203058688?color=4e5d94&label=discord&logo=discord&logoColor=4e5d94)](https://discord.gg/7rG4ueJgX6)
 
 ### A C framework which creates a secure application layer
