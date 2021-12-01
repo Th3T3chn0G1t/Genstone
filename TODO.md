@@ -1,67 +1,41 @@
 # TODO
 
-- Builds
-    - Bundles
-      - Integrate https://github.com/create-dmg/create-dmg
-      - https://appimage.org
-    - Portability
-        - Easier handling of adding new platforms in build system
-            - `build/platforms.mk`
-    - Centralized toolchain management config (separate from `config.mk`)
-        - Fix `.clang-format`
-        - Fetch (& Build) toolchain from remote (Not submodule!)
-        - Enforce toolchain on submodules
-        - Fix submodule toolchain management
-        - Checked C
-            - https://api.github.com/repos/microsoft/checkedc-clang/releases/latest
-                - Returns a json
-                - Build tarball
-- Features
-    - Genfs filewatcher macOS FSEvents
-    - `__builtin_readcyclecounter` for high precision clock
-    - Async IO using `aio(7)` (`aio_read` `aio_write`)
-    - `timer_create` (https://linux.die.net/man/2/timer_create)
-    - `diagnose_if`
-    - `genproc`
-        - Fix
-        - Signals/killing subprocesses
-        - Add loads of error checking
-    - Validate where neccesary with `gen_path_exists`
-    - wchar support lib
-    - Time-formats
-    - Integrate `notcurses` for terminal stuff
-    - generator (editor)
-        - Visual build tool
-    - Work on GenUIne with binary partitioning
-    - Networking
-        - Debugger ports (Pretty much the only reason networking is here already)
-            - Visual debugger connection
-    - Compression
-    - Memory tools
-        - Measure usage
-    - Native UI
-        - File dialogue
-        - **Windowing**
-    - Database stuff
-    - Cryptography
-        - Hashing
-            - Hash loaded shared libs to avoid shared lib injection
-        - Secure-rand
-    - Integrate a renderer (Probably need to port back from C++)
-        - Figure out yer' scene format
-        - More matrix/vector operations
-            - ~~Steal~~ Borrow stuff from `cglm` and adapt to `clang` matrix intrins
-            - Rework renderer to use matrix intrins instead of whatever it uses internally
-        - Integrate a physics system
-            - Rework to use matrix intrins instead of whatever it uses internally
-    - Multiprocessing
-        - OpenMP
-        - `__sync_swap` wrapper
-        - Fibers intrins
-        - Coroutines
-            - `__builtin_coro_resume` `__builtin_coro_destroy` `__builtin_coro_done` `__builtin_coro_promise` `__builtin_coro_size` `__builtin_coro_frame` `__builtin_coro_free` `__builtin_coro_id` `__builtin_coro_alloc` `__builtin_coro_begin` `__builtin_coro_end` `__builtin_coro_suspend` `__builtin_coro_param`
-            - https://llvm.org/docs/Coroutines.html
-            - https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins
-        - Better threading interface
-        - `clang` mutex intrins
-        - Thread-safety checker intrins
+- Add a `PORTING.md` info file or put in `README.md`
+- Genfs filewatcher macOS FSEvents
+- Async IO using `aio(7)` (`aio_read` `aio_write`)
+- `timer_create` (https://linux.die.net/man/2/timer_create)
+- `genproc`
+    - Fix
+    - Signals/killing subprocesses
+- wchar support lib
+- Time-formats
+- generator (editor)
+    - Visual build tool
+- Work on GenUIne with binary partitioning
+- Networking
+- Compression
+- Memory tools
+    - Measure usage
+- Windowing
+- Databases
+- Cryptography
+    - Hashing
+        - Hash loaded shared libs to avoid shared lib injection
+    - Secure-rand
+- Integrate a renderer (Probably need to port back from C++)
+    - More matrix/vector operations
+        - ~~Steal~~ Borrow stuff from `cglm` and adapt to `clang` matrix intrins
+        - Rework renderer to use matrix intrins instead of whatever it uses internally
+    - Integrate a physics system
+        - Rework to use matrix intrins instead of whatever it uses internally
+- Multiprocessing
+    - OpenMP
+    - `__sync_swap` wrapper
+    - Fibers intrins
+    - Coroutines
+        - `__builtin_coro_resume` `__builtin_coro_destroy` `__builtin_coro_done` `__builtin_coro_promise` `__builtin_coro_size` `__builtin_coro_frame` `__builtin_coro_free` `__builtin_coro_id` `__builtin_coro_alloc` `__builtin_coro_begin` `__builtin_coro_end` `__builtin_coro_suspend` `__builtin_coro_param`
+        - https://llvm.org/docs/Coroutines.html
+        - https://clang.llvm.org/docs/LanguageExtensions.html#c-coroutines-support-builtins
+    - Better threading interface
+    - `clang` mutex intrins
+    - Thread-safety checker intrins
