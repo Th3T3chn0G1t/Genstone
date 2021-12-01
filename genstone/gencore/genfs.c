@@ -158,7 +158,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	int fd = open(path, O_DIRECTORY | O_RDONLY | O_CLOEXEC);
-	if(fd == -1 && errno == ENOTDIR) {
+	if(errno == ENOTDIR) {
 		errno = EOK;
 
 		fd = open(path, O_RDWR | O_CLOEXEC);
@@ -172,6 +172,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 
 	GEN_ERROR_OUT_IF_ERRNO(open, errno);
 	output_handle->is_directory = true;
+	output_handle->file_handle = fd;
 	output_handle->directory_handle = fdopendir(fd);
 	GEN_ERROR_OUT_IF_ERRNO(fdopendir, errno);
 
@@ -252,48 +253,77 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	GEN_FRAME_BEGIN(gen_directory_list);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	if(!handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(!handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a file");
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handler);
 
+	rewinddir(handle->directory_handle);
+
 	struct dirent* entry;
-	errno = 0;
 	while((entry = readdir(handle->directory_handle))) {
-		if(!entry && errno) GEN_ERROR_OUT_ERRNO(readdir, errno);
+		GEN_ERROR_OUT_IF_ERRNO(readdir, errno);
+
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '\0') continue;
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0') continue;
 
 		handler(entry->d_name, passthrough);
-
-		errno = 0;
 	}
+	GEN_ERROR_OUT_IF_ERRNO(readdir, errno);
+
 	rewinddir(handle->directory_handle);
 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_filewatch_create(gen_filewatch_handle_t* const restrict out_handle, const char* const restrict path) {
+#if PLATFORM == DWN
+static void gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
+	++(*(size_t*) passthrough);
+}
+#endif
+
+gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_handle, const gen_filesystem_handle_t* const restrict handle) {
 	GEN_INTERNAL_BASIC_PARAM_CHECK(out_handle);
-	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
 #if PLATFORM == LNX
-	*out_handle = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+	out_handle->is_directory = false;
+
+	char pipe_name[GEN_PATH_MAX + 1] = {0};
+	snprintf_s(pipe_name, GEN_PATH_MAX, "/proc/self/fd/%i", handle->file_handle);
+	GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
+
+	char path[GEN_PATH_MAX + 1] = {0};
+	readlink(pipe_name, path, GEN_PATH_MAX);
+	GEN_ERROR_OUT_IF_ERRNO(readlink, errno);
+
+	out_handle->file_handle = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
 	GEN_ERROR_OUT_IF_ERRNO(inotify_init1, errno);
-	inotify_add_watch(*out_handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
+	inotify_add_watch(out_handle->file_handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
 	GEN_ERROR_OUT_IF_ERRNO(inotify_add_watch, errno);
 #elif PLATFORM == DWN
+	out_handle->file_handle = dup(handle->file_handle);
+	GEN_ERROR_OUT_IF_ERRNO(dup, errno);
+	out_handle->directory_handle = fdopendir(out_handle->file_handle);
+	GEN_ERROR_OUT_IF_ERRNO(fdopendir, errno);
+	out_handle->is_directory = handle->is_directory;
+
+	gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &out_handle->internal_directory_len);
+	GEN_ERROR_OUT_IF(error, "`gen_directory_list` failed");
+
+	fstat(out_handle->file_handle, &out_handle->internal_descriptor_details);
+	GEN_ERROR_OUT_IF_ERRNO(fstat, errno);
 #endif
 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_filewatch_poll(const gen_filewatch_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
+gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(out_event);
 
 	*out_event = GEN_FILEWATCH_NONE;
 
 #if PLATFORM == LNX
-	struct pollfd fd = {*handle, POLLIN, 0};
+	struct pollfd fd = {handle->file_handle, POLLIN, 0};
 
 	fd.revents = 0;
 	poll(&fd, 1, 0);
@@ -301,11 +331,11 @@ gen_error_t gen_filewatch_poll(const gen_filewatch_handle_t* const restrict hand
 
 	if(fd.revents & POLLIN) {
 		unsigned int events_size;
-		ioctl(*handle, FIONREAD, &events_size);
+		ioctl(handle->file_handle, FIONREAD, &events_size);
 		GEN_ERROR_OUT_IF_ERRNO(ioctl, errno);
 
 		alignas(struct inotify_event) unsigned char raw_events[events_size];
-		read(*handle, raw_events, events_size);
+		read(handle->file_handle, raw_events, events_size);
 		GEN_ERROR_OUT_IF_ERRNO(read, errno);
 
 		unsigned int offset = 0;
@@ -327,18 +357,46 @@ gen_error_t gen_filewatch_poll(const gen_filewatch_handle_t* const restrict hand
 	}
 
 #elif PLATFORM == DWN
+	struct stat file_info;
+	fstat(handle->file_handle, &file_info);
+	GEN_ERROR_OUT_IF_ERRNO(fstat, errno);
+
+	if(!(file_info.st_mtimespec.tv_sec == handle->internal_descriptor_details.st_mtimespec.tv_sec && file_info.st_mtimespec.tv_nsec == handle->internal_descriptor_details.st_mtimespec.tv_nsec) || !(file_info.st_ctimespec.tv_sec == handle->internal_descriptor_details.st_ctimespec.tv_sec && file_info.st_ctimespec.tv_nsec == handle->internal_descriptor_details.st_ctimespec.tv_nsec)) {
+		if(handle->is_directory) {
+			size_t n_items = 0;
+			gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &n_items);
+			GEN_ERROR_OUT_IF(error, "`gen_directory_list` failed");
+
+			if(handle->internal_directory_len > n_items)
+				*out_event |= GEN_FILEWATCH_DELETED;
+			else if(handle->internal_directory_len < n_items)
+				*out_event |= GEN_FILEWATCH_CREATED;
+			else
+				*out_event |= GEN_FILEWATCH_MODIFIED;
+
+			handle->internal_directory_len = n_items;
+		}
+		else {
+			*out_event |= GEN_FILEWATCH_MODIFIED;
+		}
+	}
+
+	memcpy_s(&handle->internal_descriptor_details, sizeof(struct stat), &file_info, sizeof(struct stat));
+	GEN_ERROR_OUT_IF_ERRNO(memcpy_s, errno);
 #endif
 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_filewatch_destroy(const gen_filewatch_handle_t* const restrict handle) {
+gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle) {
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
 #if PLATFORM == LNX
-	close(*handle);
+	close(handle->file_handle);
 	GEN_ERROR_OUT_IF_ERRNO(close, errno);
 #elif PLATFORM == DWN
+	gen_error_t error = gen_handle_close(handle);
+	GEN_ERROR_OUT_IF(error, "`gen_handle_close` failed");
 #endif
 
 	GEN_ALL_OK;

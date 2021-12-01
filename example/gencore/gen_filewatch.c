@@ -5,9 +5,12 @@
 #include <genfs.h>
 
 int main(void) {
-	gen_filewatch_handle_t handle;
+	gen_filesystem_handle_t my_file;
+	gen_error_t error = gen_handle_open(&my_file, "./path/to/file/or/folder");
 
-	gen_error_t error = gen_filewatch_create(&handle, ".");
+	gen_filesystem_handle_t handle;
+
+	error = gen_filewatch_create(&handle, &my_file);
     GEN_REQUIRE_NO_ERROR(error);
 
 	gen_filewatch_event_t event = GEN_FILEWATCH_NONE;

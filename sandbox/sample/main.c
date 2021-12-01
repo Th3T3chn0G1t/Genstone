@@ -5,78 +5,24 @@
 #include <genfs.h>
 #include <genlocale.h>
 
-// typedef struct gen_json_t gen_json_t;
-// typedef struct gen_json_t {
-// 	const char* key;
-
-// 	size_t n_values;
-// 	gen_json_t* values;
-// } gen_json_t;
-
-// static gen_error_t gen_internal_parse_json_recursive(const char* const restrict json, const size_t json_len, const size_t offset, gen_json_t* const restrict out_json) {
-// 	out_json->key = json + offset;
-// 	out_json->n_values = 0;
-// 	out_json->values = NULL;
-
-// 	size_t local_offset = offset;
-
-// 	do {
-// 		char current = json[local_offset];
-
-// 		switch(current) {
-// 			case ' ':
-// 			case '\t':
-// 			case '\n':
-// 				continue;
-// 		}
-// 	} while(++local_offset < json_len);
-
-// 	GEN_ALL_OK;
-// }
-
-// static void dump_json(const gen_json_t* json) {
-// 	printf("%s", json->key);
-
-// 	GEN_FOREACH_PTR(i, val, json->n_values, json->values) {
-// 		dump_json(val);
-// 	}
-// }
-
 int main(void) {
 	glog(INFO, "Hello, Genstone!");
 
-	gen_filewatch_handle_t handle;
-	(void) gen_filewatch_create(&handle, ".");
+	gen_filesystem_handle_t cwd;
+	gen_error_t error = gen_handle_open(&cwd, "sandbox/sample");
+	GEN_REQUIRE_NO_ERROR(error);
+
+	gen_filesystem_handle_t handle;
+	error = gen_filewatch_create(&handle, &cwd);
+	GEN_REQUIRE_NO_ERROR(error);
 	gen_filewatch_event_t event = GEN_FILEWATCH_NONE;
 	while(true) {
-		gen_error_t error = gen_filewatch_poll(&handle, &event);
-		if(event) {
-			if(event & GEN_FILEWATCH_CREATED) glog(INFO, "File created");
-			if(event & GEN_FILEWATCH_MODIFIED) glog(INFO, "File modified");
-			if(event & GEN_FILEWATCH_DELETED) glog(INFO, "File deleted");
-			if(event & GEN_FILEWATCH_MOVED) glog(INFO, "File moved");
-		}
+		error = gen_filewatch_poll(&handle, &event);
+		GEN_REQUIRE_NO_ERROR(error);
 
-		if(error != GEN_OK) break;
+		if(event & GEN_FILEWATCH_CREATED) glog(INFO, "File created");
+		if(event & GEN_FILEWATCH_MODIFIED) glog(INFO, "File modified");
+		if(event & GEN_FILEWATCH_DELETED) glog(INFO, "File deleted");
+		if(event & GEN_FILEWATCH_MOVED) glog(INFO, "File moved");
 	}
-	(void) gen_filewatch_destroy(&handle);
-
-	// gen_filesystem_handle_t handle;
-	// (void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
-	// (void) gen_handle_open(&handle, "sandbox/sample/test.json");
-	// size_t len;
-	// (void) gen_handle_size(&len, &handle);
-	// uint8_t source[len + 1];
-	// (void) gen_handle_read(source, &handle, 0, len);
-	// source[len] = 0;
-
-	// gen_json_t json;
-	// gen_internal_parse_json_recursive((char*) source, len, 0, &json);
-
-	// const char source[] = "{}";
-
-	// gen_json_t json;
-	// gen_internal_parse_json_recursive(source, sizeof(source), 0, &json);
-
-	// dump_json(&json);
 }

@@ -23,38 +23,32 @@
 
 #if PLATFORM == LNX
 #include <sys/inotify.h>
-/**
- * File watcher instance handle
- */
-typedef int gen_filewatch_handle_t;
-#elif PLATFORM == DWN
-#include <CoreServices/CoreServices.h>
-typedef FSEventStreamRef gen_filewatch_handle_t;
 #endif
 
 /**
- * Bitmasks for filewatch event reporting
+ * Bitmasks for filewatch event reporting.
+ * Not all event types are reported on all platforms.
  * @see gen_filewatch_poll
  */
 typedef enum {
     /**
-     * No event occurred
+     * No event occurred.
      */
     GEN_FILEWATCH_NONE = 0,
     /**
-     * A file was created
+     * A file was created.
      */
     GEN_FILEWATCH_CREATED = 1,
     /**
-     * A file was modified
+     * A file was modified.
      */
     GEN_FILEWATCH_MODIFIED = 2,
     /**
-     * A file was deleted
+     * A file was deleted.
      */
     GEN_FILEWATCH_DELETED = 4,
     /**
-     * A file was moved
+     * A file was moved.
      */
     GEN_FILEWATCH_MOVED = 8
 } gen_filewatch_event_t;
@@ -69,20 +63,29 @@ typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* c
  * @note Directly modifying the internal handles may cause undefined behaviour.
  */
 typedef struct {
-    union {
-        /**
-         * Handle for a file if dir is false.
-         */
-        int file_handle;
-        /**
-         * Handle for a directory if dir is true.
-         */
-        DIR* directory_handle;
-    };
+    /**
+     * Handle for a file if dir is false.
+     * May still contain important data if dir is true.
+     */
+    int file_handle;
+    /**
+     * Handle for a directory if dir is true.
+     */
+    DIR* directory_handle;
     /**
      * Whether this handle is for a directory.
      */
     bool is_directory;
+    /**
+     * Internal caching of `stat` retvals.
+     * Please don't use this directly.
+     */
+    struct stat internal_descriptor_details;
+    /**
+     * Intenal caching of directory size.
+     * Please don't use this directly.
+     */
+    size_t internal_directory_len;
 } gen_filesystem_handle_t;
 
 /**
@@ -228,25 +231,25 @@ GEN_ERRORABLE gen_directory_list(const gen_filesystem_handle_t* const restrict h
 
 /**
  * Creates a filesystem watcher for a file or directory.
- * @param[out] out_handle a pointer to storage for the created handle.
- * @param[in] path path to the file to watch.
+ * @param[out] out_handle a pointer to storage for the created handle. This is not required to be the same as the filesystem handle used for IO.
+ * @param[in] handle a filesystem handle to the file to watch.
  * @return an error code.
  */
-GEN_ERRORABLE gen_filewatch_create(gen_filewatch_handle_t* const restrict out_handle, const char* const restrict path);
+GEN_ERRORABLE gen_filewatch_create(gen_filesystem_handle_t* const restrict out_handle, const gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Checks a filesystem watcher for events.
- * @param[in] handle the handle to the filesystem watcher to check.
+ * @param[in] handle the handle to the filesystem watcher to check. This is not required to be the same as the filesystem handle used for IO.
  * @param[out] out_event pointer to storage for events which have occurred. Bitmask of `gen_filewatch_event_t` values.
  * @return an error code.
  */
-GEN_ERRORABLE gen_filewatch_poll(const gen_filewatch_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event);
+GEN_ERRORABLE gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event);
 
 /**
  * Destroys a filesystem watcher.
- * @param[in] handle the handle to the filesystem watcher to destroy.
+ * @param[in] handle the handle to the filesystem watcher to destroy. This is not required to be the same as the filesystem handle used for IO.
  * @return an error code.
  */
-GEN_ERRORABLE gen_filewatch_destroy(const gen_filewatch_handle_t* const restrict handle);
+GEN_ERRORABLE gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle);
 
 #endif
