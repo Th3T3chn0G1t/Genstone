@@ -317,8 +317,8 @@ tmp:
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
-	@echo "$(ACTION_PREFIX)genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
-	@genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<
+	@echo "$(ACTION_PREFIX)genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
+	@genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
@@ -359,8 +359,8 @@ endif
 	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
 
-	@echo "$(ACTION_PREFIX)genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
-	@genstone/vendor/c11compat/safeclib/scripts/check_for_unsafe_apis $<
+	@echo "$(ACTION_PREFIX)genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
+	@genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@echo "$(ACTION_PREFIX)$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"

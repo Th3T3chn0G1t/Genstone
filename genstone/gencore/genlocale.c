@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
+
 #include "include/genlocale.h"
 
 __attribute__((constructor)) static void gen_internal_initialize_locales(void) {
@@ -21,7 +24,7 @@ __attribute__((constructor)) static void gen_internal_initialize_locales(void) {
 
 gen_error_t gen_locale_convert_currency(char *const restrict out_string, const size_t buffer_size, size_t *const restrict out_size, const uint64_t units, const uint64_t cents) {
 	GEN_FRAME_BEGIN(gen_locale_convert_currency);
-	
+
 	const struct lconv *const restrict locale_info = localeconv();
 
 	const int size_r = snprintf(NULL, 0, GEN_INTERNAL_CURRENCY_FORMAT, locale_info->currency_symbol, units, locale_info->decimal_point, cents);

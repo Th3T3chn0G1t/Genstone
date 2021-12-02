@@ -33,21 +33,13 @@ On some versions of macOS, the provided `clang` version does not support some of
 
 The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions.
 
-The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_c11compat_annexk`.
+The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_safeclib_real`.
 
 ### Special Targets
 
 Additional build targets exist for building IDE configuration files (`ideconf`) and documentation (`docs`). These targets' settings are also controlled by values in `build/config.mk`. `ideconf` will overwrite existing configuration and does not behave differently on subsequent invocations (i.e. calling once and then modifying is recommended).
 
 Documentation requires `Doxygen` to be installed and available on the `PATH`.
-
-If you don't plan to use the source of Genstone during development, you can generate a more lightweight development environment using `make devenv`.
-
-This is *not* viable if you plan to embed Genstone into your own project, as it generates the project for your platform and configuration.
-
-`make devenv` will output to `out/` with generated `include`, `lib` and `docs` folders.
-
-It is recommended to use this in conjunction with `make ideconf` to generate your development environment configuration.
 
 ### Options
 

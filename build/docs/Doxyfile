@@ -876,7 +876,6 @@ INPUT                  = genstone/gencore \
                          genstone/gencalc \
                          genstone/genuine \
                          README.md \
-                         genstone/vendor/c11compat/c11compat.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

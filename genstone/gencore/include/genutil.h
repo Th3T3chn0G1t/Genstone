@@ -160,6 +160,19 @@
         } \
     } while(0)
 
+/**
+ * Pretty assertion for truthiness.
+ * @param[in] a the recieved expression.
+ * @note Only works for trivial types.
+ */
+#define GEN_REQUIRE_NON_NULL(a) \
+    do { \
+        if(!a) { \
+            glogf(FATAL, "Require failed - %s was NULL at line %i in %s", #a, __LINE__, __FILE__); \
+            abort(); \
+        } \
+    } while(0)
+
 #define GEN_MICROSECONDS_PER_SECOND 1000000
 #define GEN_MILLISECONDS_PER_SECOND 1000
 

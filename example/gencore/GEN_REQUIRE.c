@@ -13,6 +13,8 @@ int main(void) {
     GEN_REQUIRE_EQUAL_STRING("foo", "foo");
 
     GEN_REQUIRE_NO_ERROR(GEN_OK);
+    
+    GEN_REQUIRE_NON_NULL("bar");
 
     GEN_REQUIRE_NO_REACH; // This will abort
 }
