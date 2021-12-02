@@ -7,13 +7,15 @@ build_message_genargs_test:
 	@echo "$(SECTION_PREFIX) Genargs Test"
 	@echo "$(INFO_PREFIX) Testing Genstone argument parser"
 
-genargs_test: gencore build_message_genargs_test $(GEN_ARGS_TEST) ### @Test Builds and runs Genstone argument parser tests
+genargs_test: build_message_genargs_test $(GEN_ARGS_TEST) ### @Test Builds and runs Genstone argument parser tests
 	@echo "$(ACTION_PREFIX)$(GEN_ARGS_TEST)$(ACTION_SUFFIX)"
 	@LD_LIBRARY_PATH=lib $(GEN_ARGS_TEST)
 
 $(GEN_ARGS_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_ARGS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_ARGS_TEST): $(GEN_ARGS_TEST_OBJECTS)
+
+$(GEN_ARGS_TEST_OBJECTS): $(GEN_CORE_LIB)
 
 clean_genargs_test:
 	-rm $(GEN_ARGS_TEST_OBJECTS)

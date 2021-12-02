@@ -20,7 +20,7 @@ build_message_gencore:
 	@echo "$(SECTION_PREFIX) Gencore"
 	@echo "$(INFO_PREFIX) Core Genstone utilities"
 
-gencore: safeclib mimalloc build_message_gencore $(GEN_CORE_LIB) ### @Genstone Builds core Genstone utilities
+gencore: build_message_gencore $(GEN_CORE_LIB) ### @Genstone Builds core Genstone utilities
 
 _GEN_CORE_CFLAGS = $(GEN_CORE_DIAGNOSTIC_FLAGS)
 
@@ -36,6 +36,7 @@ $(GEN_CORE_LIB): LFLAGS = -Llib $(SAFEC_LFLAGS) $(MIMALLOC_LFLAGS) $(_GEN_CORE_L
 $(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) | lib
 
 $(GEN_CORE_OBJECTS): $(wildcard genstone/gencore/include/*.h)
+$(GEN_CORE_OBJECTS): $(SAFEC_LIB) $(MIMALLOC_LIB)
 
 clean_gencore:
 	-rm $(GEN_CORE_OBJECTS)

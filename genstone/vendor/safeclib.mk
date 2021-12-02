@@ -12,7 +12,7 @@ build_message_safeclib:
 
 $(_SAFEC_LIB_INTERNAL_MAKEFILE):
 	cd genstone/vendor/safeclib && ./build-aux/autogen.sh
-	cd genstone/vendor/safeclib && ./configure --prefix=/usr --enable-unsafe
+	cd genstone/vendor/safeclib && ./configure --prefix=/usr --enable-unsafe CC=$(COMPILER) CFLAGS="-Wno-unused-command-line-argument"
 
 $(_SAFEC_LIB_INTERNAL): $(_SAFEC_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/safeclib

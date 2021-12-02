@@ -18,13 +18,6 @@ BUILD_MODE = DEBUG
 # `DISABLED`: Don't run tests
 TEST = ALL
 
-# Set build target platform
-# Possible values are:
-# `DEFAULT`: Detect host OS. Sets to the respective value
-# `DWN`: macOS
-# `LNX`: Linux
-PLATFORM = DEFAULT
-
 # The IDE to generate IDE configuration for with `ideconf` target
 # Possible values are:
 # `VSC`:  VSCode

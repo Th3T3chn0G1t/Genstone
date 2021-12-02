@@ -1,3 +1,10 @@
+# Set build target platform
+# Possible values are:
+# `DEFAULT`: Detect host OS. Sets to the respective value
+# `DWN`: macOS
+# `LNX`: Linux
+PLATFORM = DEFAULT
+
 # The C compiler to use
 # This is unlikely to work with compilers other than clang
 COMPILER = clang
