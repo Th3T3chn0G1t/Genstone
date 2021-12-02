@@ -3,7 +3,7 @@
 # Try to keep everything contained in the Makefile
 # If platform specific tools make sense contextually then you can use them
 
-IDECONF_INCLUDE_DIRS = genstone/gencore/include genstone/genuine/include genstone/gencalc/include genstone/genfx/gfx/include genstone/genfx/sfx/include genstone/vendor/safeclib/include
+IDECONF_INCLUDE_DIRS = genstone/gencore/include genstone/genuine/include genstone/gencalc/include genstone/genfx/gfx/include genstone/genfx/sfx/include genstone/vendor/safeclib/include genstone/vendor/mimalloc/include
 ifeq ($(PLATFORM),DWN)
 IDECONF_INCLUDE_DIRS += genstone/gencore/threademu/include
 endif
