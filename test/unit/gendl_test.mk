@@ -14,6 +14,7 @@ build_message_gendl_test:
 gendl_test: gencore build_message_gendl_test $(GEN_DL_TEST_EXEC) $(GEN_DL_TEST_LIB) ### @Test Builds and runs Genstone dynamic library utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_DL_TEST_EXEC)$(ACTION_SUFFIX)"
 	@LD_LIBRARY_PATH=lib $(GEN_DL_TEST_EXEC)
+	-rm $(GEN_DL_TEST_LIB)
 
 $(GEN_DL_TEST_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_DL_TEST_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
