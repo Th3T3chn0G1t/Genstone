@@ -1,5 +1,5 @@
-[submodule "genstone/vendor/c11compat/safeclib"]
-	path = genstone/vendor/c11compat/safeclib
+[submodule "genstone/vendor/safeclib"]
+	path = genstone/vendor/safeclib
 	url = https://github.com/rurban/safeclib
 [submodule "genstone/vendor/mimalloc"]
 	path = genstone/vendor/mimalloc
