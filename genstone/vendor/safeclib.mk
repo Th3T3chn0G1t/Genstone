@@ -11,7 +11,7 @@ build_message_safeclib:
 	@echo "$(INFO_PREFIX) For one night and one night only, Rurban brings us Annex K"
 
 $(_SAFEC_LIB_INTERNAL_MAKEFILE):
-	cd genstone/vendor/safeclib && ./build-aux/autogen.sh
+	cd genstone/vendor/safeclib && autoreconf -Wall --install
 	cd genstone/vendor/safeclib && ./configure --prefix=/usr --enable-unsafe CC=$(COMPILER) CFLAGS="-Wno-unused-command-line-argument"
 
 $(_SAFEC_LIB_INTERNAL): $(_SAFEC_LIB_INTERNAL_MAKEFILE)
@@ -30,5 +30,4 @@ clean_safeclib:
 # (It takes forever)
 clean_safeclib_real: | $(_SAFEC_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/safeclib clean
-	$(MAKE) -Cgenstone/vendor/safeclib distclean
 	-rm $(wildcard lib/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)

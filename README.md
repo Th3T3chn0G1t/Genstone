@@ -31,7 +31,7 @@ The codebase will only build with `clang`. You will also need `make` installed i
 #### Note
 On some versions of macOS, the provided `clang` version does not support some of the features used in `gencalc`. To fix this - install the Homebrew version of `clang` with the features enabled using `brew install llvm` and adding a link to `/usr/local/Cellar/llvm/{VERSION}/bin/clang` in your path (with `ln -sf /usr/local/Cellar/llvm/{VERSION}/bin/clang /usr/local/bin/clang-13` or the like). Homebrew can be gotten from [brew.sh](https://brew.sh).
 
-The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions.
+The default configuration should build a sandbox project, so after a fresh clone just run `make` - or `make -j$(nproc)` for a much faster build making use of parallelism \[0]/. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions.
 
 The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_safeclib_real`.
 
@@ -72,4 +72,4 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |`GEN_FATAL_ANNEXK_CONSTRAINTS`|`ENABLED` `DISABLED`|`ENABLED`|Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program|You may want to disable this if you are getting false Annex K constraint hits or are using unsafe string manipulation code|
 |`GEN_USE_MIMALLOC`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use mimalloc as the allocator|Disabling mimalloc may be detrimental to performance and is not as well tested nor as secure|
 |`GEN_CALC_COMMON_TYPES`|`ENABLED` `DISABLED`|`ENABLED`|Enables the default definition of common vector and matrix types in gencalc||
-
+|`GEN_FS_FILEWATCH_USE_SYSLIB`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use the system library where implemented to get filewatch functionality|Disabling may make results more consistent across platforms as the alternative uses standard utilities|

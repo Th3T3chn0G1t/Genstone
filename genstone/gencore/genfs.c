@@ -280,11 +280,19 @@ static void gen_internal_filewatch_dwn_dircount(__unused const char* const restr
 }
 #endif
 
+#ifndef GEN_FS_FILEWATCH_USE_SYSLIB
+/**
+ * Whether to use the system library where implemented to get filewatch functionality.
+ * @note Disabling may make results more consistent across platforms as the alternative uses standard utilities.
+ */
+#define GEN_FS_FILEWATCH_USE_SYSLIB ENABLED
+#endif
+
 gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_handle, const gen_filesystem_handle_t* const restrict handle) {
 	GEN_INTERNAL_BASIC_PARAM_CHECK(out_handle);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
-#if PLATFORM == LNX
+#if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
 	out_handle->is_directory = false;
 
 	char pipe_name[GEN_PATH_MAX + 1] = {0};
@@ -299,7 +307,7 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 	GEN_ERROR_OUT_IF_ERRNO(inotify_init1, errno);
 	inotify_add_watch(out_handle->file_handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
 	GEN_ERROR_OUT_IF_ERRNO(inotify_add_watch, errno);
-#elif PLATFORM == DWN
+#else
 	out_handle->file_handle = dup(handle->file_handle);
 	GEN_ERROR_OUT_IF_ERRNO(dup, errno);
 	out_handle->directory_handle = fdopendir(out_handle->file_handle);
@@ -322,7 +330,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 	*out_event = GEN_FILEWATCH_NONE;
 
-#if PLATFORM == LNX
+#if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
 	struct pollfd fd = {handle->file_handle, POLLIN, 0};
 
 	fd.revents = 0;
@@ -356,7 +364,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 		}
 	}
 
-#elif PLATFORM == DWN
+#else
 	struct stat file_info;
 	fstat(handle->file_handle, &file_info);
 	GEN_ERROR_OUT_IF_ERRNO(fstat, errno);
@@ -391,10 +399,10 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle) {
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
-#if PLATFORM == LNX
+#if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
 	close(handle->file_handle);
 	GEN_ERROR_OUT_IF_ERRNO(close, errno);
-#elif PLATFORM == DWN
+#else
 	gen_error_t error = gen_handle_close(handle);
 	GEN_ERROR_OUT_IF(error, "`gen_handle_close` failed");
 #endif
