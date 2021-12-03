@@ -14,7 +14,7 @@ gepport: build_message_gepport $(GEN_PORT_LIB) ### @Genstone Builds Genstone use
 
 $(GEN_PORT_LIB): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_PORT_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
-$(GEN_PORT_LIB): $(GEN_PORT_OBJECTS) | lib
+$(GEN_PORT_LIB): $(GEN_PORT_OBJECTS) $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB) | lib
 
 $(GEN_PORT_OBJECTS): $(wildcard genstone/gepport/include/*.hpp)
 $(GEN_PORT_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)

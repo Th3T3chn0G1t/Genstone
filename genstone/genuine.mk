@@ -14,7 +14,7 @@ genuine: gencore build_message_genuine $(GEN_UI_LIB) ### @Genstone Builds Gensto
 
 $(GEN_UI_LIB): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_UI_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
-$(GEN_UI_LIB): $(GEN_UI_OBJECTS) | lib
+$(GEN_UI_LIB): $(GEN_UI_OBJECTS) $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB) | lib
 
 $(GEN_UI_OBJECTS): $(wildcard genstone/genuine/include/*.h)
 $(GEN_UI_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
