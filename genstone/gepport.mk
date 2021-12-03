@@ -17,7 +17,7 @@ $(GEN_PORT_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_PORT_LIB): $(GEN_PORT_OBJECTS) | lib
 
 $(GEN_PORT_OBJECTS): $(wildcard genstone/gepport/include/*.hpp)
-$(GEN_PORT_OBJECTS): $(GEN_CORE_LIB)
+$(GEN_PORT_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_gepport:
 	-rm $(GEN_PORT_OBJECTS)

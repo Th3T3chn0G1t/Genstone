@@ -11,7 +11,7 @@ build_message_gendl_test:
 	@echo "$(SECTION_PREFIX) Gendl Test"
 	@echo "$(INFO_PREFIX) Testing Genstone dynamic library management"
 
-gendl_test: gencore build_message_gendl_test $(GEN_DL_TEST_EXEC) $(GEN_DL_TEST_LIB) ### @Test Builds and runs Genstone dynamic library utility tests
+gendl_test: build_message_gendl_test $(GEN_DL_TEST_EXEC) $(GEN_DL_TEST_LIB) ### @Test Builds and runs Genstone dynamic library utility tests
 	@echo "$(ACTION_PREFIX)$(GEN_DL_TEST_EXEC)$(ACTION_SUFFIX)"
 	@LD_LIBRARY_PATH=lib $(GEN_DL_TEST_EXEC)
 	-rm $(GEN_DL_TEST_LIB)
@@ -24,7 +24,7 @@ $(GEN_DL_TEST_LIB): CFLAGS =
 $(GEN_DL_TEST_LIB): LFLAGS =
 $(GEN_DL_TEST_LIB): $(GEN_DL_TEST_LIB_OBJECTS)
 
-$(GEN_DL_TEST_EXEC_OBJECTS): $(GEN_CORE_LIB)
+$(GEN_DL_TEST_EXEC_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_gendl_test:
 	-rm $(GEN_DL_TEST_EXEC_OBJECTS)

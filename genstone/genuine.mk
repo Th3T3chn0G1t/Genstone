@@ -17,7 +17,7 @@ $(GEN_UI_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_UI_LIB): $(GEN_UI_OBJECTS) | lib
 
 $(GEN_UI_OBJECTS): $(wildcard genstone/genuine/include/*.h)
-$(GEN_UI_OBJECTS): $(GEN_CORE_LIB)
+$(GEN_UI_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_genuine:
 	-rm $(GEN_UI_OBJECTS)
