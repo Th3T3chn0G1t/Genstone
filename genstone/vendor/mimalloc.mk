@@ -9,7 +9,6 @@ MIMALLOC_LFLAGS = -lmimalloc -pthread
 MIMALLOC_DISABLED_SOURCES = alloc-override.c alloc-override-osx.c page-queue.c static.c
 MIMALLOC_SOURCES = $(filter-out $(addprefix genstone/vendor/mimalloc/src/,$(MIMALLOC_DISABLED_SOURCES)),$(wildcard genstone/vendor/mimalloc/src/*.c))
 MIMALLOC_OBJECTS = $(MIMALLOC_SOURCES:.c=$(OBJECT_SUFFIX))
-MIMALLOC_CLEANTREE_OBJECTS = $(subst genstone/vendor/mimalloc/src/,genstone/vendor/mimalloc/out/,$(MIMALLOC_OBJECTS))
 
 MIMALLOC_LIB = lib/$(LIB_PREFIX)mimalloc$(DYNAMIC_LIB_SUFFIX)
 
@@ -24,13 +23,7 @@ mimalloc: build_message_mimalloc $(MIMALLOC_LIB) ### @Vendor builds Microsoft `m
 $(MIMALLOC_LIB): CFLAGS = $(_MIMALLOC_CFLAGS)
 $(MIMALLOC_LIB): LFLAGS = $(_MIMALLOC_LFLAGS)
 $(MIMALLOC_LIB): CLANG_FORMAT = DISABLED
-$(MIMALLOC_LIB): $(MIMALLOC_CLEANTREE_OBJECTS) | lib
-
-$(MIMALLOC_CLEANTREE_OBJECTS): $(MIMALLOC_OBJECTS) | genstone/vendor/mimalloc/out
-	-mv $(MIMALLOC_OBJECTS) genstone/vendor/mimalloc/out
-
-genstone/vendor/mimalloc/out:
-	-mkdir $@
+$(MIMALLOC_LIB): $(MIMALLOC_OBJECTS) | lib
 
 clean_mimalloc:
 	-rm $(MIMALLOC_OBJECTS)

@@ -1,7 +1,6 @@
 # TODO
 
 - Add a `PORTING.md` info file or put in `README.md`
-- Genfs filewatcher macOS FSEvents
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
 - `genproc`
@@ -22,9 +21,5 @@
     - Hashing
         - Hash loaded shared libs to avoid shared lib injection
     - Secure-rand
-- Integrate a renderer (Probably need to port back from C++)
-    - More matrix/vector operations
-        - ~~Steal~~ Borrow stuff from `cglm` and adapt to `clang` matrix intrins
-        - Rework renderer to use matrix intrins instead of whatever it uses internally
-    - Integrate a physics system
-        - Rework to use matrix intrins instead of whatever it uses internally
+- Integrate a physics system
+    - Rework to use matrix intrins instead of whatever it uses internally
