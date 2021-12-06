@@ -233,6 +233,46 @@ gen_error_t gen_handle_read(uint8_t* restrict output_buffer, const gen_filesyste
 	GEN_ALL_OK;
 }
 
+#ifndef GEN_FS_READ_BUFFER_CHUNK
+/**
+ * The size of chunk to read at once while storing output in `gen_handle_read_all_available`.
+ * @note Increasing this if you have large amounts of data in raw reads may improve performance.
+ */
+#define GEN_FS_READ_BUFFER_CHUNK 512
+#endif
+
+gen_error_t gen_handle_read_all_available(const gen_filesystem_handle_t* const restrict handle, char* restrict* const restrict out_output) {
+	GEN_FRAME_BEGIN(gen_handle_read_all_available);
+
+	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_output);
+
+	char chunk[GEN_FS_READ_BUFFER_CHUNK + 1] = {0};
+	char* out = NULL;
+	size_t size = 0;
+	while(true) {
+		ssize_t retval = read(handle->file_handle, &chunk, GEN_FS_READ_BUFFER_CHUNK);
+		size += strnlen_s(chunk, GEN_FS_READ_BUFFER_CHUNK);
+
+		if(size) {
+			gen_error_t error = grealloc((void**) &out, size + 1, sizeof(char));
+			GEN_ERROR_OUT_IF(error, "`grealloc` failed");
+
+			strcat_s(out, size + 1, chunk);
+			GEN_ERROR_OUT_IF_ERRNO(strcat_s, errno);
+
+			memset_s(chunk, GEN_FS_READ_BUFFER_CHUNK, 0, GEN_FS_READ_BUFFER_CHUNK);
+			GEN_ERROR_OUT_IF_ERRNO(memset_s, errno);
+		}
+
+		if(retval == EOF) break;
+	}
+
+	*out_output = out;
+
+	GEN_ALL_OK;
+}
+
 gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
 	GEN_FRAME_BEGIN(gen_handle_write);
 

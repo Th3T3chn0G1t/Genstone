@@ -4,8 +4,6 @@
 /**
  * @file gencommon.h
  * Includes common helpers and utilities for across the codebase.
- * Includes the stdlib and helpers to provide missing headers on noncompliant platforms.
- * Defines helper macros for pretty keywords and diagnostic info.
  */
 
 #ifndef GEN_COMMON_H
@@ -50,8 +48,11 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
 #include <poll.h>
 #include <unistd.h>
+#include <stdnoreturn.h>
 
 #ifndef GEN_USE_MIMALLOC
 /**
@@ -70,8 +71,6 @@ GEN_DIAG_IGNORE_ALL
 #include <safe_lib_errno.h>
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
-
-#include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
 #include "glog.h"

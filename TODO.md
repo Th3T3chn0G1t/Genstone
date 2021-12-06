@@ -3,9 +3,6 @@
 - Add a `PORTING.md` info file or put in `README.md`
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
-- `genproc`
-    - Fix
-    - Signals/killing subprocesses
 - wchar support lib
 - Time-formats
 - generator (editor)

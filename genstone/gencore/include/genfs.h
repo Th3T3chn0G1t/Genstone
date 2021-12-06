@@ -89,6 +89,19 @@ typedef struct {
 } gen_filesystem_handle_t;
 
 /**
+ * `gen_filesystem_handle_t` wrapper for stdin.
+ */
+#define gen_stdin_handle  ((gen_filesystem_handle_t) { STDIN_FILENO, NULL, false, {0}, 0})
+/**
+ * `gen_filesystem_handle_t` wrapper for stdout.
+ */
+#define gen_stdout_handle ((gen_filesystem_handle_t) {STDOUT_FILENO, NULL, false, {0}, 0})
+/**
+ * `gen_filesystem_handle_t` wrapper for stderr.
+ */
+#define gen_stderr_handle ((gen_filesystem_handle_t) {STDERR_FILENO, NULL, false, {0}, 0})
+
+/**
  * @example{lineno} example/gencore/gen_path.c
  * Example for how to use the `gen_path*` family of functions.
  * The `gen_path*` family of functions is used for manipulating paths in a better way than the libc provides.
@@ -204,6 +217,16 @@ GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesys
  * @return an error code.
  */
 GEN_ERRORABLE gen_handle_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
+
+/**
+ * Reads all available data from a filesystem object handle without attempting to seek.
+ * This is intended to be used for reading redirected output from a subprocess from pipes created with "gen_handle_create_proc_redirect_target".
+ * @param[in] handle the handle to read from.
+ * @param[out] out_output pointer to storage for a pointer to read data.
+ * @return an error code.
+ * @note `out_output` will be assigned a heap pointer which will need to be `gfree`'d. 
+ */
+GEN_ERRORABLE gen_handle_read_all_available(const gen_filesystem_handle_t* const restrict handle, char* restrict* const restrict out_output);
 
 /**
  * Writes to a file.

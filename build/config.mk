@@ -67,7 +67,7 @@ STRIP_BINARIES = DISABLED
 ADDITIONAL_BUILD_MODULES =
 
 # A list of module names to exclude from the build
-DISABLED_MODULES = genproc_test
+DISABLED_MODULES =
 
 # Debugging for the build system
 # You probably don't need to enable this

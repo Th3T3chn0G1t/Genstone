@@ -32,4 +32,4 @@ jobs:
           macos: automake
 
       - name: Build & Test
-        run: make -j$(nproc) OVERRIDE_DISABLED_MODULES="genproc_test gencalc_test"
+        run: make -j$(nproc) OVERRIDE_DISABLED_MODULES="gencalc_test"

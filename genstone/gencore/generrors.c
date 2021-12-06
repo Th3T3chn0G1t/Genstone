@@ -105,6 +105,9 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case EBUSY: return GEN_IN_USE;
 		case EFAULT: return GEN_BAD_CONTENT;
 		case EISDIR: return GEN_WRONG_OBJECT_TYPE;
+		case EAGAIN: return GEN_BAD_OPERATION;
+		case ECHILD: return GEN_NO_SUCH_OBJECT;
+		case ESRCH: return GEN_NO_SUCH_OBJECT;
 		case ESNULLP: return GEN_INVALID_PARAMETER;
 		case ESZEROL: return GEN_TOO_SHORT;
 		case ESLEMIN: return GEN_TOO_SHORT;
@@ -116,7 +119,6 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case ESNODIFF: return GEN_BAD_OPERATION;
 		case ESNOTFND: return GEN_NO_SUCH_OBJECT;
 		case ESLEWRNG: return GEN_INVALID_PARAMETER;
-		case EAGAIN: return GEN_BAD_OPERATION;
 		default: return GEN_UNKNOWN;
 	}
 }

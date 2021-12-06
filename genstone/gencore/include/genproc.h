@@ -10,6 +10,7 @@
 #define GEN_PROC_H
 
 #include "gencommon.h"
+#include "genfs.h"
 
 /**
  * Handle type for a process.
@@ -17,47 +18,48 @@
  */
 typedef pid_t gen_process_t;
 
-#ifndef GEN_PROC_READ_BUFFER_CHUNK
-/**
- * The size of chunk to read at once while storing output in `gen_proc_get_output`.
- * @note Increasing this if you have large amounts of output in subprocesses may improve performance.
- */
-#define GEN_PROC_READ_BUFFER_CHUNK 128
-#endif
-
 /**
  * @example{lineno} example/gencore/gen_proc.c
  * Example for how to use the `gen_proc*` family of functions.
  * The `gen_proc*` family of functions is used for managing subprocesses in a platform agnostic way.
  */
 
-/**
- * Creates a new subprocess whose output is redirected to a `FILE*`.
- * @param[out] process_out pointer to storage for the `gen_process_t`.
- * @param[in] exec the command line to execute.
- * @param[in] redirect the stream to redirect output to.
- * @return an error code.
- */
-GEN_ERRORABLE gen_proc_start_redirected(gen_process_t* const restrict process_out, const char* const restrict exec, FILE* const restrict redirect);
 
 /**
- * Blocks the current thread until the specified process returns.
- * Provides exit code after return.
- * @param[out] out_result pointer to storage for the exit code.
- * @param[in] process the process to wait on.
+ * Creates a pair of filesystem object handles which back eachother - a pipe.
+ * This is intended to be used as a redirect for subprocess output.
+ * Writing to the "write" handle will make data available for reading in the "read" handle etc.
+ * These handles are *not* suitable for regular genfs IO and will cause errors.
+ * @param[out] output_handle_read pointer to storage for the read handle.
+ * @param[out] output_handle_write pointer to storage for the write handle.
  * @return an error code.
+ * @see gen_proc_create_redirected_to
  */
-GEN_ERRORABLE gen_proc_wait(int* const restrict out_result, gen_process_t process);
+GEN_ERRORABLE gen_handle_create_proc_redirect_target(gen_filesystem_handle_t* restrict output_handle_read, gen_filesystem_handle_t* restrict output_handle_write);
 
 /**
- * Blocks the current thread until the specified process returns.
- * Provides exit code and console output after return.
- * @param[out] out_output pointer to storage for the output buffer heap pointer.
- * @param[out] out_result pointer to storage for the exit code.
- * @param[in] exec the command line to execute.
- * @return an error code.
- * @note `out_output` will be assigned a heap pointer which will need to be `gfree`'d.
+ * Creates a subprocess and redirects output to a given redirect handle.
+ * @param[out] out_process pointer to storage for the created process.
+ * @param[in] exec the command line to start the process. This goes through the shell so caution should be taken regarding arbitrary shell execution.
+ * @param[in] redirect the handle to redirect output to. If created with `gen_handle_create_proc_redirect_target` should be the "write" handle. Pass `gen_stdout_handle` to get regular output.
+ * @return an error code. 
+ * @see gen_handle_create_proc_redirect_target
  */
-GEN_ERRORABLE gen_proc_get_output(char** const restrict out_output, int* const restrict out_result, const char* const restrict exec);
+GEN_ERRORABLE gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect);
+
+/**
+ * Blocks the current thread until the specified subprocess exits.
+ * @param process the subprocess to wait for.
+ * @param out_exitcode pointer to storage for the exit code of the subprocess.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_proc_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
+
+/**
+ * Attempts to kill a subprocess.
+ * @param process the subprocess to kill.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_proc_kill(const gen_process_t* const restrict process);
 
 #endif
