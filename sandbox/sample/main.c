@@ -2,6 +2,7 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 #include <gencommon.h>
+#include <gendl.h>
 #include <genfs.h>
 #include <genlocale.h>
 #include <genproc.h>

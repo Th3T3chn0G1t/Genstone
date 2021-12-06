@@ -252,7 +252,7 @@ gen_error_t gen_handle_read_all_available(const gen_filesystem_handle_t* const r
 	size_t size = 0;
 	while(true) {
 		ssize_t retval = read(handle->file_handle, &chunk, GEN_FS_READ_BUFFER_CHUNK);
-		size += strnlen_s(chunk, GEN_FS_READ_BUFFER_CHUNK);
+		size += strnlen_s(chunk, GEN_FS_READ_BUFFER_CHUNK + 1);
 
 		if(size) {
 			gen_error_t error = grealloc((void**) &out, size + 1, sizeof(char));
@@ -261,7 +261,7 @@ gen_error_t gen_handle_read_all_available(const gen_filesystem_handle_t* const r
 			strcat_s(out, size + 1, chunk);
 			GEN_ERROR_OUT_IF_ERRNO(strcat_s, errno);
 
-			memset_s(chunk, GEN_FS_READ_BUFFER_CHUNK, 0, GEN_FS_READ_BUFFER_CHUNK);
+			memset_s(chunk, GEN_FS_READ_BUFFER_CHUNK + 1, 0, GEN_FS_READ_BUFFER_CHUNK);
 			GEN_ERROR_OUT_IF_ERRNO(memset_s, errno);
 		}
 
@@ -329,6 +329,8 @@ static void gen_internal_filewatch_dwn_dircount(__unused const char* const restr
 #endif
 
 gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_handle, const gen_filesystem_handle_t* const restrict handle) {
+	GEN_FRAME_BEGIN(gen_filewatch_create);
+
 	GEN_INTERNAL_BASIC_PARAM_CHECK(out_handle);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
@@ -336,7 +338,7 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 	out_handle->is_directory = false;
 
 	char pipe_name[GEN_PATH_MAX + 1] = {0};
-	snprintf_s(pipe_name, GEN_PATH_MAX, "/proc/self/fd/%i", handle->file_handle);
+	snprintf_s(pipe_name, GEN_PATH_MAX + 1, "/proc/self/fd/%i", handle->file_handle);
 	GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
 
 	char path[GEN_PATH_MAX + 1] = {0};
@@ -365,6 +367,8 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 }
 
 gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
+	GEN_FRAME_BEGIN(gen_filewatch_poll);
+
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(out_event);
 
@@ -437,6 +441,8 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 }
 
 gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle) {
+	GEN_FRAME_BEGIN(gen_filewatch_destroy);
+
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 
 #if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED

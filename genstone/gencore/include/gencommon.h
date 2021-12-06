@@ -74,9 +74,9 @@ GEN_DIAG_IGNORE_ALL
 #include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
+#include "gentooling.h"
 #include "glog.h"
 #include "genutil.h"
-#include "gentooling.h"
 #include "gemory.h"
 
 #endif

@@ -122,9 +122,7 @@
 #define GEN_REQUIRE_EQUAL_STRING(a, b) \
     do { \
         if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` (%s) is not constant at line %i in %s", #a, a, __LINE__, __FILE__); \
-        int gen_internal_require_equal_string_res = 0; \
-        strcmp_s(a, sizeof(a), b, &gen_internal_require_equal_string_res); \
-        if(!b || gen_internal_require_equal_string_res) { \
+        if(!b || strcmp(a, b)) { \
             glogf(FATAL, "Require failed - Expected: `%s` (%s) Got: `%s` (%s) at line %i in %s", #a, a, #b, b, __LINE__, __FILE__); \
             abort(); \
         } \
