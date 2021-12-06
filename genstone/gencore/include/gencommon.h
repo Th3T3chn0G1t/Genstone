@@ -52,7 +52,6 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/syscall.h>
 #include <poll.h>
 #include <unistd.h>
-#include <stdnoreturn.h>
 
 #ifndef GEN_USE_MIMALLOC
 /**
@@ -71,6 +70,8 @@ GEN_DIAG_IGNORE_ALL
 #include <safe_lib_errno.h>
 #include <safe_mem_lib.h>
 #include <safe_str_lib.h>
+
+#include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
 #include "glog.h"
