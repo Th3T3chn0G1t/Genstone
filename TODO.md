@@ -20,3 +20,9 @@
     - Secure-rand
 - Integrate a physics system
     - Rework to use matrix intrins instead of whatever it uses internally
+- Rendering
+    - Windowing
+        - DRI3
+        - Window shapes (`--enable-shape`) (https://www.x.org/releases/X11R7.7/doc/xextproto/shape.html)
+    - Accelerated video decoding
+        - Xv? XvMC? (`--enable-xvmc`) (`--enable-xv`) (https://en.wikipedia.org/wiki/X-Video_Motion_Compensation) (https://www.x.org/releases/current/doc/man/man3/Xv.3.xhtml)

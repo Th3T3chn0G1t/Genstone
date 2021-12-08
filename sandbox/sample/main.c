@@ -6,6 +6,7 @@
 #include <genfs.h>
 #include <genlocale.h>
 #include <genproc.h>
+// #include <genfx/genwindow.h>
 
 int main(void) {
 	GEN_FRAME_BEGIN(main);

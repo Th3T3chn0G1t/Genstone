@@ -226,6 +226,27 @@ CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
 endif
 
+GLOBAL_CONFIGURE_CFLAGS += -Wno-unused-command-line-argument
+
+ifneq ($(LINKER),DEFAULT)
+ifeq ($(LINKER),LLD)
+GLOBAL_CONFIGURE_CFLAGS += -fuse-ld=lld
+ifeq ($(BUILD_MODE),RELEASE)
+GLOBAL_CONFIGURE_CFLAGS += -flto
+GLOBAL_CONFIGURE_LFLAGS += -flto
+endif
+ifeq ($(PLATFORM),LNX)
+GLOBAL_CONFIGURE_FLAGS += LD=ld.lld
+else
+ifeq ($(PLATFORM),DWN)
+GLOBAL_CONFIGURE_FLAGS += LD=ld64
+endif
+endif
+else
+GLOBAL_CONFIGURE_FLAGS += LD=$(LINKER)
+endif
+endif
+
 ifeq ($(BUILD_SYS_DEBUG),ENABLED)
 	ifeq ($(PLATFORM),DWN)
 		GLOBAL_L_FLAGS += -Wl,-why_load,-print_statistics

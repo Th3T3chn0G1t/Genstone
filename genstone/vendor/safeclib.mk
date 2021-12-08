@@ -5,7 +5,7 @@ SAFEC_LIB = lib/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
 _SAFEC_LIB_INTERNAL = genstone/vendor/safeclib/src/.libs/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
 _SAFEC_LIB_INTERNAL_PATTERN = $(wildcard genstone/vendor/safeclib/src/.libs/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
 _SAFEC_LIB_INTERNAL_MAKEFILE = genstone/vendor/safeclib/Makefile
-SAFEC_LIB_CONFIGURE_FLAGS = --enable-unsafe --disable-doc --enable-warn-dmax --enable-silent-rules CC=$(COMPILER) CFLAGS="-Wno-unused-command-line-argument"
+SAFEC_LIB_CONFIGURE_FLAGS = --enable-unsafe --disable-doc --enable-warn-dmax --enable-silent-rules
 ifeq ($(BUILD_MODE),DEBUG)
 SAFEC_LIB_CONFIGURE_FLAGS += --enable-debug-build --enable-debug
 endif
@@ -16,7 +16,7 @@ build_message_safeclib:
 
 $(_SAFEC_LIB_INTERNAL_MAKEFILE):
 	cd genstone/vendor/safeclib && autoreconf -Wall --install
-	cd genstone/vendor/safeclib && ./configure $(SAFEC_LIB_CONFIGURE_FLAGS)
+	cd genstone/vendor/safeclib && ./configure $(GLOBAL_CONFIGURE_FLAGS) CFLAGS="$(GLOBAL_CONFIGURE_CFLAGS)" LFLAGS="$(GLOBAL_CONFIGURE_LFLAGS)" $(SAFEC_LIB_CONFIGURE_FLAGS)
 
 $(_SAFEC_LIB_INTERNAL): $(_SAFEC_LIB_INTERNAL_MAKEFILE)
 	make -Cgenstone/vendor/safeclib
