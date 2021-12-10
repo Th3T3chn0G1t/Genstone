@@ -16,5 +16,7 @@ $(UI_TEST_EXEC): $(UI_TEST_OBJECTS)
 $(UI_TEST_OBJECTS): $(GEN_UI_LIB) $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_uitest:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(UI_TEST_OBJECTS)
 	-rm $(UI_TEST_EXEC)
+	@echo "$(ACTION_SUFFIX)"

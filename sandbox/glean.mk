@@ -16,5 +16,7 @@ $(GLEAN_EXEC): $(GLEAN_OBJECTS)
 $(GLEAN_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_glean:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(GLEAN_OBJECTS)
 	-rm $(GLEAN_EXEC)
+	@echo "$(ACTION_SUFFIX)"

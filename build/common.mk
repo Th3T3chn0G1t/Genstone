@@ -226,7 +226,7 @@ CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
 endif
 
-GLOBAL_CONFIGURE_CFLAGS += -Wno-unused-command-line-argument
+GLOBAL_CONFIGURE_CFLAGS += -Wno-deprecated-declarations -Wno-unused-command-line-argument
 GLOBAL_CONFIGURE_FLAGS += CC="$(COMPILER)" CXX="$(COMPILERXX)"
 
 ifneq ($(LINKER),DEFAULT)
@@ -324,13 +324,16 @@ ifeq ($(TEST),BUILD)
 endif
 
 clean_tmpfile:
-	@echo "$(ACTION_PREFIX)rm $(wildcard tmp/*.tmp)$(ACTION_SUFFIX)"
+	@echo "$(ACTION_PREFIX)"
 	-@rm $(wildcard tmp/*.tmp)
+	@echo "$(ACTION_SUFFIX)"
 
 clean_clang_tooling_artifacts:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(shell find . -name "*.gcda")
 	-rm $(shell find . -name "*.gcno")
 	-rm $(wildcard "*.profraw")
+	@echo "$(ACTION_SUFFIX)"
 
 tmp:
 	-mkdir $@

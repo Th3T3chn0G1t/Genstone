@@ -20,5 +20,7 @@ $(GEN_PORT_OBJECTS): $(wildcard genstone/gepport/include/*.hpp)
 $(GEN_PORT_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_gepport:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(GEN_PORT_OBJECTS)
 	-rm $(GEN_PORT_LIB)
+	@echo "$(ACTION_SUFFIX)"

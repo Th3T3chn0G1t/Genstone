@@ -20,5 +20,7 @@ $(GEN_UI_OBJECTS): $(wildcard genstone/genuine/include/*.h)
 $(GEN_UI_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_genuine:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(GEN_UI_OBJECTS)
 	-rm $(GEN_UI_LIB)
+	@echo "$(ACTION_SUFFIX)"

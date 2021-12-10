@@ -18,5 +18,7 @@ $(GEN_FS_TEST): $(GEN_FS_TEST_OBJECTS)
 $(GEN_FS_TEST_OBJECTS): $(GEN_CORE_LIB) $(MIMALLOC_LIB) $(SAFEC_LIB)
 
 clean_genfs_test:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(GEN_FS_TEST_OBJECTS)
 	-rm $(GEN_FS_TEST)
+	@echo "$(ACTION_SUFFIX)"

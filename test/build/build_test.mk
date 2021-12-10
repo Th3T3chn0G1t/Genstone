@@ -36,6 +36,7 @@ $(BUILD_TEST_LIB_STATIC): $(BUILD_TEST_LIB_OBJECTS)
 $(BUILD_TEST_LIB_OBJECTS): Makefile build/common.mk build/config.mk
 
 clean_build_test:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(BUILD_TEST_LIB_OBJECTS)
 	-rm $(BUILD_TEST_LIB_DYNAMIC)
 	-rm $(BUILD_TEST_LIB_STATIC)
@@ -43,3 +44,4 @@ clean_build_test:
 	-rm $(BUILD_TEST_EXEC_OBJECTS)
 	-rm $(BUILD_TEST_EXEC_DYNAMIC)
 	-rm $(BUILD_TEST_EXEC_STATIC)
+	@echo "$(ACTION_SUFFIX)"

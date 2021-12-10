@@ -6,14 +6,25 @@
 
 ### A C framework which creates a secure application layer
 
+## About
+
+Genstone is intended to provide a solid series of application-programming utilities which:
+- Is more secure than using the utilities provided by the stdlib.
+- Aims to provide a better API than the stdlib.
+- Abstract over utilities which are normally platform specific.
+- Have extensive examples and documentation.
+- Are provided in a modular way to cut down distribution bundle sizes by removing things you don't need.
+
+Genstone at the moment only supports Linux and macOS "officially" although at the time of writing many modules do compile on Android, BSD and iOS. Windows support is on the backburner as it would require quite drastic changes to several module backends and has caused issues with CI in the past.
+
 ## Building
 
 #### Note
-Genstone uses Javadoc-style docstrings to document functions, variables outside of functions, macros, structures and structure members. You can view these directly in the headers, generate local docs (Use `make docs`), or view the latest documentation build on Github pages at https://th3t3chn0g1t.github.io/Genstone/ (Recommended).
+Genstone uses Javadoc-style docstrings to document functions, macros, structures and other aspects of the public API. You can view these directly in the headers, generate local docs using `make docs`, or view the latest documentation build on Github pages at https://th3t3chn0g1t.github.io/Genstone/ (Recommended).
 
-Genstone uses a configurable system of `Makefile` (Have only tested with GNU Make flavour) modules to build, this also applies to integrating submodule building.
+Genstone uses a configurable system of `Makefile` modules to build, this also applies to integrating submodule building.
 
-The base `Makefile` in the project root tries to build the sandbox project be default.
+The base `Makefile` in the project root tries to build the active sandbox project be default (See [Makefile Options] for information on configuring this sandbox project).
 
 Documentation of most user-oriented targets is available through `make help`. This is provided through `###` docstrings in Makefiles. These can be specified in user modules in the following format:
 ```
@@ -24,14 +35,14 @@ target: PREREQUISITES (Will be removed from output) ### @HighlightedThing The re
 
 ### Prerequisites
 
-The codebase will only build with `clang`. You will also need `make` installed in some form.
+The codebase will only build with `clang`, with some modules being broken prior to `clang-13`. This is due to a number of reasons but primarily it allows us to have a consistent idea of what compiler features and extensions are available, and the build interface is consistent. By default we try to use `lld` aswell but you can configure the build not to use it via. `toolchain.mk` in `build/` of the project root. Additionally you will need `autoconf` installed to build the safeclib submodule.
 
-### Building
+### Running the Build
 
 #### Note
-On some versions of macOS, the provided `clang` version does not support some of the features used in `gencalc`. To fix this - install the Homebrew version of `clang` with the features enabled using `brew install llvm` and adding a link to `/usr/local/Cellar/llvm/{VERSION}/bin/clang` in your path (with `ln -sf /usr/local/Cellar/llvm/{VERSION}/bin/clang /usr/local/bin/clang-13` or the like). Homebrew can be gotten from [brew.sh](https://brew.sh).
+On some versions of macOS, the provided `clang` version does not support some of the features used in Genstone. To fix this - install the Homebrew version of `clang` with the features enabled using `brew install llvm` and adding a link to `/usr/local/Cellar/llvm/{VERSION}/bin/clang` in your path (with `ln -sf /usr/local/Cellar/llvm/{VERSION}/bin/clang /usr/local/bin/clang-13` or the like). Then specify the compiler in `toolchain.mk` or use `OVERRIDE_COMPILER` on the command line. Homebrew can be gotten from [brew.sh](https://brew.sh).
 
-The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts. YOU MAY NEED TO RUN TWICE due to the way make processes `$(wildcard)` and `$(shell)` functions.
+The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts.
 
 The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_safeclib_real`.
 
@@ -48,7 +59,7 @@ Variables to influence the way an application or module is built with Genstone.
 ### Makefile Options
 
 #### Note
-These options can be overriden with a variable `OVERRIDE_keyname` in the executing environment. e.g. `OVERRIDE_LINKER=lld.ld make`.
+These options can be overriden with a variable `OVERRIDE_keyname` in the executing environment. e.g. `OVERRIDE_LINKER=gold make`.
 
 Set options for the build process itself (e.g. for cross-compilation) in `build/config.mk` amd `build/toolchain.mk`, the file from which these options are sourced can be changed with `OVERRIDE_CONFIG`. All variables are commented to explain their purpose and possible values. The more commonly used options are toward the top of the files.
 

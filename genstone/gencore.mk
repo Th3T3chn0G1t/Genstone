@@ -39,5 +39,7 @@ $(GEN_CORE_OBJECTS): $(wildcard genstone/gencore/include/*.h)
 $(GEN_CORE_OBJECTS): $(SAFEC_LIB) $(MIMALLOC_LIB)
 
 clean_gencore:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(GEN_CORE_OBJECTS)
 	-rm $(GEN_CORE_LIB)
+	@echo "$(ACTION_SUFFIX)"

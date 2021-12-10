@@ -26,5 +26,7 @@ $(MIMALLOC_LIB): CLANG_FORMAT = DISABLED
 $(MIMALLOC_LIB): $(MIMALLOC_OBJECTS) | lib
 
 clean_mimalloc:
+	@echo "$(ACTION_PREFIX)"
 	-rm $(MIMALLOC_OBJECTS)
 	-rm $(MIMALLOC_LIB)
+	@echo "$(ACTION_SUFFIX)"
