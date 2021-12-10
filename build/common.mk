@@ -227,6 +227,7 @@ CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
 endif
 
 GLOBAL_CONFIGURE_CFLAGS += -Wno-unused-command-line-argument
+GLOBAL_CONFIGURE_FLAGS += CC="$(COMPILER)" CXX="$(COMPILERXX)"
 
 ifneq ($(LINKER),DEFAULT)
 ifeq ($(LINKER),LLD)

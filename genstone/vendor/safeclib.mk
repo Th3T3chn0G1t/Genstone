@@ -19,7 +19,7 @@ $(_SAFEC_LIB_INTERNAL_MAKEFILE):
 	cd genstone/vendor/safeclib && ./configure $(GLOBAL_CONFIGURE_FLAGS) CFLAGS="$(GLOBAL_CONFIGURE_CFLAGS)" LFLAGS="$(GLOBAL_CONFIGURE_LFLAGS)" $(SAFEC_LIB_CONFIGURE_FLAGS)
 
 $(_SAFEC_LIB_INTERNAL): $(_SAFEC_LIB_INTERNAL_MAKEFILE)
-	make -Cgenstone/vendor/safeclib
+	$(MAKE) -Cgenstone/vendor/safeclib
 
 $(SAFEC_LIB): $(_SAFEC_LIB_INTERNAL) | lib
 	cp -r $(_SAFEC_LIB_INTERNAL_PATTERN) lib
@@ -34,4 +34,5 @@ clean_safeclib:
 # (It takes forever)
 clean_safeclib_real: | $(_SAFEC_LIB_INTERNAL_MAKEFILE)
 	$(MAKE) -Cgenstone/vendor/safeclib clean
+	-rm $(_SAFEC_LIB_INTERNAL_MAKEFILE)
 	-rm $(wildcard lib/$(LIB_PREFIX)safec*$(DYNAMIC_LIB_SUFFIX)*)
