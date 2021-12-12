@@ -18,6 +18,8 @@
 
 *.dSYM
 
+*.depfile
+
 *.tmp
 *.log
 

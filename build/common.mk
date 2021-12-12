@@ -208,6 +208,8 @@ GLOBAL_CXX_FLAGS += -std=gnu++17 -Wno-c++98-compat-pedantic -Wno-old-style-cast
 GLOBAL_C_FLAGS += -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=gnu2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
 GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
 
+DEPENDENCY_GEN_FLAGS = -MM -MF$(subst .o,.depfile,$@) 
+
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
 
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=deadcode
@@ -342,6 +344,9 @@ tmp:
 	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
+	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<
+
 	@echo "$(ACTION_PREFIX)genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
 	@genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<
 
@@ -383,6 +388,9 @@ endif
 %$(OBJECT_SUFFIX): %.cpp build/config.mk | tmp
 	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
+
+	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
 
 	@echo "$(ACTION_PREFIX)genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
 	@genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<

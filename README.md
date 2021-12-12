@@ -35,7 +35,7 @@ target: PREREQUISITES (Will be removed from output) ### @HighlightedThing The re
 
 ### Prerequisites
 
-The codebase will only build with `clang`, with some modules being broken prior to `clang-13`. This is due to a number of reasons but primarily it allows us to have a consistent idea of what compiler features and extensions are available, and the build interface is consistent. By default we try to use `lld` aswell but you can configure the build not to use it via. `toolchain.mk` in `build/` of the project root. Additionally you will need `autoconf` installed to build the safeclib submodule.
+The codebase will only build with `clang`, with some modules being broken prior to `clang-13`. This is due to a number of reasons but primarily it allows us to have a consistent idea of what compiler features and extensions are available, and the build interface is consistent. By default we try to use `lld` aswell but you can configure the build not to use it via. `toolchain.mk` in `build/` of the project root.
 
 ### Running the Build
 
@@ -43,8 +43,6 @@ The codebase will only build with `clang`, with some modules being broken prior 
 On some versions of macOS, the provided `clang` version does not support some of the features used in Genstone. To fix this - install the Homebrew version of `clang` with the features enabled using `brew install llvm` and adding a link to `/usr/local/Cellar/llvm/{VERSION}/bin/clang` in your path (with `ln -sf /usr/local/Cellar/llvm/{VERSION}/bin/clang /usr/local/bin/clang-13` or the like). Then specify the compiler in `toolchain.mk` or use `OVERRIDE_COMPILER` on the command line. Homebrew can be gotten from [brew.sh](https://brew.sh).
 
 The default configuration should build a sandbox project, so after a fresh clone just run `make`. (Configuration may be required for adding additional projects). For cleaning the project, `make clean` should remove most artifacts.
-
-The Annex K compat lib (safeclib) takes a *very* long time to build, so a separate clean command is provided `clean_safeclib_real`.
 
 ### Special Targets
 

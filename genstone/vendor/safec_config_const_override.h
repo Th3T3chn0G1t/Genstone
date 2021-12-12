@@ -1,0 +1,19 @@
+#define SIZEOF_SIZE_T 8 
+#define SIZEOF_TIME_T8
+#define HAVE_X86INTRIN_H 1
+#define HAVE_XMMINTRIN_H 1
+
+#define HAVE___BUILTIN_CONSTANT_P 1
+#define HAVE___BUILTIN_CTZ 1
+#define HAVE___BUILTIN_OBJECT_SIZE 1
+
+#define SAFECLIB_HAVE_C99 1
+
+#define SIZEOF_TIME_T 8
+#define SIZEOF_WCHAR_T 4
+
+#define HAVE_WCHAR_H
+
+#define STDC_HEADERS 1
+
+#define TIME_WITH_SYS_TIME 1
