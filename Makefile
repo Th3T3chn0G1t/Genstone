@@ -60,7 +60,14 @@ BUILD_TARGETS = \
 		$(notdir $(subst .mk,,$(SANDBOX_PROJECT_MODULE))) \
 		$(BUILD_POST) \
 		clean_tmpfile \
+		dependency_list \
 	)
+	
+dependency_list: dependency_list.depfile ### @Default generates a list of source header dependencies and outputs it to a file
+
+dependency_list.depfile:
+	@echo "$(ACTION_PREFIX)cat `find . -name "*.depfile"` > dependency_list.depfile$(ACTION_SUFFIX)"
+	@cat `find . -name "*.depfile"` > dependency_list.depfile
 
 all: $(BUILD_TARGETS) ### @Default Builds all modules specified in `config.mk`
 	@echo "$(INFO_PREFIX) All built!"
