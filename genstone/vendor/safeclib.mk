@@ -1,4 +1,4 @@
-SAFEC_CFLAGS = -Igenstone/vendor/safeclib/include
+SAFEC_CFLAGS = -Igenstone/vendor/safec_overrides -Igenstone/vendor/safeclib -Igenstone/vendor/safeclib/include -Igenstone/vendor/safeclib/src
 SAFEC_LFLAGS = -lsafec
 
 SAFEC_LIB = lib/$(LIB_PREFIX)safec$(DYNAMIC_LIB_SUFFIX)
@@ -7,10 +7,8 @@ SAFEC_DISABLED_SOURCES = extwchar/wcsstr.c
 SAFEC_SOURCES = $(filter-out $(addprefix genstone/vendor/safeclib/src/,$(SAFEC_DISABLED_SOURCES)),$(wildcard genstone/vendor/safeclib/src/*.c) $(wildcard genstone/vendor/safeclib/src/extmem/*.c) $(wildcard genstone/vendor/safeclib/src/extstr/*.c) $(wildcard genstone/vendor/safeclib/src/extwchar/*.c) $(wildcard genstone/vendor/safeclib/src/io/*.c) $(wildcard genstone/vendor/safeclib/src/str/*.c) $(wildcard genstone/vendor/safeclib/src/mem/*.c) $(wildcard genstone/vendor/safeclib/src/misc/*.c) $(wildcard genstone/vendor/safeclib/src/os/*.c) $(wildcard genstone/vendor/safeclib/src/wchar/*.c))
 SAFEC_OBJECTS = $(SAFEC_SOURCES:.c=$(OBJECT_SUFFIX))
 
-_SAFEC_CFLAGS = -include string.h -Igenstone/vendor -Igenstone/vendor/safeclib -Igenstone/vendor/safeclib/include -Igenstone/vendor/safeclib/src
+_SAFEC_CFLAGS = -include string.h -Igenstone/vendor/safec_overrides -Igenstone/vendor/safeclib -Igenstone/vendor/safeclib/include -Igenstone/vendor/safeclib/src
 _SAFEC_LFLAGS =
-# SAFEC_LIB_CONFIGURE_FLAGS = --enable-unsafe --disable-doc --enable-warn-dmax --enable-silent-rules
-# SAFEC_LIB_CONFIGURE_FLAGS += --enable-debug-build --enable-debug
 
 build_message_safeclib:
 	@echo "$(SECTION_PREFIX) Safeclib"

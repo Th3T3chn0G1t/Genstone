@@ -3,7 +3,6 @@
 - Add a `PORTING.md` info file or put in `README.md`
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
-- wchar support lib
 - Time-formats
 - generator (editor)
     - Visual build tool
@@ -23,6 +22,6 @@
 - Rendering
     - Windowing
         - DRI3
-        - Window shapes (`--enable-shape`) (https://www.x.org/releases/X11R7.7/doc/xextproto/shape.html)
+        - Window shapes (https://www.x.org/releases/X11R7.7/doc/xextproto/shape.html)
     - Accelerated video decoding
-        - Xv? XvMC? (`--enable-xvmc`) (`--enable-xv`) (https://en.wikipedia.org/wiki/X-Video_Motion_Compensation) (https://www.x.org/releases/current/doc/man/man3/Xv.3.xhtml)
+        - Xv? XvMC? (https://en.wikipedia.org/wiki/X-Video_Motion_Compensation) (https://www.x.org/releases/current/doc/man/man3/Xv.3.xhtml)
