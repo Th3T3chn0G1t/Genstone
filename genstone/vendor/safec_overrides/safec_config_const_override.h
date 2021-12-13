@@ -1,5 +1,20 @@
+#if PLATFORM == DWN
+#define HAVE_TOWUPPER
+#define HAVE_TOWLOWER
+#endif
+
+#ifndef __cplusplus
+#if PLATFORM != DWN
+#define restrict __restrict
+#endif
+#else
+#define restrict __restrict
+#endif
+
+#define HAVE_STDINT_H
+
 #define SIZEOF_SIZE_T 8
-#define SIZEOF_TIME_T8
+#define SIZEOF_TIME_T 8
 #define HAVE_X86INTRIN_H 1
 #define HAVE_XMMINTRIN_H 1
 
@@ -62,8 +77,6 @@ typedef size_t rsize_t;
 #define ESNOTFND (409)
 #define ESLEWRNG (410)
 #define ESLAST ESLEWRNG
-
-#define restrict __restrict
 
 #ifndef EOK
 #define EOK (0)
