@@ -35,7 +35,7 @@ target: PREREQUISITES (Will be removed from output) ### @HighlightedThing The re
 
 ### Prerequisites
 
-The codebase will only build with `clang`, with some modules being broken prior to `clang-13`. This is due to a number of reasons but primarily it allows us to have a consistent idea of what compiler features and extensions are available, and the build interface is consistent. By default we try to use `lld` aswell but you can configure the build not to use it via. `toolchain.mk` in `build/` of the project root.
+The codebase will only build with `clang`, with some modules being broken prior to `clang-13`. This is due to a number of reasons but primarily it allows us to have a consistent idea of what compiler features and extensions are available, and the build interface is consistent. We also now use Polly and OpenMP in release builds both of which should be available from the same place you got `clang`.
 
 ### Running the Build
 

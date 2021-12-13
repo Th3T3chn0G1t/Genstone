@@ -25,13 +25,4 @@ AR = ar
 # The clang-format command line to use
 CLANG_FORMAT = clang-format
 
-# The tool to use for stripping binaries
-# Expected to have a command line interface similar to `llvm-strip`
-# If the target platform's linker should supports stripping, please set this to `LINKER` (the literal word *not* the value of the `LINKER` variable)
-# Stripping is more effective if the linker is responsible for stripping
-STRIP_TOOL = strip
-
-# CMake exec to use for building CMake submodules
-CMAKE = cmake
-
 # CHECKED_CLANG_CURL_TARGET_PATTERN = https://github.com/microsoft/checkedc/releases/download/*.tar.gz

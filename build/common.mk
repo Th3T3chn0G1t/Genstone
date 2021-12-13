@@ -101,14 +101,8 @@ endif
 ifneq ($(OVERRIDE_STRIP_BINARIES),)
 STRIP_BINARIES = $(OVERRIDE_STRIP_BINARIES)
 endif
-ifneq ($(OVERIDE_STRIP_TOOL),)
-STRIP_TOOL = $(OVERIDE_STRIP_TOOL)
-endif
 ifneq ($(OVERRIDE_DISABLED_MODULES),)
 DISABLED_MODULES = $(OVERRIDE_DISABLED_MODULES)
-endif
-ifneq ($(OVERRIDE_CMAKE),)
-CMAKE = $(OVERRIDE_CMAKE)
 endif
 
 ifneq ($(PLATFORM),DEFAULT)
@@ -204,9 +198,15 @@ else
 endif
 
 CXX_UNSUPPORTED_CFLAGS += -std=gnu2x
-GLOBAL_CXX_FLAGS += -std=gnu++17 -Wno-c++98-compat-pedantic -Wno-old-style-cast
+GLOBAL_CXX_FLAGS += -std=gnu++17 -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-register
 GLOBAL_C_FLAGS += -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=gnu2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
-GLOBAL_CMAKE_MODULE_FLAGS = -G "Unix Makefiles"
+
+ifeq ($(STRIP_BINARIES),ENABLED)
+GLOBAL_L_FLAGS += -Wl,-s
+endif
+ifeq ($(STRIP_BINARIES),DEBUG)
+GLOBAL_L_FLAGS += -Wl,-S
+endif
 
 DEPENDENCY_GEN_FLAGS = -MM -MF$(subst .o,.depfile,$@) 
 
@@ -226,28 +226,6 @@ CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
 ifeq ($(PLATFORM),DWN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.osx
-endif
-
-GLOBAL_CONFIGURE_CFLAGS += -Wno-deprecated-declarations -Wno-unused-command-line-argument
-GLOBAL_CONFIGURE_FLAGS += CC="$(COMPILER)" CXX="$(COMPILERXX)"
-
-ifneq ($(LINKER),DEFAULT)
-ifeq ($(LINKER),LLD)
-GLOBAL_CONFIGURE_CFLAGS += -fuse-ld=lld
-ifeq ($(BUILD_MODE),RELEASE)
-GLOBAL_CONFIGURE_CFLAGS += -flto
-GLOBAL_CONFIGURE_LFLAGS += -flto
-endif
-ifeq ($(PLATFORM),LNX)
-GLOBAL_CONFIGURE_FLAGS += LD=ld.lld
-else
-ifeq ($(PLATFORM),DWN)
-GLOBAL_CONFIGURE_FLAGS += LD=ld64
-endif
-endif
-else
-GLOBAL_CONFIGURE_FLAGS += LD=$(LINKER)
-endif
 endif
 
 ifeq ($(BUILD_SYS_DEBUG),ENABLED)
@@ -288,9 +266,8 @@ ifeq ($(PLATFORM),DWN)
 endif
 
 ifeq ($(BUILD_MODE),RELEASE)
-	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -DNDEBUG -flto
-	GLOBAL_L_FLAGS += -flto
-	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Release
+	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -DNDEBUG -flto -fopenmp -mllvm -polly -mllvm -polly-parallel -mllvm -polly-omp-backend=LLVM
+	GLOBAL_L_FLAGS += -flto -fopenmp
 
 	ifeq ($(PLATFORM),LNX)
 		GLOBAL_L_FLAGS += -Wl,-O1
@@ -302,7 +279,6 @@ ifeq ($(BUILD_MODE),RELEASE)
 else
 	GLOBAL_C_FLAGS += -m64 -glldb -O0 -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
 	GLOBAL_L_FLAGS += -fno-lto
-	GLOBAL_CMAKE_MODULE_FLAGS += -DCMAKE_BUILD_TYPE=Debug
 
 	ifeq ($(PLATFORM),DWN)
 		GLOBAL_L_FLAGS += -Wl,-random_uuid,-warn_stabs,-warn_commons
@@ -366,25 +342,6 @@ else
 	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 
-ifeq ($(STRIP_BINARIES),ENABLED)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-s -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -x -D -o $@ $@
-endif
-endif
-ifeq ($(STRIP_BINARIES),DEBUG)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-S -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -S -D -o $@ $@
-endif
-endif
-
 %$(OBJECT_SUFFIX): %.cpp build/config.mk | tmp
 	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
@@ -415,68 +372,10 @@ endif
 	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(STATIC_LIB_TOOL)
 
-ifeq ($(STRIP_BINARIES),ENABLED)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-s -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -x -D -o $@ $@
-endif
-endif
-ifeq ($(STRIP_BINARIES),DEBUG)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-S -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -S -D -o $@ $@
-endif
-endif
-
-
 %$(DYNAMIC_LIB_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(DYNAMIC_LIB_TOOL)
 
-ifeq ($(STRIP_BINARIES),ENABLED)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-s -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -x -D -o $@ $@
-endif
-endif
-ifeq ($(STRIP_BINARIES),DEBUG)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-S -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -S -D -o $@ $@
-endif
-endif
-
 %$(EXECUTABLE_SUFFIX):
 	@echo "$(ACTION_PREFIX)$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)$(ACTION_SUFFIX)"
 	@$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)
-
-ifeq ($(STRIP_BINARIES),ENABLED)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-s -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-s -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -x -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -x -D -o $@ $@
-endif
-endif
-ifeq ($(STRIP_BINARIES),DEBUG)
-ifeq ($(STRIP_TOOL),LINKER)
-	@echo "$(ACTION_PREFIX)$(CLINKER) -Wl,-S -o $@ $@$(ACTION_SUFFIX)"
-	@$(CLINKER) -Wl,-S -o $@ $@
-else
-	@echo "$(ACTION_PREFIX)$(STRIP_TOOL) -S -D -o $@ $@$(ACTION_SUFFIX)"
-	@$(STRIP_TOOL) -S -D -o $@ $@
-endif
-endif
