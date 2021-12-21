@@ -1,0 +1,18 @@
+#define number 4
+
+external routine number+ static<number> align<number> a, static<number> align<number> b, static<number> align<number> out;
+external routine number- static<number> align<number> a, static<number> align<number> b, static<number> align<number> out;
+external routine number* static<number> align<number> a, static<number> align<number> b, static<number> align<number> out;
+external routine number/ static<number> align<number> a, static<number> align<number> b, static<number> align<number> out;
+
+external routine number= static<number> align<number> a, static<number> align<number> b;
+
+external routine number+= static<number> align<number> a, static<number> align<number> b;
+external routine number-= static<number> align<number> a, static<number> align<number> b;
+external routine number*= static<number> align<number> a, static<number> align<number> b;
+external routine number/= static<number> align<number> a, static<number> align<number> b;
+
+external routine number++ static<number> align<number> a, static<number> align<number> out;
+external routine ++number static<number> align<number> a, static<number> align<number> out;
+external routine number-- static<number> align<number> a, static<number> align<number> out;
+external routine --number static<number> align<number> a, static<number> align<number> out;

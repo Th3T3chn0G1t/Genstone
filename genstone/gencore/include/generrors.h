@@ -230,6 +230,25 @@ extern void* gen_error_handler_passthrough;
 
 /**
  * Horrible macro string manipulation to get some nice output on your errno.
+ * Pretty assertion for errno == EOK.
+ * @param[in] proc the function which set errno.
+ * @param[in] native_errno the errno value.
+ */
+#define GEN_REQUIRE_NO_ERRNO(proc, native_errno) \
+    do { \
+        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(native_errno); \
+        const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
+        const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(native_errno); \
+        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len + 1; \
+        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
+        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
+        strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) - 1, gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), native_errno); \
+        GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
+        GEN_REQUIRE_EQUAL(GEN_OK, gen_internal_error_out_native_errno_gen_error); \
+    } while(0)
+
+/**
+ * Horrible macro string manipulation to get some nice output on your errno.
  * @param[in] proc the function which set errno.
  * @param[in] native_errno the errno value.
  */

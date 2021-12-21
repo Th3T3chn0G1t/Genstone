@@ -582,8 +582,10 @@ void editor_show_about_prompt(void) {
 
 	GtkBuilder* builder = gtk_builder_new();
 	GError* error = NULL;
-	if(!gtk_builder_add_from_file(builder, "sandbox/glean/res/interface/about.glade", &error))
+	if(!gtk_builder_add_from_file(builder, "sandbox/glean/res/interface/about.glade", &error)) {
 		glogf(FATAL, "Failed to load UI from file: %s", error->message);
+		GEN_REQUIRE_NO_REACH;
+	}
 	glean_signal_connect(gtk_builder_get_object(builder, "about_diag"), "response", G_CALLBACK(gtk_widget_destroy), NULL);
 	g_object_unref(builder);
 }
@@ -730,7 +732,10 @@ void editor_tab_close(editor_tab_T* tab) {
 		file_remove_inotify_handle(tab->wd);
 
 	size_t tab_index = editor_tab_find(tab);
-	if(tab_index == SIZE_MAX) glogf(FATAL, "Failed to find tab %s for closure", tab->name);
+	if(tab_index == SIZE_MAX) {
+		glogf(FATAL, "Failed to find tab %s for closure", tab->name);
+		GEN_REQUIRE_NO_REACH;
+	}
 
 	// Free the tab from the state
 	for(size_t i = 0; i < tab->undo_stack->n_members; i++) {

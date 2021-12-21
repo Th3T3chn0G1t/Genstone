@@ -109,7 +109,7 @@
         if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` is not constant at line %i in %s", #a, __LINE__, __FILE__); \
         if(a != b) { \
             glogf(FATAL, GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __LINE__, __FILE__); \
-            abort(); \
+        	GEN_REQUIRE_NO_REACH; \
         } \
     } while(0)
 
@@ -124,7 +124,7 @@
         if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` (%s) is not constant at line %i in %s", #a, a, __LINE__, __FILE__); \
         if(!b || strcmp(a, b)) { \
             glogf(FATAL, "Require failed - Expected: `%s` (%s) Got: `%s` (%s) at line %i in %s", #a, a, #b, b, __LINE__, __FILE__); \
-            abort(); \
+        	GEN_REQUIRE_NO_REACH; \
         } \
     } while(0)
 
@@ -138,14 +138,18 @@
     do { \
         if((!b && s) || memcmp(a, b, s)) { \
             glogf(FATAL, "Require failed - Expected: `%s` (%p) (%c%c%c...) Got: `%s` (%p) (%c%c%c...) at line %i in %s", #a, a, ((char* const restrict) a)[0], ((char* const restrict) a)[1], ((char* const restrict) a)[2], #b, b, ((char* const restrict) b)[0], ((char* const restrict) b)[1], ((char* const restrict) b)[2], __LINE__, __FILE__); \
-            abort(); \
+        	GEN_REQUIRE_NO_REACH; \
         } \
     } while(0)
 
 /**
  * Pretty assertion for bad control paths.
  */
-#define GEN_REQUIRE_NO_REACH glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s", __LINE__, __FILE__)
+#define GEN_REQUIRE_NO_REACH \
+    do { \
+        glogf(FATAL, "Require failed - Invalid control path reached at line %i in %s", __LINE__, __FILE__); \
+        abort(); \
+    } while(0)
 
 /**
  * Pretty assertion for `result == GEN_OK`.
@@ -154,7 +158,7 @@
     do { \
         if(result != GEN_OK) { \
             glogf(FATAL, "Require failed - Got error: `%s` (%s) at line %i in %s", gen_error_name(result), gen_error_description(result), __LINE__, __FILE__); \
-            abort(); \
+            GEN_REQUIRE_NO_REACH; \
         } \
     } while(0)
 
@@ -167,7 +171,7 @@
     do { \
         if(!a) { \
             glogf(FATAL, "Require failed - %s was NULL at line %i in %s", #a, __LINE__, __FILE__); \
-            abort(); \
+            GEN_REQUIRE_NO_REACH; \
         } \
     } while(0)
 

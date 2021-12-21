@@ -131,8 +131,10 @@ int main(int argc, char* argv[], char* envp[]) {
 		glog(ERROR, "Unable to get time with `clock()` for some reason");
 
 	GError* error = NULL;
-	if(!gtk_init_with_args(&argc, &argv, "Nothing yet", NULL, NULL, &error))
+	if(!gtk_init_with_args(&argc, &argv, "Nothing yet", NULL, NULL, &error)) {
 		glogf(FATAL, "Failed to initialize GTK: %s", error->message);
+		GEN_REQUIRE_NO_REACH;
+	}
 
 	// Load the configs!
 	config_init();
@@ -140,8 +142,10 @@ int main(int argc, char* argv[], char* envp[]) {
 	GtkBuilder* builder = gtk_builder_new();
 
 	error = NULL;
-	if(!gtk_builder_add_from_file(builder, "sandbox/glean/res/interface/eui.glade", &error))
+	if(!gtk_builder_add_from_file(builder, "sandbox/glean/res/interface/eui.glade", &error)) {
 		glogf(FATAL, "Failed to load UI from file: %s", error->message);
+		GEN_REQUIRE_NO_REACH;
+	}
 
 	// Make GTK exit on main window closure
 	glean_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "window")), "destroy", G_CALLBACK(shutdown), NULL);

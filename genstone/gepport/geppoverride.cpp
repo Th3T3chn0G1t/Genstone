@@ -9,20 +9,29 @@ GEN_DIAG_REGION_END
 #define GEN_INTERNAL_OPERATOR_DELETE_GLOBAL_OVERLOAD_BODY \
 	do { \
 		gen_error_t error = gfree(ptr); \
-		if(error) glogf(FATAL, "`delete` failed on pointer %p - %s: %s", ptr, gen_error_name(error), gen_error_description(error)); \
+		if(error) { \
+			glogf(FATAL, "`delete` failed on pointer %p - %s: %s", ptr, gen_error_name(error), gen_error_description(error)); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
 	} while(0)
 #define GEN_INTERNAL_OPERATOR_NEW_GLOBAL_OVERLOAD_BODY \
 	do { \
 		void* outp = NULL; \
 		gen_error_t error = gzalloc(&outp, size, sizeof(char)); \
-		if(error) glogf(FATAL, "`new` failed on size %zu - %s: %s", size, gen_error_name(error), gen_error_description(error)); \
+		if(error) { \
+			glogf(FATAL, "`new` failed on size %zu - %s: %s", size, gen_error_name(error), gen_error_description(error)); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
 		return outp; \
 	} while(0)
 #define GEN_INTERNAL_ALIGNED_OPERATOR_NEW_GLOBAL_OVERLOAD_BODY \
 	do { \
 		void* outp = NULL; \
 		gen_error_t error = gzalloc_aligned(&outp, size, sizeof(char), alignment); \
-		if(error) glogf(FATAL, "`new` failed on size %zu - %s: %s", size, gen_error_name(error), gen_error_description(error)); \
+		if(error) { \
+			glogf(FATAL, "`new` failed on size %zu - %s: %s", size, gen_error_name(error), gen_error_description(error)); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
 		return outp; \
 	} while(0)
 

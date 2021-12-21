@@ -1,0 +1,1 @@
+external routine dynamic= static<dynamic> align<dynamic> a, static<dynamic> align<dynamic> b;

@@ -62,8 +62,8 @@ typedef size_t rsize_t;
 #define RSIZE_MAX (~(rsize_t) 0)
 
 #define __attribute_format__(type, index, check) __attribute__((format(type, index, check)))
-#define __attribute_format_wprintf(index, check) __attribute__((format(__wprintf__, index, check)))
-#define __attribute_format_wscanf(index, check) __attribute__((format(__wscanf__, index, check)))
+#define __attribute_format_wprintf(index, check)
+#define __attribute_format_wscanf(index, check)
 
 #define ESNULLP (400)
 #define ESZEROL (401)

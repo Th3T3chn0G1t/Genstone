@@ -23,6 +23,7 @@ static void gen_internal_annexk_constraint_callback(const char* restrict msg, __
 #if GEN_GLOGGIFY_EH == ENABLED
 #if GEN_FATAL_ANNEXK_CONSTRAINTS == ENABLED
 	glogf(FATAL, "Annex K constraint handler was tripped: %s: %s" GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) "\nReason:" GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR) " %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
+	GEN_REQUIRE_NO_REACH;
 #else
 	glogf(ERROR, "Annex K constraint handler was tripped: %s: %s" GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) "\nReason:" GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR) " %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
 #endif
