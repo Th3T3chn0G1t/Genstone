@@ -1,4 +1,5 @@
-GEN_PORT_CFLAGS = -Igenstone/gepport/include $(GEN_CORE_CFLAGS)
+_GEN_PORT_CFLAGS = -Wno-c11-extensions
+GEN_PORT_CFLAGS = -Igenstone/gepport/include $(GEN_CORE_CFLAGS) $(_GEN_PORT_CFLAGS)
 GEN_PORT_LFLAGS = -lgepport $(GEN_CORE_LFLAGS)
 
 GEN_PORT_SOURCES = $(wildcard genstone/gepport/*.cpp)
@@ -12,7 +13,7 @@ build_message_gepport:
 
 gepport: build_message_gepport $(GEN_PORT_LIB) ### @Genstone Builds Genstone user-interface utilities
 
-$(GEN_PORT_LIB): CFLAGS = $(GEN_CORE_CFLAGS)
+$(GEN_PORT_LIB): CFLAGS = $(GEN_CORE_CFLAGS) $(_GEN_PORT_CFLAGS)
 $(GEN_PORT_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
 $(GEN_PORT_LIB): $(GEN_PORT_OBJECTS) $(GEN_CORE_LIB) | lib
 

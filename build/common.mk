@@ -197,7 +197,11 @@ else
 	endif
 endif
 
+ifeq ($(PLATFORM),DWN)
+ECHO = echo
+else
 ECHO = echo -e
+endif
 
 CXX_UNSUPPORTED_CFLAGS += -std=gnu2x
 GLOBAL_CXX_FLAGS += -std=gnu++17

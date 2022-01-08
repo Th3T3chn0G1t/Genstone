@@ -11,6 +11,8 @@
 
 #if PLATFORM != DWN
 #define restrict __restrict
+#else
+#define restrict
 #endif
 
 extern "C" {
