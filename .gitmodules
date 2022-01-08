@@ -1,7 +1,3 @@
-[submodule "genstone/vendor/safeclib"]
-	path = genstone/vendor/safeclib
-	url = https://github.com/rurban/safeclib
-	ignore = untracked
 [submodule "genstone/vendor/mimalloc"]
 	path = genstone/vendor/mimalloc
 	url = https://github.com/microsoft/mimalloc
