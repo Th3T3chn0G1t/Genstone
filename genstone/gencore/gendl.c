@@ -5,15 +5,8 @@
 
 #include "include/gencommon.h"
 #include "include/genfs.h"
+#include "include/genstring.h"
 #include "include/gentooling.h"
-
-#ifndef GEN_PRESUMED_SYMBOL_MAX_LEN
-/**
- * Presumed maximum length of a symbol to be imported from a dynamic library
- * @note Default is taken from Annex B minimum symbol name reccommendations
- */
-#define GEN_PRESUMED_SYMBOL_MAX_LEN 1024
-#endif
 
 gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char* const restrict lib_name) {
 	GEN_FRAME_BEGIN(gen_dylib_load);
@@ -24,7 +17,9 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_dylib);
 	if(!lib_name) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`lib_name` was invalid");
 
-	const size_t lib_name_len = strnlen_s(lib_name, GEN_PATH_MAX);
+	size_t lib_name_len = 0;
+	gen_error_t error = gen_string_length(lib_name, GEN_PATH_MAX + 1, &lib_name_len);
+	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 #if PLATFORM == DWN
 	static const char lib_prefix[] = "lib";
@@ -36,14 +31,14 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 
 	const size_t lib_file_name_len = (sizeof(lib_prefix) - 1) + lib_name_len + (sizeof(lib_suffix) - 1) + 1;
 	char lib_file_name[lib_file_name_len];
+	memset(lib_file_name, 0, lib_file_name_len);
 
-	memcpy_s(lib_file_name, lib_file_name_len, lib_prefix, (sizeof(lib_prefix) - 1));
-	GEN_ERROR_OUT_IF_ERRNO(memcpy_s, errno);
-	memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1), lib_file_name_len - (sizeof(lib_prefix) - 1), lib_name, lib_name_len);
-	GEN_ERROR_OUT_IF_ERRNO(memcpy_s, errno);
-	memcpy_s(lib_file_name + (sizeof(lib_prefix) - 1) + lib_name_len, lib_file_name_len - ((sizeof(lib_prefix) - 1) + lib_name_len), lib_suffix, (sizeof(lib_suffix) - 1));
-	GEN_ERROR_OUT_IF_ERRNO(memcpy_s, errno);
-	lib_file_name[lib_file_name_len - 1] = '\0';
+	error = gen_string_append(lib_file_name, lib_file_name_len, lib_prefix, sizeof(lib_prefix), sizeof(lib_prefix) - 1);
+	GEN_ERROR_OUT_IF(error, "`gen_string_append` failed");
+	error = gen_string_append(lib_file_name, lib_file_name_len, lib_name, lib_name_len + 1, lib_name_len);
+	GEN_ERROR_OUT_IF(error, "`gen_string_append` failed");
+	error = gen_string_append(lib_file_name, lib_file_name_len, lib_suffix, sizeof(lib_suffix), sizeof(lib_suffix) - 1);
+	GEN_ERROR_OUT_IF(error, "`gen_string_append` failed");
 
 	if(!(*output_dylib = dlopen(lib_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
 #if GEN_GLOGGIFY_EH == ENABLED
@@ -56,10 +51,11 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 }
 
 gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
+	GEN_FRAME_BEGIN(gen_dylib_symbol);
+
 	GEN_INTERNAL_BASIC_PARAM_CHECK(output_address);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(dylib);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(symname);
-	if(!strnlen_s(symname, GEN_PRESUMED_SYMBOL_MAX_LEN)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`symname` was invalid (`len(symname)` < 0)");
 
 	if(!(*output_address = dlsym(dylib, symname))) {
 #if GEN_GLOGGIFY_EH == ENABLED

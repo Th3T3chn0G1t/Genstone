@@ -109,42 +109,18 @@ typedef struct {
 
 /**
  * Gets the canonical representation of a path.
- * @param[out] output_path storage for the output path. Should be `GEN_PATH_MAX` in size if length is unknown.
+ * @param[out] output_path storage for the output path. Should be `GEN_PATH_MAX + 1` in size if length is unknown.
  * @param[in] path the path to get a canonical representation for.
  * @return an error code.
  */
 GEN_ERRORABLE gen_path_canonical(char* restrict output_path, const char* const restrict path);
 
 /**
- * Gets the filename of a path.
- * @param[out] output_filename storage for the output filename. Should be `GEN_PATH_MAX` in size if length is unknown.
- * @param[in] path the path to get a filename from.
- * @return an error code.
- */
-GEN_ERRORABLE gen_path_filename(char* restrict output_filename, const char* const restrict path);
-
-/**
- * Gets the pathname of a path.
- * @param[out] output_path storage for the output path. Should be `GEN_PATH_MAX` in size if length is unknown.
- * @param[in] path the path to get a pathname from.
- * @return an error code.
- */
-GEN_ERRORABLE gen_path_pathname(char* restrict output_path, const char* const restrict path);
-
-/**
- * Gets the file extension of a path.
- * @param[out] output_extension storage for the output extension, Should be `GEN_PATH_MAX` in size if length is unknown.
- * @param[in] path the path to get an extension from.
- * @return an error code.
- */
-GEN_ERRORABLE gen_path_extension(char* restrict output_extension, const char* const restrict path);
-
-/**
  * Returns whether a filesystem object exists at a path.
  * @param[in] path the path to check.
  * @return whether an object exists at path.
  */
-extern __nodiscard bool gen_path_exists(const char* const restrict path);
+GEN_ERRORABLE gen_path_exists(const char* const restrict path, bool* const restrict out_exists);
 
 /**
  * Checks whether a path is valid.
@@ -217,16 +193,6 @@ GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesys
  * @return an error code.
  */
 GEN_ERRORABLE gen_handle_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
-
-/**
- * Reads all available data from a filesystem object handle without attempting to seek.
- * This is intended to be used for reading redirected output from a subprocess from pipes created with "gen_handle_create_proc_redirect_target".
- * @param[in] handle the handle to read from.
- * @param[out] out_output pointer to storage for a pointer to read data.
- * @return an error code.
- * @note `out_output` will be assigned a heap pointer which will need to be `gfree`'d. 
- */
-GEN_ERRORABLE gen_handle_read_all_available(const gen_filesystem_handle_t* const restrict handle, char* restrict* const restrict out_output);
 
 /**
  * Writes to a file.

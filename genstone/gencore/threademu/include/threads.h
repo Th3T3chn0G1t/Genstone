@@ -8,6 +8,8 @@
 
 #include <pthread.h>
 
+#define thread_local _Thread_local
+
 typedef pthread_cond_t cnd_t;
 typedef pthread_t thrd_t;
 typedef pthread_key_t tss_t;

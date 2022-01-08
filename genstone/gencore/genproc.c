@@ -3,28 +3,6 @@
 
 #include "include/genproc.h"
 
-gen_error_t gen_handle_create_proc_redirect_target(gen_filesystem_handle_t* restrict output_handle_read, gen_filesystem_handle_t* restrict output_handle_write) {
-	GEN_FRAME_BEGIN(gen_handle_create_proc_redirect_target);
-
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle_read);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle_write);
-
-	int pipedes[2];
-	pipe(pipedes);
-	GEN_ERROR_OUT_IF_ERRNO(pipe, errno);
-
-	fcntl(pipedes[0], F_SETFL, O_RDONLY | O_NONBLOCK);
-	GEN_ERROR_OUT_IF_ERRNO(fcntl, errno);
-
-	output_handle_read->file_handle = pipedes[0];
-	output_handle_read->is_directory = false;
-
-	output_handle_write->file_handle = pipedes[1];
-	output_handle_write->is_directory = false;
-
-	GEN_ALL_OK;
-}
-
 gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect) {
 	GEN_FRAME_BEGIN(gen_proc_create_redirected_to);
 

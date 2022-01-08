@@ -9,6 +9,10 @@
 #ifndef GEN_PORT_H
 #define GEN_PORT_H
 
+#if PLATFORM != DWN
+#define restrict __restrict
+#endif
+
 extern "C" {
     #include "gendiag.h"
 

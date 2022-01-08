@@ -159,24 +159,6 @@ typedef enum {
  */
 #define GEN_LOGGER_FATAL_PREFIX GEN_ANSI_COLOR_DARK(GEN_ANSI_PURPLE) GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Fatal: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
 
-#ifndef GEN_GLOG_STREAM_COUNT
-/**
- * The number of output/error streams available to `glog`.
- */
-#define GEN_GLOG_STREAM_COUNT 8
-#endif
-
-/**
- * `glog` output streams.
- * @note Buffer is null terminated for simplicity.
- */
-extern FILE* gen_glog_out_streams[GEN_GLOG_STREAM_COUNT + 1];
-/**
- * glog error streams.
- * @note Buffer is null terminated for simplicity.
- */
-extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
-
 /**
  * @example{lineno} example/gencore/glog.c
  * Example for how to use `glog` and `glogf`.
@@ -194,12 +176,8 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
     do { \
         GEN_DIAG_REGION_BEGIN \
         pragma("clang diagnostic ignored \"-Wshadow\"") \
-        bool gen_internal_glog_level_is_error = level >= ERROR; \
-        GEN_FOREACH(gen_internal_glog_streams_iterator_index, gen_internal_glog_streams_iterator_value, GEN_GLOG_STREAM_COUNT, gen_internal_glog_level_is_error ? gen_glog_err_streams : gen_glog_out_streams) { \
-            if(!gen_internal_glog_streams_iterator_value) break; \
-            fprintf_s(gen_internal_glog_streams_iterator_value, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
-        } \
-        if(gen_internal_glog_level_is_error) gtrace; \
+        fprintf(level >= ERROR ? stderr : stdout, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
+        if(level >= ERROR) gtrace; \
         GEN_DIAG_REGION_END \
     } while(0)
 
@@ -215,15 +193,10 @@ extern FILE* gen_glog_err_streams[GEN_GLOG_STREAM_COUNT + 1];
     do { \
         GEN_DIAG_REGION_BEGIN \
         pragma("clang diagnostic ignored \"-Wshadow\"") \
-        bool gen_internal_glog_level_is_error = level >= ERROR; \
-        GEN_FOREACH(gen_internal_glog_streams_iterator_index, gen_internal_glog_streams_iterator_value, GEN_GLOG_STREAM_COUNT, gen_internal_glog_level_is_error ? gen_glog_err_streams : gen_glog_out_streams) { \
-            if(!gen_internal_glog_streams_iterator_value) break; \
-            fputs(GEN_LOGGER_##level##_PREFIX, gen_internal_glog_streams_iterator_value); \
-            fprintf_s(gen_internal_glog_streams_iterator_value, format, __VA_ARGS__); \
-            fputc('\n', gen_internal_glog_streams_iterator_value); \
-        } \
-        if(gen_internal_glog_level_is_error) gtrace; \
-        if(level >= FATAL) abort(); \
+        fputs(GEN_LOGGER_##level##_PREFIX, level >= ERROR ? stderr : stdout); \
+        fprintf(level >= ERROR ? stderr : stdout, format, __VA_ARGS__); \
+        fputc('\n', level >= ERROR ? stderr : stdout); \
+        if(level >= ERROR) gtrace; \
         GEN_DIAG_REGION_END \
     } while(0)
 

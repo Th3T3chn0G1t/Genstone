@@ -51,13 +51,6 @@ GEN_ERRORABLE gzalloc_aligned(void* restrict* const restrict out_address, const 
  */
 GEN_ERRORABLE grealloc(void* restrict* const restrict out_address, const size_t size, const size_t count);
 /**
- * Duplicates a string onto the heap.
- * @param[out] out_address pointer to storage for a pointer into the allocated heap block.
- * @param[in] str the string to duplicate.
- * @param[in] max the maximum number of characters to duplicate.
- */
-GEN_ERRORABLE gstrndup(char* restrict* const restrict out_address, const char* const restrict str, const size_t max);
-/**
  * Frees a block of heap memory.
  * @param[in] address the heap pointer to free.
  * @note Contents of the block become undefined after freeing.

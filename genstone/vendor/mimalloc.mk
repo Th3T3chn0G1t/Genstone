@@ -15,8 +15,8 @@ MIMALLOC_LIB = lib/$(LIB_PREFIX)mimalloc$(DYNAMIC_LIB_SUFFIX)
 _MIMALLOC_CFLAGS = -include stdbool.h -ftls-model=local-dynamic -Igenstone/vendor/mimalloc/include $(MIMALLOC_DEFINES)
 
 build_message_mimalloc:
-	@echo "$(SECTION_PREFIX) Mimalloc"
-	@echo "$(INFO_PREFIX) The gods of Microsoft hath bestowed their memory magic on us"
+	@$(ECHO) "$(SECTION_PREFIX) Mimalloc"
+	@$(ECHO) "$(INFO_PREFIX) The gods of Microsoft hath bestowed their memory magic on us"
 
 mimalloc: build_message_mimalloc $(MIMALLOC_LIB) ### @Vendor builds Microsoft `mimalloc` as a Genstone module
 
@@ -26,7 +26,7 @@ $(MIMALLOC_LIB): CLANG_FORMAT = DISABLED
 $(MIMALLOC_LIB): $(MIMALLOC_OBJECTS) | lib
 
 clean_mimalloc:
-	@echo "$(ACTION_PREFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)"
 	-rm $(MIMALLOC_OBJECTS)
 	-rm $(MIMALLOC_LIB)
-	@echo "$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_SUFFIX)"

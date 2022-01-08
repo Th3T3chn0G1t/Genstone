@@ -1,5 +1,25 @@
 # TODO
 
+- Fix `-DDEBUG` and `DEBUG` enumeration conflict
+- Make `gen_filesystem_handle_t` internal storage for filesystem event notify backend-specific
+- Recentralize opts into gendbg or decentralize them completely
+- Memory equivalent to `genstring`
+    - `memset`
+    - `memcpy`
+    - Replace `mem*` family in Genstone with in-house wrappers
+        - Replace `genstring`'s naive implementations with in-house wrappers of efficient impls
+- Format headers
+- Redo examples
+    - Build examples
+- Lock `genfs` objects on write
+- Sinks impl for `glog`
+- Remove instances of VLAs
+    - Remove `-Wno-vla`
+- Replace shell mode for `genproc` with proper parameter arrays
+- Nice dynamic RAMDisk for `genfs`
+    - `memfd_create`
+    - macOS RAMDisk mount at startup
+    - Fix `genproc` tests
 - Add a `PORTING.md` info file or put in `README.md`
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
@@ -19,9 +39,11 @@
     - Secure-rand
 - Integrate a physics system
     - Rework to use matrix intrins instead of whatever it uses internally
+- Modify tests for fuzzing with https://github.com/AFLplusplus/AFLplusplus/blob/stable/instrumentation/README.persistent_mode.md
 - Rendering
     - Windowing
         - DRI3
         - Window shapes (https://www.x.org/releases/X11R7.7/doc/xextproto/shape.html)
     - Accelerated video decoding
         - Xv? XvMC? (https://en.wikipedia.org/wiki/X-Video_Motion_Compensation) (https://www.x.org/releases/current/doc/man/man3/Xv.3.xhtml)
+    - Finish Vulkan fetcher script

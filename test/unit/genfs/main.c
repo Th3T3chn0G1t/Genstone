@@ -16,31 +16,10 @@ int main(void) {
 	// We can't really check that this is correct in-language
 	// We just need to trust the OS implementation of `realpath` or equiv.
 	glog(INFO, "Testing gen_path_canonical()...");
-	char canonical[GEN_PATH_MAX];
+	char canonical[GEN_PATH_MAX + 1] = {0};
 	error = gen_path_canonical(canonical, ".");
 
 	GEN_REQUIRE_NO_ERROR(error);
-
-	glog(INFO, "Testing gen_path_filename()...");
-	char filename[GEN_PATH_MAX];
-	error = gen_path_filename(filename, "foo/bar/fizz.txt");
-
-	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL_STRING("fizz.txt", filename);
-
-	glog(INFO, "Testing gen_path_pathname()...");
-	char pathname[GEN_PATH_MAX];
-	error = gen_path_pathname(pathname, "foo/bar/fizz.txt");
-
-	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL_STRING("foo/bar", pathname);
-
-	glog(INFO, "Testing gen_path_extension()...");
-	char extension[GEN_PATH_MAX];
-	error = gen_path_extension(extension, "foo/bar/fizz.txt");
-
-	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL_STRING(".txt", extension);
 
 	glog(INFO, "Testing gen_path_validate()...");
 
@@ -48,13 +27,19 @@ int main(void) {
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_path_exists()...");
-	GEN_REQUIRE_EQUAL(true, gen_path_exists("."));
+	bool exists = false;
+	error = gen_path_exists(".", &exists);
+	GEN_REQUIRE_NO_ERROR(error);
+	GEN_REQUIRE_EQUAL(true, exists);
 
 	glog(INFO, "Testing gen_path_create_file()...");
 	error = gen_path_create_file("./testfile");
 
 	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL(true, gen_path_exists("./testfile"));
+	exists = false;
+	error = gen_path_exists("./testfile", &exists);
+	GEN_REQUIRE_NO_ERROR(error);
+	GEN_REQUIRE_EQUAL(true, exists);
 
 	glog(INFO, "Testing gen_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
@@ -87,7 +72,10 @@ int main(void) {
 	error = gen_path_create_dir("./testdir");
 
 	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL(true, gen_path_exists("./testdir"));
+	exists = false;
+	error = gen_path_exists("./testdir", &exists);
+	GEN_REQUIRE_NO_ERROR(error);
+	GEN_REQUIRE_EQUAL(true, exists);
 
 	glog(INFO, "Testing gen_handle_open() (directory)...");
 	gen_filesystem_handle_t dir_handle;
@@ -117,11 +105,17 @@ int main(void) {
 	error = gen_path_delete("./testfile");
 
 	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL(false, gen_path_exists("./testfile"));
+	exists = false;
+	error = gen_path_exists("./testfile", &exists);
+	GEN_REQUIRE_NO_ERROR(error);
+	GEN_REQUIRE_EQUAL(false, exists);
 
 	glog(INFO, "Testing gen_path_delete() (directory)...");
 	error = gen_path_delete("./testdir");
 
 	GEN_REQUIRE_NO_ERROR(error);
-	GEN_REQUIRE_EQUAL(false, gen_path_exists("./testdir"));
+	exists = false;
+	error = gen_path_exists("./testdir", &exists);
+	GEN_REQUIRE_NO_ERROR(error);
+	GEN_REQUIRE_EQUAL(false, exists);
 }

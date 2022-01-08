@@ -28,13 +28,13 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 	const struct lconv *const restrict locale_info = localeconv();
 
 	const int size_r = snprintf(NULL, 0, GEN_INTERNAL_CURRENCY_FORMAT, locale_info->currency_symbol, units, locale_info->decimal_point, cents);
-	GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
+	GEN_ERROR_OUT_IF_ERRNO(snprintf, errno);
 	const size_t size = (size_t) size_r + 1;
 	if(out_size) *out_size = size;
 	if(out_string) {
 		if(!buffer_size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`buffer_size` was 0");
-		snprintf_s(out_string, buffer_size, GEN_INTERNAL_CURRENCY_FORMAT, locale_info->currency_symbol, units, locale_info->decimal_point, cents);
-		GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
+		snprintf(out_string, buffer_size, GEN_INTERNAL_CURRENCY_FORMAT, locale_info->currency_symbol, units, locale_info->decimal_point, cents);
+		GEN_ERROR_OUT_IF_ERRNO(snprintf, errno);
 	}
 
 	GEN_ALL_OK;

@@ -4,41 +4,8 @@
 #include "include/gencommon.h"
 
 #if GEN_CENTRALIZE_EH == ENABLED
-gen_error_handler_t gen_error_handler = NULL;
-void* gen_error_handler_passthrough = NULL;
-#endif
-
-#ifndef GEN_FATAL_ANNEXK_CONSTRAINTS
-/**
- * Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program
- */
-#define GEN_FATAL_ANNEXK_CONSTRAINTS ENABLED
-
-GEN_DIAG_REGION_BEGIN
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-static void gen_internal_annexk_constraint_callback(const char* restrict msg, __unused void* restrict passthrough, errno_t error) {
-	gen_error_t gen_error = gen_convert_errno(error);
-
-	GEN_DISPATCH_ERROR_HANDLER(gen_error, "Annex K constraint handler was tripped");
-#if GEN_GLOGGIFY_EH == ENABLED
-#if GEN_FATAL_ANNEXK_CONSTRAINTS == ENABLED
-	glogf(FATAL, "Annex K constraint handler was tripped: %s: %s" GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) "\nReason:" GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR) " %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
-	GEN_REQUIRE_NO_REACH;
-#else
-	glogf(ERROR, "Annex K constraint handler was tripped: %s: %s" GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) GEN_ANSI_COLOR_LIGHT(GEN_ANSI_RED) "\nReason:" GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR) " %s", gen_error_name(gen_error), gen_error_description(gen_error), msg);
-#endif
-#else
-#if GEN_FATAL_ANNEXK_CONSTRAINTS == ENABLED
-	GEN_REQUIRE_NO_REACH;
-#endif
-#endif
-}
-GEN_DIAG_REGION_END
-
-__attribute__((constructor)) static void gen_internal_initialize_annexk_constraint_callback(void) {
-	set_mem_constraint_handler_s(gen_internal_annexk_constraint_callback);
-	set_str_constraint_handler_s(gen_internal_annexk_constraint_callback);
-}
+thread_local gen_error_handler_t gen_error_handler = NULL;
+thread_local void* gen_error_handler_passthrough = NULL;
 #endif
 
 const char* gen_error_name(const gen_error_t error) {
@@ -108,18 +75,6 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case EISDIR: return GEN_WRONG_OBJECT_TYPE;
 		case EAGAIN: return GEN_BAD_OPERATION;
 		case ECHILD: return GEN_NO_SUCH_OBJECT;
-		case ESRCH: return GEN_NO_SUCH_OBJECT;
-		case ESNULLP: return GEN_INVALID_PARAMETER;
-		case ESZEROL: return GEN_TOO_SHORT;
-		case ESLEMIN: return GEN_TOO_SHORT;
-		case ESLEMAX: return GEN_TOO_LONG;
-		case ESOVRLP: return GEN_BAD_OPERATION;
-		case ESEMPTY: return GEN_TOO_SHORT;
-		case ESNOSPC: return GEN_OUT_OF_SPACE;
-		case ESUNTERM: return GEN_TOO_LONG;
-		case ESNODIFF: return GEN_BAD_OPERATION;
-		case ESNOTFND: return GEN_NO_SUCH_OBJECT;
-		case ESLEWRNG: return GEN_INVALID_PARAMETER;
 		default: return GEN_UNKNOWN;
 	}
 }

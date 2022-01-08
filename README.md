@@ -69,16 +69,12 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |---|---|---|---|---|
 |`PLATFORM`|`DWN` `LNX`|Determined by Makefile|The target platform for the compilation|Do not mix platforms in a binary|
 |`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|
-|`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a stateful buffer|
-|`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a stateful buffer|
-|`GEN_GLOG_STREAM_COUNT`|Any valid array size|8|The maximum number of output streams `glog` and `glogf` can output to|Is used to initialize a stateful buffer|
+|`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a thread-local stateful buffer|
+|`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a thread-local stateful buffer|
 |`GEN_GLOGGIFY_EH`|`ENABLED` `DISABLED`|`ENABLED`|Whether error sites in Genstone modules are allowed to output string information via. `glog`|Depending on the error, this may contain more information than centralized error functions|
-|`GEN_CENTRALIZE_EH`|`ENABLED` `DISABLED`|`DISABLED`|Whether to call `gen_error_handler` at error sites in Genstone modules|Creates global state if enabled. Set `gen_error_handler_passthrough` to get a passthrough pointer in `gen_error_handler`|
+|`GEN_CENTRALIZE_EH`|`ENABLED` `DISABLED`|`DISABLED`|Whether to call `gen_error_handler` at error sites in Genstone modules|Creates thread-local state if enabled. Set `gen_error_handler_passthrough` to get a passthrough pointer in `gen_error_handler`|
 |`GEN_DEBUG_PATH_VALIDATION`|`ENABLED` `DISABLED`|`BUILD_MODE=DEBUG`: `ENABLED` `BUILD_MODE=RELEASE`: `DISABLED`|Whether to validate paths passed to genfs functions with `gen_path_validate`|Does not affect the presence of `gen_path_validate`|
 |`GEN_DEBUG_FOREACH_REGISTER`|`ENABLED` `DISABLED`|`BUILD_MODE=DEBUG`: `DISABLED` `BUILD_MODE=RELEASE`: `ENABLED`|Whether to use register variables for iteration in `GEN_FOREACH` statements|Disabling this can sometimes help with printing iterator values from a debugger|
-|`GEN_FS_READ_BUFFER_CHUNK`|Any valid array size greater than 0|512|The size of chunk to read at once while storing output in `gen_handle_read_all_available`|Increasing this if you have large amounts of data in raw reads may improve performance|
-|`GEN_PRESUMED_SYMBOL_MAX_LEN`|Any valid array size|1024|Presumed maximum length of a symbol to be imported from a dynamic library|Default is taken from Annex B minimum symbol name limitation reccommendations|
-|`GEN_FATAL_ANNEXK_CONSTRAINTS`|`ENABLED` `DISABLED`|`ENABLED`|Whether the Genstone-installed Annex K constraint handler should trigger a fatal error and abort the program|You may want to disable this if you are getting false Annex K constraint hits or are using unsafe string manipulation code|
 |`GEN_USE_MIMALLOC`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use mimalloc as the allocator|Disabling mimalloc may be detrimental to performance and is not as well tested nor as secure|
 |`GEN_CALC_COMMON_TYPES`|`ENABLED` `DISABLED`|`ENABLED`|Enables the default definition of common vector and matrix types in gencalc||
 |`GEN_FS_FILEWATCH_USE_SYSLIB`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use the system library where implemented to get filewatch functionality|Disabling may make results more consistent across platforms as the alternative uses standard utilities|

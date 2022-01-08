@@ -84,28 +84,28 @@ typedef void (*gen_tooling_stack_pop_handler_t) (void);
 /**
  * The global tooled call stack.
  */
-extern gen_tooling_stack_t gen_tooling_call_stack;
+extern thread_local gen_tooling_stack_t gen_tooling_call_stack;
 
 /**
  * The global frequency profile pool.
  */
-extern gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX];
+extern thread_local gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX];
 
 /**
  * The offset of the next free space in the global frequency profile pool.
  * @see gen_tooling_freq_profiles
  */
-extern size_t gen_tooling_freq_profile_next;
+extern thread_local size_t gen_tooling_freq_profile_next;
 
 /**
  * The global pre-push handler for the tooled call stack.
  */
-extern gen_tooling_stack_push_handler_t gen_tooling_push_handler;
+extern thread_local gen_tooling_stack_push_handler_t gen_tooling_push_handler;
 
 /**
  * The global pre-pop handler for the tooled call stack.
  */
-extern gen_tooling_stack_pop_handler_t gen_tooling_pop_handler;
+extern thread_local gen_tooling_stack_pop_handler_t gen_tooling_pop_handler;
 
 /**
  * Pushes a new entry onto the tooled call stack.

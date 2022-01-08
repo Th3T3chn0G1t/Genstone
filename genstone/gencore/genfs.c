@@ -4,6 +4,7 @@
 #include "include/genfs.h"
 
 #include "include/gendbg.h"
+#include "include/genstring.h"
 #include "include/gentooling.h"
 
 #if GEN_DEBUG_PATH_VALIDATION == ENABLED
@@ -34,70 +35,18 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_path_filename(char* restrict output_filename, const char* const restrict path) {
-	GEN_FRAME_BEGIN(gen_path_filename);
-
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_filename);
-	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
-
-	strcpy_s(output_filename, GEN_PATH_MAX, strrchr(path, '/') + 1);
-	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
-
-	GEN_ALL_OK;
-}
-
-gen_error_t gen_path_pathname(char* restrict output_path, const char* const restrict path) {
-	GEN_FRAME_BEGIN(gen_path_pathname);
-
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_path);
-	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
-
-	size_t mark = (size_t) ((strrchr(path, '/') + 1) - path);
-	strncpy_s(output_path, GEN_PATH_MAX, path, mark);
-	GEN_ERROR_OUT_IF_ERRNO(strncpy_s, errno);
-	output_path[mark - 1] = '\0';
-
-	GEN_ALL_OK;
-}
-
-gen_error_t gen_path_extension(char* restrict output_extension, const char* const restrict path) {
-	GEN_FRAME_BEGIN(gen_path_extension);
-
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_extension);
-	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
-
-	char* final_pathseg_terminator = NULL;
-	strrchr_s(path, GEN_PATH_MAX, '/', &final_pathseg_terminator);
-	if(!final_pathseg_terminator) {
-		// We need to duplicate like this because `strrchr_s` doesn't take a `const char*`
-
-		char* ext_start = NULL;
-		strchr_s(path, GEN_PATH_MAX, '.', &ext_start);
-		size_t mark = ext_start ? (size_t) (ext_start - path) : 0;
-		strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
-		GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
-		if(mark == 0) GEN_ERROR_OUT(GEN_UNKNOWN, "`mark` became invalid for some reason");
-		output_extension[mark - 1] = '\0';
-
-		GEN_ALL_OK;
-	}
-	char* ext_start = NULL;
-	strchr_s(final_pathseg_terminator, GEN_PATH_MAX, '.', &ext_start);
-	size_t mark = ext_start ? (size_t) (ext_start - path) : 0;
-	strcpy_s(output_extension, GEN_PATH_MAX, path + mark);
-	GEN_ERROR_OUT_IF_ERRNO(strcpy_s, errno);
-	if(mark == 0) GEN_ERROR_OUT(GEN_UNKNOWN, "`mark` became invalid for some reason");
-	output_extension[mark - 1] = '\0';
-
-	GEN_ALL_OK;
-}
-
-bool gen_path_exists(const char* const restrict path) {
+gen_error_t gen_path_exists(const char* const restrict path, bool* const restrict out_exists) {
 	GEN_FRAME_BEGIN(gen_path_exists);
 
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_exists);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
-	return !access(path, F_OK);
+	*out_exists = !access(path, F_OK);
+	if(errno != ENOENT) GEN_ERROR_OUT_IF_ERRNO(access, errno);
+
+	errno = EOK;
+
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_validate(const char* const restrict path) {
@@ -107,12 +56,17 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`len(path)` was 0)");
 
 	// This is a kinda nonsensical test but it feels like the best way to do this
-	if(strnlen_s(path, GEN_PATH_MAX) > GEN_PATH_MAX) GEN_ERROR_OUT(GEN_TOO_LONG, "`path` was too long (`len(path)` > GEN_PATH_MAX)");
+	// Testing if length of path is less than GEN_PATH_MAX
+	size_t path_len = 0;
+	gen_error_t error = gen_string_length(path, GEN_PATH_MAX + 1, &path_len);
+	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	GEN_ALL_OK;
 }
 
 gen_error_t gen_path_create_file(const char* const restrict path) {
+	GEN_FRAME_BEGIN(gen_path_create_file);
+
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	int descriptor = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0777);
@@ -233,46 +187,6 @@ gen_error_t gen_handle_read(uint8_t* restrict output_buffer, const gen_filesyste
 	GEN_ALL_OK;
 }
 
-#ifndef GEN_FS_READ_BUFFER_CHUNK
-/**
- * The size of chunk to read at once while storing output in `gen_handle_read_all_available`.
- * @note Increasing this if you have large amounts of data in raw reads may improve performance.
- */
-#define GEN_FS_READ_BUFFER_CHUNK 512
-#endif
-
-gen_error_t gen_handle_read_all_available(const gen_filesystem_handle_t* const restrict handle, char* restrict* const restrict out_output) {
-	GEN_FRAME_BEGIN(gen_handle_read_all_available);
-
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_output);
-
-	char chunk[GEN_FS_READ_BUFFER_CHUNK + 1] = {0};
-	char* out = NULL;
-	size_t size = 0;
-	while(true) {
-		ssize_t retval = read(handle->file_handle, &chunk, GEN_FS_READ_BUFFER_CHUNK);
-		size += strnlen_s(chunk, GEN_FS_READ_BUFFER_CHUNK + 1);
-
-		if(size) {
-			gen_error_t error = grealloc((void**) &out, size + 1, sizeof(char));
-			GEN_ERROR_OUT_IF(error, "`grealloc` failed");
-
-			strcat_s(out, size + 1, chunk);
-			GEN_ERROR_OUT_IF_ERRNO(strcat_s, errno);
-
-			memset_s(chunk, GEN_FS_READ_BUFFER_CHUNK + 1, 0, GEN_FS_READ_BUFFER_CHUNK);
-			GEN_ERROR_OUT_IF_ERRNO(memset_s, errno);
-		}
-
-		if(retval == EOF) break;
-	}
-
-	*out_output = out;
-
-	GEN_ALL_OK;
-}
-
 gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
 	GEN_FRAME_BEGIN(gen_handle_write);
 
@@ -338,8 +252,8 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 	out_handle->is_directory = false;
 
 	char pipe_name[GEN_PATH_MAX + 1] = {0};
-	snprintf_s(pipe_name, GEN_PATH_MAX + 1, "/proc/self/fd/%i", handle->file_handle);
-	GEN_ERROR_OUT_IF_ERRNO(snprintf_s, errno);
+	snprintf(pipe_name, GEN_PATH_MAX, "/proc/self/fd/%i", handle->file_handle);
+	GEN_ERROR_OUT_IF_ERRNO(snprintf, errno);
 
 	char path[GEN_PATH_MAX + 1] = {0};
 	readlink(pipe_name, path, GEN_PATH_MAX);
@@ -433,7 +347,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 		}
 	}
 
-	memcpy_s(&handle->internal_descriptor_details, sizeof(struct stat), &file_info, sizeof(struct stat));
+	handle->internal_descriptor_details = file_info;
 	GEN_ERROR_OUT_IF_ERRNO(memcpy_s, errno);
 #endif
 

@@ -75,29 +75,6 @@ gen_error_t grealloc(void* restrict* const restrict out_address, const size_t si
 	GEN_ALL_OK;
 }
 
-gen_error_t gstrndup(char* restrict* const restrict out_address, const char* const restrict str, const size_t max) {
-	GEN_FRAME_BEGIN(gstrndup);
-
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_address);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(str);
-
-	if(!max) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`max` was 0");
-	if(max == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`max` was SIZE_MAX");
-
-#if GEN_USE_MIMALLOC == ENABLED
-	char* const allocated = mi_strndup(str, max);
-#else
-	char* const allocated = strndup(str, max);
-#endif
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_strndup, errno);
-
-	*out_address = allocated;
-
-	errno = 0; // mimalloc does weirdness with NUMA
-
-	GEN_ALL_OK;
-}
-
 gen_error_t gfree(void* const restrict address) {
 	GEN_FRAME_BEGIN(gfree);
 

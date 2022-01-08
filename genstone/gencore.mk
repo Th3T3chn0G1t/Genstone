@@ -1,4 +1,4 @@
-GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-gnu-statement-expression -Wno-c++98-compat -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories -Wno-unknown-warning-option
+GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-gnu-statement-expression -Wno-c++98-compat -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories -Wno-unknown-warning-option  -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-register -Wno-overlength-strings
 GEN_CORE_CFLAGS = -Igenstone/gencore/include $(SAFEC_CFLAGS) $(MIMALLOC_CFLAGS) $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),DWN)
 GEN_CORE_CFLAGS += -Igenstone/gencore/threademu/include
@@ -17,8 +17,8 @@ GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))
 GEN_CORE_LIB = lib/$(LIB_PREFIX)gencore$(DYNAMIC_LIB_SUFFIX)
 
 build_message_gencore:
-	@echo "$(SECTION_PREFIX) Gencore"
-	@echo "$(INFO_PREFIX) Core Genstone utilities"
+	@$(ECHO) "$(SECTION_PREFIX) Gencore"
+	@$(ECHO) "$(INFO_PREFIX) Core Genstone utilities"
 
 gencore: build_message_gencore $(GEN_CORE_LIB) ### @Genstone Builds core Genstone utilities
 
@@ -39,7 +39,7 @@ $(GEN_CORE_OBJECTS): $(wildcard genstone/gencore/include/*.h)
 $(GEN_CORE_OBJECTS): $(SAFEC_LIB) $(MIMALLOC_LIB)
 
 clean_gencore:
-	@echo "$(ACTION_PREFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)"
 	-rm $(GEN_CORE_OBJECTS)
 	-rm $(GEN_CORE_LIB)
-	@echo "$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_SUFFIX)"

@@ -13,12 +13,12 @@ BUILD_TEST_LIB_DYNAMIC = lib/$(LIB_PREFIX)test_dynamic$(DYNAMIC_LIB_SUFFIX)
 BUILD_TEST_LIB_STATIC = lib/$(LIB_PREFIX)test_static$(STATIC_LIB_SUFFIX)
 
 build_message_build_test:
-	@echo "$(SECTION_PREFIX) Build Test"
-	@echo "$(INFO_PREFIX) Testing build configuration"
+	@$(ECHO) "$(SECTION_PREFIX) Build Test"
+	@$(ECHO) "$(INFO_PREFIX) Testing build configuration"
 
 build_test: build_message_build_test $(BUILD_TEST_EXEC_DYNAMIC) $(BUILD_TEST_EXEC_STATIC) lib ### @Test Builds and runs build-system tests
-	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_STATIC)$(ACTION_SUFFIX)"
-	@echo "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_DYNAMIC)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_STATIC)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(BUILD_TEST_EXEC_DYNAMIC)$(ACTION_SUFFIX)"
 	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_DYNAMIC)
 	@LD_LIBRARY_PATH=lib $(BUILD_TEST_EXEC_STATIC)
 	# -rm $(BUILD_TEST_LIB_DYNAMIC) $(BUILD_TEST_LIB_STATIC)
@@ -36,7 +36,7 @@ $(BUILD_TEST_LIB_STATIC): $(BUILD_TEST_LIB_OBJECTS)
 $(BUILD_TEST_LIB_OBJECTS): Makefile build/common.mk build/config.mk
 
 clean_build_test:
-	@echo "$(ACTION_PREFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)"
 	-rm $(BUILD_TEST_LIB_OBJECTS)
 	-rm $(BUILD_TEST_LIB_DYNAMIC)
 	-rm $(BUILD_TEST_LIB_STATIC)
@@ -44,4 +44,4 @@ clean_build_test:
 	-rm $(BUILD_TEST_EXEC_OBJECTS)
 	-rm $(BUILD_TEST_EXEC_DYNAMIC)
 	-rm $(BUILD_TEST_EXEC_STATIC)
-	@echo "$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_SUFFIX)"

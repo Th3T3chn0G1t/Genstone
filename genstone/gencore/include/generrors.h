@@ -13,10 +13,13 @@
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
 #include <errno.h>
-
-#include <safe_lib_errno.h>
-#include <safe_types.h>
 GEN_DIAG_REGION_END
+
+#ifndef EOK
+#define EOK (0)
+#endif
+
+typedef int errno_t;
 
 /**
  * Return values for errorable functions.
@@ -134,7 +137,7 @@ extern const char* gen_error_description(const gen_error_t error);
 
 
 #if GEN_GLOGGIFY_EH == ENABLED
-#define GEN_INTERNAL_MSG_EH(error, msg) if(error != GEN_OK) glogf(ERROR, "%s: %s", gen_error_name(error), msg)
+#define GEN_INTERNAL_MSG_EH(error, msg) if(error != GEN_OK) glogf(ERROR, "%s: %s at %s:%i", gen_error_name(error), msg, __FILE__, __LINE__)
 #else
 /**
  * Internal handling of error messages.
@@ -236,17 +239,13 @@ extern void* gen_error_handler_passthrough;
  */
 #define GEN_REQUIRE_NO_ERRNO(proc, native_errno) \
     do { \
-        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(native_errno); \
-        const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
-        const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(native_errno); \
-        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len + 1; \
-        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
-        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
-        strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) - 1, gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), native_errno); \
-        GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
-        GEN_REQUIRE_EQUAL(GEN_OK, gen_internal_error_out_native_errno_gen_error); \
+        const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
+        const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
+        if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "Require failed - %s: `%s` failed: %s", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno)); \
+        GEN_REQUIRE_EQUAL(GEN_OK, gen_internal_gen_require_no_errno_gen_error); \
     } while(0)
-
+    
+#if GEN_GLOGGIFY_EH == ENABLED
 /**
  * Horrible macro string manipulation to get some nice output on your errno.
  * @param[in] proc the function which set errno.
@@ -254,16 +253,14 @@ extern void* gen_error_handler_passthrough;
  */
 #define GEN_ERROR_OUT_ERRNO(proc, native_errno) \
     do { \
-        const gen_error_t gen_internal_error_out_native_errno_gen_error = gen_convert_errno(native_errno); \
-        const static char GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING[] = "`" #proc "` failed: "; \
-        const size_t gen_internal_error_out_native_errno_native_strerror_len = strerrorlen_s(native_errno); \
-        const size_t gen_internal_error_out_native_errno_msg_len = sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) + gen_internal_error_out_native_errno_native_strerror_len + 1; \
-        char gen_internal_error_out_native_errno_msg[gen_internal_error_out_native_errno_msg_len]; \
-        strcpy_s(gen_internal_error_out_native_errno_msg, gen_internal_error_out_native_errno_msg_len, GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING); \
-        strerror_s(gen_internal_error_out_native_errno_msg + sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING) - 1, gen_internal_error_out_native_errno_msg_len - sizeof(GEN_INTERNAL_ERROR_OUT_NATIVE_ERRNO_BASESTRING), native_errno); \
-        GEN_INTERNAL_MSG_EH(gen_internal_error_out_native_errno_gen_error, gen_internal_error_out_native_errno_msg); \
-        return gen_internal_error_out_native_errno_gen_error; \
+        const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
+        const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
+        if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "%s: `%s` failed: %s at %s:%i", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno), __FILE__, __LINE__); \
+        return gen_internal_gen_require_no_errno_gen_error; \
     } while(0)
+#else
+#define GEN_ERROR_OUT_ERRNO(proc, native_errno) return gen_convert_errno(native_errno)
+#endif
 
 /**
  * This is to make the static analyzer happy.

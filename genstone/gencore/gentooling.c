@@ -3,12 +3,12 @@
 
 #include "include/gencommon.h"
 
-gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
-gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX] = {0};
-size_t gen_tooling_freq_profile_next = 0;
+thread_local gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
+thread_local gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX] = {0};
+thread_local size_t gen_tooling_freq_profile_next = 0;
 
-gen_tooling_stack_push_handler_t gen_tooling_push_handler = NULL;
-gen_tooling_stack_pop_handler_t gen_tooling_pop_handler = NULL;
+thread_local gen_tooling_stack_push_handler_t gen_tooling_push_handler = NULL;
+thread_local gen_tooling_stack_pop_handler_t gen_tooling_pop_handler = NULL;
 
 void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file) {
 	if(gen_tooling_call_stack.next >= GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
@@ -75,6 +75,8 @@ void gen_tooling_freq_profile_ping(const char* const restrict name) {
 void gen_tooling_print_backtrace(void) {
 	if(gen_tooling_call_stack.next > GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
 
-	GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions)
-		glogf(TRACE, "%zu. %p %s() %s", i, (void*) gen_tooling_call_stack.addresses[i], trace, gen_tooling_call_stack.files[i]);
+	GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions) {
+		(void) trace;
+		glogf(TRACE, "frame #%zu: 0x%p %s() %s", i, (void*) gen_tooling_call_stack.addresses[gen_tooling_call_stack.next - (i + 1)], gen_tooling_call_stack.functions[gen_tooling_call_stack.next - (i + 1)], gen_tooling_call_stack.files[gen_tooling_call_stack.next - (i + 1)]);
+	}
 }

@@ -34,18 +34,18 @@ MODULE_CLEAN_TARGETS += clean_tmpfile
 .DEFAULT_GOAL := all
 
 build_message_pre_build:
-	@echo "$(SECTION_PREFIX) Pre-Build"
+	@$(ECHO) "$(SECTION_PREFIX) Pre-Build"
 ifneq ($(DISABLED_MODULES),)
-	@echo "$(INFO_PREFIX) Excluding disabled targets: $(addprefix \n   - ,$(DISABLED_MODULES))"
+	@$(ECHO) "$(INFO_PREFIX) Excluding disabled targets: $(addprefix \n   - ,$(DISABLED_MODULES))"
 endif
 ifneq ($(ERROR),)
-	@echo $(ERROR)
+	@$(ECHO) $(ERROR)
 	@exit 1
 endif
 
 ifeq ($(DISABLED_MODULES),)
 ifeq ($(ERROR),)
-	@echo "$(INFO_PREFIX) Nothing to do!"
+	@$(ECHO) "$(INFO_PREFIX) Nothing to do!"
 endif
 endif
 
@@ -66,27 +66,27 @@ BUILD_TARGETS = \
 dependency_list: dependency_list.depfile ### @Default generates a list of source header dependencies and outputs it to a file
 
 dependency_list.depfile:
-	@echo "$(ACTION_PREFIX)cat `find . -name "*.depfile"` > dependency_list.depfile$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)cat `find . -name "*.depfile"` > dependency_list.depfile$(ACTION_SUFFIX)"
 	@cat `find . -name "*.depfile"` > dependency_list.depfile
 
 all: $(BUILD_TARGETS) ### @Default Builds all modules specified in `config.mk`
-	@echo "$(INFO_PREFIX) All built!"
+	@$(ECHO) "$(INFO_PREFIX) All built!"
 
 list: ### @Default Lists targets to be built for `all`
-	@echo "$(INFO_PREFIX) Targets to be built for \`all\`: $(addprefix \n - $(TARGET_PREFIX),$(addsuffix $(TARGET_SUFFIX),$(BUILD_TARGETS)))"
-	@echo "$(INFO_PREFIX) Excluded targets: $(addprefix \n - $(TARGET_PREFIX),$(addsuffix $(TARGET_SUFFIX),$(DISABLED_MODULES)))"
-	@echo "$(NOTE_PREFIX) For a list of available targets and their descriptions, see \`make help\`"
+	@$(ECHO) "$(INFO_PREFIX) Targets to be built for \`all\`: $(addprefix \n - $(TARGET_PREFIX),$(addsuffix $(TARGET_SUFFIX),$(BUILD_TARGETS)))"
+	@$(ECHO) "$(INFO_PREFIX) Excluded targets: $(addprefix \n - $(TARGET_PREFIX),$(addsuffix $(TARGET_SUFFIX),$(DISABLED_MODULES)))"
+	@$(ECHO) "$(NOTE_PREFIX) For a list of available targets and their descriptions, see \`make help\`"
 
 help: ### @Default Generates this message
-	@echo "$(INFO_PREFIX) Makefile help\n$(NOTE_PREFIX) This list only includes descriptions for user-desireable targets$(patsubst @%,$(NOTABLE_PREFIX)%$(NOTABLE_SUFFIX),$(patsubst %:,\n - $(TARGET_PREFIX)%$(TARGET_SUFFIX):,$(subst `,\`,$(shell grep -Eh '^\w+:.*\#\#\#.*' $(MAKEFILE_LIST) | sed 's|:.*\#\#\#|:|g'))))"
+	@$(ECHO) "$(INFO_PREFIX) Makefile help\n$(NOTE_PREFIX) This list only includes descriptions for user-desireable targets$(patsubst @%,$(NOTABLE_PREFIX)%$(NOTABLE_SUFFIX),$(patsubst %:,\n - $(TARGET_PREFIX)%$(TARGET_SUFFIX):,$(subst `,\`,$(shell grep -Eh '^\w+:.*\#\#\#.*' $(MAKEFILE_LIST) | sed 's|:.*\#\#\#|:|g'))))"
 
 build_message_clean:
-	@echo "$(SECTION_PREFIX) Clean"
-	@echo "$(INFO_PREFIX) Cleaning up build artifacts from all modules"
-	@echo "$(NOTE_PREFIX) To clean an individual module, use \`make clean_MODULE_NAME\`$(ACTION_PREFIX)"
+	@$(ECHO) "$(SECTION_PREFIX) Clean"
+	@$(ECHO) "$(INFO_PREFIX) Cleaning up build artifacts from all modules"
+	@$(ECHO) "$(NOTE_PREFIX) To clean an individual module, use \`make clean_MODULE_NAME\`$(ACTION_PREFIX)"
 
 clean: build_message_clean $(MODULE_CLEAN_TARGETS) clean_clang_tooling_artifacts ### @Default Cleans the repository of most build artifacts
-	@echo "$(ACTION_SUFFIX)$(INFO_PREFIX) All clean!"
+	@$(ECHO) "$(ACTION_SUFFIX)$(INFO_PREFIX) All clean!"
 
 lib:
 	-mkdir $@

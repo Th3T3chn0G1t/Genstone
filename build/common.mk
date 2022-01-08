@@ -197,8 +197,10 @@ else
 	endif
 endif
 
+ECHO = echo -e
+
 CXX_UNSUPPORTED_CFLAGS += -std=gnu2x
-GLOBAL_CXX_FLAGS += -std=gnu++17 -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-register
+GLOBAL_CXX_FLAGS += -std=gnu++17
 GLOBAL_C_FLAGS += -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=gnu2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
 
 ifeq ($(STRIP_BINARIES),ENABLED)
@@ -302,80 +304,74 @@ ifeq ($(TEST),BUILD)
 endif
 
 clean_tmpfile:
-	@echo "$(ACTION_PREFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)"
 	-@rm $(wildcard tmp/*.tmp)
-	@echo "$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_SUFFIX)"
 
 clean_clang_tooling_artifacts:
-	@echo "$(ACTION_PREFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)"
 	-rm $(shell find . -name "*.gcda")
 	-rm $(shell find . -name "*.gcno")
 	-rm $(wildcard "*.profraw")
-	@echo "$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_SUFFIX)"
 
 tmp:
 	-mkdir $@
 
 %$(OBJECT_SUFFIX): %.c build/config.mk | tmp
-	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
 
-	@echo "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<
 
-	@echo "$(ACTION_PREFIX)genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
-	@genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<
-
 ifeq ($(STATIC_ANALYSIS),ENABLED)
-	@echo "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
-	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
-	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
 	-@$(CLANG_FORMAT) -i $<
 else
-	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
 	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 
 %$(OBJECT_SUFFIX): %.cpp build/config.mk | tmp
-	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
 
-	@echo "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
 
-	@echo "$(ACTION_PREFIX)genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<$(ACTION_SUFFIX)"
-	@genstone/vendor/safeclib/scripts/check_for_unsafe_apis $<
-
 ifeq ($(STATIC_ANALYSIS),ENABLED)
-	@echo "$(ACTION_PREFIX)$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
 	@$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
-	@echo "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
 	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)
 
 ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
-	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
 	-@$(CLANG_FORMAT) -i $<
 else
-	@echo "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
 	-@$(CLANG_FORMAT) --dry-run -Werror $<
 endif
 
 %$(STATIC_LIB_SUFFIX):
-	@echo "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(STATIC_LIB_TOOL)
 
 %$(DYNAMIC_LIB_SUFFIX):
-	@echo "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(DYNAMIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(DYNAMIC_LIB_TOOL)
 
 %$(EXECUTABLE_SUFFIX):
-	@echo "$(ACTION_PREFIX)$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)$(ACTION_SUFFIX)"
+	@$(ECHO) "$(ACTION_PREFIX)$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)$(ACTION_SUFFIX)"
 	@$(CLINKER) -o $@ $(filter %$(OBJECT_SUFFIX),$^) $(GLOBAL_L_FLAGS) -fPIE $(LFLAGS)

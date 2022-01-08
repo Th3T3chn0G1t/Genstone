@@ -77,7 +77,6 @@ void config_init(void) {
 		sprintf(buffer, "%s/%s", "sandbox/glean/usr/templates", entry->d_name);
 
 		gen_filesystem_handle_t handle;
-		(void) galloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
 		(void) gen_handle_open(&handle, buffer);
 		size_t file_buffer_size;
 		(void) gen_handle_size(&file_buffer_size, &handle);

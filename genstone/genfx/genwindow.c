@@ -1,4 +1,4 @@
-#include "../include/genfx/genwindow.h"
+#include "include/genwindow.h"
 
 gen_error_t gen_window_create(gen_window_t* const restrict out_window) {
     
