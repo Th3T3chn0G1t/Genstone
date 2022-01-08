@@ -25,11 +25,5 @@ jobs:
         if: ${{ runner.os != 'macOS' }}
         uses: egor-tensin/setup-clang@v1
 
-      - name: Install Automake
-        uses: lyricwulf/abc@v1
-        with:
-          linux: automake
-          macos: automake
-
       - name: Build & Test
         run: make OVERRIDE_DISABLED_MODULES="gencalc_test"
