@@ -9,8 +9,8 @@
 #ifndef GEN_WINDOW_H
 #define GEN_WINDOW_H
 
-#include <gencommon.h>
-
 #include "genwindow.h"
+
+#include <gencommon.h>
 
 #endif

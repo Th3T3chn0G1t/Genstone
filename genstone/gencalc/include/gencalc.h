@@ -31,7 +31,10 @@ typedef __fp16 gfloat16;
  * @param[in] b the second number.
  * @param[in] epsilon the error or "fuzziness" for the comparison. Set to -1 to use the machine epsilon for the provided precision of `a`.
  */
-#define GEN_FUZZY_COMPARE_FP(a, b, epsilon) GEN_DIAG_REGION_BEGIN GEN_DIAG_IGNORE_FP_EQ (((a) == (b)) ||(fabs((a) - (b)) < (generic((a), float: (((epsilon) == -1.0f) ? FLT_EPSILON : (epsilon)), double: (((epsilon) == -1.0) ? DBL_EPSILON : (epsilon)), long double: (((epsilon) == -1.0L) ? LDBL_EPSILON : (epsilon)))))) GEN_DIAG_REGION_END
+#define GEN_FUZZY_COMPARE_FP(a, b, epsilon) GEN_DIAG_REGION_BEGIN GEN_DIAG_IGNORE_FP_EQ(((a) == (b)) || (fabs((a) - (b)) < (generic((a), float \
+																																	: (((epsilon) == -1.0f) ? FLT_EPSILON : (epsilon)), double \
+																																	: (((epsilon) == -1.0) ? DBL_EPSILON : (epsilon)), long double \
+																																	: (((epsilon) == -1.0L) ? LDBL_EPSILON : (epsilon)))))) GEN_DIAG_REGION_END
 
 /**
  * Internal type declarator for clang vectors (OpenCL-style).

@@ -30,27 +30,28 @@
  * Not all event types are reported on all platforms.
  * @see gen_filewatch_poll
  */
-typedef enum {
-    /**
+typedef enum
+{
+	/**
      * No event occurred.
      */
-    GEN_FILEWATCH_NONE = 0,
-    /**
+	GEN_FILEWATCH_NONE = 0,
+	/**
      * A file was created.
      */
-    GEN_FILEWATCH_CREATED = 1,
-    /**
+	GEN_FILEWATCH_CREATED = 1,
+	/**
      * A file was modified.
      */
-    GEN_FILEWATCH_MODIFIED = 2,
-    /**
+	GEN_FILEWATCH_MODIFIED = 2,
+	/**
      * A file was deleted.
      */
-    GEN_FILEWATCH_DELETED = 4,
-    /**
+	GEN_FILEWATCH_DELETED = 4,
+	/**
      * A file was moved.
      */
-    GEN_FILEWATCH_MOVED = 8
+	GEN_FILEWATCH_MOVED = 8
 } gen_filewatch_event_t;
 
 /**
@@ -63,43 +64,43 @@ typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* c
  * @note Directly modifying the internal handles may cause undefined behaviour.
  */
 typedef struct {
-    /**
+	/**
      * Handle for a file if dir is false.
      * May still contain important data if dir is true.
      */
-    int file_handle;
-    /**
+	int file_handle;
+	/**
      * Handle for a directory if dir is true.
      */
-    DIR* directory_handle;
-    /**
+	DIR* directory_handle;
+	/**
      * Whether this handle is for a directory.
      */
-    bool is_directory;
-    /**
+	bool is_directory;
+	/**
      * Internal caching of `stat` retvals.
      * Please don't use this directly.
      */
-    struct stat internal_descriptor_details;
-    /**
+	struct stat internal_descriptor_details;
+	/**
      * Intenal caching of directory size.
      * Please don't use this directly.
      */
-    size_t internal_directory_len;
+	size_t internal_directory_len;
 } gen_filesystem_handle_t;
 
 /**
  * `gen_filesystem_handle_t` wrapper for stdin.
  */
-#define gen_stdin_handle  ((gen_filesystem_handle_t) { STDIN_FILENO, NULL, false, {0}, 0})
+#define gen_stdin_handle ((gen_filesystem_handle_t){STDIN_FILENO, NULL, false, {0}, 0})
 /**
  * `gen_filesystem_handle_t` wrapper for stdout.
  */
-#define gen_stdout_handle ((gen_filesystem_handle_t) {STDOUT_FILENO, NULL, false, {0}, 0})
+#define gen_stdout_handle ((gen_filesystem_handle_t){STDOUT_FILENO, NULL, false, {0}, 0})
 /**
  * `gen_filesystem_handle_t` wrapper for stderr.
  */
-#define gen_stderr_handle ((gen_filesystem_handle_t) {STDERR_FILENO, NULL, false, {0}, 0})
+#define gen_stderr_handle ((gen_filesystem_handle_t){STDERR_FILENO, NULL, false, {0}, 0})
 
 /**
  * @example{lineno} example/gencore/gen_path.c

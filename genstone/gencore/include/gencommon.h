@@ -9,23 +9,18 @@
 #ifndef GEN_COMMON_H
 #define GEN_COMMON_H
 
-#include "gendiag.h"
 #include "gendbg.h"
+#include "gendiag.h"
 #include "generrors.h"
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
 #include <assert.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <complex.h>
 #include <ctype.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <fenv.h>
 #include <float.h>
 #include <inttypes.h>
@@ -33,25 +28,30 @@ GEN_DIAG_IGNORE_ALL
 #include <limits.h>
 #include <locale.h>
 #include <math.h>
+#include <poll.h>
 #include <setjmp.h>
 #include <signal.h>
 #include <stdalign.h>
+#include <stdarg.h>
 #include <stdatomic.h>
-#include <time.h>
-#include <threads.h>
-#include <wchar.h>
-#include <wctype.h>
-#include <tgmath.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/syscall.h>
-#include <poll.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <tgmath.h>
+#include <threads.h>
+#include <time.h>
 #include <unistd.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #ifndef GEN_USE_MIMALLOC
 /**
@@ -60,7 +60,6 @@ GEN_DIAG_IGNORE_ALL
 #define GEN_USE_MIMALLOC ENABLED
 #endif
 
-
 #if GEN_USE_MIMALLOC == ENABLED
 #include <mimalloc.h> // \[0]/
 #endif
@@ -68,9 +67,9 @@ GEN_DIAG_IGNORE_ALL
 #include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
-#include "gentooling.h"
-#include "glog.h"
-#include "genutil.h"
 #include "gemory.h"
+#include "gentooling.h"
+#include "genutil.h"
+#include "glog.h"
 
 #endif

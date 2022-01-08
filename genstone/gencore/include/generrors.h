@@ -26,71 +26,72 @@ typedef int errno_t;
  * The descriptions on `gen_error_t` enumerations are *hints*, they may be used in other contexts.
  * @note Some errors will become `GEN_UNKNOWN` on platforms that do not support them or report them nontrivially.
  */
-typedef enum {
-    /**
+typedef enum
+{
+	/**
      * No error occurred.
      */
-    GEN_OK = 0,
-    /**
+	GEN_OK = 0,
+	/**
      * An unknown error occurred.
      */
-    GEN_UNKNOWN,
-    /**
+	GEN_UNKNOWN,
+	/**
      * A permission error occurred.
      */
-    GEN_PERMISSION,
-    /**
+	GEN_PERMISSION,
+	/**
      * The provided parameter was invalid.
      */
-    GEN_INVALID_PARAMETER,
-    /**
+	GEN_INVALID_PARAMETER,
+	/**
      * An IO error occurred.
      */
-    GEN_IO,
-    /**
+	GEN_IO,
+	/**
      * The provided argument is too long.
      */
-    GEN_TOO_LONG,
-    /**
+	GEN_TOO_LONG,
+	/**
      * A nonexistent object was referenced.
      */
-    GEN_NO_SUCH_OBJECT,
-    /**
+	GEN_NO_SUCH_OBJECT,
+	/**
      * Program ran out of usable memory.
      */
-    GEN_OUT_OF_MEMORY,
-    /**
+	GEN_OUT_OF_MEMORY,
+	/**
      * An object of the wrong type was provided.
      */
-    GEN_WRONG_OBJECT_TYPE,
-    /**
+	GEN_WRONG_OBJECT_TYPE,
+	/**
      * An object already exists by the provided identifier.
      */
-    GEN_ALREADY_EXISTS,
-    /**
+	GEN_ALREADY_EXISTS,
+	/**
      * The specified destination is out of space.
      */
-    GEN_OUT_OF_SPACE,
-    /**
+	GEN_OUT_OF_SPACE,
+	/**
      * Too many platform handles are open.
      */
-    GEN_OUT_OF_HANDLES,
-    /**
+	GEN_OUT_OF_HANDLES,
+	/**
      * The provided argument is too short.
      */
-    GEN_TOO_SHORT,
-    /**
+	GEN_TOO_SHORT,
+	/**
      * The provided argument contains bad or invalid content.
      */
-    GEN_BAD_CONTENT,
-    /**
+	GEN_BAD_CONTENT,
+	/**
      * A bad or invalid operation was requested.
      */
-    GEN_BAD_OPERATION,
-    /**
+	GEN_BAD_OPERATION,
+	/**
      * The specified target is in use elsewhere.
      */
-    GEN_IN_USE
+	GEN_IN_USE
 } gen_error_t;
 
 /**
@@ -135,20 +136,19 @@ extern const char* gen_error_description(const gen_error_t error);
 #define GEN_CENTRALIZE_EH DISABLED
 #endif
 
-
 #if GEN_GLOGGIFY_EH == ENABLED
-#define GEN_INTERNAL_MSG_EH(error, msg) if(error != GEN_OK) glogf(ERROR, "%s: %s at %s:%i", gen_error_name(error), msg, __FILE__, __LINE__)
+#define GEN_INTERNAL_MSG_EH(error, msg) \
+	if(error != GEN_OK) glogf(ERROR, "%s: %s at %s:%i", gen_error_name(error), msg, __FILE__, __LINE__)
 #else
 /**
  * Internal handling of error messages.
  */
 #define GEN_INTERNAL_MSG_EH(error, msg) \
-    do { \
-        (void) error; \
-        (void) msg; \
-    } while(0)
+	do { \
+		(void) error; \
+		(void) msg; \
+	} while(0)
 #endif
-
 
 /**
  * Dispatches error handling and aborts the program with a fatal error.
@@ -156,17 +156,17 @@ extern const char* gen_error_description(const gen_error_t error);
  * @param[in] msg contextual error message.
  */
 #define GEN_FATAL_ERROR(error, msg) \
-    do { \
-        glogf(FATAL, "%s: %s", gen_error_name(error), msg); \
-        GEN_DISPATCH_ERROR_HANDLER(error, msg); \
-        GEN_REQUIRE_NO_REACH; \
-    } while(0)
+	do { \
+		glogf(FATAL, "%s: %s", gen_error_name(error), msg); \
+		GEN_DISPATCH_ERROR_HANDLER(error, msg); \
+		GEN_REQUIRE_NO_REACH; \
+	} while(0)
 
 /**
  * Handler for library errors.
  * @note Only used if `GEN_CENTRALIZE_EH` is `ENABLED`.
  */
-typedef void (*gen_error_handler_t) (const gen_error_t, const char * const restrict, const char * const restrict, const char * const restrict, int, void* const restrict);
+typedef void (*gen_error_handler_t)(const gen_error_t, const char* const restrict, const char* const restrict, const char* const restrict, int, void* const restrict);
 #if GEN_CENTRALIZE_EH == ENABLED
 /**
  * The currently installed error handler.
@@ -177,17 +177,18 @@ extern gen_error_handler_t gen_error_handler;
  */
 extern void* gen_error_handler_passthrough;
 
-#define GEN_DISPATCH_ERROR_HANDLER(error, msg) if(error != GEN_OK && gen_error_handler) gen_error_handler(error, msg, __FILE__, __func__, __LINE__, gen_error_handler_passthrough);
+#define GEN_DISPATCH_ERROR_HANDLER(error, msg) \
+	if(error != GEN_OK && gen_error_handler) gen_error_handler(error, msg, __FILE__, __func__, __LINE__, gen_error_handler_passthrough);
 #else
 /**
  * Runs the installed error handler if defined.
  * @note Only acts if `GEN_CENTRALIZE_EH` is `ENABLED`.
  */
 #define GEN_DISPATCH_ERROR_HANDLER(error, msg) \
-    do { \
-        (void) error; \
-        (void) msg; \
-    } while(0)
+	do { \
+		(void) error; \
+		(void) msg; \
+	} while(0)
 #endif
 
 /**
@@ -197,11 +198,11 @@ extern void* gen_error_handler_passthrough;
  * @param[in] msg contextual error message.
  */
 #define GEN_ERROR_OUT(error, msg) \
-    do { \
-        GEN_INTERNAL_MSG_EH(error, msg); \
-        GEN_DISPATCH_ERROR_HANDLER(error, msg); \
-        return error; \
-    } while(0)
+	do { \
+		GEN_INTERNAL_MSG_EH(error, msg); \
+		GEN_DISPATCH_ERROR_HANDLER(error, msg); \
+		return error; \
+	} while(0)
 
 /**
  * Returns from a function marked `GEN_ERRORABLE`.
@@ -215,13 +216,13 @@ extern void* gen_error_handler_passthrough;
  * @param[in] msg contextual error message.
  */
 #define GEN_ERROR_OUT_IF(error, msg) \
-    do { \
-        if(error != GEN_OK) { \
-            GEN_INTERNAL_MSG_EH(error, msg); \
-            GEN_DISPATCH_ERROR_HANDLER(error, msg); \
-            return error; \
-        } \
-    } while(0)
+	do { \
+		if(error != GEN_OK) { \
+			GEN_INTERNAL_MSG_EH(error, msg); \
+			GEN_DISPATCH_ERROR_HANDLER(error, msg); \
+			return error; \
+		} \
+	} while(0)
 
 /**
  * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not `EOK` or equivalent.
@@ -229,7 +230,8 @@ extern void* gen_error_handler_passthrough;
  * @param[in] proc the function which set errno.
  * @param[in] native_errno the errno value.
  */
-#define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) if(native_errno) GEN_ERROR_OUT_ERRNO(proc, native_errno)
+#define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) \
+	if(native_errno) GEN_ERROR_OUT_ERRNO(proc, native_errno)
 
 /**
  * Horrible macro string manipulation to get some nice output on your errno.
@@ -238,13 +240,13 @@ extern void* gen_error_handler_passthrough;
  * @param[in] native_errno the errno value.
  */
 #define GEN_REQUIRE_NO_ERRNO(proc, native_errno) \
-    do { \
-        const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
-        const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
-        if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "Require failed - %s: `%s` failed: %s", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno)); \
-        GEN_REQUIRE_EQUAL(GEN_OK, gen_internal_gen_require_no_errno_gen_error); \
-    } while(0)
-    
+	do { \
+		const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
+		const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
+		if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "Require failed - %s: `%s` failed: %s", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno)); \
+		GEN_REQUIRE_EQUAL(GEN_OK, gen_internal_gen_require_no_errno_gen_error); \
+	} while(0)
+
 #if GEN_GLOGGIFY_EH == ENABLED
 /**
  * Horrible macro string manipulation to get some nice output on your errno.
@@ -252,12 +254,12 @@ extern void* gen_error_handler_passthrough;
  * @param[in] native_errno the errno value.
  */
 #define GEN_ERROR_OUT_ERRNO(proc, native_errno) \
-    do { \
-        const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
-        const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
-        if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "%s: `%s` failed: %s at %s:%i", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno), __FILE__, __LINE__); \
-        return gen_internal_gen_require_no_errno_gen_error; \
-    } while(0)
+	do { \
+		const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
+		const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
+		if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "%s: `%s` failed: %s at %s:%i", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno), __FILE__, __LINE__); \
+		return gen_internal_gen_require_no_errno_gen_error; \
+	} while(0)
 #else
 #define GEN_ERROR_OUT_ERRNO(proc, native_errno) return gen_convert_errno(native_errno)
 #endif
@@ -265,7 +267,8 @@ extern void* gen_error_handler_passthrough;
 /**
  * This is to make the static analyzer happy.
  */
-#define GEN_INTERNAL_BASIC_PARAM_CHECK(param) if(!param) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`"#param"` was NULL")
+#define GEN_INTERNAL_BASIC_PARAM_CHECK(param) \
+	if(!param) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`" #param "` was NULL")
 
 /**
  * Converts an errno into a genstone error.

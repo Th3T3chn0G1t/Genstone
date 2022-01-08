@@ -39,7 +39,7 @@ GEN_ERRORABLE gen_dylib_load(gen_dylib_t* restrict output_dylib, const char* con
  * @param[in] symname the name of the symbol to get.
  * @return an error code.
  */
-GEN_ERRORABLE gen_dylib_symbol(void* restrict * const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname);
+GEN_ERRORABLE gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname);
 /**
  * Unloads a dynamic library.
  * @param[in] dylib the library to unload.

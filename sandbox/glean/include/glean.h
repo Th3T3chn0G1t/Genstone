@@ -9,16 +9,13 @@
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
 
-#include <gtk/gtk.h>
 #include <gdk/gdkkeysyms-compat.h>
-#include <vte/vte.h>
-
-#include <libgen.h>
-
-#include <sys/inotify.h>
-
 #include <gencommon.h>
 #include <genfs.h>
+#include <gtk/gtk.h>
+#include <libgen.h>
+#include <sys/inotify.h>
+#include <vte/vte.h>
 
 GEN_DIAG_REGION_END
 
@@ -127,7 +124,11 @@ typedef struct {
 	/**
 	 * The type of identification method to use
 	 */
-	enum { NAME, EXTENSION } type;
+	enum
+	{
+		NAME,
+		EXTENSION
+	} type;
 	/**
 	 * The data to compare to the filename under method
 	 * Only valid for `type` = `NAME` or `EXTENSION`
@@ -167,7 +168,8 @@ typedef struct {
 	 * The type of the messsage
 	 * Reflects the action requested to perform
 	 */
-	enum { PROMPT } type;
+	enum
+	{ PROMPT } type;
 
 	/**
 	 * The title to use for the dialog window
@@ -209,7 +211,7 @@ typedef struct {
 /**
  * Signature for inotify watch thread callbacks
  */
-typedef void (*inotify_watch_callback_T) (struct inotify_event*, int, void*);
+typedef void (*inotify_watch_callback_T)(struct inotify_event*, int, void*);
 
 /**
  * Helper macro, the read end of a pipe as output by `pipe`
@@ -255,7 +257,7 @@ extern void directory_tree_free(void);
 /// Inotify thread operations
 
 extern thrd_t file_begin_inotify_watcher(int comm_pipe);
-extern int file_add_inotify_handle(char* path, uint32_t mask, inotify_watch_callback_T callback, void* pass 	);
+extern int file_add_inotify_handle(char* path, uint32_t mask, inotify_watch_callback_T callback, void* pass);
 extern void file_remove_inotify_handle(int wd);
 extern void file_stop_inotify_root(void);
 

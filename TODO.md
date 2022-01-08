@@ -8,7 +8,7 @@
     - `memcpy`
     - Replace `mem*` family in Genstone with in-house wrappers
         - Replace `genstring`'s naive implementations with in-house wrappers of efficient impls
-- Format headers
+- Create format implementation
 - Redo examples
     - Build examples
 - Lock `genfs` objects on write
@@ -20,6 +20,7 @@
     - `memfd_create`
     - macOS RAMDisk mount at startup
     - Fix `genproc` tests
+- Add tests for `genstring`
 - Add a `PORTING.md` info file or put in `README.md`
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)

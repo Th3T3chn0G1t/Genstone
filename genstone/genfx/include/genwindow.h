@@ -21,19 +21,20 @@ typedef xcb_window_t gen_window_t;
  * Bitmasks for window attributes.
  * @see gen_window_modify
  */
-typedef enum {
-    /**
+typedef enum
+{
+	/**
      * Window visibility.
      */
-    GEN_WINDOW_VISIBILITY,
-    /**
+	GEN_WINDOW_VISIBILITY,
+	/**
      * Window position.
      */
-    GEN_WINDOW_POSITION,
-    /**
+	GEN_WINDOW_POSITION,
+	/**
      * Window size.
      */
-    GEN_WINDOW_SIZE
+	GEN_WINDOW_SIZE
 } gen_window_attrib_t;
 
 /**

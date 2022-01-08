@@ -28,58 +28,58 @@
  * A tooled call stack.
  */
 typedef struct {
-    /**
+	/**
      * Offset of the next free space in the stack.
      */
-    size_t next;
-    /**
+	size_t next;
+	/**
      * A buffer of function names.
      */
-    const char* functions[GEN_TOOLING_DEPTH];
-    /**
+	const char* functions[GEN_TOOLING_DEPTH];
+	/**
      * A buffer of function addresses.
      */
-    uintptr_t addresses[GEN_TOOLING_DEPTH]; 
-    /**
+	uintptr_t addresses[GEN_TOOLING_DEPTH];
+	/**
      * A buffer of source files for functions.
      */
-    const char* files[GEN_TOOLING_DEPTH];
+	const char* files[GEN_TOOLING_DEPTH];
 } gen_tooling_stack_t;
 
 /**
  * A frequency profile.
  */
 typedef struct {
-    /**
+	/**
      * The name of the profile.
      */
-    const char* name;
-    /**
+	const char* name;
+	/**
      * The number of calls the profile has had.
      */
-    uintmax_t n_calls;
-    /**
+	uintmax_t n_calls;
+	/**
      * The running total time for all calls.
      */
-    struct timeval running;
-    /**
+	struct timeval running;
+	/**
      * The time of the first call.
      */
-    struct timeval first;
-    /**
+	struct timeval first;
+	/**
      * The time of the last call.
      */
-    struct timeval last;
+	struct timeval last;
 } gen_tooling_freq_profile_t;
 
 /**
  * Handler for call stack push events.
  */
-typedef void (*gen_tooling_stack_push_handler_t) (void);
+typedef void (*gen_tooling_stack_push_handler_t)(void);
 /**
  * Handler for call stack pop events.
  */
-typedef void (*gen_tooling_stack_pop_handler_t) (void);
+typedef void (*gen_tooling_stack_pop_handler_t)(void);
 
 /**
  * The global tooled call stack.
@@ -130,7 +130,6 @@ extern void gen_internal_tooling_frame_scope_end(const char* const restrict pass
  */
 extern void gen_tooling_freq_profile_ping(const char* const restrict name);
 
-
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 /**
  * Begins a tooled frame with an automatic lifetime.
@@ -138,9 +137,9 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
  * @note For non-function frames use `gen_tooling_stack_push` directly.
  */
 #define GEN_FRAME_BEGIN(func) \
-    __attribute__((cleanup (gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar = '\0'; \
-    GEN_REQUIRE_EQUAL_STRING(#func, __func__); \
-    gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
+	__attribute__((cleanup(gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar = '\0'; \
+	GEN_REQUIRE_EQUAL_STRING(#func, __func__); \
+	gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)
 /**
  * @example{lineno} example/gencore/GEN_FRAME_BEGIN.c
  * Example for how to use `GEN_FRAME_BEGIN`.
@@ -163,10 +162,10 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
  * Frequency profiling for the call site.
  */
 #define GEN_NAMED_FREQ_PROFILE(name) \
-    do { \
-        if(!__builtin_constant_p(name)) glogf(WARNING, "Non-constant frequency profile name %s (%s)", #name, name); \
-        gen_tooling_freq_profile_ping(__func__); \
-    } while(0)
+	do { \
+		if(!__builtin_constant_p(name)) glogf(WARNING, "Non-constant frequency profile name %s (%s)", #name, name); \
+		gen_tooling_freq_profile_ping(__func__); \
+	} while(0)
 
 extern void gen_tooling_print_backtrace(void);
 

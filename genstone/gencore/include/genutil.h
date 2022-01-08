@@ -35,8 +35,8 @@
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH(iter, memb, len, container) \
-    __typeof__((container)[0]) memb = (container)[0]; \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
+	__typeof__((container)[0]) memb = (container)[0]; \
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
 
 /**
  * Iterates over a container with explicit length.
@@ -48,8 +48,8 @@
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_PTR(iter, memb, len, container) \
-    __typeof__((container)[0])* memb = &(container)[0]; \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
+	__typeof__((container)[0])* memb = &(container)[0]; \
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
 /**
  * Iterates over a container with explicit length.
@@ -63,33 +63,48 @@
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
-    __typeof__((container)) memb = (container); \
-    for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
+	__typeof__((container)) memb = (container); \
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
 
 /**
  * Gets the require message from the expected expressions type.
  * @param[in] b the expected expression.
  */
 #define GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b) \
-    generic((b), \
-        long double: "Require failed - Expected: `%s` (%Lf) Got: `%s` (%Lf) at %s:%i", \
-        double: "Require failed - Expected: `%s` (%lf) Got: `%s` (%lf) at %s:%i", \
-        float: "Require failed - Expected: `%s` (%f) Got: `%s` (%f) at %s:%i", \
-        unsigned long long: "Require failed - Expected: `%s` (%llu) Got: `%s` (%llu) at %s:%i", \
-        long long: "Require failed - Expected: `%s` (%lli) Got: `%s` (%lli) at %s:%i", \
-        unsigned long: "Require failed - Expected: `%s` (%lu) Got: `%s` (%lu) at %s:%i", \
-        long: "Require failed - Expected: `%s` (%li) Got: `%s` (%li) at %s:%i", \
-        unsigned int: "Require failed - Expected: `%s` (%u) Got: `%s` (%u) at %s:%i", \
-        int: "Require failed - Expected: `%s` (%i) Got: `%s` (%i) at %s:%i", \
-        unsigned short: "Require failed - Expected: `%s` (%hu) Got: `%s` (%hu) at %s:%i", \
-        short: "Require failed - Expected: `%s` (%hi) Got: `%s` (%hi) at %s:%i", \
-        signed char: "Require failed - Expected: `%s` (%hhi) Got: `%s` (%hhi) at %s:%i", \
-        unsigned char: "Require failed - Expected: `%s` (%hhu) Got: `%s` (%hhu) at %s:%i", \
-        char: "Require failed - Expected: `%s` (%c) Got: `%s` (%c) at %s:%i", \
-        bool: "Require failed - Expected: `%s` (%i) Got: `%s` (%i) at %s:%i", \
-        default: "Require failed - Expected: `%s` (%p) Got: `%s` (%p) at %s:%i" \
-    )
-    
+	generic((b), \
+			long double \
+			: "Require failed - Expected: `%s` (%Lf) Got: `%s` (%Lf) at %s:%i", \
+			  double \
+			: "Require failed - Expected: `%s` (%lf) Got: `%s` (%lf) at %s:%i", \
+			  float \
+			: "Require failed - Expected: `%s` (%f) Got: `%s` (%f) at %s:%i", \
+			  unsigned long long \
+			: "Require failed - Expected: `%s` (%llu) Got: `%s` (%llu) at %s:%i", \
+			  long long \
+			: "Require failed - Expected: `%s` (%lli) Got: `%s` (%lli) at %s:%i", \
+			  unsigned long \
+			: "Require failed - Expected: `%s` (%lu) Got: `%s` (%lu) at %s:%i", \
+			  long \
+			: "Require failed - Expected: `%s` (%li) Got: `%s` (%li) at %s:%i", \
+			  unsigned int \
+			: "Require failed - Expected: `%s` (%u) Got: `%s` (%u) at %s:%i", \
+			  int \
+			: "Require failed - Expected: `%s` (%i) Got: `%s` (%i) at %s:%i", \
+			  unsigned short \
+			: "Require failed - Expected: `%s` (%hu) Got: `%s` (%hu) at %s:%i", \
+			  short \
+			: "Require failed - Expected: `%s` (%hi) Got: `%s` (%hi) at %s:%i", \
+			  signed char \
+			: "Require failed - Expected: `%s` (%hhi) Got: `%s` (%hhi) at %s:%i", \
+			  unsigned char \
+			: "Require failed - Expected: `%s` (%hhu) Got: `%s` (%hhu) at %s:%i", \
+			  char \
+			: "Require failed - Expected: `%s` (%c) Got: `%s` (%c) at %s:%i", \
+			  bool \
+			: "Require failed - Expected: `%s` (%i) Got: `%s` (%i) at %s:%i", \
+			  default \
+			: "Require failed - Expected: `%s` (%p) Got: `%s` (%p) at %s:%i")
+
 /**
  * @example{lineno} example/gencore/GEN_REQUIRE.c
  * Example for how to use the `GEN_REQUIRE*` family of macros.
@@ -105,13 +120,13 @@
  * @note Only works for trivial types.
  */
 #define GEN_REQUIRE_EQUAL(a, b) \
-    do { \
-        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` is not constant at %s:%i", #a, __FILE__, __LINE__); \
-        if(a != b) { \
-            glogf(FATAL, GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __FILE__, __LINE__); \
-        	GEN_REQUIRE_NO_REACH; \
-        } \
-    } while(0)
+	do { \
+		if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` is not constant at %s:%i", #a, __FILE__, __LINE__); \
+		if(a != b) { \
+			glogf(FATAL, GEN_INTERNAL_REQUIRE_EQUAL_MESSAGE(b), #a, a, #b, b, __FILE__, __LINE__); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
+	} while(0)
 
 /**
  * Pretty assertion for equality of strings.
@@ -120,13 +135,13 @@
  * @note Use `GEN_REQUIRE_EQUAL_MEMREGION` for non-constant expected values.
  */
 #define GEN_REQUIRE_EQUAL_STRING(a, b) \
-    do { \
-        if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` (%s) is not constant at %s:%i", #a, a, __FILE__, __LINE__); \
-        if(!b || strcmp(a, b)) { \
-            glogf(FATAL, "Require failed - Expected: `%s` (%s) Got: `%s` (%s) at %s:%i", #a, a, #b, b, __FILE__, __LINE__); \
-        	GEN_REQUIRE_NO_REACH; \
-        } \
-    } while(0)
+	do { \
+		if(!__builtin_constant_p(a)) glogf(WARNING, "Expected expression `%s` (%s) is not constant at %s:%i", #a, a, __FILE__, __LINE__); \
+		if(!b || strcmp(a, b)) { \
+			glogf(FATAL, "Require failed - Expected: `%s` (%s) Got: `%s` (%s) at %s:%i", #a, a, #b, b, __FILE__, __LINE__); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
+	} while(0)
 
 /**
  * Pretty assertion for equality of memory regions.
@@ -135,32 +150,32 @@
  * @param[in] s the amount of data in bytes to compare.
  */
 #define GEN_REQUIRE_EQUAL_MEMREGION(a, b, s) \
-    do { \
-        if((!b && s) || memcmp(a, b, s)) { \
-            glogf(FATAL, "Require failed - Expected: `%s` (%p) (%c%c%c...) Got: `%s` (%p) (%c%c%c...) at %s:%i", #a, a, ((char* const restrict) a)[0], ((char* const restrict) a)[1], ((char* const restrict) a)[2], #b, b, ((char* const restrict) b)[0], ((char* const restrict) b)[1], ((char* const restrict) b)[2], __FILE__, __LINE__); \
-        	GEN_REQUIRE_NO_REACH; \
-        } \
-    } while(0)
+	do { \
+		if((!b && s) || memcmp(a, b, s)) { \
+			glogf(FATAL, "Require failed - Expected: `%s` (%p) (%c%c%c...) Got: `%s` (%p) (%c%c%c...) at %s:%i", #a, a, ((char* const restrict) a)[0], ((char* const restrict) a)[1], ((char* const restrict) a)[2], #b, b, ((char* const restrict) b)[0], ((char* const restrict) b)[1], ((char* const restrict) b)[2], __FILE__, __LINE__); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
+	} while(0)
 
 /**
  * Pretty assertion for bad control paths.
  */
 #define GEN_REQUIRE_NO_REACH \
-    do { \
-        glogf(FATAL, "Require failed - Invalid control path reached at %s:%i", __FILE__, __LINE__); \
-        abort(); \
-    } while(0)
+	do { \
+		glogf(FATAL, "Require failed - Invalid control path reached at %s:%i", __FILE__, __LINE__); \
+		abort(); \
+	} while(0)
 
 /**
  * Pretty assertion for `result == GEN_OK`.
  */
 #define GEN_REQUIRE_NO_ERROR(result) \
-    do { \
-        if(result != GEN_OK) { \
-            glogf(FATAL, "Require failed - Got error: `%s` (%s) at %s:%i", gen_error_name(result), gen_error_description(result), __FILE__, __LINE__); \
-            GEN_REQUIRE_NO_REACH; \
-        } \
-    } while(0)
+	do { \
+		if(result != GEN_OK) { \
+			glogf(FATAL, "Require failed - Got error: `%s` (%s) at %s:%i", gen_error_name(result), gen_error_description(result), __FILE__, __LINE__); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
+	} while(0)
 
 /**
  * Pretty assertion for truthiness.
@@ -168,12 +183,12 @@
  * @note Only works for trivial types.
  */
 #define GEN_REQUIRE_NON_NULL(a) \
-    do { \
-        if(!a) { \
-            glogf(FATAL, "Require failed - %s was NULL at %s:%i", #a, __FILE__, __LINE__); \
-            GEN_REQUIRE_NO_REACH; \
-        } \
-    } while(0)
+	do { \
+		if(!a) { \
+			glogf(FATAL, "Require failed - %s was NULL at %s:%i", #a, __FILE__, __LINE__); \
+			GEN_REQUIRE_NO_REACH; \
+		} \
+	} while(0)
 
 #define GEN_MICROSECONDS_PER_SECOND 1000000
 #define GEN_MILLISECONDS_PER_SECOND 1000

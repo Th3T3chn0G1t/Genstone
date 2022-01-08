@@ -160,7 +160,7 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 	size_t search_length = string_length;
 	if(limit < search_length) search_length = limit;
 
-	GEN_STRING_FOREACH(c, string_bound, string) {
+	GEN_STRING_FOREACH(c, search_length, string) {
 		if(*c == character) {
 			*out_found = c;
 			GEN_ALL_OK;
@@ -187,7 +187,7 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 	size_t search_length = string_length;
 	if(limit < search_length) search_length = limit;
 
-	GEN_STRING_FOREACH(c, string_bound, string) {
+	GEN_STRING_FOREACH(c, search_length, string) {
 		const char* const current = ((string + (string_length - 1)) - (c - string));
 		if(*current == character) {
 			*out_found = current;

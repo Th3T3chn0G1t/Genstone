@@ -65,7 +65,7 @@ GEN_ERRORABLE gen_string_length(const char* const restrict string, const size_t 
  * @param[out] out_duplicated pointer to storage for a pointer to the duplicated string. Must be freed.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict * const restrict out_duplicated);
+GEN_ERRORABLE gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated);
 /**
  * Finds the first occurrence of a character in a string.
  * @param[in] string the string to search in.

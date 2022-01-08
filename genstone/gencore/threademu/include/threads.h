@@ -20,12 +20,25 @@ typedef void (*tss_dtor_t)(void*);
 typedef int (*thrd_start_t)(void*);
 
 struct impl_thrd_param {
-    thrd_start_t func;
-    void* arg;
+	thrd_start_t func;
+	void* arg;
 };
 
-enum { mtx_plain, mtx_try, mtx_timed, mtx_recursive };
-enum { thrd_success, thrd_timeout, thrd_error, thrd_busy, thrd_nomem };
+enum
+{
+	mtx_plain,
+	mtx_try,
+	mtx_timed,
+	mtx_recursive
+};
+enum
+{
+	thrd_success,
+	thrd_timeout,
+	thrd_error,
+	thrd_busy,
+	thrd_nomem
+};
 
 #define TSS_DTOR_ITERATIONS PTHREAD_DESTRUCTOR_ITERATIONS
 

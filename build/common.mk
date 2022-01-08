@@ -309,7 +309,7 @@ endif
 
 clean_tmpfile:
 	@$(ECHO) "$(ACTION_PREFIX)"
-	-@rm $(wildcard tmp/*.tmp)
+	-rm $(wildcard tmp/*.tmp)
 	@$(ECHO) "$(ACTION_SUFFIX)"
 
 clean_clang_tooling_artifacts:
@@ -317,6 +317,7 @@ clean_clang_tooling_artifacts:
 	-rm $(shell find . -name "*.gcda")
 	-rm $(shell find . -name "*.gcno")
 	-rm $(wildcard "*.profraw")
+	-rm $(shell find . -name "*.depfile")
 	@$(ECHO) "$(ACTION_SUFFIX)"
 
 tmp:
