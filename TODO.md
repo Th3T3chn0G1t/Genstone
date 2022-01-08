@@ -15,6 +15,9 @@
 - Sinks impl for `glog`
 - Remove instances of VLAs
     - Remove `-Wno-vla`
+- Redo `genargs` with `genstring`
+    - Add `--opt="string"` support
+- `GEN_ERROR_OUT_IF` take proc instead of message to be consistent with `GEN_ERROR_OUT_IF_ERRNO`
 - Replace shell mode for `genproc` with proper parameter arrays
 - Nice dynamic RAMDisk for `genfs`
     - `memfd_create`

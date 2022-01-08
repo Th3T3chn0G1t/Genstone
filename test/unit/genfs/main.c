@@ -61,7 +61,9 @@ int main(void) {
 	GEN_REQUIRE_EQUAL(sizeof(file_data), file_size);
 
 	glog(INFO, "Testing gen_handle_read()...");
-	uint8_t file_read_buffer[file_size + 1];
+	uint8_t* file_read_buffer = NULL;
+	error = gzalloc((void**) &file_read_buffer, file_size + 1, sizeof(uint8_t));
+	GEN_REQUIRE_NO_ERROR(error);
 	error = gen_handle_read(file_read_buffer, &file_handle, 0, file_size);
 	file_read_buffer[file_size] = '\0';
 

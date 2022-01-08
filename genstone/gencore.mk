@@ -1,4 +1,4 @@
-GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-gnu-statement-expression -Wno-c++98-compat -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-vla -Wno-poison-system-directories -Wno-unknown-warning-option  -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-register -Wno-overlength-strings
+GEN_CORE_DIAGNOSTIC_FLAGS = -Werror -Weverything -Wno-gnu-statement-expression -Wno-c++98-compat -Wno-redundant-parens -Wno-atomic-implicit-seq-cst -Wno-padded -Wno-poison-system-directories -Wno-unknown-warning-option  -Wno-c++98-compat-pedantic -Wno-old-style-cast -Wno-register -Wno-overlength-strings
 GEN_CORE_CFLAGS = -Igenstone/gencore/include $(SAFEC_CFLAGS) $(MIMALLOC_CFLAGS) $(GEN_CORE_DIAGNOSTIC_FLAGS)
 ifeq ($(PLATFORM),DWN)
 GEN_CORE_CFLAGS += -Igenstone/gencore/threademu/include

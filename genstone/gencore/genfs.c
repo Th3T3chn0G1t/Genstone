@@ -300,9 +300,17 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 		ioctl(handle->file_handle, FIONREAD, &events_size);
 		GEN_ERROR_OUT_IF_ERRNO(ioctl, errno);
 
-		alignas(struct inotify_event) unsigned char raw_events[events_size];
+		unsigned char* raw_events = NULL;
+		gen_error_t error = gzalloc_aligned((void**) &raw_events, events_size, sizeof(unsigned char), alignof(struct inotify_event));
+		GEN_ERROR_OUT_IF(error, "`gzalloc_aligned` failed");
+
 		read(handle->file_handle, raw_events, events_size);
-		GEN_ERROR_OUT_IF_ERRNO(read, errno);
+		if(errno != EOK) {
+			error = gfree(raw_events);
+			GEN_ERROR_OUT_IF(error, "`gfree` failed");
+
+			GEN_ERROR_OUT_ERRNO(read, errno);
+		}
 
 		unsigned int offset = 0;
 		while(offset < events_size) {
@@ -320,8 +328,11 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 			offset += sizeof(struct inotify_event) + event->len;
 		}
+		error = gfree(raw_events);
+		GEN_ERROR_OUT_IF(error, "`gfree` failed");
 	}
 
+	GEN_ALL_OK;
 #else
 	struct stat file_info;
 	fstat(handle->file_handle, &file_info);
@@ -349,9 +360,9 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 	handle->internal_descriptor_details = file_info;
 	GEN_ERROR_OUT_IF_ERRNO(memcpy_s, errno);
-#endif
 
 	GEN_ALL_OK;
+#endif
 }
 
 gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle) {

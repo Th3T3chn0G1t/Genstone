@@ -30,22 +30,44 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 #endif
 
 	const size_t lib_file_name_len = (sizeof(lib_prefix) - 1) + lib_name_len + (sizeof(lib_suffix) - 1) + 1;
-	char lib_file_name[lib_file_name_len];
-	memset(lib_file_name, 0, lib_file_name_len);
+	char* lib_file_name = NULL;
+	error = gzalloc((void**) &lib_file_name, lib_file_name_len, sizeof(char));
+	GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
 
 	error = gen_string_append(lib_file_name, lib_file_name_len, lib_prefix, sizeof(lib_prefix), sizeof(lib_prefix) - 1);
-	GEN_ERROR_OUT_IF(error, "`gen_string_append` failed");
+	if(error != GEN_OK) {
+		gen_error_t free_error = gfree(lib_file_name);
+		GEN_ERROR_OUT_IF(free_error, "`gfree` failed");
+
+		GEN_ERROR_OUT(error, "`gen_string_append` failed");
+	}
 	error = gen_string_append(lib_file_name, lib_file_name_len, lib_name, lib_name_len + 1, lib_name_len);
-	GEN_ERROR_OUT_IF(error, "`gen_string_append` failed");
+	if(error != GEN_OK) {
+		gen_error_t free_error = gfree(lib_file_name);
+		GEN_ERROR_OUT_IF(free_error, "`gfree` failed");
+
+		GEN_ERROR_OUT(error, "`gen_string_append` failed");
+	}
 	error = gen_string_append(lib_file_name, lib_file_name_len, lib_suffix, sizeof(lib_suffix), sizeof(lib_suffix) - 1);
-	GEN_ERROR_OUT_IF(error, "`gen_string_append` failed");
+	if(error != GEN_OK) {
+		gen_error_t free_error = gfree(lib_file_name);
+		GEN_ERROR_OUT_IF(free_error, "`gfree` failed");
+
+		GEN_ERROR_OUT(error, "`gen_string_append` failed");
+	}
 
 	if(!(*output_dylib = dlopen(lib_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
 #if GEN_GLOGGIFY_EH == ENABLED
 		glogf(ERROR, "Failed to load library '%s': %s", lib_file_name, dlerror());
 #endif
+		gen_error_t free_error = gfree(lib_file_name);
+		GEN_ERROR_OUT_IF(free_error, "`gfree` failed");
+
 		GEN_ERROR_OUT(GEN_UNKNOWN, "`dlopen` failed");
 	}
+
+	gen_error_t free_error = gfree(lib_file_name);
+	GEN_ERROR_OUT_IF(free_error, "`gfree` failed");
 
 	GEN_ALL_OK;
 }

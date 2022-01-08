@@ -14,10 +14,10 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 	if(n_short_args && !short_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`short_args` was NULL but `n_short_args` > 0");
 	if(n_long_args && !long_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`long_args` was NULL but `n_long_args` > 0");
 
-	// Precalculating the long args' lengths to save time while looping
-	// We need this weirdness to avoid creating a zero-length VLA
-	size_t long_arg_lens[n_long_args ? n_long_args : 1];
+	size_t* long_arg_lens = NULL;
 	if(n_long_args) {
+		gen_error_t error = gzalloc((void**) &long_arg_lens, n_long_args, sizeof(size_t));
+		GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
 		GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {
 			*len = 0;
 			while(long_args[i][*len]) ++(*len);
@@ -71,9 +71,19 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 			value = (*arg);
 		}
 
-		if(argn == SIZE_MAX) GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "An unknown argument was passed");
+		if(argn == SIZE_MAX) {
+			if(n_long_args) {
+				gen_error_t error = gfree(long_arg_lens);
+				GEN_ERROR_OUT_IF(error, "`gfree` failed");
+			}
+			GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "An unknown argument was passed");
+		}
 		handler(type, argn, value, passthrough);
 	}
 
+	if(n_long_args) {
+		gen_error_t error = gfree(long_arg_lens);
+		GEN_ERROR_OUT_IF(error, "`gfree` failed");
+	}
 	GEN_ALL_OK;
 }
