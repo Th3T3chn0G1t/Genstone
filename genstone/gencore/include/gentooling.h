@@ -137,6 +137,7 @@ extern void gen_tooling_freq_profile_ping(const char* const restrict name);
  * @note For non-function frames use `gen_tooling_stack_push` directly.
  */
 #define GEN_FRAME_BEGIN(func) \
+	errno = EOK; /* This is *very* naughty but it really screws us up if we don't do it due to errno being taken as a condition basically everywhere */ \
 	__attribute__((cleanup(gen_internal_tooling_frame_scope_end))) __unused const char gen_internal_frame_scope_tmpvar = '\0'; \
 	GEN_REQUIRE_EQUAL_STRING(#func, __func__); \
 	gen_tooling_stack_push(__func__, (uintptr_t) func, __FILE__)

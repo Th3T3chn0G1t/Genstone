@@ -1,6 +1,7 @@
 # TODO
 
-- Fix `-DDEBUG` and `DEBUG` enumeration conflict
+- Uncomment submodule initialization in vulkan Makefiles
+- Review static analysis warning-creep
 - Make `gen_filesystem_handle_t` internal storage for filesystem event notify backend-specific
 - Recentralize opts into gendbg or decentralize them completely
 - Memory equivalent to `genstring`
@@ -13,8 +14,6 @@
     - Build examples
 - Lock `genfs` objects on write
 - Sinks impl for `glog`
-- Remove instances of VLAs
-    - Remove `-Wno-vla`
 - Redo `genargs` with `genstring`
     - Add `--opt="string"` support
 - `GEN_ERROR_OUT_IF` take proc instead of message to be consistent with `GEN_ERROR_OUT_IF_ERRNO`
@@ -28,14 +27,13 @@
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
 - Time-formats
-- generator (editor)
+- `generator` (editor)
     - Visual build tool
-- Work on GenUIne with binary partitioning
+- Work on `genuine` with binary partitioning
 - Networking
 - Compression
 - Memory tools
     - Measure usage
-- Windowing
 - Databases
 - Cryptography
     - Hashing

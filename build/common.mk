@@ -205,7 +205,7 @@ endif
 
 CXX_UNSUPPORTED_CFLAGS += -std=gnu2x
 GLOBAL_CXX_FLAGS += -std=gnu++17
-GLOBAL_C_FLAGS += -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -std=gnu2x -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -std=gnu2x -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
 
 ifeq ($(STRIP_BINARIES),ENABLED)
 GLOBAL_L_FLAGS += -Wl,-s

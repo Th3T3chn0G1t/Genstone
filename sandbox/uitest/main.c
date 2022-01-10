@@ -1,6 +1,6 @@
 #include <gencommon.h>
-#include <genuine.h>
 #include <genfs.h>
+#include <genuine.h>
 
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
@@ -58,6 +58,9 @@ int main(void) {
 	SDL_Texture* viewport_texture = SDL_CreateTextureFromSurface(renderer, viewport_texture_r);
 	SDL_FreeSurface(viewport_texture_r);
 
+	gen_filesystem_handle_t dir;
+	(void) gen_handle_open(&dir, ".");
+
 	while(true) {
 		SDL_Event e;
 		while(SDL_PollEvent(&e) != 0) {
@@ -114,11 +117,7 @@ int main(void) {
 		(void) gen_ui_draw_ninepatch_direct(viewport_texture, rect_callback, (gen_ui_rect_t){VIEWPORT_X, SIDEBAR_Y, (screen_width - ui_scale) - (VIEWPORT_X + HIERARCHY_WIDTH + ui_scale), (screen_height - ui_scale) - (SIDEBAR_Y + EXPLORER_HEIGHT + ui_scale)}, NINEPATCH_SCALE, ui_scale, NULL);
 
 		dir_list_height = 0;
-		gen_filesystem_handle_t dir;
-		(void) gzalloc((void**) &dir.path, GEN_PATH_MAX, sizeof(char));
-		(void) gen_handle_open(&dir, ".");
 		(void) gen_directory_list(&dir, dir_list_callback, font);
-		(void) gen_handle_close(&dir);
 
 		SDL_RenderPresent(renderer);
 		TTF_CloseFont(font);
@@ -126,6 +125,8 @@ int main(void) {
 		SDL_Delay(MILLIS_PER_SECOND / FPS);
 	}
 cleanup:
+	(void) gen_handle_close(&dir);
+
 	SDL_DestroyTexture(texture);
 	SDL_DestroyTexture(viewport_texture);
 	SDL_DestroyWindow(window);

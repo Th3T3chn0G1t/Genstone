@@ -18,12 +18,17 @@ build_message_mimalloc:
 	@$(ECHO) "$(SECTION_PREFIX) Mimalloc"
 	@$(ECHO) "$(INFO_PREFIX) The gods of Microsoft hath bestowed their memory magic on us"
 
-mimalloc: build_message_mimalloc $(MIMALLOC_LIB) ### @Vendor builds Microsoft `mimalloc` as a Genstone module
+mimalloc: build_message_mimalloc $(MIMALLOC_LIB) ### @Vendor Builds Microsoft `mimalloc` as a Genstone module
 
 $(MIMALLOC_LIB): CFLAGS = $(_MIMALLOC_CFLAGS)
 $(MIMALLOC_LIB): LFLAGS = $(_MIMALLOC_LFLAGS)
 $(MIMALLOC_LIB): CLANG_FORMAT = DISABLED
 $(MIMALLOC_LIB): $(MIMALLOC_OBJECTS) | lib
+
+$(MIMALLOC_SOURCES): | genstone/vendor/mimalloc
+
+genstone/vendor/mimalloc:
+	git submodule update --init genstone/vendor/mimalloc
 
 clean_mimalloc:
 	@$(ECHO) "$(ACTION_PREFIX)"
