@@ -56,7 +56,7 @@ GEN_ERRORABLE gen_string_append(char* const restrict destination, const size_t d
  * @param[out] out_length pointer to storage for the length of the string.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_length(const char* const restrict string, const size_t string_bound, size_t* const restrict out_length);
+GEN_ERRORABLE gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length);
 /**
  * Duplicates a string onto the heap.
  * @param[in] string the string to duplicate.

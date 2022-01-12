@@ -18,7 +18,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	if(!lib_name) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`lib_name` was invalid");
 
 	size_t lib_name_len = 0;
-	gen_error_t error = gen_string_length(lib_name, GEN_PATH_MAX + 1, &lib_name_len);
+	gen_error_t error = gen_string_length(lib_name, GEN_PATH_MAX + 1, GEN_PATH_MAX, &lib_name_len);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 #if PLATFORM == DWN

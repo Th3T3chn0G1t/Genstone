@@ -58,7 +58,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	// This is a kinda nonsensical test but it feels like the best way to do this
 	// Testing if length of path is less than GEN_PATH_MAX
 	size_t path_len = 0;
-	gen_error_t error = gen_string_length(path, GEN_PATH_MAX + 1, &path_len);
+	gen_error_t error = gen_string_length(path, GEN_PATH_MAX + 1, GEN_PATH_MAX, &path_len);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	GEN_ALL_OK;
