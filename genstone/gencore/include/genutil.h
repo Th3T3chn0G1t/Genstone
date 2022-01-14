@@ -51,6 +51,11 @@
 	__typeof__((container)[0])* memb = &(container)[0]; \
 	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
 
+#define GEN_FOREACH_PTR_NEXT(iter, memb, len, container) \
+	do { \
+		memb = iter < len ? &(container)[++iter + 1] : NULL; \
+	} while(0)
+
 /**
  * Iterates over a container with explicit length.
  * `memb` is a pointer to the indexed member.

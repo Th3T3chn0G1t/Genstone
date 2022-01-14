@@ -1,5 +1,6 @@
 # TODO
 
+- Add next for every gen foreach
 - Uncomment submodule initialization in vulkan Makefiles
 - Review static analysis warning-creep
 - Make `gen_filesystem_handle_t` internal storage for filesystem event notify backend-specific
