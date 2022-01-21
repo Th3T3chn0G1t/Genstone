@@ -50,7 +50,7 @@ void gen_tooling_freq_profile_ping(const char* const restrict name) {
 			gen_timeval_add(&profile->running, &delta, &profile->running);
 			profile->last.tv_sec = current_time.tv_sec;
 			profile->last.tv_usec = current_time.tv_usec;
-			++profile->n_calls;
+			++profile->calls_length;
 
 			return;
 		}
@@ -69,7 +69,7 @@ void gen_tooling_freq_profile_ping(const char* const restrict name) {
 	new_profile->first.tv_usec = current_time.tv_usec;
 	new_profile->last.tv_sec = current_time.tv_sec;
 	new_profile->last.tv_usec = current_time.tv_usec;
-	++new_profile->n_calls;
+	++new_profile->calls_length;
 }
 
 void gen_tooling_print_backtrace(void) {

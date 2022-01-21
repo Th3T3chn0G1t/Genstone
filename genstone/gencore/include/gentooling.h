@@ -57,7 +57,7 @@ typedef struct {
 	/**
      * The number of calls the profile has had.
      */
-	uintmax_t n_calls;
+	uintmax_t calls_length;
 	/**
      * The running total time for all calls.
      */

@@ -14,11 +14,11 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 	if(n_short_args && !short_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`short_args` was NULL but `n_short_args` > 0");
 	if(n_long_args && !long_args) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`long_args` was NULL but `n_long_args` > 0");
 
-	size_t* long_arg_lens = NULL;
+	size_t* long_arg_lengths = NULL;
 	if(n_long_args) {
-		gen_error_t error = gzalloc((void**) &long_arg_lens, n_long_args, sizeof(size_t));
+		gen_error_t error = gzalloc((void**) &long_arg_lengths, n_long_args, sizeof(size_t));
 		GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
-		GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lens) {
+		GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lengths) {
 			*len = 0;
 			while(long_args[i][*len]) ++(*len);
 		}
@@ -33,16 +33,16 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 			if((*arg)[1] == '-' && n_long_args) {
 				type = GEN_ARG_LONG;
 				GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
-					const size_t arg_len = long_arg_lens[j];
+					const size_t arg_length = long_arg_lengths[j];
 
 					// Calculating inline like this might be very slightly faster
 					// given the specific use-case
-					GEN_FOREACH_PTR(k, arg_char, arg_len, *long_arg) {
+					GEN_FOREACH_PTR(k, arg_char, arg_length, *long_arg) {
 						if(*arg_char != (*arg)[k + 2]) goto long_arg_continue;
 					}
 
 					argn = j;
-					if((*arg)[arg_len + 2]) value = (*arg) + 2 + arg_len + 1;
+					if((*arg)[arg_length + 2]) value = (*arg) + 2 + arg_length + 1;
 
 				long_arg_continue:
 					continue;
@@ -73,7 +73,7 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 
 		if(argn == SIZE_MAX) {
 			if(n_long_args) {
-				gen_error_t error = gfree(long_arg_lens);
+				gen_error_t error = gfree(long_arg_lengths);
 				GEN_ERROR_OUT_IF(error, "`gfree` failed");
 			}
 			GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "An unknown argument was passed");
@@ -82,7 +82,7 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 	}
 
 	if(n_long_args) {
-		gen_error_t error = gfree(long_arg_lens);
+		gen_error_t error = gfree(long_arg_lengths);
 		GEN_ERROR_OUT_IF(error, "`gfree` failed");
 	}
 	GEN_ALL_OK;

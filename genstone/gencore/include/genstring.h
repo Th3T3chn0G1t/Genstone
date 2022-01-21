@@ -16,7 +16,7 @@
  */
 #define GEN_STRING_NO_BOUND SIZE_MAX
 
-#define GEN_STRING_FOREACH(member, n_members, container) for(register __typeof__((container)[0])* member = &(container)[0]; (size_t) ((member) - (container)) < (n_members); ++(member))
+#define GEN_STRING_FOREACH(member, members_length, container) for(register __typeof__((container)[0])* member = &(container)[0]; (size_t) ((member) - (container)) < (members_length); ++(member))
 
 /**
  * Compares 2 strings.

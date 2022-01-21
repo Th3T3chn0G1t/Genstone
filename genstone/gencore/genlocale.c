@@ -46,7 +46,7 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 // strftime(strtv, 1024, "%X %Z%z %a %d %b %Y", localtime(&now));
 // printf("%s", strtv);
 
-// const static uint64_t month_lens[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+// const static uint64_t month_lengths[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 // gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds, const gen_dt_fmt_flags_t flags) {
 // 	if(flags & GEN_DT_FMT_TIME) {
@@ -56,7 +56,7 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 // 	}
 
 // 	if(flags & GEN_DT_FMT_DATE) {
-// 		if(day > month_lens[month]) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`day` exceeded the number of days in `month`");
+// 		if(day > month_lengths[month]) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`day` exceeded the number of days in `month`");
 // 	}
 
 // 	// year month day hours minutes seconds

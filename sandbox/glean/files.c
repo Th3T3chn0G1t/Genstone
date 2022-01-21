@@ -85,10 +85,10 @@ char* get_extensionless_filename(const char* path) {
 		return str;
 	}
 
-	size_t n_chars = (size_t) ((uintptr_t) dot - (uintptr_t) base);
+	size_t chars_length = (size_t) ((uintptr_t) dot - (uintptr_t) base);
 	(void) gfree(tmp);
 	char* str;
-	(void) gstrndup(&str, base, n_chars);
+	(void) gstrndup(&str, base, chars_length);
 	return str;
 }
 
@@ -101,11 +101,11 @@ char* get_home_relative_path(char* path) {
 	GEN_FRAME_BEGIN(get_home_relative_path);
 
 	char* home = getenv("HOME");
-	size_t home_len = strlen(home);
+	size_t home_length = strlen(home);
 
 	char* home_rel_path = NULL;
-	if(!strncmp(path, home, home_len)) {
-		(void) gstrndup(&home_rel_path, path + (home_len - 1), strlen(path + (home_len - 1)));
+	if(!strncmp(path, home, home_length)) {
+		(void) gstrndup(&home_rel_path, path + (home_length - 1), strlen(path + (home_length - 1)));
 		home_rel_path[0] = '~';
 	}
 	return home_rel_path;
@@ -139,7 +139,7 @@ char* get_path_from_home_relative(char* path) {
 static void _tree_view_populate(GtkTreeStore* store, GtkTreeIter* parent, tree_node_T* node) {
 	GEN_FRAME_BEGIN(_tree_view_populate);
 
-	for(unsigned long i = 0; i < node->children->n_members; i++) {
+	for(unsigned long i = 0; i < node->children->members_length; i++) {
 		tree_node_T* child = node->children->members[i];
 		char* title = basename(child->data);
 
@@ -149,7 +149,7 @@ static void _tree_view_populate(GtkTreeStore* store, GtkTreeIter* parent, tree_n
 		gtk_tree_store_set(store, &current, 0, "text-x-generic", 1, title, -1);
 
 		// If the child's file extension is mapped to an icon, apply it
-		for(size_t j = 0; j < icon_map->n_mappings; j++) {
+		for(size_t j = 0; j < icon_map->mappings_length; j++) {
 			switch(icon_map->keys[j].type) {
 				case NAME: {
 					if(!strcmp(icon_map->keys[j].data, title)) {
@@ -406,7 +406,7 @@ static void _directory_tree_free(tree_node_T* current) {
 
 	(void) gfree(current->data);
 	if(current->children) {
-		for(unsigned long i = 0; i < current->children->n_members; i++) {
+		for(unsigned long i = 0; i < current->children->members_length; i++) {
 			_directory_tree_free(current->children->members[i]);
 			if(current->children->members[i]) (void) gfree(current->children->members[i]);
 		}
@@ -430,13 +430,13 @@ void directory_tree_free(void) {
  * Finds the first occurrence in an array
  * @param key the key to search for
  * @param values the values to search in
- * @param n_values the number of values to search
+ * @param values_length the number of values to search
  * @return the index of `key` in `values`, or SIZE_MAX if not present
  */
-static size_t find(int key, int* values, size_t n_values) {
+static size_t find(int key, int* values, size_t values_length) {
 	GEN_FRAME_BEGIN(find);
 
-	for(size_t i = 0; i < n_values; i++)
+	for(size_t i = 0; i < values_length; i++)
 		if(values[i] == key) return i;
 	return SIZE_MAX;
 }
@@ -458,7 +458,7 @@ static int inotify_watcher_func(void* vargp) {
 	(void) vargp;
 
 	// Mappings from watch descriptors to callbacks and callback data
-	size_t n_mappings = 0;
+	size_t mappings_length = 0;
 	int* other_wds = NULL;
 	inotify_watch_callback_T* callbacks = NULL;
 	void** passthroughs = NULL;
@@ -474,7 +474,7 @@ static int inotify_watcher_func(void* vargp) {
 		FD_SET(inotify_fd, &set);
 		FD_SET(inotify_watch_thread_fd[PIPE_READ], &set);
 		if(select(MAX(inotify_fd, inotify_watch_thread_fd[PIPE_READ]) + 1, &set, NULL, NULL, NULL) == -1) {
-			glogf(ERROR, "Failed to monitor %lu fds: %s", n_mappings + 1, strerror(errno));
+			glogf(ERROR, "Failed to monitor %lu fds: %s", mappings_length + 1, strerror(errno));
 			continue;
 		}
 
@@ -486,9 +486,9 @@ static int inotify_watcher_func(void* vargp) {
 			switch(message.type) {
 				case ADD: {
 					// Allocate a new mapping for the incoming data
-					(void) grealloc((void**) &other_wds, ++n_mappings, sizeof(int));
-					(void) grealloc((void**) &callbacks, n_mappings, sizeof(inotify_watch_callback_T));
-					(void) grealloc((void**) &passthroughs, n_mappings, sizeof(void*));
+					(void) grealloc((void**) &other_wds, ++mappings_length, sizeof(int));
+					(void) grealloc((void**) &callbacks, mappings_length, sizeof(inotify_watch_callback_T));
+					(void) grealloc((void**) &passthroughs, mappings_length, sizeof(void*));
 					// Add the watcher
 					int wd = inotify_add_watch(inotify_fd, message.path, message.mask);
 					if(wd == -1)
@@ -498,9 +498,9 @@ static int inotify_watcher_func(void* vargp) {
 						if(write(message.ret_fd, &wd, sizeof(int)) == -1)
 							glogf(ERROR, "Failed to write return value to thread communication pipe: %s", strerror(errno));
 						// Set the new mappings
-						other_wds[n_mappings - 1] = wd;
-						callbacks[n_mappings - 1] = message.callback;
-						passthroughs[n_mappings - 1] = message.pass;
+						other_wds[mappings_length - 1] = wd;
+						callbacks[mappings_length - 1] = message.callback;
+						passthroughs[mappings_length - 1] = message.pass;
 
 						glogf(DEBUG, "Added file watcher for %s", message.path);
 					}
@@ -509,23 +509,23 @@ static int inotify_watcher_func(void* vargp) {
 				case REMOVE: {
 					// Shifts all elements of the arrays back into the new vacancy in the mappings
 					// This is unwiely as all hell but fixing it seems like it would just create more problems
-					size_t index = find(message.wd, other_wds, n_mappings);
+					size_t index = find(message.wd, other_wds, mappings_length);
 					if(index == SIZE_MAX)
 						glogf(ERROR, "Could not find fd %i in watched file mappings", message.wd);
 					else {
 						int* new_other_wds = NULL;
 						inotify_watch_callback_T* new_callbacks = NULL;
 						void** new_passthroughs = NULL;
-						if(--n_mappings) {
-							(void) galloc((void**) &new_other_wds, n_mappings, sizeof(int));
-							(void) galloc((void**) &new_callbacks, n_mappings, sizeof(inotify_watch_callback_T));
-							(void) galloc((void**) &new_passthroughs, n_mappings, sizeof(void*));
+						if(--mappings_length) {
+							(void) galloc((void**) &new_other_wds, mappings_length, sizeof(int));
+							(void) galloc((void**) &new_callbacks, mappings_length, sizeof(inotify_watch_callback_T));
+							(void) galloc((void**) &new_passthroughs, mappings_length, sizeof(void*));
 							memcpy(new_other_wds, other_wds, index * sizeof(int));
 							memcpy(new_callbacks, callbacks, index * sizeof(inotify_watch_callback_T));
 							memcpy(new_passthroughs, passthroughs, index * sizeof(void*));
-							memcpy(&(new_other_wds[index]), &(other_wds[index + 1]), (n_mappings - index) * sizeof(int));
-							memcpy(&(new_callbacks[index]), &(callbacks[index + 1]), (n_mappings - index) * sizeof(inotify_watch_callback_T));
-							memcpy(&(new_passthroughs[index]), &(passthroughs[index + 1]), (n_mappings - index) * sizeof(void*));
+							memcpy(&(new_other_wds[index]), &(other_wds[index + 1]), (mappings_length - index) * sizeof(int));
+							memcpy(&(new_callbacks[index]), &(callbacks[index + 1]), (mappings_length - index) * sizeof(inotify_watch_callback_T));
+							memcpy(&(new_passthroughs[index]), &(passthroughs[index + 1]), (mappings_length - index) * sizeof(void*));
 						}
 						(void) gfree(other_wds);
 						(void) gfree(callbacks);
@@ -551,7 +551,7 @@ static int inotify_watcher_func(void* vargp) {
 			if(read(inotify_fd, event, needed) == -1)
 				glogf(ERROR, "Failed to read from inotify pipe: %s", strerror(errno));
 
-			size_t index = find(event->wd, other_wds, n_mappings);
+			size_t index = find(event->wd, other_wds, mappings_length);
 			if(index == SIZE_MAX)
 				glogf(ERROR, "Could not find fd %i in watched file mappings", event->wd);
 			else {
@@ -563,7 +563,7 @@ static int inotify_watcher_func(void* vargp) {
 	}
 thread_exit:
 
-	for(size_t i = 0; i < n_mappings; i++) {
+	for(size_t i = 0; i < mappings_length; i++) {
 		if(inotify_rm_watch(inotify_fd, other_wds[i]) == -1)
 			glogf(ERROR, "Failed to remove inotify watcher: %s", strerror(errno));
 	}

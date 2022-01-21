@@ -86,7 +86,7 @@ typedef struct {
      * Intenal caching of directory size.
      * Please don't use this directly.
      */
-	size_t internal_directory_len;
+	size_t internal_directory_length;
 } gen_filesystem_handle_t;
 
 /**
@@ -198,11 +198,11 @@ GEN_ERRORABLE gen_handle_read(uint8_t* restrict output_buffer, const gen_filesys
 /**
  * Writes to a file.
  * @param[in] handle a handle to a file object to write to. Must not be a directory.
- * @param[in] n_bytes the number of bytes of buffer to write.
+ * @param[in] bytes_length the number of bytes of buffer to write.
  * @param[in] buffer the buffer to source bytes from for writing.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer);
+GEN_ERRORABLE gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const uint8_t* const restrict buffer);
 
 /**
  * Lists the contents of a directory.

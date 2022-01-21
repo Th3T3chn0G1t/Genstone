@@ -56,8 +56,8 @@ void glean_signal_connect_swapped(GObject* instance, char* signal, GCallback cal
 void vector_append(vector_T* vector, void* data) {
 	GEN_FRAME_BEGIN(vector_append);
 
-	(void) grealloc((void**) &vector->members, ++vector->n_members, sizeof(void*));
-	vector->members[vector->n_members - 1] = data;
+	(void) grealloc((void**) &vector->members, ++vector->members_length, sizeof(void*));
+	vector->members[vector->members_length - 1] = data;
 }
 /**
  * Removes an item from a vector and shifts down proceeding members into the vacancy
@@ -68,10 +68,10 @@ void vector_remove(vector_T* vector, size_t index) {
 	GEN_FRAME_BEGIN(vector_remove);
 
 	void** new_members = NULL;
-	if(--(vector->n_members)) {
-		(void) galloc((void**) &new_members, vector->n_members, sizeof(void*));
+	if(--(vector->members_length)) {
+		(void) galloc((void**) &new_members, vector->members_length, sizeof(void*));
 		memcpy(new_members, vector->members, index * sizeof(void*));
-		memcpy(&(new_members[index]), &(vector->members[index + 1]), (vector->n_members - index) * sizeof(void*));
+		memcpy(&(new_members[index]), &(vector->members[index + 1]), (vector->members_length - index) * sizeof(void*));
 	}
 	(void) gfree(vector->members);
 	vector->members = new_members;
@@ -113,7 +113,7 @@ static int inotify_watcher_message(GIOChannel* source, GIOCondition condition, v
 
 	switch(message.type) {
 		case PROMPT: {
-			editor_show_prompt(message.title, message.child, message.n_buttons, message.button_labels, message.response_ids, message.callback, message.pass);
+			editor_show_prompt(message.title, message.child, message.buttons_length, message.button_labels, message.response_ids, message.callback, message.pass);
 			break;
 		}
 	}
