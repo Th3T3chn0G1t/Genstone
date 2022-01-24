@@ -120,7 +120,7 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 
 	*out_duplicated = NULL;
 
-	if(!limit) GEN_ALL_OK;
+	if(!limit) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was 0");
 
 	size_t string_length = 0;
 	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);

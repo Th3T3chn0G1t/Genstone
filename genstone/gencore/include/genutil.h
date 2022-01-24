@@ -49,11 +49,14 @@
  */
 #define GEN_FOREACH_PTR(iter, memb, length, container) \
 	__typeof__((container)[0])* memb = &(container)[0]; \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (length); memb = &(container)[iter + 1])
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = &(container)[++iter])
 
-#define GEN_FOREACH_PTR_NEXT(iter, memb, length, container) \
+#define GEN_FOREACH_PTR_ADVANCE(iter, memb, length, container, n) \
 	do { \
-		memb = iter < length ? &(container)[++iter + 1] : NULL; \
+		if(iter + n <= length) { \
+			iter += n; \
+			memb = &(container)[iter]; \
+		} \
 	} while(0)
 
 /**
