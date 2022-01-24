@@ -18,9 +18,9 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 	if(n_long_args) {
 		gen_error_t error = gzalloc((void**) &long_arg_lengths, n_long_args, sizeof(size_t));
 		GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
-		GEN_FOREACH_PTR(i, len, n_long_args, long_arg_lengths) {
-			*len = 0;
-			while(long_args[i][*len]) ++(*len);
+		GEN_FOREACH_PTR(i, length, n_long_args, long_arg_lengths) {
+			*length = 0;
+			while(long_args[i][*length]) ++(*length);
 		}
 	}
 

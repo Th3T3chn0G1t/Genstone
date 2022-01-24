@@ -53,7 +53,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_validate);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(path);
-	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`len(path)` was 0)");
+	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`length(path)` was 0)");
 
 	// This is a kinda nonsensical test but it feels like the best way to do this
 	// Testing if length of path is less than GEN_PATH_MAX
@@ -326,7 +326,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 			if(event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) *out_event |= GEN_FILEWATCH_DELETED;
 			if(event->mask & IN_MOVE_SELF || event->mask & IN_MOVED_FROM || event->mask & IN_MOVED_TO) *out_event |= GEN_FILEWATCH_MOVED;
 
-			offset += sizeof(struct inotify_event) + event->len;
+			offset += sizeof(struct inotify_event) + event->length;
 		}
 		error = gfree(raw_events);
 		GEN_ERROR_OUT_IF(error, "`gfree` failed");
