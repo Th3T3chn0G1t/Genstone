@@ -83,7 +83,7 @@ int main(void) {
 
 		static const char* const labels[] = {"File", "Edit", "View", "Run", "Help"};
 
-		gen_ui_extent_t TOOLBAR_N_BUTTONS = sizeof(labels) / sizeof(labels[0]);
+		gen_ui_extent_t TOOLBAR_BUTTONS_LENGTH = sizeof(labels) / sizeof(labels[0]);
 		gen_ui_extent_t TOOLBAR_HEIGHT = ui_scale + ui_scale / 2;
 		gen_ui_extent_t TOOLBAR_BUTTON_WIDTH = 4 * ui_scale;
 		gen_ui_extent_t TOOLBAR_BUTTON_STRIDE = 5 * ui_scale;
@@ -99,7 +99,7 @@ int main(void) {
 
 		gen_ui_extent_t VIEWPORT_X = SIDEBAR_WIDTH + ui_scale;
 
-		for(register gen_ui_extent_t i = 0; i < TOOLBAR_N_BUTTONS; ++i) {
+		for(register gen_ui_extent_t i = 0; i < TOOLBAR_BUTTONS_LENGTH; ++i) {
 			(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){i * TOOLBAR_BUTTON_STRIDE, 0, TOOLBAR_BUTTON_WIDTH, TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
 
 			SDL_Surface* text_r = TTF_RenderText_Blended(font, labels[i], color);
@@ -110,7 +110,7 @@ int main(void) {
 			SDL_DestroyTexture(text);
 		}
 
-		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){(TOOLBAR_BUTTON_STRIDE * TOOLBAR_N_BUTTONS), 0, (screen_width - ui_scale) - (TOOLBAR_BUTTON_STRIDE * TOOLBAR_N_BUTTONS), TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
+		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){(TOOLBAR_BUTTON_STRIDE * TOOLBAR_BUTTONS_LENGTH), 0, (screen_width - ui_scale) - (TOOLBAR_BUTTON_STRIDE * TOOLBAR_BUTTONS_LENGTH), TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
 		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){0, SIDEBAR_Y, SIDEBAR_WIDTH, (screen_height - ui_scale) - SIDEBAR_Y}, NINEPATCH_SCALE, ui_scale, NULL);
 		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){SIDEBAR_WIDTH + ui_scale, EXPLORER_Y, (screen_width - ui_scale) - (SIDEBAR_WIDTH + ui_scale), EXPLORER_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
 		(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){HIERARCHY_X, SIDEBAR_Y, HIERARCHY_WIDTH, (screen_height - ui_scale) - (SIDEBAR_Y + EXPLORER_HEIGHT + ui_scale)}, NINEPATCH_SCALE, ui_scale, NULL);

@@ -53,12 +53,12 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_validate);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(path);
-	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`len(path)` was 0)");
+	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`length(path)` was 0)");
 
 	// This is a kinda nonsensical test but it feels like the best way to do this
 	// Testing if length of path is less than GEN_PATH_MAX
-	size_t path_len = 0;
-	gen_error_t error = gen_string_length(path, GEN_PATH_MAX + 1, &path_len);
+	size_t path_length = 0;
+	gen_error_t error = gen_string_length(path, GEN_PATH_MAX + 1, GEN_PATH_MAX, &path_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	GEN_ALL_OK;
@@ -187,14 +187,14 @@ gen_error_t gen_handle_read(uint8_t* restrict output_buffer, const gen_filesyste
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t n_bytes, const uint8_t* const restrict buffer) {
+gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const uint8_t* const restrict buffer) {
 	GEN_FRAME_BEGIN(gen_handle_write);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 	GEN_INTERNAL_BASIC_PARAM_CHECK(buffer);
 
-	write(handle->file_handle, buffer, n_bytes);
+	write(handle->file_handle, buffer, bytes_length);
 	GEN_ERROR_OUT_IF_ERRNO(write, errno);
 
 	lseek(handle->file_handle, 0, SEEK_SET);
@@ -270,7 +270,7 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 	GEN_ERROR_OUT_IF_ERRNO(fdopendir, errno);
 	out_handle->is_directory = handle->is_directory;
 
-	gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &out_handle->internal_directory_len);
+	gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &out_handle->internal_directory_length);
 	GEN_ERROR_OUT_IF(error, "`gen_directory_list` failed");
 
 	fstat(out_handle->file_handle, &out_handle->internal_descriptor_details);
@@ -326,7 +326,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 			if(event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) *out_event |= GEN_FILEWATCH_DELETED;
 			if(event->mask & IN_MOVE_SELF || event->mask & IN_MOVED_FROM || event->mask & IN_MOVED_TO) *out_event |= GEN_FILEWATCH_MOVED;
 
-			offset += sizeof(struct inotify_event) + event->len;
+			offset += sizeof(struct inotify_event) + event->length;
 		}
 		error = gfree(raw_events);
 		GEN_ERROR_OUT_IF(error, "`gfree` failed");
@@ -340,18 +340,18 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 	if(!(file_info.st_mtimespec.tv_sec == handle->internal_descriptor_details.st_mtimespec.tv_sec && file_info.st_mtimespec.tv_nsec == handle->internal_descriptor_details.st_mtimespec.tv_nsec) || !(file_info.st_ctimespec.tv_sec == handle->internal_descriptor_details.st_ctimespec.tv_sec && file_info.st_ctimespec.tv_nsec == handle->internal_descriptor_details.st_ctimespec.tv_nsec)) {
 		if(handle->is_directory) {
-			size_t n_items = 0;
-			gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &n_items);
+			size_t items_length = 0;
+			gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &items_length);
 			GEN_ERROR_OUT_IF(error, "`gen_directory_list` failed");
 
-			if(handle->internal_directory_len > n_items)
+			if(handle->internal_directory_length > items_length)
 				*out_event |= GEN_FILEWATCH_DELETED;
-			else if(handle->internal_directory_len < n_items)
+			else if(handle->internal_directory_length < items_length)
 				*out_event |= GEN_FILEWATCH_CREATED;
 			else
 				*out_event |= GEN_FILEWATCH_MODIFIED;
 
-			handle->internal_directory_len = n_items;
+			handle->internal_directory_length = items_length;
 		}
 		else {
 			*out_event |= GEN_FILEWATCH_MODIFIED;

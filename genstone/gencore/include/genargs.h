@@ -42,14 +42,14 @@ typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char
  * @param[in] argc the number of arguments to parse.
  * @param[in] argv an array of arguments.
  * @param[in] handler the handler to be called for each parsed argument.
- * @param[in] n_short_args the number of short arguments.
+ * @param[in] short_args_length the number of short arguments.
  * @param[in] short_args an array of short arguments.
- * @param[in] n_long_args the number of long arguments.
+ * @param[in] long_args_length the number of long arguments.
  * @param[in] long_args an array of long arguments.
  * @param[in] passthrough a passthrough argument for the handler.
  * @return an error code.
  */
-GEN_ERRORABLE gen_parse_args(const int argc, const char* const restrict* const restrict argv, const gen_arg_handler_t handler, const size_t n_short_args, const char* const restrict short_args, const size_t n_long_args, const char* const restrict* const restrict long_args, void* const restrict passthrough);
+GEN_ERRORABLE gen_parse_args(const int argc, const char* const restrict* const restrict argv, const gen_arg_handler_t handler, const size_t short_args_length, const char* const restrict short_args, const size_t long_args_length, const char* const restrict* const restrict long_args, void* const restrict passthrough);
 /**
  * @example{lineno} example/gencore/gen_parse_args.c
  * Example for how to use `gen_parse_args`.

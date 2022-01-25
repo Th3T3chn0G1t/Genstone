@@ -34,7 +34,7 @@ int main(void) {
 
 	error = gen_string_copy(destination, sizeof(destination), PAYLOAD_0, sizeof(PAYLOAD_0), sizeof(PAYLOAD_0) - 1);
 	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_string_length(destination, sizeof(destination), &length);
+	error = gen_string_length(destination, sizeof(destination), GEN_STRING_NO_BOUND, &length);
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(sizeof(PAYLOAD_0) - 1, length);
 	error = gen_string_compare(destination, sizeof(destination), PAYLOAD_0, sizeof(PAYLOAD_0), sizeof(PAYLOAD_0) - 1, &equal);
@@ -43,7 +43,7 @@ int main(void) {
 
 	error = gen_string_copy(destination, sizeof(destination), PAYLOAD_1, sizeof(PAYLOAD_1), sizeof(PAYLOAD_1) - 1);
 	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_string_length(destination, sizeof(destination), &length);
+	error = gen_string_length(destination, sizeof(destination), GEN_STRING_NO_BOUND, &length);
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(sizeof(PAYLOAD_1) - 1, length);
 	error = gen_string_compare(destination, sizeof(destination), PAYLOAD_1, sizeof(PAYLOAD_1), sizeof(PAYLOAD_1) - 1, &equal);
@@ -52,7 +52,7 @@ int main(void) {
 
 	error = gen_string_copy(destination, sizeof(destination), PAYLOAD_4095, sizeof(PAYLOAD_4095), sizeof(PAYLOAD_4095) - 1);
 	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_string_length(destination, sizeof(destination), &length);
+	error = gen_string_length(destination, sizeof(destination), GEN_STRING_NO_BOUND, &length);
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(sizeof(PAYLOAD_4095) - 1, length);
 	error = gen_string_compare(destination, sizeof(destination), PAYLOAD_4095, sizeof(PAYLOAD_4095), sizeof(PAYLOAD_4095) - 1, &equal);
@@ -61,7 +61,7 @@ int main(void) {
 
 	error = gen_string_copy(destination, sizeof(destination), PAYLOAD_4096, sizeof(PAYLOAD_4096), sizeof(PAYLOAD_4096) - 1);
 	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_string_length(destination, sizeof(destination), &length);
+	error = gen_string_length(destination, sizeof(destination), GEN_STRING_NO_BOUND, &length);
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(sizeof(PAYLOAD_4096) - 1, length);
 	error = gen_string_compare(destination, sizeof(destination), PAYLOAD_4096, sizeof(PAYLOAD_4096), sizeof(PAYLOAD_4096) - 1, &equal);

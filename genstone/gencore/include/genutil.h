@@ -30,26 +30,34 @@
  * Iterates over a container with explicit length.
  * @param[in] iter the identifier to use for the iterating index.
  * @param[in] memb the identifier to use for the indexed member.
- * @param[in] len the length of the container to iterate.
+ * @param[in] length the length of the container to iterate.
  * @param[in] container the container to iterate.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
-#define GEN_FOREACH(iter, memb, len, container) \
+#define GEN_FOREACH(iter, memb, length, container) \
 	__typeof__((container)[0]) memb = (container)[0]; \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container)[iter + 1])
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (length); memb = (container)[iter + 1])
 
 /**
  * Iterates over a container with explicit length.
  * `memb` is a pointer to the indexed member.
  * @param[in] iter the identifier to use for the iterating index.
  * @param[in] memb the identifier to use for the indexed member.
- * @param[in] len the length of the container to iterate.
+ * @param[in] length the length of the container to iterate.
  * @param[in] container the container to iterate.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
-#define GEN_FOREACH_PTR(iter, memb, len, container) \
+#define GEN_FOREACH_PTR(iter, memb, length, container) \
 	__typeof__((container)[0])* memb = &(container)[0]; \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = &(container)[iter + 1])
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = &(container)[++iter])
+
+#define GEN_FOREACH_PTR_ADVANCE(iter, memb, length, container, n) \
+	do { \
+		if(iter + n <= length) { \
+			iter += n; \
+			memb = &(container)[iter]; \
+		} \
+	} while(0)
 
 /**
  * Iterates over a container with explicit length.
@@ -58,13 +66,13 @@
  * `GEN_FOREACH_DIRECT_PTR` is a variant of `GEN_FOREACH_PTR` added for diagnostic reasons and probably shouldn't be used.
  * @param[in] iter the identifier to use for the iterating index.
  * @param[in] memb the identifier to use for the indexed member.
- * @param[in] len the length of the container to iterate.
+ * @param[in] length the length of the container to iterate.
  * @param[in] container the container to iterate.
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
-#define GEN_FOREACH_DIRECT_PTR(iter, memb, len, container) \
+#define GEN_FOREACH_DIRECT_PTR(iter, memb, length, container) \
 	__typeof__((container)) memb = (container); \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (len); memb = (container) + (iter + 1))
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (length); memb = (container) + (iter + 1))
 
 /**
  * Gets the require message from the expected expressions type.

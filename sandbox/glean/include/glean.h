@@ -26,7 +26,7 @@ typedef struct {
 	/**
 	 * The current number of members in the vector
 	 */
-	size_t n_members;
+	size_t members_length;
 	/**
 	 * The members the vector is holding
 	 */
@@ -65,9 +65,9 @@ typedef struct {
 	 * The number of characters changed in the edit
 	 * Can be negative to reflect the removal of characters
 	 */
-	long n_changed;
+	long changed_length;
 	/**
-	 * If `n_changed` <0, holds the removed characters
+	 * If `changed_length` <0, holds the removed characters
 	 */
 	char* data;
 } undo_stack_node_T;
@@ -143,7 +143,7 @@ typedef struct {
 	/**
 	 * The number of mappings
 	 */
-	size_t n_mappings;
+	size_t mappings_length;
 	/**
 	 * A list of file identification methods(name, extension etc.) for mapping to values
 	 */
@@ -185,7 +185,7 @@ typedef struct {
 	 * The number of user-defined buttons, or 0 for default layout
 	 * Only valid for `type` = `PROMPT`
 	 */
-	size_t n_buttons;
+	size_t buttons_length;
 	/**
  	 * The button labels to use for dialog responses, or `NULL` for default layout
 	 * Only valid for `type` = `PROMPT`
@@ -269,7 +269,7 @@ extern void editor_cleanup(void);
 /// Various prompts
 
 extern void editor_open_url(const char* url);
-extern void editor_show_prompt(char* title, GtkWidget* child, size_t n_buttons, char** button_labels, int* response_ids, GCallback callback, void* pass);
+extern void editor_show_prompt(char* title, GtkWidget* child, size_t buttons_length, char** button_labels, int* response_ids, GCallback callback, void* pass);
 extern void editor_show_new_prompt(void);
 extern void editor_show_save_as_prompt(editor_tab_T* tab);
 extern void editor_show_open_prompt(void);

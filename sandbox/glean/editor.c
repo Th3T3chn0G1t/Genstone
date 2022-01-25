@@ -31,7 +31,7 @@ static GtkWindow* window;
 editor_tab_T* editor_tab_get_active(void) {
 	GEN_FRAME_BEGIN(editor_tab_get_active);
 
-	if(editor_tabs->n_members) return editor_tabs->members[gtk_notebook_get_current_page(editor_notebook)];
+	if(editor_tabs->members_length) return editor_tabs->members[gtk_notebook_get_current_page(editor_notebook)];
 	return NULL;
 }
 
@@ -39,21 +39,21 @@ editor_tab_T* editor_tab_get_active(void) {
  * Shows a `GtkDialog` parented to the main window
  * @param title the title to use for the dialog window
  * @param child the widget to display in the dialog
- * @param n_buttons the number of user-defined buttons, or 0 for default layout
+ * @param buttons_length the number of user-defined buttons, or 0 for default layout
  * @param button_labels the button labels to use for dialog responses, or `NULL` for default layout
  * @param response_ids the response ids to use for buttons, or `NULL` for default layout
  * @param callback the function to call when a response is selected in the dialog. Should be the signature of the `GtkDialog` `"response"` signal
  * @param pass a passthrough for the response callback
  */
-void editor_show_prompt(char* title, GtkWidget* child, size_t n_buttons, char** button_labels, int* response_ids, GCallback callback, void* pass) {
+void editor_show_prompt(char* title, GtkWidget* child, size_t buttons_length, char** button_labels, int* response_ids, GCallback callback, void* pass) {
 	GEN_FRAME_BEGIN(editor_show_prompt);
 
 	GtkDialog* dialog;
-	if(!button_labels || !response_ids || !n_buttons)
+	if(!button_labels || !response_ids || !buttons_length)
 		dialog = GTK_DIALOG(gtk_dialog_new_with_buttons(title, window, GTK_DIALOG_DESTROY_WITH_PARENT, "_CANCEL", GTK_RESPONSE_CANCEL, "_OK", GTK_RESPONSE_OK, NULL));
 	else {
 		dialog = GTK_DIALOG(gtk_dialog_new());
-		for(size_t i = 0; i < n_buttons; i++)
+		for(size_t i = 0; i < buttons_length; i++)
 			gtk_dialog_add_button(dialog, button_labels[i], response_ids[i]);
 	}
 
@@ -96,28 +96,28 @@ enum
 /**
  * Replaces a section of a buffer with a string, resizing the buffer as appropriate
  * @param buffer a pointer to the buffer to replace in
- * @param buffer_len a pointer to the size of the buffer, modified if buffer length changes
+ * @param buffer_length a pointer to the size of the buffer, modified if buffer length changes
  * @param mark the start of the region to replace
- * @param mark_len the length of the region to replace
+ * @param mark_length the length of the region to replace
  * @param data the data to insert
  */
-static void _replace(char** buffer, size_t* buffer_len, char* mark, size_t mark_len, char* data) {
+static void _replace(char** buffer, size_t* buffer_length, char* mark, size_t mark_length, char* data) {
 	GEN_FRAME_BEGIN(_replace);
 
-	size_t data_len = strlen(data);
-	ptrdiff_t diff = (ptrdiff_t) (data_len - mark_len);
+	size_t data_length = strlen(data);
+	ptrdiff_t diff = (ptrdiff_t) (data_length - mark_length);
 
 	if(diff > 0) {
-		*buffer_len += (size_t) diff;
+		*buffer_length += (size_t) diff;
 		size_t off = (uintptr_t) mark - (uintptr_t) *buffer;
-		(void) grealloc((void**) buffer, *buffer_len, sizeof(char));
+		(void) grealloc((void**) buffer, *buffer_length, sizeof(char));
 		mark = *buffer + off;
 	}
-	memmove(mark + mark_len + diff, mark + mark_len, (uintptr_t) (*buffer + ((ptrdiff_t) *buffer_len - diff)) - (uintptr_t) (mark + mark_len));
-	strncpy(mark, data, data_len);
+	memmove(mark + mark_length + diff, mark + mark_length, (uintptr_t) (*buffer + ((ptrdiff_t) *buffer_length - diff)) - (uintptr_t) (mark + mark_length));
+	strncpy(mark, data, data_length);
 	if(diff < 0) {
-		*buffer_len += (size_t) diff;
-		(void) grealloc((void**) buffer, *buffer_len, sizeof(char));
+		*buffer_length += (size_t) diff;
+		(void) grealloc((void**) buffer, *buffer_length, sizeof(char));
 	}
 }
 
@@ -213,7 +213,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 				char* buffer;
 				char* str1 = file_templates->members[gtk_combo_box_get_active(template_combo)];
 				(void) gstrndup(&buffer, str1, strlen(str));
-				size_t buffer_len = strlen(buffer);
+				size_t buffer_length = strlen(buffer);
 
 				// Keep a reference to all `\$` to replace with `$` at the end
 				vector_T* escaped_marks;
@@ -244,24 +244,24 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 					// Big 'ol WoT to replace tags with the proper data
 
 					if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_name], template_tag_compare_lengths[TEMPLATE_TAG_name]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_name], extless_name);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_name], extless_name);
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_NAME], template_tag_compare_lengths[TEMPLATE_TAG_NAME]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_NAME], EXTLESS_NAME);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_NAME], EXTLESS_NAME);
 
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_path], template_tag_compare_lengths[TEMPLATE_TAG_path]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_path], path);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_path], path);
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PATH], template_tag_compare_lengths[TEMPLATE_TAG_PATH]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PATH], PATH);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PATH], PATH);
 
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_parent], template_tag_compare_lengths[TEMPLATE_TAG_parent]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_parent], parent);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_parent], parent);
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PARENT], template_tag_compare_lengths[TEMPLATE_TAG_PARENT]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PARENT], PARENT);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PARENT], PARENT);
 
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_project], template_tag_compare_lengths[TEMPLATE_TAG_project]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_project], project);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_project], project);
 					else if(!strncmp(next_marker, template_tags[TEMPLATE_TAG_PROJECT], template_tag_compare_lengths[TEMPLATE_TAG_PROJECT]))
-						_replace(&buffer, &buffer_len, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PROJECT], PROJECT);
+						_replace(&buffer, &buffer_length, next_marker, template_tag_compare_lengths[TEMPLATE_TAG_PROJECT], PROJECT);
 				} while((next_marker = strchr(buffer, '$')));
 
 				// Cleaning up all our garbage
@@ -275,7 +275,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 
 				(void) gfree(PROJECT);
 
-				for(size_t i = 0; i < escaped_marks->n_members; i++) {
+				for(size_t i = 0; i < escaped_marks->members_length; i++) {
 					buffer[(size_t) escaped_marks->members[i]] = '$';
 				}
 				(void) gfree(escaped_marks);
@@ -306,7 +306,7 @@ static void editor_promt_new_combo_box_item_selected(GtkComboBox* box, void* pas
 
 		GtkListStore* new_store = gtk_list_store_new(1, G_TYPE_STRING);
 		GtkTreeIter new_iter;
-		for(size_t i = 0; i < file_template_names->n_members; i++) {
+		for(size_t i = 0; i < file_template_names->members_length; i++) {
 			gtk_list_store_append(new_store, &new_iter);
 			gtk_list_store_set(new_store, &new_iter, 0, file_template_names->members[i], -1);
 		}
@@ -626,7 +626,7 @@ void editor_init(GtkBuilder* builder) {
 void editor_cleanup(void) {
 	GEN_FRAME_BEGIN(editor_cleanup);
 
-	for(size_t i = 0; i < editor_tabs->n_members; i++) {
+	for(size_t i = 0; i < editor_tabs->members_length; i++) {
 		editor_tab_close(editor_tabs->members[i]);
 	}
 	if(editor_tabs->members) (void) gfree(editor_tabs->members);
@@ -738,7 +738,7 @@ void editor_tab_close(editor_tab_T* tab) {
 	}
 
 	// Free the tab from the state
-	for(size_t i = 0; i < tab->undo_stack->n_members; i++) {
+	for(size_t i = 0; i < tab->undo_stack->members_length; i++) {
 		(void) gfree(((undo_stack_node_T*) tab->undo_stack->members[i])->data);
 		(void) gfree(tab->undo_stack->members[i]);
 	}
@@ -763,7 +763,7 @@ static void editor_tab_close_button_clicked(GtkWidget* widget, void* pass) {
 
 	// Find the index of the tab to close
 	size_t tab_index = 0;
-	for(; tab_index < editor_tabs->n_members; tab_index++)
+	for(; tab_index < editor_tabs->members_length; tab_index++)
 		if(!strcmp(((editor_tab_T*) editor_tabs->members[tab_index])->full_identifier, pass)) break;
 
 	editor_tab_close(editor_tabs->members[tab_index]);
@@ -815,7 +815,7 @@ static void editor_buffer_changed(GtkTextBuffer* buffer, void* pass) {
 /**
  * The length of the running sequence of added characters
  */
-static size_t running_addition_sequence_len = 0;
+static size_t running_addition_sequence_length = 0;
 /**
  * The position of the running sequence of added characters
  */
@@ -843,20 +843,20 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 	}
 
 	if(len == 1) {
-		if(!running_addition_sequence_len)
+		if(!running_addition_sequence_length)
 			running_addition_sequence_pos = (size_t) gtk_text_iter_get_offset(location);
 
-		(void) grealloc((void**) &running_addition_sequence, ++running_addition_sequence_len + 1, sizeof(char)); // Catch the NULL-terminator
-		running_addition_sequence[running_addition_sequence_len - 1] = *text;
-		if(running_addition_sequence_len == MAX_RUNNING_ADDITION_SEQUENCE || *text == '\n' || *text == '\t' || *text == ' ') {
+		(void) grealloc((void**) &running_addition_sequence, ++running_addition_sequence_length + 1, sizeof(char)); // Catch the NULL-terminator
+		running_addition_sequence[running_addition_sequence_length - 1] = *text;
+		if(running_addition_sequence_length == MAX_RUNNING_ADDITION_SEQUENCE || *text == '\n' || *text == '\t' || *text == ' ') {
 			// Pushes back a new undo stack node for the sequence
 			undo_stack_node_T* seq_node;
 			(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 			seq_node->position = running_addition_sequence_pos;
-			seq_node->n_changed = (long) running_addition_sequence_len;
+			seq_node->changed_length = (long) running_addition_sequence_length;
 			(void) gstrndup(&seq_node->data, running_addition_sequence, strlen(running_addition_sequence));
 			editor_tab_undo_stack_push(tab, seq_node);
-			running_addition_sequence_len = 0;
+			running_addition_sequence_length = 0;
 			running_addition_sequence_pos = SIZE_MAX;
 			(void) gfree(running_addition_sequence);
 			running_addition_sequence = NULL;
@@ -867,10 +867,10 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 		undo_stack_node_T* seq_node;
 		(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 		seq_node->position = running_addition_sequence_pos;
-		seq_node->n_changed = (long) running_addition_sequence_len;
-		(void) gstrndup(&seq_node->data, running_addition_sequence, running_addition_sequence_len);
+		seq_node->changed_length = (long) running_addition_sequence_length;
+		(void) gstrndup(&seq_node->data, running_addition_sequence, running_addition_sequence_length);
 		editor_tab_undo_stack_push(tab, seq_node);
-		running_addition_sequence_len = 0;
+		running_addition_sequence_length = 0;
 		running_addition_sequence_pos = SIZE_MAX;
 		(void) gfree(running_addition_sequence);
 		running_addition_sequence = NULL;
@@ -879,7 +879,7 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 		undo_stack_node_T* node;
 		(void) galloc((void**) &node, 1, sizeof(undo_stack_node_T));
 		node->position = (size_t) gtk_text_iter_get_offset(location);
-		node->n_changed = len;
+		node->changed_length = len;
 		(void) gstrndup(&node->data, text, strlen(text));
 		editor_tab_undo_stack_push(tab, node);
 	}
@@ -910,7 +910,7 @@ static void editor_buffer_deletion(GtkTextBuffer* buffer, GtkTextIter* start, Gt
 	undo_stack_node_T* node;
 	(void) galloc((void**) &node, 1, sizeof(undo_stack_node_T));
 	node->position = offset_start;
-	node->n_changed = -((long) len);
+	node->changed_length = -((long) len);
 	(void) gstrndup(&node->data, text, strlen(text));
 	editor_tab_undo_stack_push(tab, node);
 }
@@ -923,13 +923,13 @@ static void editor_buffer_deletion(GtkTextBuffer* buffer, GtkTextIter* start, Gt
 void editor_tab_undo_stack_push(editor_tab_T* tab, undo_stack_node_T* node) {
 	GEN_FRAME_BEGIN(editor_tab_undo_stack_push);
 
-	if(node->n_changed > 0)
-		glogf(DEBUG, "Pushing back addition of %li characters: %s", node->n_changed, node->data);
-	else if(node->n_changed < 0)
-		glogf(DEBUG, "Pushing back removal of %li characters: %s", node->n_changed, node->data);
+	if(node->changed_length > 0)
+		glogf(DEBUG, "Pushing back addition of %li characters: %s", node->changed_length, node->data);
+	else if(node->changed_length < 0)
+		glogf(DEBUG, "Pushing back removal of %li characters: %s", node->changed_length, node->data);
 
 	if(tab->current_undo_stack_offset) {
-		for(size_t i = tab->undo_stack->n_members - 1; i > (tab->undo_stack->n_members - tab->current_undo_stack_offset); i--) {
+		for(size_t i = tab->undo_stack->members_length - 1; i > (tab->undo_stack->members_length - tab->current_undo_stack_offset); i--) {
 			(void) gfree(((undo_stack_node_T*) tab->undo_stack->members[i])->data);
 			(void) gfree(tab->undo_stack->members[i]);
 			vector_remove(tab->undo_stack, i);
@@ -951,55 +951,55 @@ void editor_tab_undo_stack_move_back(editor_tab_T* tab) {
 	// You can't undo on non-editable/non-text tabs
 	if(!GTK_IS_TEXT_VIEW(tab->tab_view)) return;
 
-	if(running_addition_sequence_len) {
+	if(running_addition_sequence_length) {
 		undo_stack_node_T* seq_node;
 		(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 		seq_node->position = running_addition_sequence_pos;
-		seq_node->n_changed = (long) running_addition_sequence_len;
+		seq_node->changed_length = (long) running_addition_sequence_length;
 		glogf(DEBUG, "Running addition sequence: %s", running_addition_sequence);
 		(void) gstrndup(&seq_node->data, running_addition_sequence, strlen(running_addition_sequence));
 		editor_tab_undo_stack_push(tab, seq_node);
-		running_addition_sequence_len = 0;
+		running_addition_sequence_length = 0;
 		running_addition_sequence_pos = SIZE_MAX;
 		(void) gfree(running_addition_sequence);
 		running_addition_sequence = NULL;
 	}
 
 	// Don't go beyond the stack
-	if(tab->undo_stack->n_members < 1) return;
-	if((long) (tab->undo_stack->n_members - tab->current_undo_stack_offset) <= 0) return;
+	if(tab->undo_stack->members_length < 1) return;
+	if((long) (tab->undo_stack->members_length - tab->current_undo_stack_offset) <= 0) return;
 
 	// Don't push back another state for this
 	tab->internal_update = true;
 
 	// The current node, one deeper in the stack
-	undo_stack_node_T* node = tab->undo_stack->members[tab->undo_stack->n_members - ++(tab->current_undo_stack_offset)];
+	undo_stack_node_T* node = tab->undo_stack->members[tab->undo_stack->members_length - ++(tab->current_undo_stack_offset)];
 	GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(tab->tab_view));
 
-	glogf(DEBUG, "Undoing to state at node head (aka. %zu) - %zu (%lu)", tab->undo_stack->n_members, tab->current_undo_stack_offset, tab->undo_stack->n_members - tab->current_undo_stack_offset);
+	glogf(DEBUG, "Undoing to state at node head (aka. %zu) - %zu (%lu)", tab->undo_stack->members_length, tab->current_undo_stack_offset, tab->undo_stack->members_length - tab->current_undo_stack_offset);
 
 	// Addition nodes
-	if(node->n_changed > 0) {
+	if(node->changed_length > 0) {
 		// Get the modified range
 		GtkTextIter rm_start;
 		gtk_text_buffer_get_iter_at_offset(buffer, &rm_start, (int) node->position);
 		GtkTextIter rm_end;
-		gtk_text_buffer_get_iter_at_offset(buffer, &rm_end, (int) node->position + (int) node->n_changed);
+		gtk_text_buffer_get_iter_at_offset(buffer, &rm_end, (int) node->position + (int) node->changed_length);
 
 		char* data = gtk_text_buffer_get_text(buffer, &rm_start, &rm_end, false);
 		(void) gstrndup(&data, node->data, strlen(node->data));
 
-		glogf(DEBUG, "Undoing addition of %li characters at offset %zu from buffer start: %s", node->n_changed, node->position, data);
+		glogf(DEBUG, "Undoing addition of %li characters at offset %zu from buffer start: %s", node->changed_length, node->position, data);
 		gtk_text_buffer_delete(buffer, &rm_start, &rm_end);
 	}
 	// Removal nodes
-	else if(node->n_changed < 0) {
-		glogf(DEBUG, "Undoing removal of %li characters at offset %zu from buffer start: %s", node->n_changed, node->position, node->data);
+	else if(node->changed_length < 0) {
+		glogf(DEBUG, "Undoing removal of %li characters at offset %zu from buffer start: %s", node->changed_length, node->position, node->data);
 
 		// Add the previously removed text
 		GtkTextIter add_start;
 		gtk_text_buffer_get_iter_at_offset(buffer, &add_start, (int) node->position);
-		gtk_text_buffer_insert(buffer, &add_start, node->data, (int) node->n_changed);
+		gtk_text_buffer_insert(buffer, &add_start, node->data, (int) node->changed_length);
 	}
 
 	editor_tab_mark_edited(tab);
@@ -1017,39 +1017,39 @@ void editor_tab_undo_stack_move_forward(editor_tab_T* tab) {
 	if(!GTK_IS_TEXT_VIEW(tab->tab_view)) return;
 
 	// Don't go beyond the stack
-	if(tab->undo_stack->n_members < 1) return;
+	if(tab->undo_stack->members_length < 1) return;
 	if((long) tab->current_undo_stack_offset <= 0) return;
 
 	// Don't push back another state for this
 	tab->internal_update = true;
 
 	// The current node, one shallower in the stack
-	undo_stack_node_T* node = tab->undo_stack->members[tab->undo_stack->n_members - tab->current_undo_stack_offset--];
+	undo_stack_node_T* node = tab->undo_stack->members[tab->undo_stack->members_length - tab->current_undo_stack_offset--];
 	GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(tab->tab_view));
 
-	glogf(DEBUG, "Redoing to state at node head (aka. %zu) - %lu (%lu)", tab->undo_stack->n_members, tab->current_undo_stack_offset + 1, tab->undo_stack->n_members - (tab->current_undo_stack_offset + 1));
+	glogf(DEBUG, "Redoing to state at node head (aka. %zu) - %lu (%lu)", tab->undo_stack->members_length, tab->current_undo_stack_offset + 1, tab->undo_stack->members_length - (tab->current_undo_stack_offset + 1));
 
 	// Addition nodes
-	if(node->n_changed > 0) {
-		glogf(DEBUG, "Redoing addition of %li characters at offset %zu from buffer start: %s", node->n_changed, node->position, node->data);
+	if(node->changed_length > 0) {
+		glogf(DEBUG, "Redoing addition of %li characters at offset %zu from buffer start: %s", node->changed_length, node->position, node->data);
 
 		// Add the previously removed (undone) text
 		GtkTextIter add_start;
 		gtk_text_buffer_get_iter_at_offset(buffer, &add_start, (int) node->position);
-		gtk_text_buffer_insert(buffer, &add_start, node->data, (int) node->n_changed);
+		gtk_text_buffer_insert(buffer, &add_start, node->data, (int) node->changed_length);
 	}
 	// Removal nodes
-	else if(node->n_changed < 0) {
+	else if(node->changed_length < 0) {
 		// Get the modified range
 		GtkTextIter rm_start;
 		gtk_text_buffer_get_iter_at_offset(buffer, &rm_start, (int) node->position);
 		GtkTextIter rm_end;
-		gtk_text_buffer_get_iter_at_offset(buffer, &rm_end, (int) node->position + (int) node->n_changed);
+		gtk_text_buffer_get_iter_at_offset(buffer, &rm_end, (int) node->position + (int) node->changed_length);
 
 		// Remove the text
 		char* data = gtk_text_buffer_get_text(buffer, &rm_start, &rm_end, false);
 		(void) gstrndup(&node->data, data, strlen(data));
-		glogf(DEBUG, "Redoing removal of %li characters at offset %zu from buffer start: %s", node->n_changed, node->position, data);
+		glogf(DEBUG, "Redoing removal of %li characters at offset %zu from buffer start: %s", node->changed_length, node->position, data);
 		gtk_text_buffer_delete(buffer, &rm_start, &rm_end);
 	}
 
@@ -1140,7 +1140,7 @@ static void editor_tab_file_updated(struct inotify_event* event, int main_comm_f
 		message.type = PROMPT;
 		message.title = "File contents updated";
 		message.child = gtk_label_new("File has modified on disk");
-		message.n_buttons = 3;
+		message.buttons_length = 3;
 		message.button_labels[0] = "View";
 		message.button_labels[1] = "Accept";
 		message.button_labels[2] = "Reject";
@@ -1213,7 +1213,7 @@ editor_tab_T* editor_tab_open(GtkWidget* child, char* id, char* name) {
 	GEN_FRAME_BEGIN(editor_tab_open);
 
 	// Do not open already open tabs
-	for(size_t i = 0; i < editor_tabs->n_members; i++) {
+	for(size_t i = 0; i < editor_tabs->members_length; i++) {
 		if(!strcmp(((editor_tab_T*) editor_tabs->members[i])->full_identifier, id)) {
 			gtk_notebook_set_current_page(editor_notebook, (int) i);
 			return editor_tab_get_active();
@@ -1266,10 +1266,10 @@ editor_tab_T* editor_tab_open_from_file_with_id(char* path, char* name, char* id
 	GtkTextBuffer* text_buffer = gtk_text_buffer_new(NULL);
 	GtkTextView* text_view = GTK_TEXT_VIEW(gtk_text_view_new_with_buffer(text_buffer));
 
-	size_t n_tabs = editor_tabs->n_members;
+	size_t tabs_length = editor_tabs->members_length;
 	editor_tab_T* tab = editor_tab_open(GTK_WIDGET(text_view), id, name);
 
-	if(tab && n_tabs < editor_tabs->n_members) {
+	if(tab && tabs_length < editor_tabs->members_length) {
 		(void) gzalloc((void**) &tab->undo_stack, 1, sizeof(vector_T));
 		editor_tab_update_contents_from_file(tab, path);
 		tab->internal_update = false;

@@ -16,14 +16,12 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 
 	if(!limit) GEN_ALL_OK;
 
-	if(limit > a_bound - 1 || limit > b_bound - 1) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was greater than string bounds");
-
 	size_t a_length = 0;
-	gen_error_t error = gen_string_length(a, a_bound, &a_length);
+	gen_error_t error = gen_string_length(a, a_bound, limit, &a_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t b_length = 0;
-	error = gen_string_length(b, b_bound, &b_length);
+	error = gen_string_length(b, b_bound, limit, &b_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t compare_length = a_length;
@@ -48,16 +46,14 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 
 	if(!limit) GEN_ALL_OK;
 
-	if(limit > destination_bound - 1 || limit > source_bound - 1) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was greater than string bounds");
-
-	GEN_STRING_FOREACH(c, limit, destination)* c = '\0';
+	GEN_STRING_FOREACH(c, limit < destination_bound ? limit : destination_bound, destination)* c = '\0';
 
 	size_t destination_length = 0;
-	gen_error_t error = gen_string_length(destination, destination_bound, &destination_length);
+	gen_error_t error = gen_string_length(destination, destination_bound, limit, &destination_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t source_length = 0;
-	error = gen_string_length(source, source_bound, &source_length);
+	error = gen_string_length(source, source_bound, limit, &source_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t copy_length = source_length;
@@ -78,14 +74,12 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 
 	if(!limit) GEN_ALL_OK;
 
-	if(limit > source_bound - 1) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was greater than string bounds");
-
 	size_t destination_length = 0;
-	gen_error_t error = gen_string_length(destination, destination_bound, &destination_length);
+	gen_error_t error = gen_string_length(destination, destination_bound, GEN_STRING_NO_BOUND, &destination_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t source_length = 0;
-	error = gen_string_length(source, source_bound, &source_length);
+	error = gen_string_length(source, source_bound, limit, &source_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t append_length = source_length;
@@ -99,11 +93,13 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_string_length(const char* const restrict string, const size_t string_bound, size_t* const restrict out_length) {
+gen_error_t gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length) {
 	GEN_FRAME_BEGIN(gen_string_length);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(string);
 	GEN_INTERNAL_BASIC_PARAM_CHECK(out_length);
+
+	if(!limit) GEN_ALL_OK;
 
 	*out_length = 0;
 
@@ -112,7 +108,9 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 		++*out_length;
 	}
 
-	GEN_ERROR_OUT(GEN_TOO_SHORT, "String length exceeded string bounds");
+	if(limit == GEN_STRING_NO_BOUND) GEN_ERROR_OUT(GEN_TOO_SHORT, "String length exceeded string bounds");
+
+	GEN_ALL_OK;
 }
 
 gen_error_t gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated) {
@@ -122,12 +120,10 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 
 	*out_duplicated = NULL;
 
-	if(!limit) GEN_ALL_OK;
-
-	if(limit > string_bound - 1) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was greater than string bounds");
+	if(!limit) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was 0");
 
 	size_t string_length = 0;
-	gen_error_t error = gen_string_length(string, string_bound, &string_length);
+	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t duplicate_length = string_length;
@@ -151,10 +147,8 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 
 	if(!limit) GEN_ALL_OK;
 
-	if(limit > string_bound - 1) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was greater than string bounds");
-
 	size_t string_length = 0;
-	gen_error_t error = gen_string_length(string, string_bound, &string_length);
+	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t search_length = string_length;
@@ -181,7 +175,7 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 	if(!limit) GEN_ALL_OK;
 
 	size_t string_length = 0;
-	gen_error_t error = gen_string_length(string, string_bound, &string_length);
+	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
 	size_t search_length = string_length;

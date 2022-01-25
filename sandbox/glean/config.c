@@ -32,9 +32,9 @@ void config_init(void) {
 	// Maps file extensions to gtk named icons for the file tree
 	(void) galloc((void**) &icon_map, 1, sizeof(icon_map));
 	{
-		icon_map->n_mappings = 4;
-		(void) galloc((void**) &icon_map->keys, icon_map->n_mappings, sizeof(icon_map_key_T));
-		(void) galloc((void**) &icon_map->icons, icon_map->n_mappings, sizeof(char*));
+		icon_map->mappings_length = 4;
+		(void) galloc((void**) &icon_map->keys, icon_map->mappings_length, sizeof(icon_map_key_T));
+		(void) galloc((void**) &icon_map->icons, icon_map->mappings_length, sizeof(char*));
 
 		icon_map_key_T c_key = {EXTENSION, "c"};
 		icon_map->keys[0] = c_key;
@@ -110,7 +110,7 @@ void config_cleanup(void) {
 	(void) gfree(icon_map->keys);
 	(void) gfree(icon_map);
 
-	for(size_t i = 0; i < file_templates->n_members; i++) {
+	for(size_t i = 0; i < file_templates->members_length; i++) {
 		(void) gfree(file_templates->members[i]);
 		(void) gfree(file_template_names->members[i]);
 	}
