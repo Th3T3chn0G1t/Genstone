@@ -35,8 +35,8 @@
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH(iter, memb, length, container) \
-	__typeof__((container)[0]) memb = (container)[0]; \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (length); memb = (container)[iter + 1])
+	__typeof__((container)[0]) memb = (length) ? (container)[0] : (__typeof__((container)[0])){0}; \
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = (container)[++iter])
 
 /**
  * Iterates over a container with explicit length.
@@ -48,7 +48,7 @@
  * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_PTR(iter, memb, length, container) \
-	__typeof__((container)[0])* memb = &(container)[0]; \
+	__typeof__((container)[0])* memb = (length) ? &(container)[0] : NULL; \
 	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = &(container)[++iter])
 
 #define GEN_FOREACH_PTR_ADVANCE(iter, memb, length, container, n) \
@@ -72,7 +72,7 @@
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, length, container) \
 	__typeof__((container)) memb = (container); \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = SIZE_MAX; ++iter < (size_t) (length); memb = (container) + (iter + 1))
+	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = (container) + (++iter))
 
 /**
  * Gets the require message from the expected expressions type.
