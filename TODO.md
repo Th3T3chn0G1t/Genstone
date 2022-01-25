@@ -1,5 +1,6 @@
 # TODO
 
+- Add `strtoX` equivalents to `genstring`
 - Add next for every gen foreach
 - Uncomment submodule initialization in vulkan Makefiles
 - Review static analysis warning-creep
