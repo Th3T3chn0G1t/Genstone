@@ -13,6 +13,7 @@
 - Create format implementation
 - Redo examples
     - Build examples
+- Make handlers `GEN_ERRORABLE` to allow for backpropogation
 - Lock `genfs` objects on write
 - Sinks impl for `glog`
 - Redo `genargs` with `genstring`
@@ -24,6 +25,8 @@
     - macOS RAMDisk mount at startup
     - Fix `genproc` tests
 - Add tests for `genstring`
+- Remove superfluous `-Llib`
+- Method to disable automatic `gtrace`
 - Add a `PORTING.md` info file or put in `README.md`
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
