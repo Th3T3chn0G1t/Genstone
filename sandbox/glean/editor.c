@@ -110,14 +110,14 @@ static void _replace(char** buffer, size_t* buffer_length, char* mark, size_t ma
 	if(diff > 0) {
 		*buffer_length += (size_t) diff;
 		size_t off = (uintptr_t) mark - (uintptr_t) *buffer;
-		(void) grealloc((void**) buffer, *buffer_length, sizeof(char));
+		(void) grealloc((void**) buffer, *buffer_length - (size_t) diff, *buffer_length, sizeof(char));
 		mark = *buffer + off;
 	}
 	memmove(mark + mark_length + diff, mark + mark_length, (uintptr_t) (*buffer + ((ptrdiff_t) *buffer_length - diff)) - (uintptr_t) (mark + mark_length));
 	strncpy(mark, data, data_length);
 	if(diff < 0) {
 		*buffer_length += (size_t) diff;
-		(void) grealloc((void**) buffer, *buffer_length, sizeof(char));
+		(void) grealloc((void**) buffer, *buffer_length - (size_t) diff, *buffer_length, sizeof(char));
 	}
 }
 
@@ -846,7 +846,7 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 		if(!running_addition_sequence_length)
 			running_addition_sequence_pos = (size_t) gtk_text_iter_get_offset(location);
 
-		(void) grealloc((void**) &running_addition_sequence, ++running_addition_sequence_length + 1, sizeof(char)); // Catch the NULL-terminator
+		(void) grealloc((void**) &running_addition_sequence, running_addition_sequence_length, ++running_addition_sequence_length + 1, sizeof(char)); // Catch the NULL-terminator
 		running_addition_sequence[running_addition_sequence_length - 1] = *text;
 		if(running_addition_sequence_length == MAX_RUNNING_ADDITION_SEQUENCE || *text == '\n' || *text == '\t' || *text == ' ') {
 			// Pushes back a new undo stack node for the sequence
