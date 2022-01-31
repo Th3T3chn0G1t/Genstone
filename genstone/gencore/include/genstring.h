@@ -87,4 +87,13 @@ GEN_ERRORABLE gen_string_character_first(const char* const restrict string, cons
  */
 GEN_ERRORABLE gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found);
 
+/**
+ * Creates a number from a numeric string.
+ * @param[in] string the numeric string to create from.
+ * @param[in] string_bound the bounds of the numeric string.
+ * @param[out] out_number a pointer to storage for the created number.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number);
+
 #endif

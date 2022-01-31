@@ -191,3 +191,20 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 
 	GEN_ALL_OK;
 }
+
+gen_error_t gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number) {
+	GEN_FRAME_BEGIN(gen_string_number);
+
+	GEN_INTERNAL_BASIC_PARAM_CHECK(string_bound);
+	GEN_INTERNAL_BASIC_PARAM_CHECK(out_number);
+
+	char* copy = NULL;
+	gen_error_t error = gen_string_duplicate(string, string_bound, limit, &copy);
+	GEN_ERROR_OUT_IF(error, "`gen_string_duplicate` failed");
+	*out_number = strtoul(copy, NULL, 10);
+	GEN_ERROR_OUT_IF_ERRNO(strtoul, errno);
+	error = gfree(copy);
+	GEN_ERROR_OUT_IF(error, "`gfree` failed");
+
+	GEN_ALL_OK;
+}
