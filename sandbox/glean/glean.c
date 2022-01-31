@@ -56,7 +56,7 @@ void glean_signal_connect_swapped(GObject* instance, char* signal, GCallback cal
 void vector_append(vector_T* vector, void* data) {
 	GEN_FRAME_BEGIN(vector_append);
 
-	(void) grealloc((void**) &vector->members, ++vector->members_length, sizeof(void*));
+	(void) grealloc((void**) &vector->members, vector->members_length, ++vector->members_length, sizeof(void*));
 	vector->members[vector->members_length - 1] = data;
 }
 /**

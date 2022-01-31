@@ -326,7 +326,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 			if(event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) *out_event |= GEN_FILEWATCH_DELETED;
 			if(event->mask & IN_MOVE_SELF || event->mask & IN_MOVED_FROM || event->mask & IN_MOVED_TO) *out_event |= GEN_FILEWATCH_MOVED;
 
-			offset += sizeof(struct inotify_event) + event->length;
+			offset += sizeof(struct inotify_event) + event->len;
 		}
 		error = gfree(raw_events);
 		GEN_ERROR_OUT_IF(error, "`gfree` failed");

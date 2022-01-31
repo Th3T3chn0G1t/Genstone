@@ -56,21 +56,23 @@ gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const si
 	GEN_ALL_OK;
 }
 
-gen_error_t grealloc(void* restrict* const restrict out_address, const size_t size, const size_t count) {
+gen_error_t grealloc(void* restrict* const restrict out_address, const size_t old_count, const size_t count, const size_t size) {
 	GEN_FRAME_BEGIN(grealloc);
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
 #if GEN_USE_MIMALLOC == ENABLED
+	(void) old_count;
 	void* const allocated = mi_recalloc(*out_address, count, size);
+	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_recalloc, errno);
+	errno = 0; // mimalloc does weirdness with NUMA
 #else
 	void* const allocated = realloc(*out_address, count * size);
+	GEN_ERROR_OUT_IF_ERRNO(realloc, errno);
+	if(count > old_count) memset((unsigned char*) allocated + (size * old_count), 0, size * (count - old_count));
 #endif
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_recalloc, errno);
 
 	*out_address = allocated;
-
-	errno = 0; // mimalloc does weirdness with NUMA
 
 	GEN_ALL_OK;
 }
