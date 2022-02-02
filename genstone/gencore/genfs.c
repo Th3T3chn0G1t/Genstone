@@ -167,7 +167,7 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
+gen_error_t gen_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
 	GEN_FRAME_BEGIN(gen_handle_read);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
@@ -187,7 +187,7 @@ gen_error_t gen_handle_read(uint8_t* restrict output_buffer, const gen_filesyste
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const uint8_t* const restrict buffer) {
+gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer) {
 	GEN_FRAME_BEGIN(gen_handle_write);
 
 	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);

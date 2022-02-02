@@ -48,7 +48,7 @@ gen_error_t gen_locale_convert_currency(char *const restrict out_string, const s
 
 // const static uint64_t month_lengths[] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-// gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds, const gen_dt_fmt_flags_t flags) {
+// gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const unsigned char day, const unsigned char hours, const unsigned char minutes, const unsigned char seconds, const gen_dt_fmt_flags_t flags) {
 // 	if(flags & GEN_DT_FMT_TIME) {
 // 		if(seconds > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`seconds` exceeded 59");
 // 		if(minutes > 59) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`minutes` exceeded 59");

@@ -60,6 +60,6 @@ GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const
 //  * @param flags the aspects of the string to generate, or'd together
 //  * @return an error code.
 //  */
-// GEN_ERRORABLE gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const uint8_t day, const uint8_t hours, const uint8_t minutes, const uint8_t seconds, const gen_dt_fmt_flags_t flags);
+// GEN_ERRORABLE gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const unsigned char day, const unsigned char hours, const unsigned char minutes, const unsigned char seconds, const gen_dt_fmt_flags_t flags);
 
 #endif

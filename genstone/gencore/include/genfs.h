@@ -193,7 +193,7 @@ GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesys
  * @note Does not add a null terminator to the buffer.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_read(uint8_t* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
+GEN_ERRORABLE gen_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file.
@@ -202,7 +202,7 @@ GEN_ERRORABLE gen_handle_read(uint8_t* restrict output_buffer, const gen_filesys
  * @param[in] buffer the buffer to source bytes from for writing.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const uint8_t* const restrict buffer);
+GEN_ERRORABLE gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer);
 
 /**
  * Lists the contents of a directory.
