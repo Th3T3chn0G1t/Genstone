@@ -35,7 +35,7 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t siz
 }
 
 gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align) {
-	GEN_FRAME_BEGIN(gzalloc);
+	GEN_FRAME_BEGIN(gzalloc_aligned);
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
