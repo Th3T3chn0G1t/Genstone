@@ -314,12 +314,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 		unsigned int offset = 0;
 		while(offset < events_size) {
-			GEN_DIAG_REGION_BEGIN
-#pragma clang diagnostic ignored "-Wcast-align"
-			// https://stackoverflow.com/questions/28516413/c11-alignas-vs-clang-wcast-align
-			// Clang fails to check alignment properly when delivering -Wcast-align
 			struct inotify_event* const event = (struct inotify_event*) (raw_events + offset);
-			GEN_DIAG_REGION_END
 
 			if(event->mask & IN_ATTRIB || event->mask & IN_MODIFY) *out_event |= GEN_FILEWATCH_MODIFIED;
 			if(event->mask & IN_CREATE) *out_event |= GEN_FILEWATCH_CREATED;
