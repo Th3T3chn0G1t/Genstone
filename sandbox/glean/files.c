@@ -486,7 +486,8 @@ static int inotify_watcher_func(void* vargp) {
 			switch(message.type) {
 				case ADD: {
 					// Allocate a new mapping for the incoming data
-					(void) grealloc((void**) &other_wds, mappings_length, ++mappings_length, sizeof(int));
+					(void) grealloc((void**) &other_wds, mappings_length, mappings_length + 1, sizeof(int));
+					++mappings_length;
 					(void) grealloc((void**) &callbacks, mappings_length - 1, mappings_length, sizeof(inotify_watch_callback_T));
 					(void) grealloc((void**) &passthroughs, mappings_length - 1, mappings_length, sizeof(void*));
 					// Add the watcher

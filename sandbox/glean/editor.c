@@ -846,7 +846,8 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 		if(!running_addition_sequence_length)
 			running_addition_sequence_pos = (size_t) gtk_text_iter_get_offset(location);
 
-		(void) grealloc((void**) &running_addition_sequence, running_addition_sequence_length, ++running_addition_sequence_length + 1, sizeof(char)); // Catch the NULL-terminator
+		(void) grealloc((void**) &running_addition_sequence, running_addition_sequence_length, running_addition_sequence_length + 1, sizeof(char)); // Catch the NULL-terminator
+		++running_addition_sequence_length;
 		running_addition_sequence[running_addition_sequence_length - 1] = *text;
 		if(running_addition_sequence_length == MAX_RUNNING_ADDITION_SEQUENCE || *text == '\n' || *text == '\t' || *text == ' ') {
 			// Pushes back a new undo stack node for the sequence
