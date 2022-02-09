@@ -91,7 +91,15 @@ typedef enum
 	/**
      * The specified target is in use elsewhere.
      */
-	GEN_IN_USE
+	GEN_IN_USE,
+	/**
+	 * An unimplemented feature was used
+	 */
+	GEN_NOT_IMPLEMENTED,
+	/**
+	 * The specified value is out of bounds
+	 */
+	GEN_OUT_OF_BOUNDS
 } gen_error_t;
 
 /**
@@ -151,15 +159,16 @@ extern const char* gen_error_description(const gen_error_t error);
 #endif
 
 /**
- * Dispatches error handling and aborts the program with a fatal error.
+ * Aborts the program with a fatal error.
+ * Avoids `gtrace`.
+ * Avoids triggering error hander.
  * @param[in] error an error code.
  * @param[in] msg contextual error message.
  */
 #define GEN_FATAL_ERROR(error, msg) \
 	do { \
-		glogf(FATAL, "%s: %s", gen_error_name(error), msg); \
-		GEN_DISPATCH_ERROR_HANDLER(error, msg); \
-		GEN_REQUIRE_NO_REACH; \
+		glogf(ERROR, "%s: %s", gen_error_name(error), msg); \
+		abort(); \
 	} while(0)
 
 /**

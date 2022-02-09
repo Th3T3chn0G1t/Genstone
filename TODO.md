@@ -1,5 +1,9 @@
 # TODO
 
+- `GEN_FATAL_ERROR` as used by `gentooling` is a bit of a meme - fix or remove
+- Remove `gendbg`
+- Add back more helpful debug stuff to `GEN_FOREACH`
+- Remove all uses of register
 - Add `strtoX` equivalents to `genstring`
 - Add next for every gen foreach
 - Uncomment submodule initialization in vulkan Makefiles

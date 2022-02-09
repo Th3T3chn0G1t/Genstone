@@ -26,6 +26,8 @@ const char* gen_error_name(const gen_error_t error) {
 		case GEN_BAD_CONTENT: return "GEN_BAD_CONTENT";
 		case GEN_BAD_OPERATION: return "GEN_BAD_OPERATION";
 		case GEN_IN_USE: return "GEN_IN_USE";
+		case GEN_NOT_IMPLEMENTED: return "GEN_NOT_IMPLEMENTED";
+		case GEN_OUT_OF_BOUNDS: return "GEN_OUT_OF_BOUNDS";
 	}
 }
 
@@ -47,6 +49,8 @@ const char* gen_error_description(const gen_error_t error) {
 		case GEN_BAD_CONTENT: return "The provided argument contains bad or invalid content";
 		case GEN_BAD_OPERATION: return "A bad or invalid operation was requested";
 		case GEN_IN_USE: return "The specified target is in use elsewhere";
+		case GEN_NOT_IMPLEMENTED: return "An unimplemented feature was used";
+		case GEN_OUT_OF_BOUNDS: return "The specified value is out of bounds";
 	}
 }
 
