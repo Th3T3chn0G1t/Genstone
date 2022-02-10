@@ -1,5 +1,13 @@
 # TODO
 
+- Switch to LGPL?
+- Add an override to `abort` for erroring out
+- Fix `genproc`
+- Review error callbacks and glog callbacks
+- Add `GEN_DANGER_MODE`
+  - Removing most error checking
+  - Disabling validation
+  - Remove bounds checking from genstring
 - `GEN_FATAL_ERROR` as used by `gentooling` is a bit of a meme - fix or remove
 - Remove `gendbg`
 - Add back more helpful debug stuff to `GEN_FOREACH`
