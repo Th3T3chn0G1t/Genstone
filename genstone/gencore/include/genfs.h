@@ -59,6 +59,18 @@ typedef enum
  */
 typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* const restrict);
 
+#ifndef GEN_FS_FILEWATCH_USE_SYSLIB
+#if PLATFORM == LNX
+/**
+ * Whether to use the system library where implemented to get filewatch functionality.
+ * @note Disabling may make results more consistent across platforms as the alternative uses standard utilities.
+ */
+#define GEN_FS_FILEWATCH_USE_SYSLIB ENABLED
+#else
+#define GEN_FS_FILEWATCH_USE_SYSLIB DISABLED
+#endif
+#endif
+
 /**
  * A handle to a filesystem object.
  * @note Directly modifying the internal handles may cause undefined behaviour.
@@ -77,6 +89,7 @@ typedef struct {
      * Whether this handle is for a directory.
      */
 	bool is_directory;
+#if GEN_FS_FILEWATCH_USE_SYSLIB == DISABLED
 	/**
      * Internal caching of `stat` retvals.
      * Please don't use this directly.
@@ -87,6 +100,7 @@ typedef struct {
      * Please don't use this directly.
      */
 	size_t internal_directory_length;
+#endif
 } gen_filesystem_handle_t;
 
 /**

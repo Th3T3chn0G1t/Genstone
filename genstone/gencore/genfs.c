@@ -228,18 +228,10 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	GEN_ALL_OK;
 }
 
-#if PLATFORM == DWN
+#if GEN_FS_FILEWATCH_USE_SYSLIB == DISABLED
 static void gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
 	++(*(size_t*) passthrough);
 }
-#endif
-
-#ifndef GEN_FS_FILEWATCH_USE_SYSLIB
-/**
- * Whether to use the system library where implemented to get filewatch functionality.
- * @note Disabling may make results more consistent across platforms as the alternative uses standard utilities.
- */
-#define GEN_FS_FILEWATCH_USE_SYSLIB ENABLED
 #endif
 
 gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_handle, const gen_filesystem_handle_t* const restrict handle) {
@@ -288,7 +280,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 	*out_event = GEN_FILEWATCH_NONE;
 
-#if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
+#if GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
 	struct pollfd fd = {handle->file_handle, POLLIN, 0};
 
 	fd.revents = 0;

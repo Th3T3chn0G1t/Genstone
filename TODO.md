@@ -16,7 +16,6 @@
 - Add next for every gen foreach
 - Uncomment submodule initialization in vulkan Makefiles
 - Review static analysis warning-creep
-- Make `gen_filesystem_handle_t` internal storage for filesystem event notify backend-specific
 - Recentralize opts into gendbg or decentralize them completely
 - Memory equivalent to `genstring`
     - `memset`
