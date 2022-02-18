@@ -9,7 +9,11 @@ build_message_gentooling_test:
 
 gentooling_test: build_message_gentooling_test $(GEN_TOOLING_TEST) ### @Test Builds and runs Genstone tooling utility tests
 	@$(ECHO) "$(ACTION_PREFIX)$(GEN_TOOLING_TEST)$(ACTION_SUFFIX)"
+ifeq ($(PLATFORM),DWN)
+	@DYLD_LIBRARY_PATH=lib $(GEN_TOOLING_TEST)
+else
 	@LD_LIBRARY_PATH=lib $(GEN_TOOLING_TEST)
+endif
 
 $(GEN_TOOLING_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_TOOLING_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

@@ -9,7 +9,11 @@ build_message_genargs_test:
 
 genargs_test: build_message_genargs_test $(GEN_ARGS_TEST) ### @Test Builds and runs Genstone argument parser tests
 	@$(ECHO) "$(ACTION_PREFIX)$(GEN_ARGS_TEST)$(ACTION_SUFFIX)"
+ifeq ($(PLATFORM),DWN)
+	@DYLD_LIBRARY_PATH=lib $(GEN_ARGS_TEST)
+else
 	@LD_LIBRARY_PATH=lib $(GEN_ARGS_TEST)
+endif
 
 $(GEN_ARGS_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_ARGS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

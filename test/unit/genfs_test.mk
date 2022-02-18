@@ -9,7 +9,11 @@ build_message_genfs_test:
 
 genfs_test: build_message_genfs_test $(GEN_FS_TEST) ### @Test Builds and runs Genstone filesystem utility tests
 	@$(ECHO) "$(ACTION_PREFIX)$(GEN_FS_TEST)$(ACTION_SUFFIX)"
+ifeq ($(PLATFORM),DWN)
+	@DYLD_LIBRARY_PATH=lib $(GEN_FS_TEST)
+else
 	@LD_LIBRARY_PATH=lib $(GEN_FS_TEST)
+endif
 
 $(GEN_FS_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_FS_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

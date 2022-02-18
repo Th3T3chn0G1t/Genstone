@@ -9,7 +9,11 @@ build_message_genproc_test:
 
 genproc_test: build_message_genproc_test $(GEN_PROC_TEST) ### @Test Builds and runs Genstone subprocess management utility tests
 	@$(ECHO) "$(ACTION_PREFIX)$(GEN_PROC_TEST)$(ACTION_SUFFIX)"
+ifeq ($(PLATFORM),DWN)
+	@DYLD_LIBRARY_PATH=lib $(GEN_PROC_TEST)
+else
 	@LD_LIBRARY_PATH=lib $(GEN_PROC_TEST)
+endif
 
 $(GEN_PROC_TEST): CFLAGS = $(GEN_CORE_CFLAGS)
 $(GEN_PROC_TEST): LFLAGS = -Llib $(GEN_CORE_LFLAGS)

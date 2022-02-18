@@ -13,7 +13,11 @@ build_message_gendl_test:
 
 gendl_test: build_message_gendl_test $(GEN_DL_TEST_EXEC) $(GEN_DL_TEST_LIB) ### @Test Builds and runs Genstone dynamic library utility tests
 	@$(ECHO) "$(ACTION_PREFIX)$(GEN_DL_TEST_EXEC)$(ACTION_SUFFIX)"
+ifeq ($(PLATFORM),DWN)
+	@DYLD_LIBRARY_PATH=lib $(GEN_DL_TEST_EXEC)
+else
 	@LD_LIBRARY_PATH=lib $(GEN_DL_TEST_EXEC)
+endif
 	-rm $(GEN_DL_TEST_LIB)
 
 $(GEN_DL_TEST_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)
