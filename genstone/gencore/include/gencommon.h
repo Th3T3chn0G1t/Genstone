@@ -9,7 +9,6 @@
 #ifndef GEN_COMMON_H
 #define GEN_COMMON_H
 
-#include "gendbg.h"
 #include "gendiag.h"
 #include "generrors.h"
 

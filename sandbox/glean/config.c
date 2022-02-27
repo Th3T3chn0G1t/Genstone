@@ -30,11 +30,11 @@ void config_init(void) {
 	//	gtk_icon_theme_append_search_path(gtk_icon_theme_get_default(), "res/icon/forkawesome/src/icons/svg");
 
 	// Maps file extensions to gtk named icons for the file tree
-	(void) galloc((void**) &icon_map, 1, sizeof(icon_map));
+	(void) gzalloc((void**) &icon_map, 1, sizeof(icon_map));
 	{
 		icon_map->mappings_length = 4;
-		(void) galloc((void**) &icon_map->keys, icon_map->mappings_length, sizeof(icon_map_key_T));
-		(void) galloc((void**) &icon_map->icons, icon_map->mappings_length, sizeof(char*));
+		(void) gzalloc((void**) &icon_map->keys, icon_map->mappings_length, sizeof(icon_map_key_T));
+		(void) gzalloc((void**) &icon_map->icons, icon_map->mappings_length, sizeof(char*));
 
 		icon_map_key_T c_key = {EXTENSION, "c"};
 		icon_map->keys[0] = c_key;
@@ -73,7 +73,7 @@ void config_init(void) {
 		// Concatonate the two paths with a path delimiter (`/`) in between
 		size_t needed = (size_t) snprintf(NULL, 0, "%s/%s", "sandbox/glean/usr/templates", entry->d_name) + 1ul;
 		char* buffer;
-		(void) galloc((void**) &buffer, needed, sizeof(char));
+		(void) gzalloc((void**) &buffer, needed, sizeof(char));
 		sprintf(buffer, "%s/%s", "sandbox/glean/usr/templates", entry->d_name);
 
 		gen_filesystem_handle_t handle;
@@ -81,7 +81,7 @@ void config_init(void) {
 		size_t file_buffer_size;
 		(void) gen_handle_size(&file_buffer_size, &handle);
 		char* file_buffer;
-		(void) galloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
+		(void) gzalloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
 		(void) gen_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
 		file_buffer[file_buffer_size] = '\0';
 

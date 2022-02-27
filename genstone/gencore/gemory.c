@@ -8,7 +8,7 @@
  */
 #define GEN_INTERNAL_GEMORY_PARAM_CHECK \
 	do { \
-		GEN_INTERNAL_BASIC_PARAM_CHECK(out_address); \
+		GEN_NULL_CHECK(out_address); \
 		if(!size) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was 0"); \
 		if(!count) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was 0"); \
 		if(size == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`"); \
@@ -80,7 +80,7 @@ gen_error_t grealloc(void* restrict* const restrict out_address, const size_t ol
 gen_error_t gfree(void* const restrict address) {
 	GEN_FRAME_BEGIN(gfree);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(address);
+	GEN_NULL_CHECK(address);
 
 #if GEN_USE_MIMALLOC == ENABLED
 	mi_free(address);

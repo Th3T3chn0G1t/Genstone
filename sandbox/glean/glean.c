@@ -70,7 +70,7 @@ void vector_remove(vector_T* vector, size_t index) {
 
 	void** new_members = NULL;
 	if(--(vector->members_length)) {
-		(void) galloc((void**) &new_members, vector->members_length, sizeof(void*));
+		(void) gzalloc((void**) &new_members, vector->members_length, sizeof(void*));
 		memcpy(new_members, vector->members, index * sizeof(void*));
 		memcpy(&(new_members[index]), &(vector->members[index + 1]), (vector->members_length - index) * sizeof(void*));
 	}

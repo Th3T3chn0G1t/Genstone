@@ -34,7 +34,7 @@ typedef enum
 /**
  * Handler for parsed arguments.
  */
-typedef void (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char* const restrict, void* const restrict);
+typedef __nodiscard gen_error_t (*gen_arg_handler_t)(const gen_arg_type_t, const size_t, const char* const restrict, void* const restrict);
 
 /**
  * Parses UNIX-style arguments into an easy-to-interpret format for a handler.

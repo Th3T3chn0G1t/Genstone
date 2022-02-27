@@ -72,10 +72,9 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|
 |`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a thread-local stateful buffer|
 |`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a thread-local stateful buffer|
-|`GEN_GLOGGIFY_EH`|`ENABLED` `DISABLED`|`ENABLED`|Whether error sites in Genstone modules are allowed to output string information via. `glog`|Depending on the error, this may contain more information than centralized error functions|
-|`GEN_CENTRALIZE_EH`|`ENABLED` `DISABLED`|`DISABLED`|Whether to call `gen_error_handler` at error sites in Genstone modules|Creates thread-local state if enabled. Set `gen_error_handler_passthrough` to get a passthrough pointer in `gen_error_handler`|
-|`GEN_DEBUG_PATH_VALIDATION`|`ENABLED` `DISABLED`|`BUILD_MODE=DEBUG`: `ENABLED` `BUILD_MODE=RELEASE`: `DISABLED`|Whether to validate paths passed to genfs functions with `gen_path_validate`|Does not affect the presence of `gen_path_validate`|
-|`GEN_DEBUG_FOREACH_REGISTER`|`ENABLED` `DISABLED`|`BUILD_MODE=DEBUG`: `DISABLED` `BUILD_MODE=RELEASE`: `ENABLED`|Whether to use register variables for iteration in `GEN_FOREACH` statements|Disabling this can sometimes help with printing iterator values from a debugger|
+|`GEN_PATH_VALIDATION`|`ENABLED` `DISABLED`|`BUILD_MODE=DEBUG`: `ENABLED` `BUILD_MODE=RELEASE`: `DISABLED`|Whether to validate paths passed to genfs functions with `gen_path_validate`|Does not affect the presence of `gen_path_validate`|
 |`GEN_USE_MIMALLOC`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use mimalloc as the allocator|Disabling mimalloc may be detrimental to performance and is not as well tested nor as secure|
 |`GEN_CALC_COMMON_TYPES`|`ENABLED` `DISABLED`|`ENABLED`|Enables the default definition of common vector and matrix types in gencalc||
 |`GEN_FS_FILEWATCH_USE_SYSLIB`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use the system library where implemented to get filewatch functionality|Disabling may make results more consistent across platforms as the alternative uses standard utilities|
+|`GEN_EXIT_PROC`|Any statement. Should not end in a semicolon|`abort()`|The statement to be exected when a fatal program error is encountered|This statement should exit program runtime in all cases - application may be in an unstable state if a fatal error does not result in closure|
+

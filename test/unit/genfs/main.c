@@ -3,7 +3,9 @@
 
 #include <genfs.h>
 
-static void dir_handler(__unused const char* file, __unused void* passthrough) {}
+static gen_error_t dir_handler(__unused const char* file, __unused void* passthrough) {
+	GEN_ALL_OK;
+}
 
 // This is to make sure the test value is constant for require
 #define file_data "foobarfizzbuzz123"

@@ -3,11 +3,6 @@
 
 #include "include/gencommon.h"
 
-#if GEN_CENTRALIZE_EH == ENABLED
-thread_local gen_error_handler_t gen_error_handler = NULL;
-thread_local void* gen_error_handler_passthrough = NULL;
-#endif
-
 const char* gen_error_name(const gen_error_t error) {
 	switch(error) {
 		case GEN_OK: return "GEN_OK";
@@ -28,6 +23,8 @@ const char* gen_error_name(const gen_error_t error) {
 		case GEN_IN_USE: return "GEN_IN_USE";
 		case GEN_NOT_IMPLEMENTED: return "GEN_NOT_IMPLEMENTED";
 		case GEN_OUT_OF_BOUNDS: return "GEN_OUT_OF_BOUNDS";
+		case GEN_INVALID_CONTROL: return "GEN_INVALID_CONTROL";
+		case GEN_BAD_ALIGNMENT: return "GEN_BAD_ALIGNMENT";
 	}
 }
 
@@ -51,6 +48,8 @@ const char* gen_error_description(const gen_error_t error) {
 		case GEN_IN_USE: return "The specified target is in use elsewhere";
 		case GEN_NOT_IMPLEMENTED: return "An unimplemented feature was used";
 		case GEN_OUT_OF_BOUNDS: return "The specified value is out of bounds";
+		case GEN_INVALID_CONTROL: return "The program reached an invalid control path";
+		case GEN_BAD_ALIGNMENT: return "The provided data was misaligned";
 	}
 }
 

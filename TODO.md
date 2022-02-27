@@ -1,22 +1,22 @@
 # TODO
 
+- Fix build system with changes in Alonira
+- Investigate Mimalloc error handler?
+- Clean up output of error messages
+- `glog` and `glogf` into their own functions instead of horrible macro hell
+- Bring over Alonira print-formatting implementation
+    - Figure out floating point/use external implementation
 - Switch to LGPL?
-- Add an override to `abort` for erroring out
 - Fix `genproc`
-- Review error callbacks and glog callbacks
 - Add `GEN_DANGER_MODE`
   - Removing most error checking
   - Disabling validation
   - Remove bounds checking from genstring
-- `GEN_FATAL_ERROR` as used by `gentooling` is a bit of a meme - fix or remove
-- Remove `gendbg`
 - Add back more helpful debug stuff to `GEN_FOREACH`
-- Remove all uses of register
 - Add `strtoX` equivalents to `genstring`
 - Add next for every gen foreach
 - Uncomment submodule initialization in vulkan Makefiles
 - Review static analysis warning-creep
-- Recentralize opts into gendbg or decentralize them completely
 - Memory equivalent to `genstring`
     - `memset`
     - `memcpy`
@@ -25,20 +25,18 @@
 - Create format implementation
 - Redo examples
     - Build examples
-- Make handlers `GEN_ERRORABLE` to allow for backpropogation
 - Lock `genfs` objects on write
-- Sinks impl for `glog`
 - Redo `genargs` with `genstring`
-    - Add `--opt="string"` support
+    - Add `--opt="string"`-style opts support
 - `GEN_ERROR_OUT_IF` take proc instead of message to be consistent with `GEN_ERROR_OUT_IF_ERRNO`
 - Replace shell mode for `genproc` with proper parameter arrays
+    - `envp` arrays
 - Nice dynamic RAMDisk for `genfs`
     - `memfd_create`
     - macOS RAMDisk mount at startup
     - Fix `genproc` tests
 - Add tests for `genstring`
 - Remove superfluous `-Llib`
-- Method to disable automatic `gtrace`
 - Add a `PORTING.md` info file or put in `README.md`
 - Async IO using `aio(7)` (`aio_read` `aio_write`)
 - `timer_create` (https://linux.die.net/man/2/timer_create)

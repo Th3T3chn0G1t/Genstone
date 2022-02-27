@@ -207,7 +207,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 
 				(void) gen_path_create_file(name);
 				gen_filesystem_handle_t handle;
-				(void) galloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+				(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
 				(void) gen_handle_open(&handle, name);
 
 				char* buffer;
@@ -371,7 +371,7 @@ void editor_show_new_prompt(void) {
 	// Concatonate the file name and the destination with a path delimiter (`/`) in between
 	size_t needed = (size_t) snprintf(NULL, 0, "%s/%s", root->data, "filename") + 1ul;
 	char* name;
-	(void) galloc((void**) &name, needed, sizeof(char));
+	(void) gzalloc((void**) &name, needed, sizeof(char));
 	sprintf(name, "%s/%s", root->data, "filename");
 
 	GtkEntryBuffer* buffer = gtk_entry_buffer_new(name, -1);
@@ -696,7 +696,7 @@ void editor_tab_update_contents_from_file(editor_tab_T* tab, char* path) {
 	size_t file_buffer_size;
 	(void) gen_handle_size(&file_buffer_size, &handle);
 	char* file_buffer;
-	(void) galloc((void**) &file_buffer, file_buffer_size + 1, sizeof(char));
+	(void) gzalloc((void**) &file_buffer, file_buffer_size + 1, sizeof(char));
 	(void) gen_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
 	file_buffer[file_buffer_size] = '\0';
 	(void) gen_handle_close(&handle);
@@ -852,7 +852,7 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 		if(running_addition_sequence_length == MAX_RUNNING_ADDITION_SEQUENCE || *text == '\n' || *text == '\t' || *text == ' ') {
 			// Pushes back a new undo stack node for the sequence
 			undo_stack_node_T* seq_node;
-			(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
+			(void) gzalloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 			seq_node->position = running_addition_sequence_pos;
 			seq_node->changed_length = (long) running_addition_sequence_length;
 			(void) gstrndup(&seq_node->data, running_addition_sequence, strlen(running_addition_sequence));
@@ -866,7 +866,7 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 	else {
 		// Pushes back a new undo stack node for the sequence
 		undo_stack_node_T* seq_node;
-		(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
+		(void) gzalloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 		seq_node->position = running_addition_sequence_pos;
 		seq_node->changed_length = (long) running_addition_sequence_length;
 		(void) gstrndup(&seq_node->data, running_addition_sequence, running_addition_sequence_length);
@@ -878,7 +878,7 @@ static void editor_buffer_addition(GtkTextBuffer* buffer, GtkTextIter* location,
 
 		// Pushes back a new undo stack node for the action
 		undo_stack_node_T* node;
-		(void) galloc((void**) &node, 1, sizeof(undo_stack_node_T));
+		(void) gzalloc((void**) &node, 1, sizeof(undo_stack_node_T));
 		node->position = (size_t) gtk_text_iter_get_offset(location);
 		node->changed_length = len;
 		(void) gstrndup(&node->data, text, strlen(text));
@@ -909,7 +909,7 @@ static void editor_buffer_deletion(GtkTextBuffer* buffer, GtkTextIter* start, Gt
 	size_t len = offset_end - offset_start;
 	char* text = gtk_text_buffer_get_text(buffer, start, end, false);
 	undo_stack_node_T* node;
-	(void) galloc((void**) &node, 1, sizeof(undo_stack_node_T));
+	(void) gzalloc((void**) &node, 1, sizeof(undo_stack_node_T));
 	node->position = offset_start;
 	node->changed_length = -((long) len);
 	(void) gstrndup(&node->data, text, strlen(text));
@@ -954,7 +954,7 @@ void editor_tab_undo_stack_move_back(editor_tab_T* tab) {
 
 	if(running_addition_sequence_length) {
 		undo_stack_node_T* seq_node;
-		(void) galloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
+		(void) gzalloc((void**) &seq_node, 1, sizeof(undo_stack_node_T));
 		seq_node->position = running_addition_sequence_pos;
 		seq_node->changed_length = (long) running_addition_sequence_length;
 		glogf(DEBUG, "Running addition sequence: %s", running_addition_sequence);

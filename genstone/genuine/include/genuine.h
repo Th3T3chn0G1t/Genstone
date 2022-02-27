@@ -41,7 +41,7 @@ typedef struct {
 /**
  * Handler for drawing textured UI rects.
  */
-typedef void (*gen_ui_draw_handler_t)(void* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void* const restrict);
+typedef __nodiscard gen_error_t (*gen_ui_draw_handler_t)(void* const restrict, const gen_ui_rect_t, const gen_ui_rect_t, void* const restrict);
 
 /**
  * Invokes a draw handler to correctly lay out a ninepatch UI element.

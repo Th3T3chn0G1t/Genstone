@@ -3,19 +3,18 @@
 
 #include "include/genfs.h"
 
-#include "include/gendbg.h"
 #include "include/genstring.h"
 #include "include/gentooling.h"
 
-#if GEN_DEBUG_PATH_VALIDATION == ENABLED
+#if GEN_PATH_VALIDATION == ENABLED
 /**
  * Validates the path parameter to filesystem functions
  * @param[in] path the path to validate
- * @see GEN_DEBUG_PATH_VALIDATION
+ * @see GEN_PATH_VALIDATION
  */
 #define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) \
 	do { \
-		GEN_INTERNAL_BASIC_PARAM_CHECK(path); \
+		GEN_NULL_CHECK(path); \
 		gen_error_t path_error = gen_path_validate(path); \
 		if(path_error) GEN_ERROR_OUT(path_error, "`" #path "` was invalid"); \
 	} while(0)
@@ -26,7 +25,7 @@
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_canonical);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_path);
+	GEN_NULL_CHECK(output_path);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	realpath(path, output_path);
@@ -38,7 +37,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 gen_error_t gen_path_exists(const char* const restrict path, bool* const restrict out_exists) {
 	GEN_FRAME_BEGIN(gen_path_exists);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_exists);
+	GEN_NULL_CHECK(out_exists);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	*out_exists = !access(path, F_OK);
@@ -52,7 +51,7 @@ gen_error_t gen_path_exists(const char* const restrict path, bool* const restric
 gen_error_t gen_path_validate(const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_path_validate);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(path);
+	GEN_NULL_CHECK(path);
 	if(!path[0]) GEN_ERROR_OUT(GEN_TOO_SHORT, "`path` was too short (`length(path)` was 0)");
 
 	// This is a kinda nonsensical test but it feels like the best way to do this
@@ -108,7 +107,7 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
 	GEN_FRAME_BEGIN(gen_handle_open);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_handle);
+	GEN_NULL_CHECK(output_handle);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
 
 	int fd = open(path, O_DIRECTORY | O_RDONLY | O_CLOEXEC);
@@ -136,7 +135,7 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 	GEN_FRAME_BEGIN(gen_handle_close);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(handle);
 
 	if(handle->is_directory) {
 		closedir(handle->directory_handle);
@@ -153,7 +152,7 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle) {
 	GEN_FRAME_BEGIN(gen_handle_size);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 
 	size_t mark = (size_t) lseek(handle->file_handle, 0, SEEK_END);
@@ -170,10 +169,10 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 gen_error_t gen_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
 	GEN_FRAME_BEGIN(gen_handle_read);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
 	if(start >= end) GEN_ERROR_OUT(GEN_TOO_SHORT, "`start` >= `end`");
-	GEN_INTERNAL_BASIC_PARAM_CHECK(output_buffer);
+	GEN_NULL_CHECK(output_buffer);
 
 	lseek(handle->file_handle, (long) start, SEEK_SET);
 	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
@@ -190,9 +189,9 @@ gen_error_t gen_handle_read(unsigned char* restrict output_buffer, const gen_fil
 gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer) {
 	GEN_FRAME_BEGIN(gen_handle_write);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
-	GEN_INTERNAL_BASIC_PARAM_CHECK(buffer);
+	GEN_NULL_CHECK(buffer);
 
 	write(handle->file_handle, buffer, bytes_length);
 	GEN_ERROR_OUT_IF_ERRNO(write, errno);
@@ -206,9 +205,9 @@ gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handl
 gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough) {
 	GEN_FRAME_BEGIN(gen_directory_list);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(handle);
 	if(!handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a file");
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handler);
+	GEN_NULL_CHECK(handler);
 
 	rewinddir(handle->directory_handle);
 
@@ -219,7 +218,8 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '\0') continue;
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0') continue;
 
-		handler(entry->d_name, passthrough);
+		gen_error_t error = handler(entry->d_name, passthrough);
+		GEN_ERROR_OUT_IF(error, "Call to directory list handler failed");
 	}
 	GEN_ERROR_OUT_IF_ERRNO(readdir, errno);
 
@@ -229,16 +229,18 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 }
 
 #if GEN_FS_FILEWATCH_USE_SYSLIB == DISABLED
-static void gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
+static gen_error_t gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
+	GEN_NULL_CHECK(passthrough);
 	++(*(size_t*) passthrough);
+	GEN_ALL_OK;
 }
 #endif
 
 gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_handle, const gen_filesystem_handle_t* const restrict handle) {
 	GEN_FRAME_BEGIN(gen_filewatch_create);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_handle);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(out_handle);
+	GEN_NULL_CHECK(handle);
 
 #if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
 	out_handle->is_directory = false;
@@ -275,8 +277,8 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
 	GEN_FRAME_BEGIN(gen_filewatch_poll);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_event);
+	GEN_NULL_CHECK(handle);
+	GEN_NULL_CHECK(out_event);
 
 	*out_event = GEN_FILEWATCH_NONE;
 
@@ -355,7 +357,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle) {
 	GEN_FRAME_BEGIN(gen_filewatch_destroy);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(handle);
+	GEN_NULL_CHECK(handle);
 
 #if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
 	close(handle->file_handle);

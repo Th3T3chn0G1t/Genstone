@@ -8,9 +8,9 @@
 gen_error_t gen_string_compare(const char* const restrict a, const size_t a_bound, const char* const restrict b, const size_t b_bound, const size_t limit, bool* const restrict out_equal) {
 	GEN_FRAME_BEGIN(gen_string_compare);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(a);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(b);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_equal);
+	GEN_NULL_CHECK(a);
+	GEN_NULL_CHECK(b);
+	GEN_NULL_CHECK(out_equal);
 
 	*out_equal = true;
 
@@ -41,8 +41,8 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
 	GEN_FRAME_BEGIN(gen_string_copy);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(destination);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(source);
+	GEN_NULL_CHECK(destination);
+	GEN_NULL_CHECK(source);
 
 	if(!limit) GEN_ALL_OK;
 
@@ -69,8 +69,8 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
 	GEN_FRAME_BEGIN(gen_string_append);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(destination);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(source);
+	GEN_NULL_CHECK(destination);
+	GEN_NULL_CHECK(source);
 
 	if(!limit) GEN_ALL_OK;
 
@@ -96,8 +96,8 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 gen_error_t gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length) {
 	GEN_FRAME_BEGIN(gen_string_length);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(string);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_length);
+	GEN_NULL_CHECK(string);
+	GEN_NULL_CHECK(out_length);
 
 	if(!limit) GEN_ALL_OK;
 
@@ -107,6 +107,7 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 		if(!*c) GEN_ALL_OK;
 		++*out_length;
 	}
+	if(*out_length > limit) *out_length = limit;
 
 	if(*out_length > limit) *out_length = limit;
 	if(limit == GEN_STRING_NO_BOUND) GEN_ERROR_OUT(GEN_TOO_SHORT, "String length exceeded string bounds");
@@ -117,7 +118,7 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 gen_error_t gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated) {
 	GEN_FRAME_BEGIN(gen_string_duplicate);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(string);
+	GEN_NULL_CHECK(string);
 
 	*out_duplicated = NULL;
 
@@ -141,8 +142,8 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found) {
 	GEN_FRAME_BEGIN(gen_string_character_first);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(string);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_found);
+	GEN_NULL_CHECK(string);
+	GEN_NULL_CHECK(out_found);
 
 	*out_found = NULL;
 
@@ -168,10 +169,10 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found) {
 	GEN_FRAME_BEGIN(gen_string_character_last);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(string);
+	GEN_NULL_CHECK(string);
 
 	*out_found = NULL;
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_found);
+	GEN_NULL_CHECK(out_found);
 
 	if(!limit) GEN_ALL_OK;
 
@@ -196,8 +197,8 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 gen_error_t gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number) {
 	GEN_FRAME_BEGIN(gen_string_number);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(string_bound);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_number);
+	GEN_NULL_CHECK(string_bound);
+	GEN_NULL_CHECK(out_number);
 
 	char* copy = NULL;
 	gen_error_t error = gen_string_duplicate(string, string_bound, limit, &copy);

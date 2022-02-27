@@ -11,17 +11,6 @@
 #define GEN_MEMORY_H
 
 /**
- * Gemory does not permit the allocation of non-zeroed memory due to potential for security relevant bugs to arise from improperly initialized memory.
- * Also can help prevent UB if the programmer is careless :^).
- */
-#define galloc gzalloc
-/**
- * Gemory does not permit the allocation of non-zeroed memory due to potential for security relevant bugs to arise from improperly initialized memory.
- * Also can help prevent UB if the programmer is careless :^).
- */
-#define galloc_aligned gzalloc_aligned
-
-/**
  * Allocates memory on the heap.
  * Ensures memory is zeroed before returning.
  * @param[out] out_address pointer to storage for a pointer into the allocated heap block.

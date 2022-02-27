@@ -6,9 +6,9 @@
 gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect) {
 	GEN_FRAME_BEGIN(gen_proc_create_redirected_to);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_process);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(exec);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(redirect);
+	GEN_NULL_CHECK(out_process);
+	GEN_NULL_CHECK(exec);
+	GEN_NULL_CHECK(redirect);
 	if(redirect->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`redirect` was a directory");
 
 	gen_process_t pid = fork();
@@ -36,8 +36,8 @@ gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict out_proc
 gen_error_t gen_proc_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode) {
 	GEN_FRAME_BEGIN(gen_proc_wait);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(process);
-	GEN_INTERNAL_BASIC_PARAM_CHECK(out_exitcode);
+	GEN_NULL_CHECK(process);
+	GEN_NULL_CHECK(out_exitcode);
 
 	int exitcode = 0;
 	waitpid(*process, &exitcode, 0);
@@ -56,7 +56,7 @@ gen_error_t gen_proc_wait(const gen_process_t* const restrict process, int* cons
 gen_error_t gen_proc_kill(const gen_process_t* const restrict process) {
 	GEN_FRAME_BEGIN(gen_proc_kill);
 
-	GEN_INTERNAL_BASIC_PARAM_CHECK(process);
+	GEN_NULL_CHECK(process);
 
 	kill(*process, SIGTERM);
 	// Since kill doesn't handle "zombie" processes gracefully we just need to exit here

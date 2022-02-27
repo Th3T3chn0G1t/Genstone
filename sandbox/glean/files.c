@@ -123,7 +123,7 @@ char* get_path_from_home_relative(char* path) {
 		if(access(path, F_OK) == 0) return NULL; // `path` refers to a file `./~`
 		size_t needed = (size_t) snprintf(NULL, 0, "%s%s", getenv("HOME"), path + 1) + 1;
 		char* outbuffer;
-		(void) galloc((void**) &outbuffer, needed, sizeof(char));
+		(void) gzalloc((void**) &outbuffer, needed, sizeof(char));
 		sprintf(outbuffer, "%s%s", getenv("HOME"), path + 1);
 		return outbuffer;
 	}
@@ -160,7 +160,7 @@ static void _tree_view_populate(GtkTreeStore* store, GtkTreeIter* parent, tree_n
 				}
 				case EXTENSION: {
 					char* ext;
-					(void) galloc((void**) &ext, GEN_PATH_MAX, sizeof(char));
+					(void) gzalloc((void**) &ext, GEN_PATH_MAX, sizeof(char));
 					(void) gen_path_extension(ext, title);
 					if(!strcmp(icon_map->keys[j].data, ext)) {
 						gtk_tree_store_set(store, &current, 0, icon_map->icons[j], 1, title, -1);
@@ -283,7 +283,7 @@ static void directory_tree_populate_listdir_handler(const char* const restrict p
 	// Concatonate the two paths with a path delimiter (`/`) in between
 	size_t needed = (size_t) snprintf(NULL, 0, "%s/%s", pass->path, path) + 1ul;
 	char* buffer;
-	(void) galloc((void**) &buffer, needed, sizeof(char));
+	(void) gzalloc((void**) &buffer, needed, sizeof(char));
 	sprintf(buffer, "%s/%s", pass->path, path);
 
 	// Push back a new node into the children of the parent
@@ -321,7 +321,7 @@ static void directory_tree_populate(char* directory_path, tree_node_T* upper_nod
 		(void) gstrndup(&path, directory_path, strlen(directory_path));
 
 	gen_filesystem_handle_t handle;
-	(void) galloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
+	(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
 	(void) gen_handle_open(&handle, path);
 	directory_tree_populate_listdir_handler_passthrough_T passthrough = {path, upper_node, directory_path};
 	(void) gen_directory_list(&handle, directory_tree_populate_listdir_handler, &passthrough);
@@ -518,9 +518,9 @@ static int inotify_watcher_func(void* vargp) {
 						inotify_watch_callback_T* new_callbacks = NULL;
 						void** new_passthroughs = NULL;
 						if(--mappings_length) {
-							(void) galloc((void**) &new_other_wds, mappings_length, sizeof(int));
-							(void) galloc((void**) &new_callbacks, mappings_length, sizeof(inotify_watch_callback_T));
-							(void) galloc((void**) &new_passthroughs, mappings_length, sizeof(void*));
+							(void) gzalloc((void**) &new_other_wds, mappings_length, sizeof(int));
+							(void) gzalloc((void**) &new_callbacks, mappings_length, sizeof(inotify_watch_callback_T));
+							(void) gzalloc((void**) &new_passthroughs, mappings_length, sizeof(void*));
 							memcpy(new_other_wds, other_wds, index * sizeof(int));
 							memcpy(new_callbacks, callbacks, index * sizeof(inotify_watch_callback_T));
 							memcpy(new_passthroughs, passthroughs, index * sizeof(void*));
@@ -548,7 +548,7 @@ static int inotify_watcher_func(void* vargp) {
 
 		// Handle inotify events
 		if(FD_ISSET(inotify_fd, &set)) {
-			(void) galloc((void**) &event, needed, sizeof(char));
+			(void) gzalloc((void**) &event, needed, sizeof(char));
 			if(read(inotify_fd, event, needed) == -1)
 				glogf(ERROR, "Failed to read from inotify pipe: %s", strerror(errno));
 

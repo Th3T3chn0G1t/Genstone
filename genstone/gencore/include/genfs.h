@@ -21,6 +21,14 @@
 #define GEN_PATH_MAX PATH_MAX
 #endif
 
+#ifndef GEN_PATH_VALIDATION
+/**
+ * Whether to validate paths passed to `genfs` functions with `gen_path_validate`.
+ * @note Does not affect the presence of `gen_path_validate`.
+ */
+#define GEN_PATH_VALIDATION ENABLED
+#endif
+
 #if PLATFORM == LNX
 #include <sys/inotify.h>
 #endif
@@ -57,7 +65,7 @@ typedef enum
 /**
  * Handler for directory listing.
  */
-typedef void (*gen_directory_list_handler_t)(const char* const restrict, void* const restrict);
+typedef __nodiscard gen_error_t (*gen_directory_list_handler_t)(const char* const restrict, void* const restrict);
 
 #ifndef GEN_FS_FILEWATCH_USE_SYSLIB
 #if PLATFORM == LNX

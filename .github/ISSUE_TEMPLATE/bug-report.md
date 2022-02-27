@@ -17,7 +17,7 @@ What is wrong! Please try to be specific.
 A small example which showcases the bug - we can't sift through your entire project.
 
 **Context**
-Please give backtraces or logs where possible, compile with `GEN_GLOGGIFY_EH` set to `ENABLED` - It really helps.
+Please give backtraces or logs where possible
 
 **Trunk?**
 Are you using the latest commit of Genstone? (trunk)

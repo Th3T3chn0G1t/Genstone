@@ -183,11 +183,8 @@ GEN_ANSI_SEQUENCE(GEN_ANSI_BOLD) "Fatal: " GEN_ANSI_SEQUENCE(GEN_ANSI_CLEAR)
  */
 #define glog(level, string) \
 	do { \
-		GEN_DIAG_REGION_BEGIN \
-		pragma("clang diagnostic ignored \"-Wshadow\"") \
-			fprintf(level >= ERROR ? stderr : stdout, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
+		fprintf(level >= ERROR ? stderr : stdout, "%s%s\n", GEN_LOGGER_##level##_PREFIX, string); \
 		if(level >= ERROR) gtrace; \
-		GEN_DIAG_REGION_END \
 	} while(0)
 
 /**

@@ -9,16 +9,6 @@
 #ifndef GEN_UTIL_H
 #define GEN_UTIL_H
 
-#if GEN_DEBUG_FOREACH_REGISTER == ENABLED
-#define GEN_INTERNAL_FOREACH_ITER_DECL register size_t
-#else
-/**
- * The type used when declaring an iterator in `GEN_FOREACH`.
- * @see GEN_DEBUG_FOREACH_REGISTER
- */
-#define GEN_INTERNAL_FOREACH_ITER_DECL size_t
-#endif
-
 /**
  * @example{lineno} example/gencore/GEN_FOREACH.c
  * Example for how to use `GEN_FOREACH`.
@@ -32,11 +22,10 @@
  * @param[in] memb the identifier to use for the indexed member.
  * @param[in] length the length of the container to iterate.
  * @param[in] container the container to iterate.
- * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH(iter, memb, length, container) \
 	__typeof__((container)[0]) memb = (length) ? (container)[0] : (__typeof__((container)[0])){0}; \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = (container)[++iter])
+	for(size_t iter = 0; iter < (size_t) (length); memb = (container)[++iter])
 
 /**
  * Iterates over a container with explicit length.
@@ -45,11 +34,10 @@
  * @param[in] memb the identifier to use for the indexed member.
  * @param[in] length the length of the container to iterate.
  * @param[in] container the container to iterate.
- * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_PTR(iter, memb, length, container) \
 	__typeof__((container)[0])* memb = (length) ? &(container)[0] : NULL; \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = &(container)[++iter])
+	for(size_t iter = 0; iter < (size_t) (length); memb = &(container)[++iter])
 
 #define GEN_FOREACH_PTR_ADVANCE(iter, memb, length, container, n) \
 	do { \
@@ -68,11 +56,10 @@
  * @param[in] memb the identifier to use for the indexed member.
  * @param[in] length the length of the container to iterate.
  * @param[in] container the container to iterate.
- * @see GEN_DEBUG_FOREACH_REGISTER
  */
 #define GEN_FOREACH_DIRECT_PTR(iter, memb, length, container) \
 	__typeof__((container)) memb = (container); \
-	for(GEN_INTERNAL_FOREACH_ITER_DECL iter = 0; iter < (size_t) (length); memb = (container) + (++iter))
+	for(size_t iter = 0; iter < (size_t) (length); memb = (container) + (++iter))
 
 /**
  * Gets the require message from the expected expressions type.
@@ -165,13 +152,21 @@
 		} \
 	} while(0)
 
+#ifndef GEN_EXIT_PROC
+/**
+ * The statement to be exected when a fatal program error is encountered.
+ * @note This statement should exit program runtime in all cases - application may be in an unstable state if a fatal error does not result in closure.
+ */
+#define GEN_EXIT_PROC abort()
+#endif
+
 /**
  * Pretty assertion for bad control paths.
  */
 #define GEN_REQUIRE_NO_REACH \
 	do { \
 		glogf(FATAL, "Require failed - Invalid control path reached at %s:%i", __FILE__, __LINE__); \
-		abort(); \
+		GEN_EXIT_PROC; \
 	} while(0)
 
 /**

@@ -99,7 +99,7 @@ int main(void) {
 
 		gen_ui_extent_t VIEWPORT_X = SIDEBAR_WIDTH + ui_scale;
 
-		for(register gen_ui_extent_t i = 0; i < TOOLBAR_BUTTONS_LENGTH; ++i) {
+		for(gen_ui_extent_t i = 0; i < TOOLBAR_BUTTONS_LENGTH; ++i) {
 			(void) gen_ui_draw_ninepatch_direct(texture, rect_callback, (gen_ui_rect_t){i * TOOLBAR_BUTTON_STRIDE, 0, TOOLBAR_BUTTON_WIDTH, TOOLBAR_HEIGHT}, NINEPATCH_SCALE, ui_scale, NULL);
 
 			SDL_Surface* text_r = TTF_RenderText_Blended(font, labels[i], color);
