@@ -176,8 +176,8 @@ GEN_ERRORABLE gen_path_delete(const char* const restrict path);
 
 /**
  * @example{lineno} example/gencore/gen_filesystem_handle.c
- * Example for how to use `gen_handle_open` `gen_handle_size` `gen_handle_read` `gen_handle_write` and `gen_directory_list`.
- * The `gen_handle*` family of functions is used for managing files and directories in a better way than the libc provides.
+ * Example for how to use `gen_filesystem_handle_open` `gen_filesystem_handle_size` `gen_filesystem_handle_read` `gen_filesystem_handle_write` and `gen_directory_list`.
+ * The `gen_filesystem_handle*` family of functions is used for managing files and directories in a better way than the libc provides.
  */
 
 /**
@@ -187,7 +187,7 @@ GEN_ERRORABLE gen_path_delete(const char* const restrict path);
  * @param[in] path the path to open.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path);
+GEN_ERRORABLE gen_filesystem_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path);
 
 /**
  * Closes a filesystem object handle.
@@ -195,7 +195,7 @@ GEN_ERRORABLE gen_handle_open(gen_filesystem_handle_t* restrict output_handle, c
  * @param[in] handle pointer to the handle to close.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_close(gen_filesystem_handle_t* const restrict handle);
+GEN_ERRORABLE gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets the size of a handle's object's content.
@@ -203,7 +203,7 @@ GEN_ERRORABLE gen_handle_close(gen_filesystem_handle_t* const restrict handle);
  * @param[in] handle a handle to an object whose size to get. Must not be a directory.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle);
+GEN_ERRORABLE gen_filesystem_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Gets a file's content.
@@ -211,11 +211,11 @@ GEN_ERRORABLE gen_handle_size(size_t* const restrict out_size, const gen_filesys
  * @param[in] handle a handle to a file object whose content to read. Must not be a directory.
  * @param[in] start an offset from the start of the file to begin reading from.
  * @param[in] end an offset from the start of the file to end reading from.
- * @note Use `gen_handle_size` as the end mark to read the whole file.
+ * @note Use `gen_filesystem_handle_size` as the end mark to read the whole file.
  * @note Does not add a null terminator to the buffer.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
+GEN_ERRORABLE gen_filesystem_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end);
 
 /**
  * Writes to a file.
@@ -224,7 +224,7 @@ GEN_ERRORABLE gen_handle_read(unsigned char* restrict output_buffer, const gen_f
  * @param[in] buffer the buffer to source bytes from for writing.
  * @return an error code.
  */
-GEN_ERRORABLE gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer);
+GEN_ERRORABLE gen_filesystem_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer);
 
 /**
  * Lists the contents of a directory.

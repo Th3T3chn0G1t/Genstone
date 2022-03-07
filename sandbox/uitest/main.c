@@ -59,7 +59,7 @@ int main(void) {
 	SDL_FreeSurface(viewport_texture_r);
 
 	gen_filesystem_handle_t dir;
-	(void) gen_handle_open(&dir, ".");
+	(void) gen_filesystem_handle_open(&dir, ".");
 
 	while(true) {
 		SDL_Event e;
@@ -125,7 +125,7 @@ int main(void) {
 		SDL_Delay(MILLIS_PER_SECOND / FPS);
 	}
 cleanup:
-	(void) gen_handle_close(&dir);
+	(void) gen_filesystem_handle_close(&dir);
 
 	SDL_DestroyTexture(texture);
 	SDL_DestroyTexture(viewport_texture);

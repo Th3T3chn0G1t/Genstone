@@ -322,11 +322,11 @@ static void directory_tree_populate(char* directory_path, tree_node_T* upper_nod
 
 	gen_filesystem_handle_t handle;
 	(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
-	(void) gen_handle_open(&handle, path);
+	(void) gen_filesystem_handle_open(&handle, path);
 	directory_tree_populate_listdir_handler_passthrough_T passthrough = {path, upper_node, directory_path};
 	(void) gen_directory_list(&handle, directory_tree_populate_listdir_handler, &passthrough);
 
-	(void) gen_handle_close(&handle);
+	(void) gen_filesystem_handle_close(&handle);
 	(void) gfree(path);
 }
 

@@ -208,7 +208,7 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 				(void) gen_path_create_file(name);
 				gen_filesystem_handle_t handle;
 				(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
-				(void) gen_handle_open(&handle, name);
+				(void) gen_filesystem_handle_open(&handle, name);
 
 				char* buffer;
 				char* str1 = file_templates->members[gtk_combo_box_get_active(template_combo)];
@@ -280,8 +280,8 @@ static void editor_prompt_new_response_handler(GtkDialog* dialog, int response_i
 				}
 				(void) gfree(escaped_marks);
 
-				(void) gen_handle_write(&handle, strlen(buffer), (uint8_t*) buffer);
-				(void) gen_handle_close(&handle);
+				(void) gen_filesystem_handle_write(&handle, strlen(buffer), (uint8_t*) buffer);
+				(void) gen_filesystem_handle_close(&handle);
 
 				(void) gfree(buffer);
 				break;
@@ -655,7 +655,7 @@ void editor_tab_save_as(editor_tab_T* tab, char* path) {
 	(void) gen_path_create_file(path);
 	gen_filesystem_handle_t handle;
 	(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
-	(void) gen_handle_open(&handle, path);
+	(void) gen_filesystem_handle_open(&handle, path);
 
 	if(tab->edited) {
 		tab->edited = false;
@@ -669,11 +669,11 @@ void editor_tab_save_as(editor_tab_T* tab, char* path) {
 	gtk_text_buffer_get_end_iter(text_buffer, &end);
 	char* buffer = gtk_text_buffer_get_text(text_buffer, &start, &end, false);
 
-	(void) gen_handle_write(&handle, strlen(buffer), (uint8_t*) buffer);
+	(void) gen_filesystem_handle_write(&handle, strlen(buffer), (uint8_t*) buffer);
 	(void) gfree(buffer);
 
 	// Don't forget to clean up
-	(void) gen_handle_close(&handle);
+	(void) gen_filesystem_handle_close(&handle);
 
 	// Finish blocking FS operations
 	tab->internal_update = false;
@@ -692,14 +692,14 @@ void editor_tab_update_contents_from_file(editor_tab_T* tab, char* path) {
 
 	gen_filesystem_handle_t handle;
 	(void) gzalloc((void**) &handle.path, GEN_PATH_MAX, sizeof(char));
-	(void) gen_handle_open(&handle, path);
+	(void) gen_filesystem_handle_open(&handle, path);
 	size_t file_buffer_size;
-	(void) gen_handle_size(&file_buffer_size, &handle);
+	(void) gen_filesystem_handle_size(&file_buffer_size, &handle);
 	char* file_buffer;
 	(void) gzalloc((void**) &file_buffer, file_buffer_size + 1, sizeof(char));
-	(void) gen_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
+	(void) gen_filesystem_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
 	file_buffer[file_buffer_size] = '\0';
-	(void) gen_handle_close(&handle);
+	(void) gen_filesystem_handle_close(&handle);
 
 	tab->internal_update = true;
 

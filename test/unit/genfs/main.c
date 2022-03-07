@@ -43,30 +43,30 @@ int main(void) {
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(true, exists);
 
-	glog(INFO, "Testing gen_handle_open() (file)...");
+	glog(INFO, "Testing gen_filesystem_handle_open() (file)...");
 	gen_filesystem_handle_t file_handle;
-	error = gen_handle_open(&file_handle, "./testfile");
+	error = gen_filesystem_handle_open(&file_handle, "./testfile");
 
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(false, file_handle.is_directory);
 
-	glog(INFO, "Testing gen_handle_write()...");
-	error = gen_handle_write(&file_handle, sizeof(file_data), (const uint8_t*) file_data);
+	glog(INFO, "Testing gen_filesystem_handle_write()...");
+	error = gen_filesystem_handle_write(&file_handle, sizeof(file_data), (const uint8_t*) file_data);
 
 	GEN_REQUIRE_NO_ERROR(error);
 
-	glog(INFO, "Testing gen_handle_size()...");
+	glog(INFO, "Testing gen_filesystem_handle_size()...");
 	size_t file_size;
-	error = gen_handle_size(&file_size, &file_handle);
+	error = gen_filesystem_handle_size(&file_size, &file_handle);
 
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(sizeof(file_data), file_size);
 
-	glog(INFO, "Testing gen_handle_read()...");
+	glog(INFO, "Testing gen_filesystem_handle_read()...");
 	uint8_t* file_read_buffer = NULL;
 	error = gzalloc((void**) &file_read_buffer, file_size + 1, sizeof(uint8_t));
 	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_handle_read(file_read_buffer, &file_handle, 0, file_size);
+	error = gen_filesystem_handle_read(file_read_buffer, &file_handle, 0, file_size);
 	file_read_buffer[file_size] = '\0';
 
 	GEN_REQUIRE_NO_ERROR(error);
@@ -81,9 +81,9 @@ int main(void) {
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(true, exists);
 
-	glog(INFO, "Testing gen_handle_open() (directory)...");
+	glog(INFO, "Testing gen_filesystem_handle_open() (directory)...");
 	gen_filesystem_handle_t dir_handle;
-	error = gen_handle_open(&dir_handle, "./testdir");
+	error = gen_filesystem_handle_open(&dir_handle, "./testdir");
 
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL(true, dir_handle.is_directory);
@@ -95,14 +95,14 @@ int main(void) {
 
 	GEN_REQUIRE_NO_ERROR(error);
 
-	glog(INFO, "Testing gen_handle_close() (file)...");
+	glog(INFO, "Testing gen_filesystem_handle_close() (file)...");
 
-	error = gen_handle_close(&file_handle);
+	error = gen_filesystem_handle_close(&file_handle);
 	GEN_REQUIRE_NO_ERROR(error);
 
-	glog(INFO, "Testing gen_handle_close() (directory)...");
+	glog(INFO, "Testing gen_filesystem_handle_close() (directory)...");
 
-	error = gen_handle_close(&dir_handle);
+	error = gen_filesystem_handle_close(&dir_handle);
 	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_path_delete() (file)...");

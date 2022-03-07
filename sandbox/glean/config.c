@@ -77,15 +77,15 @@ void config_init(void) {
 		sprintf(buffer, "%s/%s", "sandbox/glean/usr/templates", entry->d_name);
 
 		gen_filesystem_handle_t handle;
-		(void) gen_handle_open(&handle, buffer);
+		(void) gen_filesystem_handle_open(&handle, buffer);
 		size_t file_buffer_size;
-		(void) gen_handle_size(&file_buffer_size, &handle);
+		(void) gen_filesystem_handle_size(&file_buffer_size, &handle);
 		char* file_buffer;
 		(void) gzalloc((void**) &file_buffer, (size_t) (file_buffer_size + 1), sizeof(char));
-		(void) gen_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
+		(void) gen_filesystem_handle_read((uint8_t*) file_buffer, &handle, 0, file_buffer_size);
 		file_buffer[file_buffer_size] = '\0';
 
-		(void) gen_handle_close(&handle);
+		(void) gen_filesystem_handle_close(&handle);
 
 		vector_append(file_templates, file_buffer);
 		char* name = get_extensionless_filename(buffer);

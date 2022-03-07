@@ -104,8 +104,8 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
-	GEN_FRAME_BEGIN(gen_handle_open);
+gen_error_t gen_filesystem_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
+	GEN_FRAME_BEGIN(gen_filesystem_handle_open);
 
 	GEN_NULL_CHECK(output_handle);
 	GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path);
@@ -132,8 +132,8 @@ gen_error_t gen_handle_open(gen_filesystem_handle_t* restrict output_handle, con
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
-	GEN_FRAME_BEGIN(gen_handle_close);
+gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict handle) {
+	GEN_FRAME_BEGIN(gen_filesystem_handle_close);
 
 	GEN_NULL_CHECK(handle);
 
@@ -149,8 +149,8 @@ gen_error_t gen_handle_close(gen_filesystem_handle_t* const restrict handle) {
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle) {
-	GEN_FRAME_BEGIN(gen_handle_size);
+gen_error_t gen_filesystem_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle) {
+	GEN_FRAME_BEGIN(gen_filesystem_handle_size);
 
 	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
@@ -166,8 +166,8 @@ gen_error_t gen_handle_size(size_t* const restrict out_size, const gen_filesyste
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
-	GEN_FRAME_BEGIN(gen_handle_read);
+gen_error_t gen_filesystem_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
+	GEN_FRAME_BEGIN(gen_filesystem_handle_read);
 
 	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
@@ -186,8 +186,8 @@ gen_error_t gen_handle_read(unsigned char* restrict output_buffer, const gen_fil
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer) {
-	GEN_FRAME_BEGIN(gen_handle_write);
+gen_error_t gen_filesystem_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer) {
+	GEN_FRAME_BEGIN(gen_filesystem_handle_write);
 
 	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
@@ -363,8 +363,8 @@ gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle
 	close(handle->file_handle);
 	GEN_ERROR_OUT_IF_ERRNO(close, errno);
 #else
-	gen_error_t error = gen_handle_close(handle);
-	GEN_ERROR_OUT_IF(error, "`gen_handle_close` failed");
+	gen_error_t error = gen_filesystem_handle_close(handle);
+	GEN_ERROR_OUT_IF(error, "`gen_filesystem_handle_close` failed");
 #endif
 
 	GEN_ALL_OK;

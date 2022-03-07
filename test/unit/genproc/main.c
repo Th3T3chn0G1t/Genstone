@@ -18,9 +18,9 @@ int main(void) {
 	// error = gen_proc_wait(&pid, &exitcode);
 	// GEN_REQUIRE_NO_ERROR(error);
 
-	// glog(INFO, "Testing gen_handle_read_all_available()...");
+	// glog(INFO, "Testing gen_filesystem_handle_read_all_available()...");
 	// char* output = NULL;
-	// error = gen_handle_read_all_available(&pipedes[0], &output);
+	// error = gen_filesystem_handle_read_all_available(&pipedes[0], &output);
 	// GEN_REQUIRE_NO_ERROR(error);
 	// GEN_REQUIRE_EQUAL_STRING("Genstone Rules!\n", output);
 
