@@ -6,10 +6,11 @@
  * Genstone graphics utilities.
  */
 
-#ifndef GEN_WINDOW_H
-#define GEN_WINDOW_H
+#ifndef GEN_GRAPHICS_H
+#define GEN_GRAPHICS_H
 
-#include "genwindow.h"
+#include "gengfxdefs.h"
+#include "genuwin.h"
 
 #include <gencommon.h>
 

@@ -9,8 +9,8 @@ build_message_sample:
 
 sample: build_message_sample $(SAMPLE_EXEC) ### @User Builds a sample sandbox project
 
-$(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS)
-$(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
+$(SAMPLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_FX_CFLAGS)
+$(SAMPLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_FX_LFLAGS)
 $(SAMPLE_EXEC): $(SAMPLE_OBJECTS)
 
 $(SAMPLE_OBJECTS): $(GEN_CORE_LIB)

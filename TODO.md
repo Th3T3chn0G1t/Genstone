@@ -7,6 +7,7 @@
 - Bring over Alonira print-formatting implementation
     - Figure out floating point/use external implementation
 - Switch to LGPL?
+- Allow `genuwin` to operate without `_NET` X extensions
 - Fix `genproc`
 - Add `GEN_DANGER_MODE`
   - Removing most error checking

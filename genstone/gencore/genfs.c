@@ -229,7 +229,7 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 }
 
 #if GEN_FS_FILEWATCH_USE_SYSLIB == DISABLED
-static gen_error_t gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
+GEN_INTERNAL_ERRORABLE gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
 	GEN_NULL_CHECK(passthrough);
 	++(*(size_t*) passthrough);
 	GEN_ALL_OK;

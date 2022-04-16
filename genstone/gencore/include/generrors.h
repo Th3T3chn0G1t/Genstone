@@ -107,7 +107,11 @@ typedef enum
 	/**
 	 * The provided data was misaligned.
 	 */
-	GEN_BAD_ALIGNMENT
+	GEN_BAD_ALIGNMENT,
+	/**
+	 * An operation could not be performed.
+	 */
+	GEN_OPERATION_FAILED
 } gen_error_t;
 
 /**
@@ -131,9 +135,13 @@ extern const char* gen_error_description(const gen_error_t error);
  */
 
 /**
- * Return value specification for functions which use `generror` for error reporting.
+ * Return value specification for function declarations which use `generror` for error reporting.
  */
 #define GEN_ERRORABLE extern __nodiscard gen_error_t
+/**
+ * Return value specification for internal functions which use `generror` for error reporting.
+ */
+#define GEN_INTERNAL_ERRORABLE static __nodiscard gen_error_t
 
 /**
  * Aborts the program with a fatal error.

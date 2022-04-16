@@ -25,6 +25,7 @@ const char* gen_error_name(const gen_error_t error) {
 		case GEN_OUT_OF_BOUNDS: return "GEN_OUT_OF_BOUNDS";
 		case GEN_INVALID_CONTROL: return "GEN_INVALID_CONTROL";
 		case GEN_BAD_ALIGNMENT: return "GEN_BAD_ALIGNMENT";
+		case GEN_OPERATION_FAILED: return "GEN_OPERATION_FAILED";
 	}
 }
 
@@ -50,6 +51,7 @@ const char* gen_error_description(const gen_error_t error) {
 		case GEN_OUT_OF_BOUNDS: return "The specified value is out of bounds";
 		case GEN_INVALID_CONTROL: return "The program reached an invalid control path";
 		case GEN_BAD_ALIGNMENT: return "The provided data was misaligned";
+		case GEN_OPERATION_FAILED: return "An operation could not be performed";
 	}
 }
 
