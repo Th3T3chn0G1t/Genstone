@@ -8,9 +8,14 @@
 #include <genlocale.h>
 #include <genproc.h>
 #include <genstring.h>
+#include <vulkan/vulkan.h>
 
 int main(void) {
 	GEN_FRAME_BEGIN(main);
+
+	uint32_t extensionCount = 0;
+	vkEnumerateInstanceExtensionProperties(NULL, &extensionCount, NULL);
+	glogf(DEBUG, "%u Vulkan extensions supported", extensionCount);
 
 	gen_window_system_t window_system = {0};
 	gen_error_t error = gen_window_system_create(&window_system);
