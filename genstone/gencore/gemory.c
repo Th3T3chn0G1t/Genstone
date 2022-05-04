@@ -20,16 +20,10 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t cou
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
-#if GEN_USE_MIMALLOC == ENABLED
-	void* const allocated = mi_calloc(count, size);
-#else
 	void* const allocated = calloc(count, size);
-#endif
 	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_calloc, errno);
 
 	*out_address = allocated;
-
-	errno = 0; // mimalloc does weirdness with NUMA
 
 	GEN_ALL_OK;
 }
@@ -42,16 +36,10 @@ gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const si
 	if(!align) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was 0");
 	if(align & (align - 1)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was not a power of 2");
 
-#if GEN_USE_MIMALLOC == ENABLED
-	void* const allocated = mi_calloc_aligned(count, size, align);
-#else
 	void* const allocated = aligned_alloc(align, count * size);
-#endif
 	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_calloc, errno);
 
 	*out_address = allocated;
-
-	errno = 0; // mimalloc does weirdness with NUMA
 
 	GEN_ALL_OK;
 }
@@ -61,16 +49,9 @@ gen_error_t grealloc(void* restrict* const restrict out_address, const size_t ol
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
-#if GEN_USE_MIMALLOC == ENABLED
-	(void) old_count;
-	void* const allocated = mi_recalloc(*out_address, count, size);
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_recalloc, errno);
-	errno = 0; // mimalloc does weirdness with NUMA
-#else
 	void* const allocated = realloc(*out_address, count * size);
 	GEN_ERROR_OUT_IF_ERRNO(realloc, errno);
 	if(count > old_count) memset((unsigned char*) allocated + (size * old_count), 0, size * (count - old_count));
-#endif
 
 	*out_address = allocated;
 
@@ -79,16 +60,10 @@ gen_error_t grealloc(void* restrict* const restrict out_address, const size_t ol
 
 gen_error_t gfree(void* const restrict address) {
 	GEN_FRAME_BEGIN(gfree);
-
+	
 	GEN_NULL_CHECK(address);
 
-#if GEN_USE_MIMALLOC == ENABLED
-	mi_free(address);
-#else
 	free(address);
-#endif
-
-	errno = 0; // mimalloc does weirdness with NUMA
 
 	GEN_ALL_OK;
 }

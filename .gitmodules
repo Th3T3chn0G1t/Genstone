@@ -1,4 +1,0 @@
-[submodule "genstone/vendor/mimalloc"]
-	path = genstone/vendor/mimalloc
-	url = https://github.com/microsoft/mimalloc
-	ignore = untracked

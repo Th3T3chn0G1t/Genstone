@@ -52,17 +52,6 @@ GEN_DIAG_IGNORE_ALL
 #include <wchar.h>
 #include <wctype.h>
 
-#ifndef GEN_USE_MIMALLOC
-/**
- * Whether to use mimalloc as the allocator.
- */
-#define GEN_USE_MIMALLOC ENABLED
-#endif
-
-#if GEN_USE_MIMALLOC == ENABLED
-#include <mimalloc.h> // \[0]/
-#endif
-
 #include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 

@@ -1,7 +1,6 @@
 # TODO
 
 - Fix build system with changes in Alonira
-- Investigate Mimalloc error handler?
 - Clean up output of error messages
 - `gfree` sets pointers to `NULL`
 - `glog` and `glogf` into their own functions instead of horrible macro hell
