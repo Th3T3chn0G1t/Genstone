@@ -345,7 +345,7 @@ typedef struct {
      gen_window_system_event_t* internal_event_queue;
      size_t internal_event_queue_length;
 
-     gen_keycode_t* internal_key_mapping;
+     gen_keycode_t internal_key_mapping[UINT8_MAX];
      
      xcb_atom_t internal_net_supported_atom;
      xcb_atom_t internal_net_wm_icon_atom;

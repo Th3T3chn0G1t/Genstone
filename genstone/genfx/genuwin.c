@@ -144,20 +144,16 @@ GEN_INTERNAL_ERRORABLE gen_internal_generate_keymap(gen_window_system_t* const r
 	xcb_xkb_get_names_cookie_t cookie = xcb_xkb_get_names(window_system->internal_connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_NAME_DETAIL_KEY_NAMES);
 	xcb_xkb_get_names_reply_t* reply = xcb_xkb_get_names_reply(window_system->internal_connection, cookie, NULL);
 	if(!reply) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to get key names");
-	if(window_system->internal_key_mapping) {
-		gen_error_t error = gfree(window_system->internal_key_mapping);
-		GEN_ERROR_OUT_IF(error, "`gfree` failed");
-	}
-	gen_error_t error = gzalloc((void**) &window_system->internal_key_mapping, reply->maxKeyCode, sizeof(gen_keycode_t));
-	GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
 	xcb_xkb_get_names_value_list_t list = {0};
 	void* buffer = xcb_xkb_get_names_value_list(reply);
 	xcb_xkb_get_names_value_list_unpack(buffer, reply->nTypes, reply->indicators, reply->virtualMods, reply->groupNames, reply->nKeys, reply->nKeyAliases, reply->nRadioGroups, reply->which, &list);
 
 	int length = xcb_xkb_get_names_value_list_key_names_length(reply, &list);
 
+	gen_error_t error = gen_memory_set(window_system->internal_key_mapping, sizeof(window_system->internal_key_mapping), (unsigned char) GEN_KEYCODE_NONE);
+	GEN_ERROR_OUT_IF(error, "`gen_memory_set` failed");
+
 	for(int i = 0; i < length; ++i) {
-		window_system->internal_key_mapping[i + reply->minKeyCode] = GEN_KEYCODE_NONE;
 		GEN_FOREACH_PTR(j, name, sizeof(hard_mapping) / sizeof(hard_mapping[0]), hard_mapping) {
 			bool equal = false;
 			error = gen_string_compare(*name, GEN_STRING_NO_BOUND, list.keyNames[i].name, sizeof(list.keyNames[i].name), sizeof(list.keyNames[i].name), &equal);
@@ -353,10 +349,6 @@ gen_error_t gen_window_system_destroy(gen_window_system_t* const restrict window
 
 	if(window_system->internal_event_queue) {
 		error = gfree(window_system->internal_event_queue);
-		GEN_ERROR_OUT_IF(error, "`gfree` failed");
-	}
-	if(window_system->internal_key_mapping) {
-		error = gfree(window_system->internal_key_mapping);
 		GEN_ERROR_OUT_IF(error, "`gfree` failed");
 	}
 

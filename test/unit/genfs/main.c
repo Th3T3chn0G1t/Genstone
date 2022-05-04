@@ -71,6 +71,8 @@ int main(void) {
 
 	GEN_REQUIRE_NO_ERROR(error);
 	GEN_REQUIRE_EQUAL_MEMREGION((void*) file_data, (void*) file_read_buffer, sizeof(file_data));
+	error = gfree(file_read_buffer);
+	GEN_REQUIRE_NO_ERROR(error);
 
 	glog(INFO, "Testing gen_path_create_dir()...");
 	error = gen_path_create_dir("./testdir");

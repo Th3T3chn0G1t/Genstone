@@ -60,7 +60,7 @@ gen_error_t grealloc(void* restrict* const restrict out_address, const size_t ol
 
 gen_error_t gfree(void* const restrict address) {
 	GEN_FRAME_BEGIN(gfree);
-	
+
 	GEN_NULL_CHECK(address);
 
 	free(address);
@@ -73,7 +73,7 @@ gen_error_t gen_memory_set(void* const restrict address, const size_t length, co
 
 	GEN_NULL_CHECK(address);
 
-	for(unsigned char* d = address; (size_t) (d - (unsigned char*) address) < length; ++d) {
+	for(unsigned char* d = address; d < (unsigned char*) address + length; ++d) {
 		*d = value;
 	}
 
