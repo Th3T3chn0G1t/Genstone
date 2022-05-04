@@ -152,17 +152,130 @@ typedef xcb_window_t gen_window_id_t;
 /**
  * A keycode from a keyboard event.
  */
-typedef uint16_t gen_keycode_t;
+typedef enum {
+     GEN_KEYCODE_NONE = -1,
+     GEN_KEYCODE_SPACE = 0,
+     GEN_KEYCODE_APOSTROPHE,
+     GEN_KEYCODE_COMMA,
+     GEN_KEYCODE_MINUS,
+     GEN_KEYCODE_FULL_STOP,
+     GEN_KEYCODE_SLASH,
+     GEN_KEYCODE_0,
+     GEN_KEYCODE_1,
+     GEN_KEYCODE_2,
+     GEN_KEYCODE_3,
+     GEN_KEYCODE_4,
+     GEN_KEYCODE_5,
+     GEN_KEYCODE_6,
+     GEN_KEYCODE_7,
+     GEN_KEYCODE_8,
+     GEN_KEYCODE_9,
+     GEN_KEYCODE_SEMICOLON,
+     GEN_KEYCODE_EQUAL,
+     GEN_KEYCODE_A,
+     GEN_KEYCODE_B,
+     GEN_KEYCODE_C,
+     GEN_KEYCODE_D,
+     GEN_KEYCODE_E,
+     GEN_KEYCODE_F,
+     GEN_KEYCODE_G,
+     GEN_KEYCODE_H,
+     GEN_KEYCODE_I,
+     GEN_KEYCODE_J,
+     GEN_KEYCODE_K,
+     GEN_KEYCODE_L,
+     GEN_KEYCODE_M,
+     GEN_KEYCODE_N,
+     GEN_KEYCODE_O,
+     GEN_KEYCODE_P,
+     GEN_KEYCODE_Q,
+     GEN_KEYCODE_R,
+     GEN_KEYCODE_S,
+     GEN_KEYCODE_T,
+     GEN_KEYCODE_U,
+     GEN_KEYCODE_V,
+     GEN_KEYCODE_W,
+     GEN_KEYCODE_X,
+     GEN_KEYCODE_Y,
+     GEN_KEYCODE_Z,
+     GEN_KEYCODE_LEFT_BRACKET,
+     GEN_KEYCODE_BACKSLASH,
+     GEN_KEYCODE_RIGHT_BRACKET,
+     GEN_KEYCODE_TILDE,
+     GEN_KEYCODE_ESCAPE,
+     GEN_KEYCODE_RETURN,
+     GEN_KEYCODE_TAB,
+     GEN_KEYCODE_BACKSPACE,
+     GEN_KEYCODE_INSERT,
+     GEN_KEYCODE_DELETE,
+     GEN_KEYCODE_RIGHT,
+     GEN_KEYCODE_LEFT,
+     GEN_KEYCODE_DOWN,
+     GEN_KEYCODE_UP,
+     GEN_KEYCODE_PAGE_UP,
+     GEN_KEYCODE_PAGE_DOWN,
+     GEN_KEYCODE_HOME,
+     GEN_KEYCODE_END,
+     GEN_KEYCODE_CAPS_LOCK,
+     GEN_KEYCODE_SCROLL_LOCK,
+     GEN_KEYCODE_NUM_LOCK,
+     GEN_KEYCODE_PRINT_SCREEN,
+     GEN_KEYCODE_F1,
+     GEN_KEYCODE_F2,
+     GEN_KEYCODE_F3,
+     GEN_KEYCODE_F4,
+     GEN_KEYCODE_F5,
+     GEN_KEYCODE_F6,
+     GEN_KEYCODE_F7,
+     GEN_KEYCODE_F8,
+     GEN_KEYCODE_F9,
+     GEN_KEYCODE_F10,
+     GEN_KEYCODE_F11,
+     GEN_KEYCODE_F12,
+     GEN_KEYCODE_KEYPAD_0,
+     GEN_KEYCODE_KEYPAD_1,
+     GEN_KEYCODE_KEYPAD_2,
+     GEN_KEYCODE_KEYPAD_3,
+     GEN_KEYCODE_KEYPAD_4,
+     GEN_KEYCODE_KEYPAD_5,
+     GEN_KEYCODE_KEYPAD_6,
+     GEN_KEYCODE_KEYPAD_7,
+     GEN_KEYCODE_KEYPAD_8,
+     GEN_KEYCODE_KEYPAD_9,
+     GEN_KEYCODE_KEYPAD_FULL_STOP,
+     GEN_KEYCODE_KEYPAD_DIVIDE,
+     GEN_KEYCODE_KEYPAD_MULTIPLY,
+     GEN_KEYCODE_KEYPAD_SUBTRACT,
+     GEN_KEYCODE_KEYPAD_ADD,
+     GEN_KEYCODE_KEYPAD_RETURN,
+     GEN_KEYCODE_KEYPAD_EQUAL,
+     GEN_KEYCODE_LEFT_SHIFT,
+     GEN_KEYCODE_LEFT_CONTROL,
+     GEN_KEYCODE_LEFT_ALT,
+     GEN_KEYCODE_LEFT_META,
+     GEN_KEYCODE_RIGHT_SHIFT,
+     GEN_KEYCODE_RIGHT_CONTROL,
+     GEN_KEYCODE_RIGHT_ALT,
+     GEN_KEYCODE_RIGHT_META,
+
+     GEN_INTERNAL_KEYCODE_N_KEYCODES = GEN_KEYCODE_RIGHT_META
+} gen_keycode_t;
 
 /**
  * Enumeration of mouse buttons.
  */
 typedef enum {
-     GEN_MOUSE_BUTTON_1,
+     GEN_MOUSE_BUTTON_1 = 1,
      GEN_MOUSE_BUTTON_2,
      GEN_MOUSE_BUTTON_3,
      GEN_MOUSE_BUTTON_4,
-     GEN_MOUSE_BUTTON_5
+     GEN_MOUSE_BUTTON_5,
+     GEN_MOUSE_BUTTON_6,
+     GEN_MOUSE_BUTTON_7,
+     GEN_MOUSE_BUTTON_8,
+     GEN_MOUSE_BUTTON_9,
+
+     GEN_MOUSE_BUTTON_MAX = GEN_MOUSE_BUTTON_9
 } gen_mouse_button_t;
 
 /**
@@ -231,9 +344,14 @@ typedef struct {
       */
      gen_window_system_event_t* internal_event_queue;
      size_t internal_event_queue_length;
+
+     gen_keycode_t* internal_key_mapping;
      
      xcb_atom_t internal_net_supported_atom;
-     // xcb_atom_t internal_net_supported_atom;
+     xcb_atom_t internal_net_wm_icon_atom;
+     xcb_atom_t internal_net_wm_state_fullsreen_atom;
+
+     xcb_atom_t internal_motif_wm_hints_atom;
 } gen_window_system_t;
 
 /**

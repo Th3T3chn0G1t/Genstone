@@ -2,9 +2,10 @@
 
 #include <gemory.h>
 #include <genstring.h>
+#include <xcb/xkb.h>
+#include <xkbcommon/xkbcommon.h>
 
-enum
-{
+enum {
 	GEN_INTERNAL_DATA_FORMAT_CHAR = 8,
 	GEN_INTERNAL_DATA_FORMAT_SHORT = 16,
 	GEN_INTERNAL_DATA_FORMAT_INT = 32
@@ -12,6 +13,7 @@ enum
 
 GEN_INTERNAL_ERRORABLE gen_internal_window_system_check(gen_window_system_t* const restrict window_system) {
 	GEN_FRAME_BEGIN(gen_internal_window_system_check);
+
 	GEN_NULL_CHECK(window_system);
 
 	int error = xcb_connection_has_error(window_system->internal_connection);
@@ -26,6 +28,151 @@ GEN_INTERNAL_ERRORABLE gen_internal_window_system_check(gen_window_system_t* con
 		case XCB_CONN_CLOSED_FDPASSING_FAILED: GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "Failed to establish connection to window server");
 		default: GEN_ERROR_OUT(GEN_UNKNOWN, "Failed to establish connection to window server");
 	}
+}
+
+static const char* hard_mapping[] = {
+	[GEN_KEYCODE_SPACE] = "SPCE",
+	[GEN_KEYCODE_APOSTROPHE] = "AC11",
+	[GEN_KEYCODE_COMMA] = "AB08",
+	[GEN_KEYCODE_MINUS] = "AE11",
+	[GEN_KEYCODE_FULL_STOP] = "AB09",
+	[GEN_KEYCODE_SLASH] = "AB10",
+	[GEN_KEYCODE_0] = "AE10",
+	[GEN_KEYCODE_1] = "AE01",
+	[GEN_KEYCODE_2] = "AE02",
+	[GEN_KEYCODE_3] = "AE03",
+	[GEN_KEYCODE_4] = "AE04",
+	[GEN_KEYCODE_5] = "AE05",
+	[GEN_KEYCODE_6] = "AE06",
+	[GEN_KEYCODE_7] = "AE07",
+	[GEN_KEYCODE_8] = "AE08",
+	[GEN_KEYCODE_9] = "AE09",
+	[GEN_KEYCODE_SEMICOLON] = "AC10",
+	[GEN_KEYCODE_EQUAL] = "AE12",
+	[GEN_KEYCODE_A] = "AC01",
+	[GEN_KEYCODE_B] = "AB05",
+	[GEN_KEYCODE_C] = "AB03",
+	[GEN_KEYCODE_D] = "AC03",
+	[GEN_KEYCODE_E] = "AD03",
+	[GEN_KEYCODE_F] = "AC04",
+	[GEN_KEYCODE_G] = "AC05",
+	[GEN_KEYCODE_H] = "AC06",
+	[GEN_KEYCODE_I] = "AD08",
+	[GEN_KEYCODE_J] = "AC07",
+	[GEN_KEYCODE_K] = "AC08",
+	[GEN_KEYCODE_L] = "AC09",
+	[GEN_KEYCODE_M] = "AB07",
+	[GEN_KEYCODE_N] = "AB06",
+	[GEN_KEYCODE_O] = "AD09",
+	[GEN_KEYCODE_P] = "AD10",
+	[GEN_KEYCODE_Q] = "AD01",
+	[GEN_KEYCODE_R] = "AD04",
+	[GEN_KEYCODE_S] = "AC02",
+	[GEN_KEYCODE_T] = "AD05",
+	[GEN_KEYCODE_U] = "AD07",
+	[GEN_KEYCODE_V] = "AB04",
+	[GEN_KEYCODE_W] = "AD02",
+	[GEN_KEYCODE_X] = "AB02",
+	[GEN_KEYCODE_Y] = "AD06",
+	[GEN_KEYCODE_Z] = "AB01",
+	[GEN_KEYCODE_LEFT_BRACKET] = "AD11",
+	[GEN_KEYCODE_BACKSLASH] = "BKSL",
+	[GEN_KEYCODE_RIGHT_BRACKET] = "AD12",
+	[GEN_KEYCODE_TILDE] = "TLDE",
+	[GEN_KEYCODE_ESCAPE] = "ESC",
+	[GEN_KEYCODE_RETURN] = "RTRN",
+	[GEN_KEYCODE_TAB] = "TAB",
+	[GEN_KEYCODE_BACKSPACE] = "BKSP",
+	[GEN_KEYCODE_INSERT] = "INS",
+	[GEN_KEYCODE_DELETE] = "DELE",
+	[GEN_KEYCODE_RIGHT] = "RGHT",
+	[GEN_KEYCODE_LEFT] = "LEFT",
+	[GEN_KEYCODE_DOWN] = "DOWN",
+	[GEN_KEYCODE_UP] = "UP",
+	[GEN_KEYCODE_PAGE_UP] = "PGUP",
+	[GEN_KEYCODE_PAGE_DOWN] = "PGDN",
+	[GEN_KEYCODE_HOME] = "HOME",
+	[GEN_KEYCODE_END] = "END",
+	[GEN_KEYCODE_CAPS_LOCK] = "CAPS",
+	[GEN_KEYCODE_SCROLL_LOCK] = "SCLK",
+	[GEN_KEYCODE_NUM_LOCK] = "NMLK",
+	[GEN_KEYCODE_PRINT_SCREEN] = "PRSC",
+	[GEN_KEYCODE_F1] = "FK01",
+	[GEN_KEYCODE_F2] = "FK02",
+	[GEN_KEYCODE_F3] = "FK03",
+	[GEN_KEYCODE_F4] = "FK04",
+	[GEN_KEYCODE_F5] = "FK05",
+	[GEN_KEYCODE_F6] = "FK06",
+	[GEN_KEYCODE_F7] = "FK07",
+	[GEN_KEYCODE_F8] = "FK08",
+	[GEN_KEYCODE_F9] = "FK09",
+	[GEN_KEYCODE_F10] = "FK10",
+	[GEN_KEYCODE_F11] = "FK11",
+	[GEN_KEYCODE_F12] = "FK12",
+	[GEN_KEYCODE_KEYPAD_0] = "KP0",
+	[GEN_KEYCODE_KEYPAD_1] = "KP1",
+	[GEN_KEYCODE_KEYPAD_2] = "KP2",
+	[GEN_KEYCODE_KEYPAD_3] = "KP3",
+	[GEN_KEYCODE_KEYPAD_4] = "KP4",
+	[GEN_KEYCODE_KEYPAD_5] = "KP5",
+	[GEN_KEYCODE_KEYPAD_6] = "KP6",
+	[GEN_KEYCODE_KEYPAD_7] = "KP7",
+	[GEN_KEYCODE_KEYPAD_8] = "KP8",
+	[GEN_KEYCODE_KEYPAD_9] = "KP9",
+	[GEN_KEYCODE_KEYPAD_FULL_STOP] = "KPDL",
+	[GEN_KEYCODE_KEYPAD_DIVIDE] = "KPDV",
+	[GEN_KEYCODE_KEYPAD_MULTIPLY] = "KPMU",
+	[GEN_KEYCODE_KEYPAD_SUBTRACT] = "KPSU",
+	[GEN_KEYCODE_KEYPAD_ADD] = "KPAD",
+	[GEN_KEYCODE_KEYPAD_RETURN] = "KPEN",
+	[GEN_KEYCODE_KEYPAD_EQUAL] = "KPEQ",
+	[GEN_KEYCODE_LEFT_SHIFT] = "LFSH",
+	[GEN_KEYCODE_LEFT_CONTROL] = "LCTL",
+	[GEN_KEYCODE_LEFT_ALT] = "LALT",
+	[GEN_KEYCODE_LEFT_META] = "LWIN",
+	[GEN_KEYCODE_RIGHT_SHIFT] = "RTSH",
+	[GEN_KEYCODE_RIGHT_CONTROL] = "RCTL",
+	[GEN_KEYCODE_RIGHT_ALT] = "RALT",
+	[GEN_KEYCODE_RIGHT_META] = "RWIN"};
+
+// https://gist.github.com/bluetech/6038239
+// Thank you for your service - documenting the undocumented
+GEN_INTERNAL_ERRORABLE gen_internal_generate_keymap(gen_window_system_t* const restrict window_system) {
+	GEN_FRAME_BEGIN(gen_internal_generate_keymap);
+
+	GEN_NULL_CHECK(window_system);
+
+	xcb_xkb_get_names_cookie_t cookie = xcb_xkb_get_names(window_system->internal_connection, XCB_XKB_ID_USE_CORE_KBD, XCB_XKB_NAME_DETAIL_KEY_NAMES);
+	xcb_xkb_get_names_reply_t* reply = xcb_xkb_get_names_reply(window_system->internal_connection, cookie, NULL);
+	if(!reply) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to get key names");
+	if(window_system->internal_key_mapping) {
+		gen_error_t error = gfree(window_system->internal_key_mapping);
+		GEN_ERROR_OUT_IF(error, "`gfree` failed");
+	}
+	gen_error_t error = gzalloc((void**) &window_system->internal_key_mapping, reply->maxKeyCode, sizeof(gen_keycode_t));
+	GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
+	xcb_xkb_get_names_value_list_t list = {0};
+	void* buffer = xcb_xkb_get_names_value_list(reply);
+	xcb_xkb_get_names_value_list_unpack(buffer, reply->nTypes, reply->indicators, reply->virtualMods, reply->groupNames, reply->nKeys, reply->nKeyAliases, reply->nRadioGroups, reply->which, &list);
+
+	int length = xcb_xkb_get_names_value_list_key_names_length(reply, &list);
+
+	for(int i = 0; i < length; ++i) {
+		window_system->internal_key_mapping[i + reply->minKeyCode] = GEN_KEYCODE_NONE;
+		GEN_FOREACH_PTR(j, name, sizeof(hard_mapping) / sizeof(hard_mapping[0]), hard_mapping) {
+			bool equal = false;
+			error = gen_string_compare(*name, GEN_STRING_NO_BOUND, list.keyNames[i].name, sizeof(list.keyNames[i].name), sizeof(list.keyNames[i].name), &equal);
+			GEN_ERROR_OUT_IF(error, "`gen_string_compare` failed");
+			if(equal) {
+				window_system->internal_key_mapping[i + reply->minKeyCode] = (gen_keycode_t) j;
+				break;
+			}
+		}
+	}
+
+	free(reply);
+
+	GEN_ALL_OK;
 }
 
 GEN_INTERNAL_ERRORABLE gen_internal_window_system_validate_request_cookie(gen_window_system_t* const restrict window_system, const xcb_void_cookie_t cookie) {
@@ -108,27 +255,48 @@ __unused static const char* gen_internal_get_event_name(const xcb_generic_event_
 	return NULL;
 }
 
-// GEN_INTERNAL_ERRORABLE gen_internal_window_system_get_atom(gen_window_system_t* const restrict window_system, const char* const restrict atom_name, xcb_atom_t** const restrict out_atom) {
-// 	GEN_FRAME_BEGIN(gen_internal_window_system_get_atom);
+__unused GEN_INTERNAL_ERRORABLE gen_internal_get_atom_name(const gen_window_system_t* const restrict window_system, const xcb_atom_t atom, char** const restrict out_name) {
+	GEN_FRAME_BEGIN(gen_internal_get_atom_name);
 
-// 	GEN_NULL_CHECK(window_system);
-// 	GEN_NULL_CHECK(atom_name);
+	GEN_NULL_CHECK(window_system);
+	GEN_NULL_CHECK(out_name);
 
-// 	gen_error_t error = gen_internal_window_system_check(window_system);
-// 	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_check` failed");
+	xcb_get_atom_name_cookie_t cookie = xcb_get_atom_name(window_system->internal_connection, atom);
+	xcb_get_atom_name_reply_t* reply = xcb_get_atom_name_reply(window_system->internal_connection, cookie, NULL);
+	if(!reply) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "Could not find the provided atom's name");
 
-// 	size_t atom_name_length = 0;
-// 	error = gen_string_length(atom_name, GEN_STRING_NO_BOUND, GEN_STRING_NO_BOUND, &atom_name_length);
-// 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	size_t atom_name_length = reply->name_len;
+	char* atom_name = xcb_get_atom_name_name(reply);
 
-// 	xcb_intern_atom_cookie_t atom_cookie = xcb_intern_atom(window_system->internal_connection, true, atom_name_length, atom_name);
-// 	xcb_intern_atom_reply_t* atom_reply = xcb_intern_atom_reply(window_system->internal_connection, atom_cookie, NULL);
-// 	if(!atom_reply) GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "The requested atom does not exist");
-// 	*out_atom = atom_reply->atom;
-// 	free(atom_reply);
+	gen_error_t error = gen_string_duplicate(atom_name, atom_name_length, atom_name_length, out_name);
+	GEN_ERROR_OUT_IF(error, "`gen_string_duplicate` failed");
 
-// 	GEN_ALL_OK;
-// }
+	free(reply);
+
+	GEN_ALL_OK;
+}
+
+GEN_INTERNAL_ERRORABLE gen_internal_window_system_get_atom(gen_window_system_t* const restrict window_system, const char* const restrict atom_name, xcb_atom_t* const restrict out_atom) {
+	GEN_FRAME_BEGIN(gen_internal_window_system_get_atom);
+
+	GEN_NULL_CHECK(window_system);
+	GEN_NULL_CHECK(atom_name);
+
+	gen_error_t error = gen_internal_window_system_check(window_system);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_check` failed");
+
+	size_t atom_name_length = 0;
+	error = gen_string_length(atom_name, GEN_STRING_NO_BOUND, GEN_STRING_NO_BOUND, &atom_name_length);
+	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+
+	xcb_intern_atom_cookie_t atom_cookie = xcb_intern_atom(window_system->internal_connection, true, (uint16_t) atom_name_length, atom_name);
+	xcb_intern_atom_reply_t* atom_reply = xcb_intern_atom_reply(window_system->internal_connection, atom_cookie, NULL);
+	if(!atom_reply) GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "The requested atom does not exist");
+	*out_atom = atom_reply->atom;
+	free(atom_reply);
+
+	GEN_ALL_OK;
+}
 
 gen_error_t gen_window_system_create(gen_window_system_t* const restrict out_window_system) {
 	GEN_FRAME_BEGIN(gen_window_system_create);
@@ -141,22 +309,33 @@ gen_error_t gen_window_system_create(gen_window_system_t* const restrict out_win
 	const xcb_setup_t* const setup = xcb_get_setup(out_window_system->internal_connection);
 	out_window_system->internal_screen = xcb_setup_roots_iterator(setup).data;
 
-	// error = gen_internal_window_system_get_atom(out_window_system, "_NET_SUPPORTED", &out_window_system->internal_net_supported_atom);
-	// GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_get_atom` failed");
+	const xcb_query_extension_reply_t* query_reply = xcb_get_extension_data(out_window_system->internal_connection, &xcb_xkb_id);
+	if(!query_reply) GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "The X server does not implement XKB");
+	xcb_xkb_use_extension_cookie_t extension_cookie = xcb_xkb_use_extension(out_window_system->internal_connection, XCB_XKB_MAJOR_VERSION, XCB_XKB_MINOR_VERSION);
+	xcb_xkb_use_extension_reply_t* extension_reply = xcb_xkb_use_extension_reply(out_window_system->internal_connection, extension_cookie, NULL);
+	if(!extension_reply) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to use XKB");
+	if(!extension_reply->supported) GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "The X server does not implement XKB or does not support the minimum required verson");
+	free(extension_reply);
 
-	// error = gen_internal_window_system_get_atom(out_window_system, "_NET_SUPPORTED", &out_window_system->internal_net_supported_atom);
-	// GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_get_atom` failed");
+	error = gen_internal_window_system_get_atom(out_window_system, "_MOTIF_WM_HINTS", &out_window_system->internal_motif_wm_hints_atom);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_get_atom` failed");
 
-	// xcb_get_property_cookie_t property_cookie = xcb_get_property(out_window_system->connection, false, out_window_system->screen->root, out_window_system->internal_net_supported_atom, XCB_ATOM_ATOM, 0, 0);
-	// xcb_get_property_reply_t* property_reply = xcb_get_property_reply(out_window_system->connection, property_cookie, NULL);
-	// if(!property_reply) GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "The X server does not implement the minimum requirements for Genuwin to function");
+	error = gen_internal_window_system_get_atom(out_window_system, "_NET_SUPPORTED", &out_window_system->internal_net_supported_atom);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_get_atom` failed");
+	glog(WARNING, "Proceeding with minimal `_NET_SUPPORTED` feature check. Errors may ensue for partially-supported X server implementations");
 
-	// free(property_reply);
+	error = gen_internal_window_system_get_atom(out_window_system, "_NET_WM_ICON", &out_window_system->internal_net_wm_icon_atom);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_get_atom` failed");
+	error = gen_internal_window_system_get_atom(out_window_system, "_NET_WM_STATE_FULLSCREEN", &out_window_system->internal_net_wm_state_fullsreen_atom);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_get_atom` failed");
 
 	out_window_system->internal_event_queue_length = 0;
 
 	int flushed = xcb_flush(out_window_system->internal_connection);
 	if(flushed <= 0) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to flush the connection");
+
+	error = gen_internal_generate_keymap(out_window_system);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_generate_keymap` failed");
 
 	GEN_ALL_OK;
 }
@@ -173,54 +352,17 @@ gen_error_t gen_window_system_destroy(gen_window_system_t* const restrict window
 
 	xcb_disconnect(window_system->internal_connection);
 
+	if(window_system->internal_event_queue) {
+		error = gfree(window_system->internal_event_queue);
+		GEN_ERROR_OUT_IF(error, "`gfree` failed");
+	}
+	if(window_system->internal_key_mapping) {
+		error = gfree(window_system->internal_key_mapping);
+		GEN_ERROR_OUT_IF(error, "`gfree` failed");
+	}
+
 	GEN_ALL_OK;
 }
-
-/*
-GEN_WINDOW_SYSTEM_EVENT_NONE:
-     XCB_EVENT_MASK_NO_EVENT
-
-GEN_WINDOW_SYSTEM_EVENT_KEY_STATE_CHANGED:
-     XCB_EVENT_MASK_KEY_PRESS
-     XCB_EVENT_MASK_KEY_RELEASE
-
-GEN_WINDOW_SYSTEM_EVENT_MOUSE_BUTTON_STATE_CHANGED:
-     XCB_EVENT_MASK_BUTTON_PRESS
-     XCB_EVENT_MASK_BUTTON_RELEASE
-
-GEN_WINDOW_SYSTEM_EVENT_WINDOW_HOVER_CHANGED:
-     XCB_EVENT_MASK_ENTER_WINDOW
-     XCB_EVENT_MASK_LEAVE_WINDOW
-
-GEN_WINDOW_SYSTEM_EVENT_MOUSE_CURSOR_MOVED:
-     XCB_EVENT_MASK_POINTER_MOTION
-     XCB_EVENT_MASK_POINTER_MOTION_HINT (?)
-     XCB_EVENT_MASK_BUTTON_1_MOTION (?)
-     XCB_EVENT_MASK_BUTTON_2_MOTION (?)
-     XCB_EVENT_MASK_BUTTON_3_MOTION (?)
-     XCB_EVENT_MASK_BUTTON_4_MOTION (?)
-     XCB_EVENT_MASK_BUTTON_5_MOTION (?)
-     XCB_EVENT_MASK_BUTTON_MOTION (?)
-
-[INTERNAL]:
-     XCB_EVENT_MASK_KEYMAP_STATE
-     XCB_EVENT_MASK_COLOR_MAP_CHANGE
-     XCB_EVENT_MASK_OWNER_GRAB_BUTTON
-
-GEN_WINDOW_SYSTEM_EVENT_WINDOW_CONTENT_DAMAGED:
-     XCB_EVENT_MASK_EXPOSURE
-
-GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED:
-     XCB_EVENT_MASK_VISIBILITY_CHANGE
-     XCB_EVENT_MASK_STRUCTURE_NOTIFY (?)
-     XCB_EVENT_MASK_RESIZE_REDIRECT
-     XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY (?)
-     XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT (?)
-     XCB_EVENT_MASK_PROPERTY_CHANGE
-
-GEN_WINDOW_SYSTEM_EVENT_FOCUS_CHANGED:
-     XCB_EVENT_MASK_FOCUS_CHANGE
-*/
 
 gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_system, gen_window_system_event_t* const restrict out_event) {
 	GEN_FRAME_BEGIN(gen_window_system_poll);
@@ -237,15 +379,27 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 		*out_event = window_system->internal_event_queue[window_system->internal_event_queue_length - 1];
 
 		window_system->internal_event_queue_length--;
-		error = grealloc((void**) &window_system->internal_event_queue, window_system->internal_event_queue_length + 1, window_system->internal_event_queue_length, sizeof(gen_window_system_event_t));
-		GEN_ERROR_OUT_IF(error, "`grealloc` failed");
+		if(window_system->internal_event_queue_length) {
+			error = grealloc((void**) &window_system->internal_event_queue, window_system->internal_event_queue_length + 1, window_system->internal_event_queue_length, sizeof(gen_window_system_event_t));
+			GEN_ERROR_OUT_IF(error, "`grealloc` failed");
+		}
+		else {
+			error = gfree(window_system->internal_event_queue);
+			GEN_ERROR_OUT_IF(error, "`gfree` failed");
+			window_system->internal_event_queue = NULL;
+		}
 
 		GEN_ALL_OK;
 	}
 
+	out_event->type = GEN_WINDOW_SYSTEM_EVENT_NONE;
+	out_event->window_id = 0;
+
 	xcb_generic_event_t* event = xcb_poll_for_event(window_system->internal_connection);
 
 	if(event) {
+		// glogf(DEBUG, "Event %s", gen_internal_get_event_name(event));
+
 		switch(event->response_type & ~0x80) {
 			case XCB_KEY_PRESS: {
 				out_event->type = GEN_WINDOW_SYSTEM_EVENT_KEY_STATE_CHANGED;
@@ -253,7 +407,7 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_key_press_event_t* e = (xcb_key_press_event_t*) event;
 				out_event->window_id = e->event;
 
-				out_event->keycode = e->detail;
+				out_event->keycode = window_system->internal_key_mapping[e->detail];
 				out_event->pressed = true;
 
 				break;
@@ -264,7 +418,7 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_key_release_event_t* e = (xcb_key_release_event_t*) event;
 				out_event->window_id = e->event;
 
-				out_event->keycode = e->detail;
+				out_event->keycode = window_system->internal_key_mapping[e->detail];
 				out_event->pressed = false;
 
 				break;
@@ -275,18 +429,9 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_button_press_event_t* e = (xcb_button_press_event_t*) event;
 				out_event->window_id = e->event;
 
-				if(e->detail & XCB_BUTTON_MASK_1)
-					out_event->button = GEN_MOUSE_BUTTON_1;
-				else if(e->detail & XCB_BUTTON_MASK_2)
-					out_event->button = GEN_MOUSE_BUTTON_2;
-				else if(e->detail & XCB_BUTTON_MASK_3)
-					out_event->button = GEN_MOUSE_BUTTON_3;
-				else if(e->detail & XCB_BUTTON_MASK_4)
-					out_event->button = GEN_MOUSE_BUTTON_4;
-				else if(e->detail & XCB_BUTTON_MASK_5)
-					out_event->button = GEN_MOUSE_BUTTON_5;
-				else
-					GEN_ERROR_OUT(GEN_BAD_CONTENT, "An invalid mouse button event was recieved");
+				if(e->detail > GEN_MOUSE_BUTTON_MAX) GEN_ERROR_OUT(GEN_BAD_CONTENT, "An invalid mouse button event was recieved");
+				out_event->button = (gen_mouse_button_t) e->detail;
+
 				out_event->pressed = true;
 
 				break;
@@ -297,18 +442,9 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_button_release_event_t* e = (xcb_button_release_event_t*) event;
 				out_event->window_id = e->event;
 
-				if(e->detail & XCB_BUTTON_MASK_1)
-					out_event->button = GEN_MOUSE_BUTTON_1;
-				else if(e->detail & XCB_BUTTON_MASK_2)
-					out_event->button = GEN_MOUSE_BUTTON_2;
-				else if(e->detail & XCB_BUTTON_MASK_3)
-					out_event->button = GEN_MOUSE_BUTTON_3;
-				else if(e->detail & XCB_BUTTON_MASK_4)
-					out_event->button = GEN_MOUSE_BUTTON_4;
-				else if(e->detail & XCB_BUTTON_MASK_5)
-					out_event->button = GEN_MOUSE_BUTTON_5;
-				else
-					GEN_ERROR_OUT(GEN_BAD_CONTENT, "An invalid mouse button event was recieved");
+				if(e->detail > GEN_MOUSE_BUTTON_MAX) GEN_ERROR_OUT(GEN_BAD_CONTENT, "An invalid mouse button event was recieved");
+				out_event->button = (gen_mouse_button_t) e->detail;
+
 				out_event->pressed = false;
 
 				break;
@@ -364,9 +500,12 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				break;
 			}
 			case XCB_KEYMAP_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Modify internal window system state");
+				// glogf(WARNING, "%s: Modify internal window system state at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_keymap_notify_event_t* e = (xcb_keymap_notify_event_t*) event;
+
+				error = gen_internal_generate_keymap(window_system);
+				GEN_ERROR_OUT_IF(error, "`gen_internal_generate_keymap` failed");
 
 				break;
 			}
@@ -403,14 +542,14 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				break;
 			}
 			case XCB_CREATE_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Modify internal window system state");
+				// glogf(WARNING, "%s: Modify internal window system state at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_create_notify_event_t* e = (xcb_create_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_DESTROY_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Modify internal window system state");
+				// glogf(WARNING, "%s: Modify internal window system state at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_destroy_notify_event_t* e = (xcb_destroy_notify_event_t*) event;
 
@@ -422,7 +561,7 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_unmap_notify_event_t* e = (xcb_unmap_notify_event_t*) event;
 				out_event->window_id = e->window;
 
-				out_event->attribute = (gen_window_attribute_t){.visible = false};
+				out_event->attribute = (gen_window_attribute_t){.type = GEN_WINDOW_ATTRIBUTE_VISIBILITY, .visible = false};
 
 				break;
 			}
@@ -432,27 +571,25 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_map_notify_event_t* e = (xcb_map_notify_event_t*) event;
 				out_event->window_id = e->window;
 
-				out_event->attribute = (gen_window_attribute_t){.visible = true};
+				out_event->attribute = (gen_window_attribute_t){.type = GEN_WINDOW_ATTRIBUTE_VISIBILITY, .visible = true};
 
 				break;
 			}
 			case XCB_MAP_REQUEST: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Responding to requests is unsupported");
+				// glogf(WARNING, "%s: Responding to requests is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_map_request_event_t* e = (xcb_map_request_event_t*) event;
 
 				break;
 			}
 			case XCB_REPARENT_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Reparenting is unsupported");
+				// glogf(WARNING, "%s: Reparenting is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_reparent_notify_event_t* e = (xcb_reparent_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_CONFIGURE_NOTIFY: {
-				out_event->type = GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED;
-
 				xcb_configure_notify_event_t* e = (xcb_configure_notify_event_t*) event;
 				out_event->window_id = e->window;
 
@@ -468,92 +605,114 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				break;
 			}
 			case XCB_CONFIGURE_REQUEST: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Responding to requests is unsupported");
+				// glogf(WARNING, "%s: Responding to requests is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_configure_request_event_t* e = (xcb_configure_request_event_t*) event;
 
 				break;
 			}
 			case XCB_GRAVITY_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Window gravity is unsupported");
+				// glogf(WARNING, "%s: Window gravity is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_gravity_notify_event_t* e = (xcb_gravity_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_RESIZE_REQUEST: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Responding to requests is unsupported");
+				// glogf(WARNING, "%s: Responding to requests is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_resize_request_event_t* e = (xcb_resize_request_event_t*) event;
 
 				break;
 			}
 			case XCB_CIRCULATE_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Event circulation is unsupported");
+				// glogf(WARNING, "%s: Event circulation is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_circulate_notify_event_t* e = (xcb_circulate_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_CIRCULATE_REQUEST: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Event circulation is unsupported");
+				// glogf(WARNING, "%s: Event circulation is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_circulate_request_event_t* e = (xcb_circulate_request_event_t*) event;
 
 				break;
 			}
 			case XCB_PROPERTY_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Atom properties are not yet implemented");
+				xcb_property_notify_event_t* e = (xcb_property_notify_event_t*) event;
 
-				//out_event->type = GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED;
-				__unused xcb_property_notify_event_t* e = (xcb_property_notify_event_t*) event;
+				out_event->type = GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED;
+
+				if(e->atom == XCB_ATOM_WM_NAME) {
+					// GEN_WINDOW_ATTRIBUTE_NAME
+				}
+				else if(e->atom == window_system->internal_motif_wm_hints_atom) {
+					// GEN_WINDOW_ATTRIBUTE_DECORATION
+				}
+				else if(e->atom == window_system->internal_net_wm_state_fullsreen_atom) {
+					// GEN_WINDOW_ATTRIBUTE_FULLSCREEN
+				}
+				else if(e->atom == window_system->internal_net_wm_icon_atom) {
+					// GEN_WINDOW_ATTRIBUTE_ICON
+				}
+				else {
+					out_event->type = GEN_WINDOW_SYSTEM_EVENT_NONE;
+
+					// char* atom_name = NULL;
+					// error = gen_internal_get_atom_name(window_system, e->atom, &atom_name);
+					// GEN_ERROR_OUT_IF(error, "`gen_internal_get_atom_name` failed");
+					// glogf(DEBUG, "Recieved atomic property change for atom %s", atom_name);
+					// error = gfree(atom_name);
+					// GEN_ERROR_OUT_IF(error, "`gfree` failed");
+				}
 
 				break;
 			}
 			case XCB_SELECTION_CLEAR: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Selection is unsupported");
+				// glogf(WARNING, "%s: Selection is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_selection_clear_event_t* e = (xcb_selection_clear_event_t*) event;
 
 				break;
 			}
 			case XCB_SELECTION_REQUEST: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Selection is unsupported");
+				// glogf(WARNING, "%s: Selection is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_selection_request_event_t* e = (xcb_selection_request_event_t*) event;
 
 				break;
 			}
 			case XCB_SELECTION_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Selection is unsupported");
+				// glogf(WARNING, "%s: Selection is unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_selection_notify_event_t* e = (xcb_selection_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_COLORMAP_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Modify internal window system state");
+				// glogf(WARNING, "%s: Modify internal window system state at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_colormap_notify_event_t* e = (xcb_colormap_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_CLIENT_MESSAGE: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Client events are unsupported");
+				// glogf(WARNING, "%s: Client events are unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_client_message_event_t* e = (xcb_client_message_event_t*) event;
 
 				break;
 			}
 			case XCB_MAPPING_NOTIFY: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Modify internal window system state");
+				// glogf(WARNING, "%s: Modify internal window system state at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_mapping_notify_event_t* e = (xcb_mapping_notify_event_t*) event;
 
 				break;
 			}
 			case XCB_GE_GENERIC: {
-				GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Generic events are unsupported");
+				// glogf(WARNING, "%s: Generic events are unsupported at %s:%i", gen_error_name(GEN_NOT_IMPLEMENTED), __FILE__, __LINE__);
 
 				__unused xcb_ge_generic_event_t* e = (xcb_ge_generic_event_t*) event;
 
@@ -566,9 +725,6 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 		}
 		free(event);
 	}
-
-	out_event->type = GEN_WINDOW_SYSTEM_EVENT_NONE;
-	out_event->window_id = 0;
 
 	flushed = xcb_flush(window_system->internal_connection);
 	if(flushed <= 0) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to flush the connection");

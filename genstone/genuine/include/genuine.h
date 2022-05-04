@@ -10,33 +10,14 @@
 #define GEN_UI_H
 
 #include <gencommon.h>
+#include <gencalc.h>
 
 /**
  * Type to use for extents in a UI such as positions or lengths.
  */
 typedef ssize_t gen_ui_extent_t;
 
-/**
- * A rectangle to be used to represent UI elements in terms of position and extent.
- */
-typedef struct {
-	/**
-	 * The x position of the element.
-	 */
-	gen_ui_extent_t x;
-	/**
-	 * The y position of the element.
-	 */
-	gen_ui_extent_t y;
-	/**
-	 * The x axis extent of the element.
-	 */
-	gen_ui_extent_t w;
-	/**
-	 * The y axis extent of the element.
-	 */
-	gen_ui_extent_t h;
-} gen_ui_rect_t;
+GEN_VECTOR_TYPE_NAMED(gen_ui_extent_t, 4, gen_ui_rect_t);
 
 /**
  * Handler for drawing textured UI rects.

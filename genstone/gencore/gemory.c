@@ -15,7 +15,7 @@
 		if(count == SIZE_MAX) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`"); \
 	} while(0)
 
-gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t size, const size_t count) {
+gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t count, const size_t size) {
 	GEN_FRAME_BEGIN(gzalloc);
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
@@ -34,7 +34,7 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t siz
 	GEN_ALL_OK;
 }
 
-gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align) {
+gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t align) {
 	GEN_FRAME_BEGIN(gzalloc_aligned);
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
@@ -89,6 +89,18 @@ gen_error_t gfree(void* const restrict address) {
 #endif
 
 	errno = 0; // mimalloc does weirdness with NUMA
+
+	GEN_ALL_OK;
+}
+
+gen_error_t gen_memory_set(void* const restrict address, const size_t length, const unsigned char value) {
+	GEN_FRAME_BEGIN(gen_memory_set);
+
+	GEN_NULL_CHECK(address);
+
+	for(unsigned char* d = address; (size_t) (d - (unsigned char*) address) < length; ++d) {
+		*d = value;
+	}
 
 	GEN_ALL_OK;
 }

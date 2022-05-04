@@ -16,24 +16,35 @@ GEN_DIAG_REGION_END
 
 static SDL_Renderer* renderer = NULL;
 
-static void rect_callback(void* const restrict ninepatch, const gen_ui_rect_t src, const gen_ui_rect_t dest, __unused void* const restrict passthrough) {
-	SDL_Rect src_r = {(int) src.x, (int) src.y, (int) src.w, (int) src.h};
-	SDL_Rect dest_r = {(int) dest.x, (int) dest.y, (int) dest.w, (int) dest.h};
+static gen_error_t rect_callback(void* const restrict ninepatch, const gen_ui_rect_t src, const gen_ui_rect_t dest, __unused void* const restrict passthrough) {
+	GEN_FRAME_BEGIN(rect_callback);
+
+	glogf(DEBUG, "src: %li %li %li %li", src.x, src.y, src.z, src.w);
+	glogf(DEBUG, "dest: %li %li %li %li", dest.x, dest.y, dest.z, dest.w);
+
+	SDL_Rect src_r = {(int) src.x, (int) src.y, (int) src.z, (int) src.w};
+	SDL_Rect dest_r = {(int) dest.x, (int) dest.y, (int) dest.z, (int) dest.w};
 
 	SDL_RenderCopy(renderer, (SDL_Texture*) ninepatch, &src_r, &dest_r);
+
+	GEN_ALL_OK;
 }
 
 static const SDL_Color color = {255, 176, 223, 255};
 static gen_ui_extent_t dir_list_height = 0;
 static gen_ui_extent_t ui_scale = 16;
 
-static void dir_list_callback(const char* const restrict path, void* const restrict passthrough) {
+static gen_error_t dir_list_callback(const char* const restrict path, void* const restrict passthrough) {
+	GEN_FRAME_BEGIN(dir_list_callback);
+
 	SDL_Surface* text_r = TTF_RenderText_Blended((TTF_Font*) passthrough, path, color);
 	SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, text_r);
 	SDL_Rect dest = {(int) ui_scale, (int) dir_list_height++ * (int) (ui_scale + ui_scale / 2) + 4 * (int) ui_scale, text_r->w, text_r->h};
 	SDL_FreeSurface(text_r);
 	SDL_RenderCopy(renderer, text, NULL, &dest);
 	SDL_DestroyTexture(text);
+
+	GEN_ALL_OK;
 }
 
 int main(void) {

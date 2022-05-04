@@ -29,6 +29,8 @@
 *.gcno
 *.profraw
 
+vgcore.*
+
 docs/*
 out/*
 tmp/*

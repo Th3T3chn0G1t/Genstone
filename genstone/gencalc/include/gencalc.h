@@ -41,7 +41,13 @@ typedef __fp16 gfloat16;
  * @param[in] base the base type of the vector.
  * @param[in] n the number of elements in the vector.
  */
-#define GEN_INTERNAL_VECTOR_TYPE(base, n) typedef base g##base##n __attribute__((ext_vector_type(n)))
+#define GEN_VECTOR_TYPE_NAMED(base, n, name) typedef base name __attribute__((ext_vector_type(n)))
+/**
+ * Internal type declarator for clang vectors (OpenCL-style).
+ * @param[in] base the base type of the vector.
+ * @param[in] n the number of elements in the vector.
+ */
+#define GEN_INTERNAL_VECTOR_TYPE(base, n) GEN_VECTOR_TYPE_NAMED(base, n, g##base##n)
 /**
  * Internal type declarator for clang matrices.
  * @param[in] base the base type of the matrix.

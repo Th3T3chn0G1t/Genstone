@@ -1,5 +1,5 @@
-_GEN_FX_CFLAGS = $(shell pkg-config --cflags xcb)
-_GEN_FX_LFLAGS = $(shell pkg-config --libs xcb)
+_GEN_FX_CFLAGS = $(shell pkg-config --cflags xcb) $(shell pkg-config --cflags xcb-xkb)
+_GEN_FX_LFLAGS = $(shell pkg-config --libs xcb) $(shell pkg-config --libs xcb-xkb)
 
 GEN_FX_CFLAGS = -Igenstone/genfx/include $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS) $(_GEN_FX_CFLAGS)
 GEN_FX_LFLAGS = -lgenfx $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS) $(_GEN_FX_LFLAGS)

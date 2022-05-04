@@ -3,6 +3,7 @@
 - Fix build system with changes in Alonira
 - Investigate Mimalloc error handler?
 - Clean up output of error messages
+- `gfree` sets pointers to `NULL`
 - `glog` and `glogf` into their own functions instead of horrible macro hell
 - Bring over Alonira print-formatting implementation
     - Figure out floating point/use external implementation
@@ -19,7 +20,6 @@
 - Uncomment submodule initialization in vulkan Makefiles
 - Review static analysis warning-creep
 - Memory equivalent to `genstring`
-    - `memset`
     - `memcpy`
     - Replace `mem*` family in Genstone with in-house wrappers
         - Replace `genstring`'s naive implementations with in-house wrappers of efficient impls

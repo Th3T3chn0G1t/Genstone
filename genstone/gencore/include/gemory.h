@@ -14,22 +14,22 @@
  * Allocates memory on the heap.
  * Ensures memory is zeroed before returning.
  * @param[out] out_address pointer to storage for a pointer into the allocated heap block.
- * @param[in] size the size of the unit being allocated for.
  * @param[in] count the number of units being allocated for.
+ * @param[in] size the size of the unit being allocated for.
  * @return an error code.
  */
-GEN_ERRORABLE gzalloc(void* restrict* const restrict out_address, const size_t size, const size_t count);
+GEN_ERRORABLE gzalloc(void* restrict* const restrict out_address, const size_t count, const size_t size);
 /**
  * Allocates memory on the heap.
  * Ensures memory is zeroed before returning.
  * Ensures memory is aligned to correct alignment.
  * @param[out] out_address pointer to storage for a pointer into the allocated heap block.
- * @param[in] size the size of the unit being allocated for.
  * @param[in] count the number of units being allocated for.
+ * @param[in] size the size of the unit being allocated for.
  * @param[in] align the alignment to align allocation to.
  * @return an error code.
  */
-GEN_ERRORABLE gzalloc_aligned(void* restrict* const restrict out_address, const size_t size, const size_t count, const size_t align);
+GEN_ERRORABLE gzalloc_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t align);
 /**
  * Resizes a memory block on the heap.
  * May move items if new size is bigger than the old block allows.
@@ -47,5 +47,14 @@ GEN_ERRORABLE grealloc(void* restrict* const restrict out_address, const size_t 
  * @return an error code.
  */
 GEN_ERRORABLE gfree(void* const restrict address);
+
+/**
+ * Sets a block of memory to a value.
+ * @param[out] address the buffer to set.
+ * @param[in] length the length of the buffer to set in bytes.
+ * @param[in] value the value to set the buffer to.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_memory_set(void* const restrict address, const size_t length, const unsigned char value);
 
 #endif

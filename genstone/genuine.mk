@@ -1,5 +1,5 @@
-GEN_UI_CFLAGS = -Igenstone/genuine/include $(GEN_CORE_CFLAGS)
-GEN_UI_LFLAGS = -lgenuine $(GEN_CORE_LFLAGS)
+GEN_UI_CFLAGS = -Igenstone/genuine/include $(GEN_CORE_CFLAGS)  $(GEN_CALC_CFLAGS)
+GEN_UI_LFLAGS = -lgenuine $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS)
 
 GEN_UI_SOURCES = $(wildcard genstone/genuine/*.c)
 GEN_UI_OBJECTS = $(GEN_UI_SOURCES:.c=$(OBJECT_SUFFIX))
@@ -12,8 +12,8 @@ build_message_genuine:
 
 genuine: gencore build_message_genuine $(GEN_UI_LIB) ### @Genstone Builds Genstone user-interface utilities
 
-$(GEN_UI_LIB): CFLAGS = $(GEN_CORE_CFLAGS)
-$(GEN_UI_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS)
+$(GEN_UI_LIB): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS)
+$(GEN_UI_LIB): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS)
 $(GEN_UI_LIB): $(GEN_UI_OBJECTS) $(GEN_CORE_LIB) | lib
 
 $(GEN_UI_OBJECTS): $(wildcard genstone/genuine/include/*.h)

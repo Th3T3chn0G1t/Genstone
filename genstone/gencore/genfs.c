@@ -260,12 +260,14 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 #else
 	out_handle->file_handle = dup(handle->file_handle);
 	GEN_ERROR_OUT_IF_ERRNO(dup, errno);
-	out_handle->directory_handle = fdopendir(out_handle->file_handle);
-	GEN_ERROR_OUT_IF_ERRNO(fdopendir, errno);
 	out_handle->is_directory = handle->is_directory;
+	if(out_handle->is_directory) {
+		out_handle->directory_handle = fdopendir(out_handle->file_handle);
+		GEN_ERROR_OUT_IF_ERRNO(fdopendir, errno);
 
-	gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &out_handle->internal_directory_length);
-	GEN_ERROR_OUT_IF(error, "`gen_directory_list` failed");
+		gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &out_handle->internal_directory_length);
+		GEN_ERROR_OUT_IF(error, "`gen_directory_list` failed");
+	}
 
 	fstat(out_handle->file_handle, &out_handle->internal_descriptor_details);
 	GEN_ERROR_OUT_IF_ERRNO(fstat, errno);
@@ -327,7 +329,11 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 	fstat(handle->file_handle, &file_info);
 	GEN_ERROR_OUT_IF_ERRNO(fstat, errno);
 
+#if PLATFORM == DWN
 	if(!(file_info.st_mtimespec.tv_sec == handle->internal_descriptor_details.st_mtimespec.tv_sec && file_info.st_mtimespec.tv_nsec == handle->internal_descriptor_details.st_mtimespec.tv_nsec) || !(file_info.st_ctimespec.tv_sec == handle->internal_descriptor_details.st_ctimespec.tv_sec && file_info.st_ctimespec.tv_nsec == handle->internal_descriptor_details.st_ctimespec.tv_nsec)) {
+#else
+	if(file_info.st_mtime != handle->internal_descriptor_details.st_mtime || file_info.st_ctime != handle->internal_descriptor_details.st_ctime) {
+#endif
 		if(handle->is_directory) {
 			size_t items_length = 0;
 			gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &items_length);

@@ -1,5 +1,5 @@
 UI_TEST_SOURCES = $(wildcard sandbox/uitest/*.c)
-UI_TEST_OBJECTS = $(UI_TEST_SOURCES:.c=.o)
+UI_TEST_OBJECTS = $(UI_TEST_SOURCES:.c=$(OBJECT_SUFFIX))
 
 UI_TEST_EXEC = uitest$(EXECUTABLE_SUFFIX)
 
