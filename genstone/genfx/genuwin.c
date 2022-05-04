@@ -3,7 +3,6 @@
 #include <gemory.h>
 #include <genstring.h>
 #include <xcb/xkb.h>
-#include <xkbcommon/xkbcommon.h>
 
 enum {
 	GEN_INTERNAL_DATA_FORMAT_CHAR = 8,
