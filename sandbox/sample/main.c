@@ -28,6 +28,10 @@ int main(void) {
 	error = gen_gfx_context_create(&context);
 	GEN_REQUIRE_NO_ERROR(error);
 
+	gen_gfx_targeted_t targeted = {0};
+	error = gen_gfx_targeted_create(&context, &window_system, &window, &targeted);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	bool run = true;
 	while(run) {
 		gen_window_system_event_t event = {0};
@@ -203,6 +207,9 @@ int main(void) {
 			}
 		} while(event.type != GEN_WINDOW_SYSTEM_EVENT_NONE);
 	}
+
+	error = gen_gfx_targeted_destroy(&context, &window_system, &window, &targeted);
+	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_context_destroy(&context);
 	GEN_REQUIRE_NO_ERROR(error);
