@@ -26,6 +26,8 @@ const char* gen_error_name(const gen_error_t error) {
 		case GEN_INVALID_CONTROL: return "GEN_INVALID_CONTROL";
 		case GEN_BAD_ALIGNMENT: return "GEN_BAD_ALIGNMENT";
 		case GEN_OPERATION_FAILED: return "GEN_OPERATION_FAILED";
+		case GEN_BAD_TIMING: return "GEN_BAD_TIMING";
+		case GEN_TIMEOUT: return "GEN_TIMEOUT";
 	}
 }
 
@@ -52,6 +54,8 @@ const char* gen_error_description(const gen_error_t error) {
 		case GEN_INVALID_CONTROL: return "The program reached an invalid control path";
 		case GEN_BAD_ALIGNMENT: return "The provided data was misaligned";
 		case GEN_OPERATION_FAILED: return "An operation could not be performed";
+		case GEN_BAD_TIMING: return "An operation was performed untimely manner";
+		case GEN_TIMEOUT: return "An operation timed out";
 	}
 }
 

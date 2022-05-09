@@ -3,6 +3,19 @@
 
 #include "include/gencommon.h"
 
+#ifndef GEN_MEMORY_CALLOC
+#define GEN_MEMORY_CALLOC calloc
+#endif
+#ifndef GEN_MEMORY_ALIGNED_ALLOC
+#define GEN_MEMORY_ALIGNED_ALLOC aligned_alloc
+#endif
+#ifndef GEN_MEMORY_REALLOC
+#define GEN_MEMORY_REALLOC realloc
+#endif
+#ifndef GEN_MEMORY_FREE
+#define GEN_MEMORY_FREE free
+#endif
+
 /**
  * This is to make the static analyzer happy
  */
@@ -20,8 +33,8 @@ gen_error_t gzalloc(void* restrict* const restrict out_address, const size_t cou
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
-	void* const allocated = calloc(count, size);
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_calloc, errno);
+	void* const allocated = GEN_MEMORY_CALLOC(count, size);
+	if(!allocated) GEN_ERROR_OUT_ERRNO(GEN_MEMORY_CALLOC, errno);
 
 	*out_address = allocated;
 
@@ -36,8 +49,11 @@ gen_error_t gzalloc_aligned(void* restrict* const restrict out_address, const si
 	if(!align) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was 0");
 	if(align & (align - 1)) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`align` was not a power of 2");
 
-	void* const allocated = aligned_alloc(align, count * size);
-	if(!allocated) GEN_ERROR_OUT_ERRNO(mi_calloc, errno);
+	// Size must be a multiple of alignment
+	const size_t aligned_size = (((count * size) / align) + 1) * align;
+
+	void* const allocated = GEN_MEMORY_ALIGNED_ALLOC(align, aligned_size);
+	if(!allocated) GEN_ERROR_OUT_ERRNO(GEN_MEMORY_ALIGNED_ALLOC, errno);
 
 	*out_address = allocated;
 
@@ -49,8 +65,8 @@ gen_error_t grealloc(void* restrict* const restrict out_address, const size_t ol
 
 	GEN_INTERNAL_GEMORY_PARAM_CHECK;
 
-	void* const allocated = realloc(*out_address, count * size);
-	GEN_ERROR_OUT_IF_ERRNO(realloc, errno);
+	void* const allocated = GEN_MEMORY_REALLOC(*out_address, count * size);
+	GEN_ERROR_OUT_IF_ERRNO(GEN_MEMORY_REALLOC, errno);
 	if(count > old_count) memset((unsigned char*) allocated + (size * old_count), 0, size * (count - old_count));
 
 	*out_address = allocated;
@@ -63,7 +79,7 @@ gen_error_t gfree(void* const restrict address) {
 
 	GEN_NULL_CHECK(address);
 
-	free(address);
+	GEN_MEMORY_FREE(address);
 
 	GEN_ALL_OK;
 }

@@ -23,7 +23,7 @@ TEST = ALL
 # `VSC`:  VSCode
 IDE =
 
-# Flags to be provided to the compiler at every call
+# Flags to be provided to the C compiler at every call
 GLOBAL_C_FLAGS =
 
 # Flags to be provided to the C++ compiler at every call

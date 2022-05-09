@@ -9,9 +9,33 @@
 #ifndef GEN_GRAPHICS_H
 #define GEN_GRAPHICS_H
 
+#include <vulkan/vulkan.h>
+
 #include "gengfxdefs.h"
 #include "genuwin.h"
 
 #include <gencommon.h>
+
+/**
+ * State object for a graphics context.
+ */
+typedef struct {
+    VkInstance internal_instance;
+    VkAllocationCallbacks internal_allocator;
+} gen_gfx_context_t;
+
+/**
+ * Creates a graphics context.
+ * @param[out] out_context pointer to storage for the created graphics context. Should be cleaned up using `gen_gfx_context_destroy`.
+ * @note Only one graphics context should exist per-process.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_context_create(gen_gfx_context_t* const restrict out_context);
+
+/**
+ * Destroys a graphics context.
+ * @param[in] context the context to destroy.
+ */
+GEN_ERRORABLE gen_gfx_context_destroy(gen_gfx_context_t* const restrict context);
 
 #endif

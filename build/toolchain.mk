@@ -13,6 +13,9 @@ COMPILER = clang
 # This is unlikely to work with compilers other than clang++
 COMPILERXX = clang++
 
+# The python3 command line to use
+PYTHON3 = python3
+
 # The linker to use
 # Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
 # Set to `DEFAULT` to allow the compiler to select a linker
@@ -24,5 +27,3 @@ AR = ar
 
 # The clang-format command line to use
 CLANG_FORMAT = clang-format
-
-# CHECKED_CLANG_CURL_TARGET_PATTERN = https://github.com/microsoft/checkedc/releases/download/*.tar.gz

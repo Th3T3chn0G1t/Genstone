@@ -79,6 +79,13 @@ GEN_DIAG_REGION_BEGIN
  */
 #define __nodiscard __attribute__((warn_unused_result))
 #endif
+#ifndef __used
+/**
+ * Defines `__used` on platforms which do not support it by default.
+ * Marks a function as being used to the compiler.
+ */
+#define __used __attribute__((used))
+#endif
 GEN_DIAG_REGION_END
 
 #endif

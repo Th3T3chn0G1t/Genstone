@@ -63,7 +63,7 @@ ifneq ($(OVERRIDE_GLOBAL_C_FLAGS),)
 GLOBAL_C_FLAGS = $(OVERRIDE_GLOBAL_C_FLAGS)
 endif
 ifneq ($(OVERRIDE_GLOBAL_CXX_FLAGS),)
-GLOBAL_CXX_FLAGS = $(OVERRIDE_GLOBAL_CXX_FLAGS)
+GLOBAL_C_FLAGS = $(OVERRIDE_GLOBAL_CXX_FLAGS)
 endif
 ifneq ($(OVERRIDE_GLOBAL_L_FLAGS),)
 GLOBAL_L_FLAGS = $(OVERRIDE_GLOBAL_L_FLAGS)
@@ -73,6 +73,9 @@ COMPILER = $(OVERRIDE_COMPILER)
 endif
 ifneq ($(OVERRIDE_COMPILERXX),)
 COMPILERXX = $(OVERRIDE_COMPILERXX)
+endif
+ifneq ($(OVERRIDE_PYTHON3),)
+PYTHON3 = $(OVERRIDE_PYTHON3)
 endif
 ifneq ($(OVERRIDE_LINKER),)
 LINKER = $(OVERRIDE_LINKER)
@@ -203,8 +206,6 @@ else
 ECHO = echo -e
 endif
 
-CXX_UNSUPPORTED_CFLAGS += -std=gnu2x
-GLOBAL_CXX_FLAGS += -std=gnu++17
 GLOBAL_C_FLAGS += -std=gnu2x -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
 
 ifeq ($(STRIP_BINARIES),ENABLED)
@@ -219,14 +220,14 @@ DEPENDENCY_GEN_FLAGS = -MM -MF$(subst .o,.depfile,$@)
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
 
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=deadcode
-CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=optin -Xanalyzer -analyzer-checker=security
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=optin
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=unix
 ifeq ($(PLATFORM),DWN)
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=osx
 endif
 
-CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.core # This one kinda sucks -Xanalyzer -analyzer-checker=alpha.clone
-CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.deadcode -Xanalyzer -analyzer-checker=alpha.security
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.core
+CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.deadcode
 CLANG_STATIC_ANALYZER_FLAGS += -Xanalyzer -analyzer-checker=alpha.unix
 
 ifeq ($(PLATFORM),DWN)
@@ -283,7 +284,7 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_L_FLAGS += -Wl,-dead_strip,-no_implicit_dylibs,-warn_unused_dylibs,-dead_strip_dylibs,-interposable,-warn_stabs,-warn_commons,-debug_variant,-unaligned_pointers,warning
 	endif
 else
-	GLOBAL_C_FLAGS += -m64 -glldb -O0 -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto
+	GLOBAL_C_FLAGS += -m64 -glldb -O0 -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto -fno-omit-frame-pointer
 	GLOBAL_L_FLAGS += -fno-lto
 
 	ifeq ($(PLATFORM),DWN)
@@ -295,6 +296,10 @@ ifeq ($(TOOLING),ENABLED)
 	GLOBAL_C_FLAGS += -fsanitize=undefined,address
 	GLOBAL_L_FLAGS += -fsanitize=undefined,address
 endif
+
+CXX_DISALLOWED_CFLAGS = -std=gnu2x
+GLOBAL_CXX_FLAGS += -std=gnu++20 $(GLOBAL_C_FLAGS)
+GLOBAL_CXX_FLAGS := $(filter-out $(CXX_DISALLOWED_CFLAGS),$(GLOBAL_CXX_FLAGS))
 
 ifeq ($(TEST),ALL)
 	TEST_UNITS = 1
@@ -347,15 +352,15 @@ else
 endif
 
 %$(OBJECT_SUFFIX): %.cpp build/config.mk | tmp
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
-	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS))  -o $@ $<$(ACTION_SUFFIX)"
-	@$(COMPILERXX) -c $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS)) -o $@ $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
-	@$(COMPILERXX) $(filter-out $(CXX_UNSUPPORTED_CFLAGS),$(GLOBAL_C_FLAGS) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS)) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
 	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"

@@ -111,7 +111,15 @@ typedef enum
 	/**
 	 * An operation could not be performed.
 	 */
-	GEN_OPERATION_FAILED
+	GEN_OPERATION_FAILED,
+	/**
+	 * An operation was performed untimely manner.
+	 */
+	GEN_BAD_TIMING,
+	/**
+	 * An operation timed out.
+	 */
+	GEN_TIMEOUT
 } gen_error_t;
 
 /**

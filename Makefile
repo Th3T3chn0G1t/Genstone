@@ -10,11 +10,6 @@ include $(GENSTONE_MODULES)
 BUILD_PREREQS += $(notdir $(subst .mk,,$(GENSTONE_MODULES)))
 MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(GENSTONE_MODULES))))
 
-VULKAN_MODULES = $(wildcard vulkan/*.mk)
-include $(VULKAN_MODULES)
-BUILD_PREREQS += $(notdir $(subst .mk,,$(VULKAN_MODULES)))
-MODULE_CLEAN_TARGETS += $(addprefix clean_,$(notdir $(subst .mk,,$(VULKAN_MODULES))))
-
 ifeq ($(TEST_BUILD),1)
 	TEST_BUILD_MODULES = $(wildcard test/build/*.mk)
 	include $(TEST_BUILD_MODULES)
