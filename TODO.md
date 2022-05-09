@@ -24,6 +24,8 @@
         - Replace `genstring`'s naive implementations with in-house wrappers of efficient impls
 - Create format implementation
 - Implement Vulkan allocator
+- Implement thorough checking of device limits/sparse properties
+- Implement thorough checking of device features
 - Redo examples
     - Build examples
 - Lock `genfs` objects on write
