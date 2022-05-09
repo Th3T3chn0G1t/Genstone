@@ -72,7 +72,7 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |`MODE`|`DEBUG` `RELEASE`|Determined by Makefile|The target output optimization mode for compilation|It is usually prefereable to set via. the `BUILD_MODE` key in `config.mk` to avoid missing mode-specific build operations|
 |`GEN_TOOLING_DEPTH`|Any valid array size|64|The maximum depth of a tooled call stack|Is used to initialize a thread-local stateful buffer|
 |`GEN_FREQ_PROFILE_MAX`|Any valid array size|64|The maximum number of frequency profilers|Is used to initialize a thread-local stateful buffer|
-|`GEN_PATH_VALIDATION`|`ENABLED` `DISABLED`|`BUILD_MODE=DEBUG`: `ENABLED` `BUILD_MODE=RELEASE`: `DISABLED`|Whether to validate paths passed to genfs functions with `gen_path_validate`|Does not affect the presence of `gen_path_validate`|
+|`GEN_PATH_VALIDATION`|`ENABLED` `DISABLED`|`ENABLED`|Whether to validate paths passed to genfs functions with `gen_path_validate`|Does not affect the presence of `gen_path_validate`|
 |`GEN_CALC_COMMON_TYPES`|`ENABLED` `DISABLED`|`ENABLED`|Enables the default definition of common vector and matrix types in gencalc||
 |`GEN_FS_FILEWATCH_USE_SYSLIB`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use the system library where implemented to get filewatch functionality|Disabling may make results more consistent across platforms as the alternative uses standard utilities|
 |`GEN_EXIT_PROC`|Any statement. Should not end in a semicolon|`abort()`|The statement to be exected when a fatal program error is encountered|This statement should exit program runtime in all cases - application may be in an unstable state if a fatal error does not result in closure|

@@ -21,7 +21,8 @@
  */
 typedef struct {
     VkInstance internal_instance;
-    VkAllocationCallbacks internal_allocator;
+    VkDebugUtilsMessengerEXT internal_debug_messenger;
+    VkPhysicalDevice internal_physical_device;
 } gen_gfx_context_t;
 
 /**
@@ -37,5 +38,7 @@ GEN_ERRORABLE gen_gfx_context_create(gen_gfx_context_t* const restrict out_conte
  * @param[in] context the context to destroy.
  */
 GEN_ERRORABLE gen_gfx_context_destroy(gen_gfx_context_t* const restrict context);
+
+GEN_ERRORABLE gen_internal_gfx_context_load_extensions(const gen_gfx_context_t* const restrict context);
 
 #endif

@@ -18,8 +18,8 @@ endif
 VULKAN_CFLAGS = $(_VULKAN_COMMON_CFLAGS)
 VULKAN_LFLAGS = -lvulkan
 
-VULKAN_DISABLED_SOURCES = dirent_on_windows.c loader_windows.c asm_offset.c
-VULKAN_SOURCES = $(filter-out $(addprefix genstone/vendor/Vulkan-Loader/loader/,$(VULKAN_DISABLED_SOURCES)),$(wildcard genstone/vendor/Vulkan-Loader/loader/*.c))
+VULKAN_DISABLED_SOURCES = dirent_on_windows.c loader_windows.c asm_offset.c generated/vk_loader_extensions.c
+VULKAN_SOURCES = $(filter-out $(addprefix genstone/vendor/Vulkan-Loader/loader/,$(VULKAN_DISABLED_SOURCES)),$(wildcard genstone/vendor/Vulkan-Loader/loader/*.c) $(wildcard genstone/vendor/Vulkan-Loader/loader/generated/*.c))
 VULKAN_OBJECTS = $(VULKAN_SOURCES:.c=$(OBJECT_SUFFIX))
 
 VULKAN_LIB = lib/$(LIB_PREFIX)vulkan$(DYNAMIC_LIB_SUFFIX)

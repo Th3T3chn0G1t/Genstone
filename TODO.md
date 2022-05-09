@@ -23,6 +23,7 @@
     - Replace `mem*` family in Genstone with in-house wrappers
         - Replace `genstring`'s naive implementations with in-house wrappers of efficient impls
 - Create format implementation
+- Implement Vulkan allocator
 - Redo examples
     - Build examples
 - Lock `genfs` objects on write
