@@ -26,6 +26,7 @@
 - Implement Vulkan allocator
 - Implement thorough checking of device limits/sparse properties
 - Implement thorough checking of device features
+- Use Dynamic Rendering to make things *clean*
 - Redo examples
     - Build examples
 - Lock `genfs` objects on write

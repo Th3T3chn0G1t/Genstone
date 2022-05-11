@@ -95,3 +95,17 @@ gen_error_t gen_memory_set(void* const restrict address, const size_t length, co
 
 	GEN_ALL_OK;
 }
+
+gen_error_t gen_memory_copy(const void* const restrict from, const size_t from_size, void* const restrict to, const size_t to_size, const size_t limit) {
+	GEN_FRAME_BEGIN(gen_memory_copy);
+
+	GEN_NULL_CHECK(from);
+	GEN_NULL_CHECK(to);
+
+	for(size_t i = 0; i < limit; ++i) {
+		if(i >= from_size || i >= to_size) GEN_ERROR_OUT(GEN_OUT_OF_BOUNDS, "`i` ran outside of buffer bounds");
+		((uint8_t*) to)[i] = ((uint8_t*) from)[i];
+	}
+
+	GEN_ALL_OK;
+}

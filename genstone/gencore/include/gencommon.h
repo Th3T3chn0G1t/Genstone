@@ -38,6 +38,7 @@ GEN_DIAG_IGNORE_ALL
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -51,8 +52,6 @@ GEN_DIAG_IGNORE_ALL
 #include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
-
-#include <stdnoreturn.h>
 GEN_DIAG_REGION_END
 
 #include "gemory.h"

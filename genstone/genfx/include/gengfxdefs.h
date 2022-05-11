@@ -20,13 +20,17 @@ typedef enum {
     GEN_GFX_BITDEPTH_12 = 12,
     GEN_GFX_BITDEPTH_14 = 14,
     GEN_GFX_BITDEPTH_16 = 16,
-    GEN_GFX_BITDEPTH_24 = 24
+    GEN_GFX_BITDEPTH_24 = 24,
+    GEN_GFX_BITDEPTH_32 = 32,
+    GEN_GFX_BITDEPTH_64 = 64
 } gen_gfx_bitdepth_t;
 
 /**
  * Layouts for graphics buffers.
  */
 typedef enum {
+    GEN_GFX_LAYOUT_UNKNOWN = 0,
+
     GEN_GFX_LAYOUT_RGB,
     GEN_GFX_LAYOUT_RGBA,
     GEN_GFX_LAYOUT_ARGB,
@@ -45,12 +49,16 @@ typedef enum {
  * Graphics attribute/component types.
  */
 typedef enum {
+    GEN_GFX_TYPE_UNKNOWN = 0,
+
     GEN_GFX_TYPE_SIGNED_INT,
+    GEN_GFX_TYPE_SIGNED_FLOAT,
     GEN_GFX_TYPE_SIGNED_SCALED,
     GEN_GFX_TYPE_SIGNED_NORMALIZED,
     GEN_GFX_TYPE_SIGNED_RGB,
 
     GEN_GFX_TYPE_UNSIGNED_INT,
+    GEN_GFX_TYPE_UNSIGNED_FLOAT,
     GEN_GFX_TYPE_UNSIGNED_SCALED,
     GEN_GFX_TYPE_UNSIGNED_NORMALIZED
 } gen_gfx_type_t;
@@ -70,7 +78,7 @@ typedef struct {
     /**
      * The bitdepth of each layout component.
      */
-    gen_gfx_bitdepth_t bitdepth[4];
+    gen_gfx_bitdepth_t bitdepth;
 } gen_gfx_format_t;
 
 /**

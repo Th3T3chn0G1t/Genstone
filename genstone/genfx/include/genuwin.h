@@ -413,6 +413,16 @@ GEN_ERRORABLE gen_window_destroy(gen_window_system_t* const restrict window_syst
 GEN_ERRORABLE gen_window_modify(gen_window_system_t* const restrict window_system, const gen_window_t* const restrict window, const gen_window_attribute_t* const restrict attribute);
 
 /**
+ * Fetches a window attribute.
+ * @param[in,out] window_system the window system to fetch the window attribute from.
+ * @param[in,out] window the window whose attribute should be fetched.
+ * @param[in] type the attribute type to fetch.
+ * @param[out] out_attribute the fetched attribute from the window.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_window_fetch(gen_window_system_t* const restrict window_system, const gen_window_t* const restrict window, const gen_window_attribute_type_t type, gen_window_attribute_t* const restrict out_attribute);
+
+/**
  * Checks whether a window id matches a window.
  * Used for matching events from `gen_window_system_poll` to windows.
  * @param[in] window the window to match against.

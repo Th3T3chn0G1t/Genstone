@@ -57,4 +57,15 @@ GEN_ERRORABLE gfree(void* const restrict address);
  */
 GEN_ERRORABLE gen_memory_set(void* const restrict address, const size_t length, const unsigned char value);
 
+/**
+ * Copies the data from one block of memory to another.
+ * @param[in] from the block from which to source the data.
+ * @param[in] from_size the size of the source block in bytes.
+ * @param[out] to the block to which to copy the data.
+ * @param[in] to_size the size of the destination block in bytes.
+ * @param[in] limit the number of bytes to copy.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_memory_copy(const void* const restrict from, const size_t from_size, void* const restrict to, const size_t to_size, const size_t limit);
+
 #endif

@@ -199,7 +199,7 @@ GEN_INTERNAL_ERRORABLE gen_internal_window_system_validate_request_cookie(gen_wi
 			case XCB_ALLOC: GEN_ERROR_OUT(GEN_OUT_OF_MEMORY, "The window system failed to allocate");
 			case XCB_COLORMAP: GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "A nonexistent colormap was referenced");
 			case XCB_G_CONTEXT: GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "A nonexistent drawing context was referenced");
-			case XCB_ID_CHOICE: GEN_ERROR_OUT(GEN_ALREADY_EXISTS, "Application tried to reuse existing identifier identifier");
+			case XCB_ID_CHOICE: GEN_ERROR_OUT(GEN_ALREADY_EXISTS, "Application tried to reuse existing identifier");
 			case XCB_NAME: GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "A nonexistent object was referenced");
 			case XCB_LENGTH: GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "Provided data was of the wrong length");
 			case XCB_IMPLEMENTATION: GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "A requested window server feature is not supported");
@@ -855,6 +855,62 @@ gen_error_t gen_window_modify(gen_window_system_t* const restrict window_system,
 			// error = gen_internal_window_system_validate_request_cookie(window_system, cookie);
 			// GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_validate_request_cookie` failed");
 
+			break;
+		}
+	}
+
+	flushed = xcb_flush(window_system->internal_connection);
+	if(flushed <= 0) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to flush the connection");
+
+	GEN_ALL_OK;
+}
+
+gen_error_t gen_window_fetch(gen_window_system_t* const restrict window_system, const gen_window_t* const restrict window, const gen_window_attribute_type_t type, gen_window_attribute_t* const restrict out_attribute) {
+	GEN_FRAME_BEGIN(gen_window_fetch);
+
+	GEN_NULL_CHECK(window_system);
+	GEN_NULL_CHECK(window);
+	GEN_NULL_CHECK(out_attribute);
+
+	gen_error_t error = gen_internal_window_system_check(window_system);
+	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_check` failed");
+
+	int flushed = xcb_flush(window_system->internal_connection);
+	if(flushed <= 0) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to flush the connection");
+
+	switch(type) {
+		case GEN_WINDOW_ATTRIBUTE_VISIBILITY: {
+			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
+			break;
+		}
+		case GEN_WINDOW_ATTRIBUTE_FULLSCREEN: {
+			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
+			break;
+		}
+		case GEN_WINDOW_ATTRIBUTE_DECORATION: {
+			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
+			break;
+		}
+		case GEN_WINDOW_ATTRIBUTE_POSITION: {
+			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
+			break;
+		}
+		case GEN_WINDOW_ATTRIBUTE_EXTENT: {
+			xcb_get_geometry_cookie_t cookie = xcb_get_geometry(window_system->internal_connection, window->window);
+			xcb_get_geometry_reply_t* reply = xcb_get_geometry_reply(window_system->internal_connection, cookie, NULL);
+			if(!reply) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to fetch window geometry");
+			out_attribute->type = GEN_WINDOW_ATTRIBUTE_EXTENT;
+			out_attribute->extent.x = reply->width;
+			out_attribute->extent.y = reply->height;
+			free(reply);
+			break;
+		}
+		case GEN_WINDOW_ATTRIBUTE_NAME: {
+			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
+			break;
+		}
+		case GEN_WINDOW_ATTRIBUTE_ICON: {
+			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
 			break;
 		}
 	}

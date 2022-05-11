@@ -28,8 +28,60 @@ int main(void) {
 	error = gen_gfx_context_create(&context);
 	GEN_REQUIRE_NO_ERROR(error);
 
+	gen_gfx_shader_t shaders[2] = {0};
+
+	gen_filesystem_handle_t vertex_handle = {0};
+	error = gen_filesystem_handle_open(&vertex_handle, "sandbox/sample/vertex.spv");
+	GEN_REQUIRE_NO_ERROR(error);
+	size_t vertex_size = 0;
+	error = gen_filesystem_handle_size(&vertex_size, &vertex_handle);
+	GEN_REQUIRE_NO_ERROR(error);
+	uint8_t* vertex_shader_data = NULL;
+	error = gzalloc((void**) &vertex_shader_data, vertex_size, sizeof(uint8_t));
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_filesystem_handle_read(vertex_shader_data, &vertex_handle, 0, vertex_size);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_gfx_shader_create(&context, &shaders[0], vertex_shader_data, vertex_size);
+	GEN_REQUIRE_NO_ERROR(error);
+	shaders[0].type = GEN_GFX_SHADER_TYPE_VERTEX;
+	error = gfree(vertex_shader_data);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_filesystem_handle_close(&vertex_handle);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	gen_filesystem_handle_t fragment_handle = {0};
+	error = gen_filesystem_handle_open(&fragment_handle, "sandbox/sample/fragment.spv");
+	GEN_REQUIRE_NO_ERROR(error);
+	size_t fragment_size = 0;
+	error = gen_filesystem_handle_size(&fragment_size, &fragment_handle);
+	GEN_REQUIRE_NO_ERROR(error);
+	uint8_t* fragment_shader_data = NULL;
+	error = gzalloc((void**) &fragment_shader_data, fragment_size, sizeof(uint8_t));
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_filesystem_handle_read(fragment_shader_data, &fragment_handle, 0, fragment_size);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_gfx_shader_create(&context, &shaders[1], fragment_shader_data, fragment_size);
+	shaders[1].type = GEN_GFX_SHADER_TYPE_FRAGMENT;
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gfree(fragment_shader_data);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_filesystem_handle_close(&fragment_handle);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	gen_gfx_pipeline_t pipeline = {0};
+	error = gen_gfx_pipeline_create(&context, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
+	GEN_REQUIRE_NO_ERROR(error);
+
+	error = gen_gfx_shader_destroy(&context, &shaders[0]);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_gfx_shader_destroy(&context, &shaders[1]);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	gen_gfx_targeted_t targeted = {0};
 	error = gen_gfx_targeted_create(&context, &window_system, &window, &targeted);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	error = gen_gfx_targeted_bind_pipeline(&context, &targeted, &pipeline);
 	GEN_REQUIRE_NO_ERROR(error);
 
 	bool run = true;
@@ -207,6 +259,12 @@ int main(void) {
 			}
 		} while(event.type != GEN_WINDOW_SYSTEM_EVENT_NONE);
 	}
+
+	error = gen_gfx_targeted_unbind_pipeline(&context, &targeted, &pipeline);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	error = gen_gfx_pipeline_destroy(&context, &pipeline);
+	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_targeted_destroy(&context, &window_system, &window, &targeted);
 	GEN_REQUIRE_NO_ERROR(error);
