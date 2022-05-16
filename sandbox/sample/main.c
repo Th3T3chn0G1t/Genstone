@@ -28,6 +28,10 @@ int main(void) {
 	error = gen_gfx_context_create(&context);
 	GEN_REQUIRE_NO_ERROR(error);
 
+	gen_gfx_targeted_t targeted = {0};
+	error = gen_gfx_targeted_create(&context, &window_system, &window, &targeted);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	gen_gfx_shader_t shaders[2] = {0};
 
 	gen_filesystem_handle_t vertex_handle = {0};
@@ -69,19 +73,12 @@ int main(void) {
 	GEN_REQUIRE_NO_ERROR(error);
 
 	gen_gfx_pipeline_t pipeline = {0};
-	error = gen_gfx_pipeline_create(&context, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
+	error = gen_gfx_pipeline_create(&context, &targeted, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
 	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_shader_destroy(&context, &shaders[0]);
 	GEN_REQUIRE_NO_ERROR(error);
 	error = gen_gfx_shader_destroy(&context, &shaders[1]);
-	GEN_REQUIRE_NO_ERROR(error);
-
-	gen_gfx_targeted_t targeted = {0};
-	error = gen_gfx_targeted_create(&context, &window_system, &window, &targeted);
-	GEN_REQUIRE_NO_ERROR(error);
-
-	error = gen_gfx_targeted_bind_pipeline(&context, &targeted, &pipeline);
 	GEN_REQUIRE_NO_ERROR(error);
 
 	bool run = true;
@@ -204,6 +201,9 @@ int main(void) {
 				}
 				case GEN_WINDOW_SYSTEM_EVENT_MOUSE_BUTTON_STATE_CHANGED: {
 					// glog(DEBUG, "GEN_WINDOW_SYSTEM_EVENT_MOUSE_BUTTON_STATE_CHANGED");
+					error = gen_gfx_shutdown_pre(&context);
+					GEN_REQUIRE_NO_ERROR(error);
+
 					run = false;
 					break;
 				}
@@ -258,12 +258,19 @@ int main(void) {
 				}
 			}
 		} while(event.type != GEN_WINDOW_SYSTEM_EVENT_NONE);
+
+		gen_gfx_frame_t frame = {0};
+
+		error = gen_gfx_pipeline_frame_begin(&context, &targeted, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &frame);
+		GEN_REQUIRE_NO_ERROR(error);
+
+		vkCmdDraw(targeted.internal_command_buffer, 3, 1, 0, 0);
+
+		error = gen_gfx_pipeline_frame_end(&context, &targeted, &pipeline, &frame);
+		GEN_REQUIRE_NO_ERROR(error);
 	}
 
-	error = gen_gfx_targeted_unbind_pipeline(&context, &targeted, &pipeline);
-	GEN_REQUIRE_NO_ERROR(error);
-
-	error = gen_gfx_pipeline_destroy(&context, &pipeline);
+	error = gen_gfx_pipeline_destroy(&context, &targeted, &pipeline);
 	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_targeted_destroy(&context, &window_system, &window, &targeted);

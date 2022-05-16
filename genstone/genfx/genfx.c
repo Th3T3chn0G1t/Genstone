@@ -77,6 +77,7 @@ static gen_error_t gen_internal_vk_convert_result(const VkResult result) {
 		case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT: return GEN_INVALID_PARAMETER;
 		case VK_ERROR_NOT_PERMITTED_KHR: return GEN_PERMISSION;
 		case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT: return GEN_OPERATION_FAILED;
+		case VK_ERROR_COMPRESSION_EXHAUSTED_EXT: return GEN_OPERATION_FAILED;
 
 		case VK_RESULT_MAX_ENUM: return GEN_UNKNOWN;
 	}
@@ -735,6 +736,7 @@ gen_error_t gen_gfx_context_create(gen_gfx_context_t* const restrict out_context
 	error = gfree(queue_family_properties);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 	if(graphics_queue_family_index == UINT32_MAX) GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "No graphics queue family available on device");
+	out_context->internal_graphics_queue_index = graphics_queue_family_index;
 
 	const VkDeviceQueueCreateInfo device_queue_create_infos[] = {{VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO, NULL, 0, graphics_queue_family_index, 1, (float[]){1.0f}}};
 	const VkPhysicalDeviceFeatures physical_device_features = {0};
@@ -744,6 +746,17 @@ gen_error_t gen_gfx_context_create(gen_gfx_context_t* const restrict out_context
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateDevice);
 
 	vkGetDeviceQueue(out_context->internal_device, graphics_queue_family_index, 0, &out_context->internal_graphics_queue);
+
+	GEN_ALL_OK;
+}
+
+gen_error_t gen_gfx_shutdown_pre(gen_gfx_context_t* const restrict context) {
+	GEN_FRAME_BEGIN(gen_gfx_shutdown_pre);
+
+	GEN_NULL_CHECK(context);
+
+	VkResult result = vkDeviceWaitIdle(context->internal_device);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkDeviceWaitIdle);
 
 	GEN_ALL_OK;
 }
@@ -1020,6 +1033,14 @@ gen_error_t gen_gfx_targeted_create(gen_gfx_context_t* const restrict context, g
 	gen_error_t error = gen_internal_vk_create_swapchain(context, window_system, window, out_targeted);
 	GEN_ERROR_OUT_IF(error, "`gen_internal_vk_create_swapchain` failed");
 
+	const VkCommandPoolCreateInfo command_pool_create_info = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO, NULL, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, context->internal_graphics_queue_index};
+	result = vkCreateCommandPool(context->internal_device, &command_pool_create_info, context->internal_allocator, &out_targeted->internal_command_pool);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateCommandPool);
+
+	const VkCommandBufferAllocateInfo command_buffer_allocate_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, NULL, out_targeted->internal_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1};
+	result = vkAllocateCommandBuffers(context->internal_device, &command_buffer_allocate_info, &out_targeted->internal_command_buffer);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkAllocateCommandBuffers);
+
 	GEN_ALL_OK;
 }
 
@@ -1039,13 +1060,14 @@ gen_error_t gen_gfx_targeted_destroy(gen_gfx_context_t* const restrict context, 
 	error = gfree(targeted->internal_swapchain_image_views);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 
+	vkDestroyCommandPool(context->internal_device, targeted->internal_command_pool, context->internal_allocator);
 	vkDestroySwapchainKHR(context->internal_device, targeted->internal_swapchain, context->internal_allocator);
 	vkDestroySurfaceKHR(context->internal_instance, targeted->internal_surface, context->internal_allocator);
 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t* const restrict shaders, const size_t shaders_length) {
+gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, const gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t* const restrict shaders, const size_t shaders_length) {
 	GEN_FRAME_BEGIN(gen_gfx_pipeline_create);
 
 	GEN_NULL_CHECK(context);
@@ -1058,13 +1080,7 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, g
 
 	for(size_t i = 0; i < shaders_length; ++i) {
 		const gen_gfx_shader_t* const restrict shader = &shaders[i];
-		pipeline_shader_stage_create_infos[i].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		pipeline_shader_stage_create_infos[i].pNext = NULL;
-		pipeline_shader_stage_create_infos[i].flags = 0;
-		pipeline_shader_stage_create_infos[i].stage = VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM;
-		pipeline_shader_stage_create_infos[i].module = shader->internal_shader_module;
-		pipeline_shader_stage_create_infos[i].pName = "main";
-		pipeline_shader_stage_create_infos[i].pSpecializationInfo = NULL;
+		pipeline_shader_stage_create_infos[i] = (VkPipelineShaderStageCreateInfo){VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, NULL, 0, VK_SHADER_STAGE_FLAG_BITS_MAX_ENUM, shader->internal_shader_module, "main", NULL};
 		switch(shader->type) {
 			case GEN_GFX_SHADER_TYPE_VERTEX: {
 				pipeline_shader_stage_create_infos[i].stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -1097,8 +1113,8 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, g
 	const VkPipelineDepthStencilStateCreateInfo pipeline_depth_stencil_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO, NULL, 0, VK_FALSE, VK_FALSE, VK_COMPARE_OP_NEVER, VK_FALSE, VK_FALSE, {VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_NEVER, 0, 0, 0}, {VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_STENCIL_OP_KEEP, VK_COMPARE_OP_NEVER, 0, 0, 0}, 0.0f, 1.0f};
 	const VkPipelineColorBlendAttachmentState pipeline_color_blend_attachment_state = {VK_TRUE, VK_BLEND_FACTOR_SRC_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA, VK_BLEND_OP_ADD, VK_BLEND_FACTOR_ONE, VK_BLEND_FACTOR_ZERO, VK_BLEND_OP_ADD, VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT};
 	const VkPipelineColorBlendStateCreateInfo pipeline_color_blend_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO, NULL, 0, VK_FALSE, VK_LOGIC_OP_MAX_ENUM, 1, &pipeline_color_blend_attachment_state, {0.0f, 0.0f, 0.0f, 0.0f}};
-	const VkDynamicState pipeline_dynamic_states[] = {VK_DYNAMIC_STATE_VIEWPORT | VK_DYNAMIC_STATE_SCISSOR};
-	const VkPipelineDynamicStateCreateInfo pipeline_dynamic_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO, NULL, 0, sizeof(pipeline_dynamic_states) / sizeof(pipeline_dynamic_states[0]), pipeline_dynamic_states};
+	// const VkDynamicState pipeline_dynamic_states[] = {VK_DYNAMIC_STATE_VIEWPORT | VK_DYNAMIC_STATE_SCISSOR};
+	const VkPipelineDynamicStateCreateInfo pipeline_dynamic_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO, NULL, 0, 0, NULL};
 	const VkPipelineLayoutCreateInfo pipeline_layout_create_info = {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, NULL, 0, 0, NULL, 0, NULL};
 	// for(size_t i = 0; i < shaders_length; ++i) {
 	// 	spvReflectCreateShaderModule
@@ -1106,54 +1122,127 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, g
 	VkResult result = vkCreatePipelineLayout(context->internal_device, &pipeline_layout_create_info, context->internal_allocator, &out_pipeline->internal_layout);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreatePipelineLayout);
 
-	const VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO, NULL, 0, (uint32_t) shaders_length, pipeline_shader_stage_create_infos, &pipeline_vertex_input_state_create_info, &pipeline_input_assembly_state_create_info, &pipeline_tessellation_state_create_info, NULL, &pipeline_rasterization_state_create_info, &pipeline_multisample_state_create_info, &pipeline_depth_stencil_state_create_info, &pipeline_color_blend_state_create_info, &pipeline_dynamic_state_create_info, out_pipeline->internal_layout, NULL, 0, VK_NULL_HANDLE, -1};
+	const VkAttachmentDescription color_attachment = {0, gen_internal_vk_format_from_gfx(targeted->internal_swapchain_image_format), VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_DONT_CARE, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
+	const VkAttachmentReference color_attachment_reference = {0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+	const VkSubpassDescription subpass_description = {0, VK_PIPELINE_BIND_POINT_GRAPHICS, 0, NULL, 1, &color_attachment_reference, NULL, NULL, 0, NULL};
+	const VkSubpassDependency subpass_dependency = {VK_SUBPASS_EXTERNAL, 0, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, 0};
+	const VkRenderPassCreateInfo render_pass_create_info = {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO, NULL, 0, 1, &color_attachment, 1, &subpass_description, 1, &subpass_dependency};
+	result = vkCreateRenderPass(context->internal_device, &render_pass_create_info, context->internal_allocator, &out_pipeline->internal_render_pass);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateRenderPass);
+
+	const VkPipelineViewportStateCreateInfo pipeline_viewport_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO, NULL, 0, 1, &targeted->internal_viewport, 1, &targeted->internal_scissor};
+
+	const VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO, NULL, 0, (uint32_t) shaders_length, pipeline_shader_stage_create_infos, &pipeline_vertex_input_state_create_info, &pipeline_input_assembly_state_create_info, &pipeline_tessellation_state_create_info, &pipeline_viewport_state_create_info, &pipeline_rasterization_state_create_info, &pipeline_multisample_state_create_info, &pipeline_depth_stencil_state_create_info, &pipeline_color_blend_state_create_info, &pipeline_dynamic_state_create_info, out_pipeline->internal_layout, out_pipeline->internal_render_pass, 0, VK_NULL_HANDLE, -1};
 	result = vkCreateGraphicsPipelines(context->internal_device, VK_NULL_HANDLE, 1, &graphics_pipeline_create_info, context->internal_allocator, &out_pipeline->internal_pipeline);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateGraphicsPipelines);
+
+	error = gzalloc((void**) &targeted->internal_framebuffers, targeted->internal_swapchain_image_count, sizeof(VkFramebuffer));
+	GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
+
+	for(size_t i = 0; i < targeted->internal_swapchain_image_count; ++i) {
+		const VkFramebufferCreateInfo framebuffer_create_info = {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO, NULL, 0, out_pipeline->internal_render_pass, 1, &targeted->internal_swapchain_image_views[i], (uint32_t) targeted->internal_swapchain_image_extent.x, (uint32_t) targeted->internal_swapchain_image_extent.y, 1};
+		result = vkCreateFramebuffer(context->internal_device, &framebuffer_create_info, context->internal_allocator, &targeted->internal_framebuffers[i]);
+		GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateFramebuffer);
+	}
 
 	error = gfree(pipeline_shader_stage_create_infos);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 
+	const VkSemaphoreCreateInfo image_available_semaphore_create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, NULL, 0};
+	result = vkCreateSemaphore(context->internal_device, &image_available_semaphore_create_info, context->internal_allocator, &out_pipeline->internal_image_available_semaphore);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSemaphore);
+
+	const VkSemaphoreCreateInfo render_finished_semaphore_create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, NULL, 0};
+	result = vkCreateSemaphore(context->internal_device, &render_finished_semaphore_create_info, context->internal_allocator, &out_pipeline->internal_render_finished_semaphore);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSemaphore);
+
+	const VkFenceCreateInfo in_flight_fence_create_info = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, NULL, VK_FENCE_CREATE_SIGNALED_BIT};
+	result = vkCreateFence(context->internal_device, &in_flight_fence_create_info, context->internal_allocator, &out_pipeline->internal_in_flight_fence);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateFence);
+
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_targeted_bind_pipeline(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline) {
-	GEN_FRAME_BEGIN(gen_gfx_targeted_bind_pipeline);
+gen_error_t gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_frame_t* const restrict out_frame) {
+	GEN_FRAME_BEGIN(gen_gfx_pipeline_frame_begin);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targeted);
 	GEN_NULL_CHECK(pipeline);
 
-	// const VkPipelineViewportStateCreateInfo pipeline_viewport_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO, NULL, 0, 1, &targeted->internal_viewport, 1, &targeted->internal_scissor};
-	const VkAttachmentDescription color_attachment = {0, gen_internal_vk_format_from_gfx(targeted->internal_swapchain_image_format), VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_DONT_CARE, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR};
+	VkResult result = vkWaitForFences(context->internal_device, 1, &pipeline->internal_in_flight_fence, VK_TRUE, UINT64_MAX);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkWaitForFences);
 
-	const VkAttachmentReference color_attachment_reference = {0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
-	const VkSubpassDescription subpass_description = {0, VK_PIPELINE_BIND_POINT_GRAPHICS, 0, NULL, 1, &color_attachment_reference, NULL, NULL, 0, NULL};
-	const VkRenderPassCreateInfo render_pass_create_info = {VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO, NULL, 0, 1, &color_attachment, 1, &subpass_description, 0, NULL};
-	VkResult result = vkCreateRenderPass(context->internal_device, &render_pass_create_info, context->internal_allocator, &pipeline->internal_render_pass);
-	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateRenderPass);
+	result = vkResetFences(context->internal_device, 1, &pipeline->internal_in_flight_fence);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkResetFences);
+
+	result = vkAcquireNextImageKHR(context->internal_device, targeted->internal_swapchain, UINT64_MAX, pipeline->internal_image_available_semaphore, VK_NULL_HANDLE, &out_frame->internal_image_index);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkAcquireNextImageKHR);
+
+	result = vkResetCommandBuffer(targeted->internal_command_buffer, 0);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkResetCommandBuffer);
+
+	const VkCommandBufferBeginInfo command_buffer_begin_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, NULL, 0, NULL};
+	result = vkBeginCommandBuffer(targeted->internal_command_buffer, &command_buffer_begin_info);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkBeginCommandBuffer);
+
+	const VkClearValue clear_value = {.color = {.float32 = {clear_color.x, clear_color.y, clear_color.z, clear_color.w}}};
+	const VkRenderPassBeginInfo render_pass_begin_info = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO, NULL, pipeline->internal_render_pass, targeted->internal_framebuffers[out_frame->internal_image_index], {{0, 0}, {(uint32_t) targeted->internal_swapchain_image_extent.x, (uint32_t) targeted->internal_swapchain_image_extent.y}}, 1, &clear_value};
+	vkCmdBeginRenderPass(targeted->internal_command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+	vkCmdBindPipeline(targeted->internal_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->internal_pipeline);
 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_targeted_unbind_pipeline(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline) {
-	GEN_FRAME_BEGIN(gen_gfx_targeted_unbind_pipeline);
+gen_error_t gen_gfx_pipeline_frame_end(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_frame_t* const restrict frame) {
+	GEN_FRAME_BEGIN(gen_gfx_pipeline_frame_end);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targeted);
 	GEN_NULL_CHECK(pipeline);
 
-	vkDestroyRenderPass(context->internal_device, pipeline->internal_render_pass, context->internal_allocator);
+	vkCmdEndRenderPass(targeted->internal_command_buffer);
+
+	VkResult result = vkEndCommandBuffer(targeted->internal_command_buffer);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkEndCommandBuffer);
+
+	const VkPipelineStageFlags flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+	const VkSubmitInfo submit_info = {VK_STRUCTURE_TYPE_SUBMIT_INFO, NULL, 1, &pipeline->internal_image_available_semaphore, flags, 1, &targeted->internal_command_buffer, 1, &pipeline->internal_render_finished_semaphore};
+
+	result = vkQueueSubmit(context->internal_graphics_queue, 1, &submit_info, pipeline->internal_in_flight_fence);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueueSubmit);
+
+	const VkPresentInfoKHR present_info = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, NULL, 1, &pipeline->internal_render_finished_semaphore, 1, &targeted->internal_swapchain, &frame->internal_image_index, NULL};
+	result = vkQueuePresentKHR(context->internal_graphics_queue, &present_info);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueuePresentKHR);
 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_destroy(gen_gfx_context_t* const restrict context, gen_gfx_pipeline_t* const restrict pipeline) {
+gen_error_t gen_gfx_pipeline_destroy(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline) {
 	GEN_FRAME_BEGIN(gen_gfx_pipeline_destroy);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(pipeline);
 
+	VkResult result = vkQueueWaitIdle(context->internal_graphics_queue);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueueWaitIdle);
+
+	for(size_t i = 0; i < targeted->internal_swapchain_image_count; ++i) {
+		vkDestroyFramebuffer(context->internal_device, targeted->internal_framebuffers[i], context->internal_allocator);
+	}
+
+	gen_error_t error = gfree(targeted->internal_framebuffers);
+	GEN_ERROR_OUT_IF(error, "`gfree` failed");
+
+	vkDestroySemaphore(context->internal_device, pipeline->internal_image_available_semaphore, context->internal_allocator);
+	vkDestroySemaphore(context->internal_device, pipeline->internal_render_finished_semaphore, context->internal_allocator);
+	vkDestroyFence(context->internal_device, pipeline->internal_in_flight_fence, context->internal_allocator);
+
+	vkDestroyRenderPass(context->internal_device, pipeline->internal_render_pass, context->internal_allocator);
 	vkDestroyPipelineLayout(context->internal_device, pipeline->internal_layout, context->internal_allocator);
+	vkDestroyPipeline(context->internal_device, pipeline->internal_pipeline, context->internal_allocator);
 
 	GEN_ALL_OK;
 }

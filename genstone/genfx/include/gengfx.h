@@ -31,6 +31,7 @@ typedef struct {
     VkDevice internal_device;
     VkAllocationCallbacks* internal_allocator;
 
+    uint32_t internal_graphics_queue_index;
     VkQueue internal_graphics_queue;
 } gen_gfx_context_t;
 
@@ -43,10 +44,13 @@ typedef struct {
     uint32_t internal_swapchain_image_count;
     VkImage* internal_swapchain_images;
     VkImageView* internal_swapchain_image_views;
+    VkFramebuffer* internal_framebuffers;
     gen_gfx_format_t internal_swapchain_image_format;
     gint2 internal_swapchain_image_extent;
     VkViewport internal_viewport;
     VkRect2D internal_scissor;
+    VkCommandPool internal_command_pool;
+    VkCommandBuffer internal_command_buffer;
 } gen_gfx_targeted_t;
 
 /**
@@ -86,7 +90,18 @@ typedef struct {
     VkRenderPass internal_render_pass;
     VkPipelineLayout internal_layout;
     VkPipeline internal_pipeline;
+
+    VkSemaphore internal_image_available_semaphore;
+    VkSemaphore internal_render_finished_semaphore;
+    VkFence internal_in_flight_fence;
 } gen_gfx_pipeline_t;
+
+/**
+ * State object for a frame.
+ */
+typedef struct {
+    uint32_t internal_image_index;
+} gen_gfx_frame_t;
 
 /**
  * Creates a graphics context.
@@ -95,6 +110,13 @@ typedef struct {
  * @return an error code.
  */
 GEN_ERRORABLE gen_gfx_context_create(gen_gfx_context_t* const restrict out_context);
+
+/**
+ * Waits for the device to complete operations preceeding a shutdown.
+ * @param[in,out] context the graphics context to wait on.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_shutdown_pre(gen_gfx_context_t* const restrict context);
 
 /**
  * Destroys a graphics context.
@@ -113,23 +135,6 @@ GEN_ERRORABLE gen_gfx_context_destroy(gen_gfx_context_t* const restrict context)
 GEN_ERRORABLE gen_gfx_targeted_create(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targeted_t* const restrict out_targeted);
 
 /**
- * Binds a graphics pipeline to a targeted graphics instance.
- * @param[in,out] context the graphics context from which the targeted instance was created.
- * @param[in,out] targeted the targeted graphics instance to bind to.
- * @param[in,out] pipeline the pipeline to bind.
- * @return an error code.
- */
-GEN_ERRORABLE gen_gfx_targeted_bind_pipeline(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline);
-
-/**
- * Unbinds a graphics pipeline from a targeted graphics instance.
- * @param[in,out] context the graphics context from which the targeted instance was created.
- * @param[in,out] targeted the targeted graphics instance to which the pipeline is bound.
- * @param[in,out] pipeline the pipeline to unbind.
- */
-GEN_ERRORABLE gen_gfx_targeted_unbind_pipeline(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline);
-
-/**
  * Destroys a targeted graphics instance.
  * @param[in,out] context the graphics context from which the targeted instance was created.
  * @param[in,out] window_system the window system to which the targeted window belongs.
@@ -140,21 +145,45 @@ GEN_ERRORABLE gen_gfx_targeted_unbind_pipeline(gen_gfx_context_t* const restrict
 GEN_ERRORABLE gen_gfx_targeted_destroy(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targeted_t* const restrict targeted);
 
 /**
- * Creates a graphics pipeline.
+ * Creates a graphics pipeline associated with a targeted graphics instance.
  * @param[in,out] context the graphics context from which to create the pipeline.
+ * @param[in,out] targeted the targeted instance to associate the pipeline with.
  * @param[out] out_pipeline pointer to storage for the created pipeline.
  * @param[in] shaders the shaders from which to construct the pipeline.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t* const restrict shaders, const size_t shaders_length);
+GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, const gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t* const restrict shaders, const size_t shaders_length);
+
+/**
+ * Starts a graphics frame using a graphics pipeline to target a targeted graphics instance.
+ * @param[in,out] context the graphics context from which the graphics pipeline was created.
+ * @param[in,out] targeted the targeted instance the pipeline was associated with.
+ * @param[in,out] pipeline the pipeline to begin the frame on.
+ * @param[in] clear_color the clear color to start the frame with.
+ * @param[out] out_frame pointer to storage for a frame state object.
+ * @note the frame must be terminated with a call to `gen_gfx_pipeline_frame_end`.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_frame_t* const restrict out_frame);
+
+/**
+ * Starts a graphics frame using a graphics pipeline to target a targeted graphics instance.
+ * @param[in,out] context the graphics context from which the graphics pipeline was created.
+ * @param[in,out] targeted the targeted instance the pipeline was associated with.
+ * @param[in,out] pipeline the pipeline to begin the frame on.
+ * @param[in] frame the frame state object from the corresponding `gen_gfx_pipeline_frame_begin` call.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_pipeline_frame_end(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_frame_t* const restrict frame);
 
 /**
  * Destroys a graphics pipeline.
  * @param[in,out] context the graphics context from which the graphics pipeline was created.
+ * @param[in,out] targeted the targeted instance the pipeline was associated with.
  * @param[in,out] pipeline the pipeline to destroy.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_destroy(gen_gfx_context_t* const restrict context, gen_gfx_pipeline_t* const restrict pipeline);
+GEN_ERRORABLE gen_gfx_pipeline_destroy(gen_gfx_context_t* const restrict context, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t* const restrict pipeline);
 
 /**
  * Creates a shader program.
