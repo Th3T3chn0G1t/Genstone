@@ -76,11 +76,6 @@ int main(void) {
 	error = gen_gfx_pipeline_create(&context, &targeted, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
 	GEN_REQUIRE_NO_ERROR(error);
 
-	error = gen_gfx_shader_destroy(&context, &shaders[0]);
-	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_gfx_shader_destroy(&context, &shaders[1]);
-	GEN_REQUIRE_NO_ERROR(error);
-
 	bool run = true;
 	while(run) {
 		gen_window_system_event_t event = {0};
@@ -269,6 +264,11 @@ int main(void) {
 		error = gen_gfx_pipeline_frame_end(&context, &targeted, &pipeline, &frame);
 		GEN_REQUIRE_NO_ERROR(error);
 	}
+
+	error = gen_gfx_shader_destroy(&context, &shaders[0]);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_gfx_shader_destroy(&context, &shaders[1]);
+	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_pipeline_destroy(&context, &targeted, &pipeline);
 	GEN_REQUIRE_NO_ERROR(error);
