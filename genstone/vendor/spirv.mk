@@ -7,7 +7,7 @@ SPIRV_CFLAGS = $(_SPIRV_COMMON_CFLAGS)
 SPIRV_LFLAGS = -lspirv
 
 SPIRV_INSTS = genstone/vendor/SPIRV-Tools/source/debuginfo.insts.inc genstone/vendor/SPIRV-Tools/source/nonsemantic.clspvreflection.insts.inc genstone/vendor/SPIRV-Tools/source/nonsemantic.shader.debuginfo.100.insts.inc genstone/vendor/SPIRV-Tools/source/opencl.debuginfo.100.insts.inc genstone/vendor/SPIRV-Tools/source/spv-amd-gcn-shader.insts.inc genstone/vendor/SPIRV-Tools/source/spv-amd-shader-ballot.insts.inc genstone/vendor/SPIRV-Tools/source/spv-amd-shader-explicit-vertex-parameter.insts.inc  genstone/vendor/SPIRV-Tools/source/spv-amd-shader-trinary-minmax.insts.inc
-SPIRV_GENERATED = genstone/vendor/SPIRV-Tools/source/extension_enum.inc genstone/vendor/SPIRV-Tools/source/opencl.std.insts.inc genstone/vendor/SPIRV-Tools/source/glsl.std.450.insts.inc genstone/vendor/SPIRV-Tools/source/core.insts-unified1.inc genstone/vendor/SPIRV-Tools/source/operand.kinds-unified1.inc genstone/vendor/SPIRV-Tools/source/generators.inc
+SPIRV_GENERATED = genstone/vendor/SPIRV-Tools/source/enum_string_mapping.inc genstone/vendor/SPIRV-Tools/source/extension_enum.inc genstone/vendor/SPIRV-Tools/source/opencl.std.insts.inc genstone/vendor/SPIRV-Tools/source/glsl.std.450.insts.inc genstone/vendor/SPIRV-Tools/source/core.insts-unified1.inc genstone/vendor/SPIRV-Tools/source/operand.kinds-unified1.inc genstone/vendor/SPIRV-Tools/source/generators.inc
 SPIRV_C_SOURCES = $(wildcard genstone/vendor/SPIRV-Reflect/*.c)
 SPIRV_CXX_SOURCES = $(wildcard genstone/vendor/SPIRV-Tools/source/*.cpp) $(wildcard genstone/vendor/SPIRV-Tools/source/val/*.cpp) $(wildcard genstone/vendor/SPIRV-Tools/source/util/*.cpp)
 SPIRV_OBJECTS = $(SPIRV_C_SOURCES:.c=$(OBJECT_SUFFIX)) $(SPIRV_CXX_SOURCES:.cpp=$(OBJECT_SUFFIX))

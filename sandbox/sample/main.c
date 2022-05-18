@@ -76,6 +76,11 @@ int main(void) {
 	error = gen_gfx_pipeline_create(&context, &targeted, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
 	GEN_REQUIRE_NO_ERROR(error);
 
+	error = gen_gfx_shader_destroy(&context, &shaders[0]);
+	GEN_REQUIRE_NO_ERROR(error);
+	error = gen_gfx_shader_destroy(&context, &shaders[1]);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	bool run = true;
 	while(run) {
 		gen_window_system_event_t event = {0};
@@ -259,16 +264,11 @@ int main(void) {
 		error = gen_gfx_pipeline_frame_begin(&context, &targeted, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &frame);
 		GEN_REQUIRE_NO_ERROR(error);
 
-		vkCmdDraw(targeted.internal_command_buffer, 3, 1, 0, 0);
+		vkCmdDraw(targeted.internal_command_buffers[pipeline.internal_current_frame], 3, 1, 0, 0);
 
 		error = gen_gfx_pipeline_frame_end(&context, &targeted, &pipeline, &frame);
 		GEN_REQUIRE_NO_ERROR(error);
 	}
-
-	error = gen_gfx_shader_destroy(&context, &shaders[0]);
-	GEN_REQUIRE_NO_ERROR(error);
-	error = gen_gfx_shader_destroy(&context, &shaders[1]);
-	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_pipeline_destroy(&context, &targeted, &pipeline);
 	GEN_REQUIRE_NO_ERROR(error);

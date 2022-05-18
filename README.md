@@ -76,4 +76,5 @@ Setting in-code options can be done via. `-D` flags set via. the config Makefile
 |`GEN_CALC_COMMON_TYPES`|`ENABLED` `DISABLED`|`ENABLED`|Enables the default definition of common vector and matrix types in gencalc||
 |`GEN_FS_FILEWATCH_USE_SYSLIB`|`ENABLED` `DISABLED`|`ENABLED`|Whether to use the system library where implemented to get filewatch functionality|Disabling may make results more consistent across platforms as the alternative uses standard utilities|
 |`GEN_EXIT_PROC`|Any statement. Should not end in a semicolon|`abort()`|The statement to be exected when a fatal program error is encountered|This statement should exit program runtime in all cases - application may be in an unstable state if a fatal error does not result in closure|
+|`GEN_GFX_FRAMES_IN_FLIGHT`|Any number greater than zero|3|The number of frames which can be processed concurrently while the GPU handles previous inbound frames|Large values may cause latency issues, and smaller values may cause stuttering|
 

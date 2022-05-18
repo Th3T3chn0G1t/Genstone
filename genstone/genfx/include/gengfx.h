@@ -21,6 +21,14 @@ GEN_DIAG_IGNORE_ALL
 #include <spirv_reflect.h>
 GEN_DIAG_REGION_END
 
+#ifndef GEN_GFX_FRAMES_IN_FLIGHT
+/**
+ * The number of frames which can be processed concurrently while the GPU handles previous inbound frames.
+ * @note Large values may cause latency issues, and smaller values may cause stuttering.
+ */
+#define GEN_GFX_FRAMES_IN_FLIGHT 3
+#endif
+
 /**
  * State object for a graphics context.
  */
@@ -50,7 +58,7 @@ typedef struct {
     VkViewport internal_viewport;
     VkRect2D internal_scissor;
     VkCommandPool internal_command_pool;
-    VkCommandBuffer internal_command_buffer;
+    VkCommandBuffer internal_command_buffers[GEN_GFX_FRAMES_IN_FLIGHT];
 } gen_gfx_targeted_t;
 
 /**
@@ -91,9 +99,11 @@ typedef struct {
     VkPipelineLayout internal_layout;
     VkPipeline internal_pipeline;
 
-    VkSemaphore internal_image_available_semaphore;
-    VkSemaphore internal_render_finished_semaphore;
-    VkFence internal_in_flight_fence;
+    size_t internal_current_frame;
+
+    VkSemaphore internal_image_available_semaphores[GEN_GFX_FRAMES_IN_FLIGHT];
+    VkSemaphore internal_render_finished_semaphores[GEN_GFX_FRAMES_IN_FLIGHT];
+    VkFence internal_in_flight_fences[GEN_GFX_FRAMES_IN_FLIGHT];
 } gen_gfx_pipeline_t;
 
 /**
@@ -133,6 +143,19 @@ GEN_ERRORABLE gen_gfx_context_destroy(gen_gfx_context_t* const restrict context)
  * @return an error code.
  */
 GEN_ERRORABLE gen_gfx_targeted_create(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targeted_t* const restrict out_targeted);
+
+/**
+ * Updates a targeted graphics instance and associated pipelines to an updated underlying window geometry for the targeted instance.
+ * @param[in,out] context the graphics context from which the targeted instance was created.
+ * @param[in,out] window_system the window system to which the targeted window belongs.
+ * @param[in,out] window the window to update the targeted instance and pipelines' geometry from.
+ * @param[in,out] targeted the targeted graphics instance whose geometry should be adjusted according to `window`.
+ * @param[in,out] pipelines a buffer of pointers to pipelines whose geometry should be adjusted according to `window` and the new state of `targeted`.
+ * @param[in] pipelines_length the number of pipeline pointers in the `pipelines` buffer.
+ * @note Should be called after window resizes to keep gen gfx structures in sync with genuwin.
+ * @return an error code.
+ */
+// GEN_ERRORABLE gen_gfx_targeted_geometry_update(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t** const restrict pipelines, const size_t pipelines_length);
 
 /**
  * Destroys a targeted graphics instance.

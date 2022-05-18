@@ -1037,12 +1037,26 @@ gen_error_t gen_gfx_targeted_create(gen_gfx_context_t* const restrict context, g
 	result = vkCreateCommandPool(context->internal_device, &command_pool_create_info, context->internal_allocator, &out_targeted->internal_command_pool);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateCommandPool);
 
-	const VkCommandBufferAllocateInfo command_buffer_allocate_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, NULL, out_targeted->internal_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1};
-	result = vkAllocateCommandBuffers(context->internal_device, &command_buffer_allocate_info, &out_targeted->internal_command_buffer);
+	const VkCommandBufferAllocateInfo command_buffer_allocate_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, NULL, out_targeted->internal_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, GEN_GFX_FRAMES_IN_FLIGHT};
+	result = vkAllocateCommandBuffers(context->internal_device, &command_buffer_allocate_info, out_targeted->internal_command_buffers);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkAllocateCommandBuffers);
 
 	GEN_ALL_OK;
 }
+
+// gen_error_t gen_gfx_targeted_geometry_update(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targeted_t* const restrict targeted, gen_gfx_pipeline_t** const restrict pipelines, const size_t pipelines_length) {
+// 	GEN_FRAME_BEGIN(gen_gfx_targeted_geometry_update);
+
+// 	GEN_NULL_CHECK(context);
+// 	GEN_NULL_CHECK(window_system);
+// 	GEN_NULL_CHECK(window);
+// 	GEN_NULL_CHECK(targeted);
+// 	if(pipelines_length) GEN_NULL_CHECK(pipelines);
+
+// 	VkResult result = vkDeviceWaitIdle(context->internal_device);
+
+// 	GEN_ALL_OK;
+// }
 
 gen_error_t gen_gfx_targeted_destroy(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targeted_t* const restrict targeted) {
 	GEN_FRAME_BEGIN(gen_gfx_targeted_destroy);
@@ -1148,17 +1162,19 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, c
 	error = gfree(pipeline_shader_stage_create_infos);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 
-	const VkSemaphoreCreateInfo image_available_semaphore_create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, NULL, 0};
-	result = vkCreateSemaphore(context->internal_device, &image_available_semaphore_create_info, context->internal_allocator, &out_pipeline->internal_image_available_semaphore);
-	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSemaphore);
+	for(size_t i = 0; i < GEN_GFX_FRAMES_IN_FLIGHT; ++i) {
+		const VkSemaphoreCreateInfo image_available_semaphore_create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, NULL, 0};
+		result = vkCreateSemaphore(context->internal_device, &image_available_semaphore_create_info, context->internal_allocator, &out_pipeline->internal_image_available_semaphores[i]);
+		GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSemaphore);
 
-	const VkSemaphoreCreateInfo render_finished_semaphore_create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, NULL, 0};
-	result = vkCreateSemaphore(context->internal_device, &render_finished_semaphore_create_info, context->internal_allocator, &out_pipeline->internal_render_finished_semaphore);
-	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSemaphore);
+		const VkSemaphoreCreateInfo render_finished_semaphore_create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, NULL, 0};
+		result = vkCreateSemaphore(context->internal_device, &render_finished_semaphore_create_info, context->internal_allocator, &out_pipeline->internal_render_finished_semaphores[i]);
+		GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSemaphore);
 
-	const VkFenceCreateInfo in_flight_fence_create_info = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, NULL, VK_FENCE_CREATE_SIGNALED_BIT};
-	result = vkCreateFence(context->internal_device, &in_flight_fence_create_info, context->internal_allocator, &out_pipeline->internal_in_flight_fence);
-	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateFence);
+		const VkFenceCreateInfo in_flight_fence_create_info = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, NULL, VK_FENCE_CREATE_SIGNALED_BIT};
+		result = vkCreateFence(context->internal_device, &in_flight_fence_create_info, context->internal_allocator, &out_pipeline->internal_in_flight_fences[i]);
+		GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateFence);
+	}
 
 	GEN_ALL_OK;
 }
@@ -1170,27 +1186,27 @@ gen_error_t gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict conte
 	GEN_NULL_CHECK(targeted);
 	GEN_NULL_CHECK(pipeline);
 
-	VkResult result = vkWaitForFences(context->internal_device, 1, &pipeline->internal_in_flight_fence, VK_TRUE, UINT64_MAX);
+	VkResult result = vkWaitForFences(context->internal_device, 1, &pipeline->internal_in_flight_fences[pipeline->internal_current_frame], VK_TRUE, UINT64_MAX);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkWaitForFences);
 
-	result = vkResetFences(context->internal_device, 1, &pipeline->internal_in_flight_fence);
+	result = vkResetFences(context->internal_device, 1, &pipeline->internal_in_flight_fences[pipeline->internal_current_frame]);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkResetFences);
 
-	result = vkAcquireNextImageKHR(context->internal_device, targeted->internal_swapchain, UINT64_MAX, pipeline->internal_image_available_semaphore, VK_NULL_HANDLE, &out_frame->internal_image_index);
+	result = vkAcquireNextImageKHR(context->internal_device, targeted->internal_swapchain, UINT64_MAX, pipeline->internal_image_available_semaphores[pipeline->internal_current_frame], VK_NULL_HANDLE, &out_frame->internal_image_index);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkAcquireNextImageKHR);
 
-	result = vkResetCommandBuffer(targeted->internal_command_buffer, 0);
+	result = vkResetCommandBuffer(targeted->internal_command_buffers[pipeline->internal_current_frame], 0);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkResetCommandBuffer);
 
 	const VkCommandBufferBeginInfo command_buffer_begin_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, NULL, 0, NULL};
-	result = vkBeginCommandBuffer(targeted->internal_command_buffer, &command_buffer_begin_info);
+	result = vkBeginCommandBuffer(targeted->internal_command_buffers[pipeline->internal_current_frame], &command_buffer_begin_info);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkBeginCommandBuffer);
 
 	const VkClearValue clear_value = {.color = {.float32 = {clear_color.x, clear_color.y, clear_color.z, clear_color.w}}};
 	const VkRenderPassBeginInfo render_pass_begin_info = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO, NULL, pipeline->internal_render_pass, targeted->internal_framebuffers[out_frame->internal_image_index], {{0, 0}, {(uint32_t) targeted->internal_swapchain_image_extent.x, (uint32_t) targeted->internal_swapchain_image_extent.y}}, 1, &clear_value};
-	vkCmdBeginRenderPass(targeted->internal_command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(targeted->internal_command_buffers[pipeline->internal_current_frame], &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
-	vkCmdBindPipeline(targeted->internal_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->internal_pipeline);
+	vkCmdBindPipeline(targeted->internal_command_buffers[pipeline->internal_current_frame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->internal_pipeline);
 
 	GEN_ALL_OK;
 }
@@ -1202,20 +1218,22 @@ gen_error_t gen_gfx_pipeline_frame_end(gen_gfx_context_t* const restrict context
 	GEN_NULL_CHECK(targeted);
 	GEN_NULL_CHECK(pipeline);
 
-	vkCmdEndRenderPass(targeted->internal_command_buffer);
+	vkCmdEndRenderPass(targeted->internal_command_buffers[pipeline->internal_current_frame]);
 
-	VkResult result = vkEndCommandBuffer(targeted->internal_command_buffer);
+	VkResult result = vkEndCommandBuffer(targeted->internal_command_buffers[pipeline->internal_current_frame]);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkEndCommandBuffer);
 
 	const VkPipelineStageFlags flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-	const VkSubmitInfo submit_info = {VK_STRUCTURE_TYPE_SUBMIT_INFO, NULL, 1, &pipeline->internal_image_available_semaphore, flags, 1, &targeted->internal_command_buffer, 1, &pipeline->internal_render_finished_semaphore};
+	const VkSubmitInfo submit_info = {VK_STRUCTURE_TYPE_SUBMIT_INFO, NULL, 1, &pipeline->internal_image_available_semaphores[pipeline->internal_current_frame], flags, 1, &targeted->internal_command_buffers[pipeline->internal_current_frame], 1, &pipeline->internal_render_finished_semaphores[pipeline->internal_current_frame]};
 
-	result = vkQueueSubmit(context->internal_graphics_queue, 1, &submit_info, pipeline->internal_in_flight_fence);
+	result = vkQueueSubmit(context->internal_graphics_queue, 1, &submit_info, pipeline->internal_in_flight_fences[pipeline->internal_current_frame]);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueueSubmit);
 
-	const VkPresentInfoKHR present_info = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, NULL, 1, &pipeline->internal_render_finished_semaphore, 1, &targeted->internal_swapchain, &frame->internal_image_index, NULL};
+	const VkPresentInfoKHR present_info = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, NULL, 1, &pipeline->internal_render_finished_semaphores[pipeline->internal_current_frame], 1, &targeted->internal_swapchain, &frame->internal_image_index, NULL};
 	result = vkQueuePresentKHR(context->internal_graphics_queue, &present_info);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueuePresentKHR);
+
+	pipeline->internal_current_frame = (pipeline->internal_current_frame + 1) % GEN_GFX_FRAMES_IN_FLIGHT;
 
 	GEN_ALL_OK;
 }
@@ -1236,9 +1254,11 @@ gen_error_t gen_gfx_pipeline_destroy(gen_gfx_context_t* const restrict context, 
 	gen_error_t error = gfree(targeted->internal_framebuffers);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 
-	vkDestroySemaphore(context->internal_device, pipeline->internal_image_available_semaphore, context->internal_allocator);
-	vkDestroySemaphore(context->internal_device, pipeline->internal_render_finished_semaphore, context->internal_allocator);
-	vkDestroyFence(context->internal_device, pipeline->internal_in_flight_fence, context->internal_allocator);
+	for(size_t i = 0; i < GEN_GFX_FRAMES_IN_FLIGHT; ++i) {
+		vkDestroySemaphore(context->internal_device, pipeline->internal_image_available_semaphores[i], context->internal_allocator);
+		vkDestroySemaphore(context->internal_device, pipeline->internal_render_finished_semaphores[i], context->internal_allocator);
+		vkDestroyFence(context->internal_device, pipeline->internal_in_flight_fences[i], context->internal_allocator);
+	}
 
 	vkDestroyRenderPass(context->internal_device, pipeline->internal_render_pass, context->internal_allocator);
 	vkDestroyPipelineLayout(context->internal_device, pipeline->internal_layout, context->internal_allocator);
