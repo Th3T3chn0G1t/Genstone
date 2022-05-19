@@ -892,7 +892,13 @@ gen_error_t gen_window_fetch(gen_window_system_t* const restrict window_system, 
 			break;
 		}
 		case GEN_WINDOW_ATTRIBUTE_POSITION: {
-			GEN_ERROR_OUT(GEN_NOT_IMPLEMENTED, "Not yet implemented");
+			xcb_get_geometry_cookie_t cookie = xcb_get_geometry(window_system->internal_connection, window->window);
+			xcb_get_geometry_reply_t* reply = xcb_get_geometry_reply(window_system->internal_connection, cookie, NULL);
+			if(!reply) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to fetch window geometry");
+			out_attribute->type = GEN_WINDOW_ATTRIBUTE_EXTENT;
+			out_attribute->position.x = reply->x;
+			out_attribute->position.y = reply->y;
+			free(reply);
 			break;
 		}
 		case GEN_WINDOW_ATTRIBUTE_EXTENT: {

@@ -3,6 +3,8 @@
 
 #include "include/gengfx.h"
 
+GEN_DIAG_REGION_BEGIN
+#pragma clang diagnostic ignored "-Wunused-macros"
 #define GEN_INTERNAL_VK_EXT_LOAD(name) \
 	gen_internal_##name##_ptr = (__typeof__(gen_internal_##name##_ptr)) vkGetInstanceProcAddr(context->internal_instance, #name); \
 	if(!gen_internal_##name##_ptr) GEN_ERROR_OUT(GEN_NO_SUCH_OBJECT, "Failed to load extension proc `" #name "`")
@@ -17,8 +19,11 @@
 
 #define GEN_INTERNAL_VK_EXT_PROC_TAIL ); \
 	}
+GEN_DIAG_REGION_END
 
 // clang-format off
+
+#if MODE == DEBUG
 GEN_INTERNAL_VK_EXT_PROC(
 	vkCreateDebugUtilsMessengerEXT,
 	VkResult,
@@ -33,14 +38,19 @@ GEN_INTERNAL_VK_EXT_VOID_PROC(
 )
     instance, messenger, pAllocator
 GEN_INTERNAL_VK_EXT_PROC_TAIL
+#endif
 
-gen_error_t gen_internal_gfx_context_load_extensions(const gen_gfx_context_t *const restrict context) {
+	// clang-format on
+
+	gen_error_t gen_internal_gfx_context_load_extensions(const gen_gfx_context_t *const restrict context) {
 	GEN_FRAME_BEGIN(gen_internal_gfx_context_load_extensions);
 
 	GEN_NULL_CHECK(context);
 
+#if MODE == DEBUG
 	GEN_INTERNAL_VK_EXT_LOAD(vkCreateDebugUtilsMessengerEXT);
 	GEN_INTERNAL_VK_EXT_LOAD(vkDestroyDebugUtilsMessengerEXT);
+#endif
 
 	GEN_ALL_OK;
 }

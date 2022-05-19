@@ -28,8 +28,8 @@ int main(void) {
 	error = gen_gfx_context_create(&context);
 	GEN_REQUIRE_NO_ERROR(error);
 
-	gen_gfx_targeted_t targeted = {0};
-	error = gen_gfx_targeted_create(&context, &window_system, &window, &targeted);
+	gen_gfx_targetable_t targetable = {0};
+	error = gen_gfx_targetable_create(&context, &window_system, &window, &targetable);
 	GEN_REQUIRE_NO_ERROR(error);
 
 	gen_gfx_shader_t shaders[2] = {0};
@@ -73,7 +73,7 @@ int main(void) {
 	GEN_REQUIRE_NO_ERROR(error);
 
 	gen_gfx_pipeline_t pipeline = {0};
-	error = gen_gfx_pipeline_create(&context, &targeted, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
+	error = gen_gfx_pipeline_create(&context, &targetable, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
 	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_shader_destroy(&context, &shaders[0]);
@@ -239,6 +239,8 @@ int main(void) {
 						}
 						case GEN_WINDOW_ATTRIBUTE_EXTENT: {
 							glogf(DEBUG, "Window extent updated to %ix%i", event.attribute.extent.x, event.attribute.extent.y);
+							error = gen_gfx_targetable_geometry_update(&context, &window_system, &window, &targetable, event.attribute.extent);
+							GEN_REQUIRE_NO_ERROR(error);
 							break;
 						}
 						case GEN_WINDOW_ATTRIBUTE_NAME: {
@@ -261,19 +263,19 @@ int main(void) {
 
 		gen_gfx_frame_t frame = {0};
 
-		error = gen_gfx_pipeline_frame_begin(&context, &targeted, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &frame);
+		error = gen_gfx_pipeline_frame_begin(&context, &targetable, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &frame);
 		GEN_REQUIRE_NO_ERROR(error);
 
-		vkCmdDraw(targeted.internal_command_buffers[pipeline.internal_current_frame], 3, 1, 0, 0);
+		vkCmdDraw(targetable.internal_command_buffers[pipeline.internal_current_frame], 3, 1, 0, 0);
 
-		error = gen_gfx_pipeline_frame_end(&context, &targeted, &pipeline, &frame);
+		error = gen_gfx_pipeline_frame_end(&context, &targetable, &pipeline, &frame);
 		GEN_REQUIRE_NO_ERROR(error);
 	}
 
-	error = gen_gfx_pipeline_destroy(&context, &targeted, &pipeline);
+	error = gen_gfx_pipeline_destroy(&context, &targetable, &pipeline);
 	GEN_REQUIRE_NO_ERROR(error);
 
-	error = gen_gfx_targeted_destroy(&context, &window_system, &window, &targeted);
+	error = gen_gfx_targetable_destroy(&context, &window_system, &window, &targetable);
 	GEN_REQUIRE_NO_ERROR(error);
 
 	error = gen_gfx_context_destroy(&context);

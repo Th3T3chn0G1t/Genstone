@@ -18,6 +18,8 @@
 - Add next for every gen foreach
 - Uncomment submodule initialization in vulkan Makefiles
 - Review static analysis warning-creep
+- Audio
+- Networking
 - Memory equivalent to `genstring`
     - `memcpy`
     - Replace `mem*` family in Genstone with in-house wrappers
