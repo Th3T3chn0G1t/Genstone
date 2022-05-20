@@ -139,7 +139,7 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found) {
+gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found) {
 	GEN_FRAME_BEGIN(gen_string_character_first);
 
 	GEN_NULL_CHECK(string);
@@ -166,7 +166,7 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found) {
+gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found) {
 	GEN_FRAME_BEGIN(gen_string_character_last);
 
 	GEN_NULL_CHECK(string);

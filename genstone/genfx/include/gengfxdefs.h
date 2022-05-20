@@ -10,6 +10,7 @@
 #define GEN_GRAPHICS_DEFS_H
 
 #include <gencommon.h>
+#include <gencalc.h>
 
 /**
  * Bitdepth values for graphics buffers.
@@ -93,6 +94,16 @@ typedef struct {
      * The contents of the buffer.
      */
     unsigned char* data;
+    union {
+        /**
+         * The size of the buffer.
+         */
+        size_t size;
+        /**
+         * The dimensions of the buffer.
+         */
+        gint2 dimensions;
+    };
 } gen_gfx_buffer_t;
 
 #endif

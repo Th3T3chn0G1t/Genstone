@@ -75,7 +75,7 @@ GEN_ERRORABLE gen_string_duplicate(const char* const restrict string, const size
  * @param[out] out_found pointer to storage for a pointer to the found occurrence, or NULL if the character was not found.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found);
+GEN_ERRORABLE gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found);
 /**
  * Finds the last occurrence of a character in a string.
  * @param[in] string the string to search in.
@@ -85,7 +85,7 @@ GEN_ERRORABLE gen_string_character_first(const char* const restrict string, cons
  * @param[out] out_found pointer to storage for a pointer to the found occurrence, or NULL if the character was not found.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char* restrict* const restrict out_found);
+GEN_ERRORABLE gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found);
 
 /**
  * Creates a number from a numeric string.

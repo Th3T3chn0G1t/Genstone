@@ -11,6 +11,11 @@
 #define GEN_MEMORY_H
 
 /**
+ * A value which can be used in place of buffer bounds in the event that no bounding should be performed.
+ */
+#define GEN_MEMORY_NO_BOUNDS SIZE_MAX
+
+/**
  * Allocates memory on the heap.
  * Ensures memory is zeroed before returning.
  * @param[out] out_address pointer to storage for a pointer into the allocated heap block.

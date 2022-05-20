@@ -33,6 +33,7 @@ vulkan: build_message_vulkan $(VULKAN_LIB) ### @Vendor Builds Vulkan as a Gensto
 $(VULKAN_LIB): CFLAGS = $(_VULKAN_CFLAGS)
 $(VULKAN_LIB): LFLAGS = -Llib $(_VULKAN_LFLAGS)
 $(VULKAN_LIB): CLANG_FORMAT = DISABLED
+$(VULKAN_LIB): CFISAN_FLAGS = -fno-lto
 $(VULKAN_LIB): $(VULKAN_OBJECTS) | lib
 
 clean_vulkan:

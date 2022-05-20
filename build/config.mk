@@ -29,6 +29,9 @@ GLOBAL_C_FLAGS =
 # Flags to be provided to the C++ compiler at every call
 GLOBAL_CXX_FLAGS =
 
+# Flags to be provided to GLSLC at every call
+GLOBAL_GLSL_FLAGS =
+
 # Flags to be provided to the linker through the compiler at every call
 # In order to pass through direct linker flags, use `-Wl,-foo,--bar,value,option`
 GLOBAL_L_FLAGS =
@@ -49,6 +52,13 @@ AUTO_APPLY_FORMAT = ENABLED
 # `ENABLED`: Apply tooling
 # `DISABLED`: Don't apply tooling
 TOOLING = ENABLED
+
+# Whether or not to enforce control flow integrity checks at runtime
+# Possible values are:
+# `ENABLED`: Enforce CFI
+# `DISABLED`: Don't enforce CFI
+# WARNING: THIS IS HORRIBLY BROKEN RIGHT NOW AND I HAVE NO IDEA WHY
+CFI = DISABLED
 
 # Whether to perform static analysis
 # Possible values are:

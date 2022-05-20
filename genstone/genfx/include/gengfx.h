@@ -41,6 +41,9 @@ typedef struct {
 
     uint32_t internal_graphics_queue_index;
     VkQueue internal_graphics_queue;
+
+    uint32_t internal_transfer_queue_index;
+    VkQueue internal_transfer_queue;
 } gen_gfx_context_t;
 
 /**
@@ -65,13 +68,18 @@ typedef struct {
 
     VkCommandPool internal_command_pool;
     VkCommandBuffer internal_command_buffers[GEN_GFX_FRAMES_IN_FLIGHT];
+
+    VkCommandPool internal_transfer_command_pool;
+    VkCommandBuffer internal_transfer_command_buffer;
 } gen_gfx_targetable_t;
 
 /**
  * State object for a graphics pipeline.
  */
 typedef struct {
+    size_t vertex_size;
     VkPipelineLayout internal_layout;
+
     VkPipeline internal_pipeline;
 
     size_t internal_current_frame;
@@ -116,7 +124,17 @@ typedef struct {
      */
     size_t data_size;
     VkShaderModule internal_shader_module;
+    SpvReflectShaderModule internal_reflected_module;
 } gen_gfx_shader_t;
+
+/**
+ * Wrapper for `gen_gfx_buffer_t` used for buffers intended for drawing operations.
+ */
+typedef struct {
+    gen_gfx_buffer_t buffer;
+    VkBuffer internal_buffer;
+    VkDeviceMemory internal_memory;
+} gen_gfx_draw_buffer_t;
 
 /**
  * Creates a graphics context.
@@ -127,11 +145,11 @@ typedef struct {
 GEN_ERRORABLE gen_gfx_context_create(gen_gfx_context_t* const restrict out_context);
 
 /**
- * Waits for the device to complete operations preceeding a shutdown.
+ * Waits for the device to complete pending operations.
  * @param[in,out] context the graphics context to wait on.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_shutdown_pre(gen_gfx_context_t* const restrict context);
+GEN_ERRORABLE gen_gfx_context_await(gen_gfx_context_t* const restrict context);
 
 /**
  * Destroys a graphics context.
@@ -176,10 +194,11 @@ GEN_ERRORABLE gen_gfx_targetable_destroy(gen_gfx_context_t* const restrict conte
  * @param[in,out] context the graphics context from which to create the pipeline.
  * @param[in,out] targetable the targetable instance to associate the pipeline with.
  * @param[out] out_pipeline pointer to storage for the created pipeline.
- * @param[in] shaders the shaders from which to construct the pipeline.
+ * @param[in] shaders a buffer of pointers to shaders from which to construct the pipeline.
+ * @param[in] shaders_length the number of shaders pointed to by shaders.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, const gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t* const restrict shaders, const size_t shaders_length);
+GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, const gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t** const restrict shaders, const size_t shaders_length);
 
 /**
  * Starts a graphics frame using a graphics pipeline to target a targetable graphics instance.
@@ -192,6 +211,17 @@ GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context,
  * @return an error code.
  */
 GEN_ERRORABLE gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_frame_t* const restrict out_frame);
+
+/**
+ * Queues a draw call submitting a vertex buffer to draw for the frame.
+ * @param[in,out] context the graphics context from which the graphics pipeline was created.
+ * @param[in,out] targetable the targetable instance the pipeline to which the frame belongs is associated with.
+ * @param[in,out] pipeline the pipeline to which the frame belongs.
+ * @param[in] vertex_buffer the vertex buffer to draw.
+ * @param[in,out] frame the frame state object for this frame.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_pipeline_frame_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_frame_t* const restrict frame);
 
 /**
  * Starts a graphics frame using a graphics pipeline to target a targetable graphics instance.
@@ -229,6 +259,24 @@ GEN_ERRORABLE gen_gfx_shader_create(gen_gfx_context_t* const restrict context, g
  * @return an error code.
  */
 GEN_ERRORABLE gen_gfx_shader_destroy(gen_gfx_context_t* const restrict context, gen_gfx_shader_t* const restrict shader);
+
+/**
+ * Creates a vertex buffer to use for drawing.
+ * @param[in,out] context the graphics context in which to create the vertex buffer.
+ * @param[in] data the raw vertex data.
+ * @param[in] size the size of the vertex data.
+ * @param[out] out_buffer pointer to storage for the created vertex buffer.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict context, const uint8_t* const restrict data, const size_t size, gen_gfx_draw_buffer_t* const restrict out_buffer);
+
+/**
+ * Destroys a vertex buffer.
+ * @param[in,out] context the graphics context from which the vertex buffer was created.
+ * @param[in,out] buffer the vertex buffer to destroy.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_vertex_buffer_destroy(gen_gfx_context_t* const restrict context, gen_gfx_draw_buffer_t* const restrict buffer);
 
 GEN_ERRORABLE gen_internal_gfx_context_load_extensions(const gen_gfx_context_t* const restrict context);
 

@@ -65,6 +65,9 @@ endif
 ifneq ($(OVERRIDE_GLOBAL_CXX_FLAGS),)
 GLOBAL_C_FLAGS = $(OVERRIDE_GLOBAL_CXX_FLAGS)
 endif
+ifneq ($(OVERRIDE_GLOBAL_GLSL_FLAGS),)
+GLOBAL_GLSL_FLAGS = $(OVERRIDE_GLOBAL_GLSL_FLAGS)
+endif
 ifneq ($(OVERRIDE_GLOBAL_L_FLAGS),)
 GLOBAL_L_FLAGS = $(OVERRIDE_GLOBAL_L_FLAGS)
 endif
@@ -73,6 +76,9 @@ COMPILER = $(OVERRIDE_COMPILER)
 endif
 ifneq ($(OVERRIDE_COMPILERXX),)
 COMPILERXX = $(OVERRIDE_COMPILERXX)
+endif
+ifneq ($(OVERRIDE_GLSLC),)
+GLSLC = $(OVERRIDE_GLSLC)
 endif
 ifneq ($(OVERRIDE_PYTHON3),)
 PYTHON3 = $(OVERRIDE_PYTHON3)
@@ -100,6 +106,9 @@ STATIC_ANALYSIS = $(OVERRIDE_STATIC_ANALYSIS)
 endif
 ifneq ($(OVERRIDE_TOOLING),)
 TOOLING = $(OVERRIDE_TOOLING)
+endif
+ifneq ($(OVERRIDE_CFI),)
+CFI = $(OVERRIDE_CFI)
 endif
 ifneq ($(OVERRIDE_STRIP_BINARIES),)
 STRIP_BINARIES = $(OVERRIDE_STRIP_BINARIES)
@@ -166,6 +175,11 @@ ERROR += "$(ERROR_PREFIX) Invalid value for TOOLING: \"$(TOOLING)\"\n"
 endif
 endif
 
+ifneq ($(CFI),ENABLED)
+ifneq ($(CFI),DISABLED)
+ERROR += "$(ERROR_PREFIX) Invalid value for CFI: \"$(CFI)\"\n"
+endif
+endif
 
 ifneq ($(STRIP_BINARIES),ENABLED)
 ifneq ($(STRIP_BINARIES),DISABLED)
@@ -206,7 +220,8 @@ else
 ECHO = echo -e
 endif
 
-GLOBAL_C_FLAGS += -std=gnu2x -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM)
+GLOBAL_C_FLAGS += -std=gnu2x -fcomment-block-commands=example -fmacro-backtrace-limit=0 -Wthread-safety -D__STDC_WANT_LIB_EXT1__=1 -DDEBUG=1 -DRELEASE=0 -DMODE=$(BUILD_MODE) -DENABLED=1 -DDISABLED=0 -DDWN=2 -DLNX=3 -DPLATFORM=$(PLATFORM) -fvisibility=default
+GLOBAL_GLSL_FLAGS += -x glsl -Werror --target-env=vulkan1.3 -std=450core
 
 ifeq ($(STRIP_BINARIES),ENABLED)
 GLOBAL_L_FLAGS += -Wl,-s
@@ -215,7 +230,8 @@ ifeq ($(STRIP_BINARIES),DEBUG)
 GLOBAL_L_FLAGS += -Wl,-S
 endif
 
-DEPENDENCY_GEN_FLAGS = -MM -MF$(subst .o,.depfile,$@) 
+DEPENDENCY_GEN_FLAGS = -MM -MF$(subst $(suffix $@),.depfile,$@) 
+GLSL_DEPENDENCY_GEN_FLAGS = -MM -MF $(subst $(suffix $@),.depfile,$@) 
 
 CLANG_STATIC_ANALYZER_FLAGS = -Xanalyzer -analyzer-output=text
 
@@ -274,6 +290,7 @@ endif
 
 ifeq ($(BUILD_MODE),RELEASE)
 	GLOBAL_C_FLAGS += -m64 -Ofast -ffast-math -DNDEBUG -flto -fopenmp -mllvm -polly -mllvm -polly-parallel -mllvm -polly-omp-backend=LLVM
+	GLOBAL_GLSL_FLAGS += -O
 	GLOBAL_L_FLAGS += -flto -fopenmp
 
 	ifeq ($(PLATFORM),LNX)
@@ -284,8 +301,8 @@ ifeq ($(BUILD_MODE),RELEASE)
 		GLOBAL_L_FLAGS += -Wl,-dead_strip,-no_implicit_dylibs,-warn_unused_dylibs,-dead_strip_dylibs,-interposable,-warn_stabs,-warn_commons,-debug_variant,-unaligned_pointers,warning
 	endif
 else
-	GLOBAL_C_FLAGS += -m64 -glldb -O0 -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-lto -fno-omit-frame-pointer
-	GLOBAL_L_FLAGS += -fno-lto
+	GLOBAL_C_FLAGS += -m64 -glldb -O0 -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-omit-frame-pointer
+	GLOBAL_GLSL_FLAGS += -g -O0
 
 	ifeq ($(PLATFORM),DWN)
 		GLOBAL_L_FLAGS += -Wl,-random_uuid,-warn_stabs,-warn_commons
@@ -296,6 +313,14 @@ ifeq ($(TOOLING),ENABLED)
 	GLOBAL_C_FLAGS += -fsanitize=undefined,address
 	GLOBAL_L_FLAGS += -fsanitize=undefined,address
 endif
+
+# Need this weird separation due to an LLD bug
+ifeq ($(CFI),ENABLED)
+	CFISAN_FLAGS = -flto=thin -fsanitize=cfi
+else
+	CFISAN_FLAGS = -fno-lto
+endif
+
 
 CXX_DISALLOWED_CFLAGS = -std=gnu2x
 GLOBAL_CXX_FLAGS += -std=gnu++20 $(GLOBAL_C_FLAGS)
@@ -328,16 +353,52 @@ clean_clang_tooling_artifacts:
 tmp:
 	-mkdir $@
 
-%$(OBJECT_SUFFIX): %.c build/config.mk | tmp
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
-	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFLAGS) -o $@ $<
+%.spv: %.vert build/config.mk | tmp
+	@$(ECHO) "$(ACTION_PREFIX)$(GLSLC) -fshader-stage=vertex $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(GLSLC) -fshader-stage=vertex $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) -o $@ $<
 
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
-	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<
+	@$(ECHO) "$(ACTION_PREFIX)$(GLSLC) -fshader-stage=vertex $(GLSL_DEPENDENCY_GEN_FLAGS) $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) $<$(ACTION_SUFFIX) > $(subst $(suffix $@),.depfile,$@)"
+	@$(GLSLC) -fshader-stage=vertex $(GLSL_DEPENDENCY_GEN_FLAGS) $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) $< > $(subst $(suffix $@),.depfile,$@)
+
+	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)
+
+ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+	-@$(CLANG_FORMAT) -i $<
+else
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
+	-@$(CLANG_FORMAT) --dry-run -Werror $<
+endif
+
+%.spv: %.frag build/config.mk | tmp
+	@$(ECHO) "$(ACTION_PREFIX)$(GLSLC) -fshader-stage=fragment $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(GLSLC) -fshader-stage=fragment $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) -o $@ $<
+
+	@$(ECHO) "$(ACTION_PREFIX)$(GLSLC) -fshader-stage=fragment $(GLSL_DEPENDENCY_GEN_FLAGS) $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) $< > $(subst $(suffix $@),.depfile,$@)$(ACTION_SUFFIX)"
+	@$(GLSLC) -fshader-stage=fragment $(GLSL_DEPENDENCY_GEN_FLAGS) $(GLOBAL_GLSL_FLAGS) $(GLSLFLAGS) $< > $(subst $(suffix $@),.depfile,$@)
+
+	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
+	-@($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)
+
+ifeq ($(AUTO_APPLY_FORMAT),ENABLED)
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+	-@$(CLANG_FORMAT) -i $<
+else
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) --dry-run -Werror $<$(ACTION_SUFFIX)"
+	-@$(CLANG_FORMAT) --dry-run -Werror $<
+endif
+
+%$(OBJECT_SUFFIX): %.c build/config.mk | tmp
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) -o $@ $<
+
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFISAN_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILER) -c $(GLOBAL_C_FLAGS) $(CFISAN_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) -o $@ $<
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
-	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILER) $(GLOBAL_C_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(COMPILER) $(GLOBAL_C_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
 	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"
@@ -352,15 +413,15 @@ else
 endif
 
 %$(OBJECT_SUFFIX): %.cpp build/config.mk | tmp
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<$(ACTION_SUFFIX)"
-	@$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<$(ACTION_SUFFIX)"
-	@$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFISAN_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) -c $(GLOBAL_CXX_FLAGS) $(CFISAN_FLAGS) $(DEPENDENCY_GEN_FLAGS) $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
-	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
-	@$(COMPILERXX) $(GLOBAL_CXX_FLAGS) $(CFLAGS) $(CXXFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
+	@$(ECHO) "$(ACTION_PREFIX)$(COMPILERXX) $(GLOBAL_CXX_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) $(CXXFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<$(ACTION_SUFFIX)"
+	@$(COMPILERXX) $(GLOBAL_CXX_FLAGS) $(CFISAN_FLAGS) $(CFLAGS) $(CXXFLAGS) --analyze $(CLANG_STATIC_ANALYZER_FLAGS) $<
 endif
 
 	@$(ECHO) "$(ACTION_PREFIX)($(CLANG_FORMAT) --style=file $< > tmp/$(notdir $<)-format.tmp) && (diff $< tmp/$(notdir $<)-format.tmp)$(ACTION_SUFFIX)"

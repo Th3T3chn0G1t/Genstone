@@ -13,6 +13,9 @@ COMPILER = clang
 # This is unlikely to work with compilers other than clang++
 COMPILERXX = clang++
 
+# The glslc binary to use
+GLSLC = glslc
+
 # The python3 command line to use
 PYTHON3 = python3
 
