@@ -1339,8 +1339,8 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, c
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_frame_t* const restrict out_frame) {
-	GEN_FRAME_BEGIN(gen_gfx_pipeline_frame_begin);
+gen_error_t gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_pipeline_scope_t* const restrict out_frame) {
+	GEN_FRAME_BEGIN(gen_gfx_pipeline_scope_begin);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targetable);
@@ -1375,8 +1375,8 @@ gen_error_t gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict conte
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_frame_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_frame_t* const restrict frame) {
-	GEN_FRAME_BEGIN(gen_gfx_pipeline_frame_draw_vertex_buffer);
+gen_error_t gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_pipeline_scope_t* const restrict frame) {
+	GEN_FRAME_BEGIN(gen_gfx_pipeline_scope_draw_vertex_buffer);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targetable);
@@ -1391,8 +1391,8 @@ gen_error_t gen_gfx_pipeline_frame_draw_vertex_buffer(gen_gfx_context_t* const r
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_frame_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_frame_t* const restrict frame) {
-	GEN_FRAME_BEGIN(gen_gfx_pipeline_frame_end);
+gen_error_t gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_pipeline_scope_t* const restrict frame) {
+	GEN_FRAME_BEGIN(gen_gfx_pipeline_scope_end);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targetable);
@@ -1508,7 +1508,17 @@ gen_error_t gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict conte
 
 	out_buffer->buffer.size = size;
 
-	const VkBufferCreateInfo buffer_create_info = {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, NULL, 0, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_SHARING_MODE_EXCLUSIVE, 0, NULL};
+	VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE;
+	const uint32_t* queues = NULL;
+	size_t queues_length = 0;
+	const uint32_t concurrent_queues[] = {context->internal_graphics_queue_index, context->internal_transfer_queue_index};
+	if(context->internal_graphics_queue_index != context->internal_transfer_queue_index) {
+		sharing_mode = VK_SHARING_MODE_CONCURRENT;
+		queues = concurrent_queues;
+		queues_length = sizeof(concurrent_queues) / sizeof(concurrent_queues[0]);
+	}
+
+	const VkBufferCreateInfo buffer_create_info = {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, NULL, 0, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, sharing_mode, (uint32_t) queues_length, queues};
 	VkResult result = vkCreateBuffer(context->internal_device, &buffer_create_info, context->internal_allocator, &out_buffer->internal_buffer);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateBuffer);
 

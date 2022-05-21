@@ -36,9 +36,13 @@ int main(void) {
 		{{-0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
 		{{0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}};
 
+	// gen_gfx_data_upload_scope_begin
+
 	gen_gfx_draw_buffer_t triangle = {0};
 	error = gen_gfx_vertex_buffer_create(&context, (uint8_t*) triangle_vertices, sizeof(triangle_vertices), &triangle);
 	GEN_REQUIRE_NO_ERROR(error);
+
+	// gen_gfx_data_upload_scope_end
 
 	gen_gfx_shader_t vertex = {0};
 	gen_gfx_shader_t fragment = {0};
@@ -132,15 +136,15 @@ int main(void) {
 			}
 		} while(event.type != GEN_WINDOW_SYSTEM_EVENT_NONE);
 
-		gen_gfx_frame_t frame = {0};
+		gen_gfx_pipeline_scope_t scope = {0};
 
-		error = gen_gfx_pipeline_frame_begin(&context, &targetable, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &frame);
+		error = gen_gfx_pipeline_scope_begin(&context, &targetable, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &scope);
 		GEN_REQUIRE_NO_ERROR(error);
 
-		error = gen_gfx_pipeline_frame_draw_vertex_buffer(&context, &targetable, &pipeline, &triangle, &frame);
+		error = gen_gfx_pipeline_scope_draw_vertex_buffer(&context, &targetable, &pipeline, &triangle, &scope);
 		GEN_REQUIRE_NO_ERROR(error);
 
-		error = gen_gfx_pipeline_frame_end(&context, &targetable, &pipeline, &frame);
+		error = gen_gfx_pipeline_scope_end(&context, &targetable, &pipeline, &scope);
 		GEN_REQUIRE_NO_ERROR(error);
 	}
 

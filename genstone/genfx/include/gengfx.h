@@ -94,7 +94,7 @@ typedef struct {
  */
 typedef struct {
     uint32_t internal_image_index;
-} gen_gfx_frame_t;
+} gen_gfx_pipeline_scope_t;
 
 /**
  * Type for shader programs.
@@ -207,10 +207,10 @@ GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context,
  * @param[in,out] pipeline the pipeline to begin the frame on.
  * @param[in] clear_color the clear color to start the frame with.
  * @param[out] out_frame pointer to storage for a frame state object.
- * @note the frame must be terminated with a call to `gen_gfx_pipeline_frame_end`.
+ * @note the frame must be terminated with a call to `gen_gfx_pipeline_scope_end`.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_frame_t* const restrict out_frame);
+GEN_ERRORABLE gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_pipeline_scope_t* const restrict out_frame);
 
 /**
  * Queues a draw call submitting a vertex buffer to draw for the frame.
@@ -221,17 +221,17 @@ GEN_ERRORABLE gen_gfx_pipeline_frame_begin(gen_gfx_context_t* const restrict con
  * @param[in,out] frame the frame state object for this frame.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_frame_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_frame_t* const restrict frame);
+GEN_ERRORABLE gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_pipeline_scope_t* const restrict frame);
 
 /**
  * Starts a graphics frame using a graphics pipeline to target a targetable graphics instance.
  * @param[in,out] context the graphics context from which the graphics pipeline was created.
  * @param[in,out] targetable the targetable instance the pipeline was associated with.
  * @param[in,out] pipeline the pipeline to begin the frame on.
- * @param[in] frame the frame state object from the corresponding `gen_gfx_pipeline_frame_begin` call.
+ * @param[in] frame the frame state object from the corresponding `gen_gfx_pipeline_scope_begin` call.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_frame_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_frame_t* const restrict frame);
+GEN_ERRORABLE gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_pipeline_scope_t* const restrict frame);
 
 /**
  * Destroys a graphics pipeline.
