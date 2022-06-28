@@ -17,9 +17,9 @@ build_message_vulkan_validation:
 	@$(ECHO) "$(SECTION_PREFIX) Vulkan Validation"
 	@$(ECHO) "$(INFO_PREFIX) Khronos helps us not be stupid"
 
-vulkan_validation: build_message_vulkan_validation $(VULKAN_VALIDATION_REDIRECT) $(VULKAN_VALIDATION_LIB) ### @Vendor Builds Vulkan Validation Layers as a Genstone module
+vulkan_validation: build_message_vulkan_validation $(VULKAN_VALIDATION_LIB) | $(VULKAN_VALIDATION_REDIRECT) ### @Vendor Builds Vulkan Validation Layers as a Genstone module
 
-$(VULKAN_VALIDATION_REDIRECT): $(VULKAN_VALIDATION_LIB)
+$(VULKAN_VALIDATION_REDIRECT): | $(VULKAN_VALIDATION_LIB)
 	ln -sf $< $@
 
 $(VULKAN_VALIDATION_LIB): CXXFLAGS = $(_VULKAN_VALIDATION_CXXFLAGS)

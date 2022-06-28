@@ -13,11 +13,14 @@ COMPILER = clang
 # This is unlikely to work with compilers other than clang++
 COMPILERXX = clang++
 
-# The glslc binary to use
+# The glslc command to use
 GLSLC = glslc
 
-# The python3 command line to use
+# The python3 command to use
 PYTHON3 = python3
+
+# The pkg-config command to use
+PKGCONFIG = pkg-config
 
 # The linker to use
 # Will be specified to the compiler via. `-fuse-ld` for compatibility reasons
@@ -28,5 +31,5 @@ LINKER = LLD
 # The `ar` tool to use for creating static libraries
 AR = ar
 
-# The clang-format command line to use
+# The clang-format command to use
 CLANG_FORMAT = clang-format

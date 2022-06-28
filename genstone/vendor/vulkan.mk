@@ -8,8 +8,8 @@ _VULKAN_CFLAGS += -DVK_USE_PLATFORM_MACOS_MVK -DVK_USE_PLATFORM_METAL_EXT
 _VULKAN_LFLAGS += -framework CoreFoundation
 endif
 ifeq ($(PLATFORM),LNX)
-_VULKAN_CFLAGS += -DVK_USE_PLATFORM_XCB_KHR -pthread $(shell pkg-config --cflags xcb)
-_VULKAN_LFLAGS += -ldl -pthread -lm $(shell pkg-config --libs xcb)
+_VULKAN_CFLAGS += -DVK_USE_PLATFORM_XCB_KHR -pthread $(shell $(PKGCONFIG) --cflags xcb)
+_VULKAN_LFLAGS += -ldl -pthread -lm $(shell $(PKGCONFIG) --libs xcb)
 endif
 ifeq ($(BUILD_MODE),DEBUG)
 _VULKAN_CFLAGS += -DDEBUG

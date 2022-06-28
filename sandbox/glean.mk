@@ -9,8 +9,8 @@ build_message_glean:
 
 glean: build_message_glean $(GLEAN_EXEC)
 
-$(GLEAN_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(shell pkg-config --cflags gtk+-3.0) $(shell pkg-config --cflags json-glib-1.0) $(shell pkg-config --cflags vte-2.91)
-$(GLEAN_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) -lpthread $(shell pkg-config --libs gtk+-3.0) $(shell pkg-config --libs json-glib-1.0) $(shell pkg-config --libs vte-2.91)
+$(GLEAN_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(shell $(PKGCONFIG) --cflags gtk+-3.0) $(shell $(PKGCONFIG) --cflags json-glib-1.0) $(shell $(PKGCONFIG) --cflags vte-2.91)
+$(GLEAN_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) -lpthread $(shell $(PKGCONFIG) --libs gtk+-3.0) $(shell $(PKGCONFIG) --libs json-glib-1.0) $(shell $(PKGCONFIG) --libs vte-2.91)
 $(GLEAN_EXEC): $(GLEAN_OBJECTS)
 
 $(GLEAN_OBJECTS): $(GEN_CORE_LIB)

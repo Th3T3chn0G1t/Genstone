@@ -1,5 +1,5 @@
-_GEN_FX_COMMON_CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS) $(VULKAN_CFLAGS) $(SPIRV_CFLAGS) $(shell pkg-config --cflags xcb) $(shell pkg-config --cflags xcb-xkb) $(shell pkg-config --cflags xcb-icccm)
-_GEN_FX_COMMON_LFLAGS = $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS) $(VULKAN_LFLAGS) $(SPIRV_LFLAGS) $(shell pkg-config --libs xcb) $(shell pkg-config --libs xcb-xkb) $(shell pkg-config --libs xcb-icccm)
+_GEN_FX_COMMON_CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS) $(VULKAN_CFLAGS) $(SPIRV_CFLAGS) $(VULKAN_MEMORY_ALLOCATOR_CFLAGS) $(shell $(PKGCONFIG) --cflags xcb) $(shell $(PKGCONFIG) --cflags xcb-xkb) $(shell $(PKGCONFIG) --cflags xcb-icccm)
+_GEN_FX_COMMON_LFLAGS = $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS) $(VULKAN_LFLAGS) $(SPIRV_LFLAGS) $(VULKAN_MEMORY_ALLOCATOR_LFLAGS) $(shell $(PKGCONFIG) --libs xcb) $(shell $(PKGCONFIG) --libs xcb-xkb) $(shell $(PKGCONFIG) --libs xcb-icccm)
 
 ifeq ($(BUILD_MODE),DEBUG)
 _GEN_FX_COMMON_LFLAGS += $(VULKAN_VALIDATION_LFLAGS)

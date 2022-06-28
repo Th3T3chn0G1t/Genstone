@@ -9,8 +9,8 @@ build_message_gidle:
 
 gidle: build_message_gidle $(GIDLE_EXEC) ### @User Builds Gidle
 
-$(GIDLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_UI_CFLAGS) $(shell pkg-config --cflags sdl2) $(shell pkg-config --cflags SDL2_image) $(shell pkg-config --cflags SDL2_ttf)
-$(GIDLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_UI_LFLAGS) $(shell pkg-config --libs sdl2) $(shell pkg-config --libs SDL2_image) $(shell pkg-config --libs SDL2_ttf)
+$(GIDLE_EXEC): CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_UI_CFLAGS) $(shell $(PKGCONFIG) --cflags sdl2) $(shell $(PKGCONFIG) --cflags SDL2_image) $(shell $(PKGCONFIG) --cflags SDL2_ttf)
+$(GIDLE_EXEC): LFLAGS = -Llib $(GEN_CORE_LFLAGS) $(GEN_UI_LFLAGS) $(shell $(PKGCONFIG) --libs sdl2) $(shell $(PKGCONFIG) --libs SDL2_image) $(shell $(PKGCONFIG) --libs SDL2_ttf)
 $(GIDLE_EXEC): $(GIDLE_OBJECTS)
 
 $(GIDLE_OBJECTS): $(GEN_UI_LIB) $(GEN_CORE_LIB)
