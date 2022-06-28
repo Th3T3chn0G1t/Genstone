@@ -86,6 +86,13 @@ GEN_DIAG_REGION_BEGIN
  */
 #define __used __attribute__((used))
 #endif
+#ifndef __packed
+/**
+ * Defines `__packed` on platforms which do not support it by default.
+ * Marks a structure or array type to exclude padding.
+ */
+#define __packed __attribute__((packed))
+#endif
 GEN_DIAG_REGION_END
 
 #endif

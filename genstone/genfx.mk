@@ -1,12 +1,12 @@
-_GEN_FX_COMMON_CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS) $(VULKAN_CFLAGS) $(SPIRV_CFLAGS)
-_GEN_FX_COMMON_LFLAGS = $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS) $(VULKAN_LFLAGS) $(SPIRV_LFLAGS)
+_GEN_FX_COMMON_CFLAGS = $(GEN_CORE_CFLAGS) $(GEN_CALC_CFLAGS) $(VULKAN_CFLAGS) $(SPIRV_CFLAGS) $(shell pkg-config --cflags xcb) $(shell pkg-config --cflags xcb-xkb) $(shell pkg-config --cflags xcb-icccm)
+_GEN_FX_COMMON_LFLAGS = $(GEN_CORE_LFLAGS) $(GEN_CALC_LFLAGS) $(VULKAN_LFLAGS) $(SPIRV_LFLAGS) $(shell pkg-config --libs xcb) $(shell pkg-config --libs xcb-xkb) $(shell pkg-config --libs xcb-icccm)
 
 ifeq ($(BUILD_MODE),DEBUG)
 _GEN_FX_COMMON_LFLAGS += $(VULKAN_VALIDATION_LFLAGS)
 endif
 
-_GEN_FX_CFLAGS = $(shell pkg-config --cflags xcb) $(shell pkg-config --cflags xcb-xkb) $(_GEN_FX_COMMON_CFLAGS)
-_GEN_FX_LFLAGS = $(shell pkg-config --libs xcb) $(shell pkg-config --libs xcb-xkb) $(_GEN_FX_COMMON_LFLAGS)
+_GEN_FX_CFLAGS = $(_GEN_FX_COMMON_CFLAGS)
+_GEN_FX_LFLAGS = $(_GEN_FX_COMMON_LFLAGS)
 
 GEN_FX_CFLAGS = -Igenstone/genfx/include $(_GEN_FX_COMMON_CFLAGS)
 GEN_FX_LFLAGS = -lgenfx $(_GEN_FX_COMMON_LFLAGS)

@@ -68,6 +68,7 @@ typedef struct {
 
     VkCommandPool internal_command_pool;
     VkCommandBuffer internal_command_buffers[GEN_GFX_FRAMES_IN_FLIGHT];
+    VkCommandBuffer internal_out_of_line_transfer_command_buffer;
 
     VkCommandPool internal_transfer_command_pool;
     VkCommandBuffer internal_transfer_command_buffer;
@@ -90,11 +91,40 @@ typedef struct {
 } gen_gfx_pipeline_t;
 
 /**
- * State object for a frame.
+ * State object for a graphics scope.
  */
 typedef struct {
     uint32_t internal_image_index;
 } gen_gfx_pipeline_scope_t;
+
+/**
+ * Enumeration of upload modes for data upload scopes and operations.
+ */
+typedef enum {
+    /**
+     * Upload mode for mid-graphics-scope graphics data uploads.
+     */
+    GEN_GFX_DATA_UPLOAD_MODE_STREAMED,
+    /**
+     * Upload mode for out-of-graphics-scope graphics data uploads.
+     */
+    GEN_GFX_DATA_UPLOAD_MODE_OUT_OF_LINE
+} gen_gfx_data_upload_mode_t;
+
+/**
+ * State object for a data scope.
+ */
+typedef struct {
+    /**
+     * The upload mode this scope was begun with.
+     */
+    gen_gfx_data_upload_mode_t mode;
+    /**
+     * The targetable graphics instance.
+     */
+    gen_gfx_targetable_t* targetable;
+    VkCommandBuffer internal_command_buffer;
+} gen_gfx_data_upload_scope_t;
 
 /**
  * Type for shader programs.
@@ -152,6 +182,26 @@ GEN_ERRORABLE gen_gfx_context_create(gen_gfx_context_t* const restrict out_conte
 GEN_ERRORABLE gen_gfx_context_await(gen_gfx_context_t* const restrict context);
 
 /**
+ * Starts a graphics data upload scope on a targetable graphics instance.
+ * @param[in,out] context the graphics context from which the targetable instance was created.
+ * @param[in,out] targetable the targetable instance to begin uploading through.
+ * @param[out] out_scope pointer to storage for the created scope object.
+ * @param[in] mode the upload mode to use for data transfer.
+ * @note the scope must be terminated with a call to `gen_gfx_targetable_data_upload_scope_end`.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_targetable_data_upload_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_data_upload_scope_t* const restrict out_scope, const gen_gfx_data_upload_mode_t mode);
+
+/**
+ * Ends a graphics data upload scope.
+ * @param[in,out] context the graphics context from which the targetable instance was created.
+ * @param[in,out] targetable the targetable instance through which the data was uploaded.
+ * @param[in] scope the scope state object from the corresponding `gen_gfx_targetable_data_upload_scope_begin` call.
+ * @return an error code.
+ */
+GEN_ERRORABLE gen_gfx_targetable_data_upload_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_data_upload_scope_t* const restrict scope);
+
+/**
  * Destroys a graphics context.
  * @param[in] context the context to destroy.
  */
@@ -173,11 +223,10 @@ GEN_ERRORABLE gen_gfx_targetable_create(gen_gfx_context_t* const restrict contex
  * @param[in,out] window_system the window system to which the targetable window belongs.
  * @param[in,out] window the window to update the targetable instance and pipelines' geometry from.
  * @param[in,out] targetable the targetable graphics instance whose geometry should be adjusted according to `window`.
- * @param[in] extent the new extent of window geometry to target.
  * @note Should be called after window resize events to keep gen gfx structures in sync with genuwin.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_targetable_geometry_update(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targetable_t* const restrict targetable, const gint2 extent);
+GEN_ERRORABLE gen_gfx_targetable_geometry_update(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targetable_t* const restrict targetable);
 
 /**
  * Destroys a targetable graphics instance.
@@ -201,37 +250,37 @@ GEN_ERRORABLE gen_gfx_targetable_destroy(gen_gfx_context_t* const restrict conte
 GEN_ERRORABLE gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, const gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict out_pipeline, const gen_gfx_shader_t** const restrict shaders, const size_t shaders_length);
 
 /**
- * Starts a graphics frame using a graphics pipeline to target a targetable graphics instance.
+ * Starts a graphics scope using a graphics pipeline to target a targetable graphics instance.
  * @param[in,out] context the graphics context from which the graphics pipeline was created.
  * @param[in,out] targetable the targetable instance the pipeline was associated with.
- * @param[in,out] pipeline the pipeline to begin the frame on.
- * @param[in] clear_color the clear color to start the frame with.
- * @param[out] out_frame pointer to storage for a frame state object.
- * @note the frame must be terminated with a call to `gen_gfx_pipeline_scope_end`.
+ * @param[in,out] pipeline the pipeline to begin the scope on.
+ * @param[in] clear_color the clear color to start the scope with.
+ * @param[out] out_scope pointer to storage for a scope state object.
+ * @note the scope must be terminated with a call to `gen_gfx_pipeline_scope_end`.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_pipeline_scope_t* const restrict out_frame);
+GEN_ERRORABLE gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_pipeline_scope_t* const restrict out_scope);
 
 /**
- * Queues a draw call submitting a vertex buffer to draw for the frame.
+ * Queues a draw call submitting a vertex buffer to draw for the scope.
  * @param[in,out] context the graphics context from which the graphics pipeline was created.
- * @param[in,out] targetable the targetable instance the pipeline to which the frame belongs is associated with.
- * @param[in,out] pipeline the pipeline to which the frame belongs.
+ * @param[in,out] targetable the targetable instance the pipeline to which the scope belongs is associated with.
+ * @param[in,out] pipeline the pipeline to which the scope belongs.
  * @param[in] vertex_buffer the vertex buffer to draw.
- * @param[in,out] frame the frame state object for this frame.
+ * @param[in,out] scope the scope state object for the scope to draw into.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_pipeline_scope_t* const restrict frame);
+GEN_ERRORABLE gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_pipeline_scope_t* const restrict scope);
 
 /**
- * Starts a graphics frame using a graphics pipeline to target a targetable graphics instance.
+ * Ends a graphics scope.
  * @param[in,out] context the graphics context from which the graphics pipeline was created.
  * @param[in,out] targetable the targetable instance the pipeline was associated with.
- * @param[in,out] pipeline the pipeline to begin the frame on.
- * @param[in] frame the frame state object from the corresponding `gen_gfx_pipeline_scope_begin` call.
+ * @param[in,out] pipeline the pipeline the scope was begun on.
+ * @param[in] scope the scope state object from the corresponding `gen_gfx_pipeline_scope_begin` call.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_pipeline_scope_t* const restrict frame);
+GEN_ERRORABLE gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_pipeline_scope_t* const restrict scope);
 
 /**
  * Destroys a graphics pipeline.
@@ -261,14 +310,15 @@ GEN_ERRORABLE gen_gfx_shader_create(gen_gfx_context_t* const restrict context, g
 GEN_ERRORABLE gen_gfx_shader_destroy(gen_gfx_context_t* const restrict context, gen_gfx_shader_t* const restrict shader);
 
 /**
- * Creates a vertex buffer to use for drawing.
+ * Creates and uploads a vertex buffer to use for drawing.
  * @param[in,out] context the graphics context in which to create the vertex buffer.
  * @param[in] data the raw vertex data.
  * @param[in] size the size of the vertex data.
  * @param[out] out_buffer pointer to storage for the created vertex buffer.
+ * @param[in,out] scope the graphics data upload scope over which to perform the data upload.
  * @return an error code.
  */
-GEN_ERRORABLE gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict context, const uint8_t* const restrict data, const size_t size, gen_gfx_draw_buffer_t* const restrict out_buffer);
+GEN_ERRORABLE gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict context, const uint8_t* const restrict data, const size_t size, gen_gfx_draw_buffer_t* const restrict out_buffer, gen_gfx_data_upload_scope_t* const restrict scope);
 
 /**
  * Destroys a vertex buffer.

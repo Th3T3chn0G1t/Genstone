@@ -83,6 +83,51 @@ static gen_error_t gen_internal_vk_convert_result(const VkResult result) {
 	}
 }
 
+static const char* gen_internal_vk_result_name(const VkResult result) {
+	switch(result) {
+		case VK_SUCCESS: return "VK_SUCCESS";
+		case VK_NOT_READY: return "VK_NOT_READY";
+		case VK_TIMEOUT: return "VK_TIMEOUT";
+		case VK_EVENT_SET: return "VK_EVENT_SET";
+		case VK_EVENT_RESET: return "VK_EVENT_RESET";
+		case VK_INCOMPLETE: return "VK_INCOMPLETE";
+		case VK_ERROR_OUT_OF_HOST_MEMORY: return "VK_ERROR_OUT_OF_HOST_MEMORY";
+		case VK_ERROR_OUT_OF_DEVICE_MEMORY: return "VK_ERROR_OUT_OF_DEVICE_MEMORY";
+		case VK_ERROR_INITIALIZATION_FAILED: return "VK_ERROR_INITIALIZATION_FAILED";
+		case VK_ERROR_DEVICE_LOST: return "VK_ERROR_DEVICE_LOST";
+		case VK_ERROR_MEMORY_MAP_FAILED: return "VK_ERROR_MEMORY_MAP_FAILED";
+		case VK_ERROR_LAYER_NOT_PRESENT: return "VK_ERROR_LAYER_NOT_PRESENT";
+		case VK_ERROR_EXTENSION_NOT_PRESENT: return "VK_ERROR_EXTENSION_NOT_PRESENT";
+		case VK_ERROR_FEATURE_NOT_PRESENT: return "VK_ERROR_FEATURE_NOT_PRESENT";
+		case VK_ERROR_INCOMPATIBLE_DRIVER: return "VK_ERROR_INCOMPATIBLE_DRIVER";
+		case VK_ERROR_TOO_MANY_OBJECTS: return "VK_ERROR_TOO_MANY_OBJECTS";
+		case VK_ERROR_FORMAT_NOT_SUPPORTED: return "VK_ERROR_FORMAT_NOT_SUPPORTED";
+		case VK_ERROR_FRAGMENTED_POOL: return "VK_ERROR_FRAGMENTED_POOL";
+		case VK_ERROR_UNKNOWN: return "VK_ERROR_UNKNOWN";
+		case VK_ERROR_OUT_OF_POOL_MEMORY: return "VK_ERROR_OUT_OF_POOL_MEMORY";
+		case VK_ERROR_INVALID_EXTERNAL_HANDLE: return "VK_ERROR_INVALID_EXTERNAL_HANDLE";
+		case VK_ERROR_FRAGMENTATION: return "VK_ERROR_FRAGMENTATION";
+		case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS: return "VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS";
+		case VK_PIPELINE_COMPILE_REQUIRED: return "VK_PIPELINE_COMPILE_REQUIRED";
+		case VK_ERROR_SURFACE_LOST_KHR: return "VK_ERROR_SURFACE_LOST_KHR";
+		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR: return "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
+		case VK_SUBOPTIMAL_KHR: return "VK_SUBOPTIMAL_KHR";
+		case VK_ERROR_OUT_OF_DATE_KHR: return "VK_ERROR_OUT_OF_DATE_KHR";
+		case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR: return "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR";
+		case VK_ERROR_VALIDATION_FAILED_EXT: return "VK_ERROR_VALIDATION_FAILED_EXT";
+		case VK_ERROR_INVALID_SHADER_NV: return "VK_ERROR_INVALID_SHADER_NV";
+		case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT: return "VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT";
+		case VK_ERROR_NOT_PERMITTED_KHR: return "VK_ERROR_NOT_PERMITTED_KHR";
+		case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT: return "VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT";
+		case VK_THREAD_IDLE_KHR: return "VK_THREAD_IDLE_KHR";
+		case VK_THREAD_DONE_KHR: return "VK_THREAD_DONE_KHR";
+		case VK_OPERATION_DEFERRED_KHR: return "VK_OPERATION_DEFERRED_KHR";
+		case VK_OPERATION_NOT_DEFERRED_KHR: return "VK_OPERATION_NOT_DEFERRED_KHR";
+		case VK_ERROR_COMPRESSION_EXHAUSTED_EXT: return "VK_ERROR_COMPRESSION_EXHAUSTED_EXT";
+		case VK_RESULT_MAX_ENUM: return "VK_RESULT_MAX_ENUM";
+	}
+}
+
 static gen_error_t gen_internal_spv_convert_result(const SpvReflectResult result) {
 	switch(result) {
 		case SPV_REFLECT_RESULT_SUCCESS: return GEN_OK;
@@ -112,7 +157,7 @@ static gen_error_t gen_internal_spv_convert_result(const SpvReflectResult result
 #define GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, proc) \
 	do { \
 		if(gen_internal_vk_convert_result(result)) { \
-			glogf(ERROR, "%s: `%s` failed at %s:%i", gen_error_name(gen_internal_vk_convert_result(result)), #proc, __FILE__, __LINE__); \
+			glogf(ERROR, "%s (%s): `%s` failed at %s:%i", gen_error_name(gen_internal_vk_convert_result(result)), gen_internal_vk_result_name(result), #proc, __FILE__, __LINE__); \
 			return gen_internal_vk_convert_result(result); \
 		} \
 	} while(0)
@@ -747,7 +792,7 @@ gen_error_t gen_gfx_context_create(gen_gfx_context_t* const restrict out_context
 	result = vkEnumeratePhysicalDevices(out_context->internal_instance, &physical_device_count, physical_devices);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkEnumeratePhysicalDevices);
 
-	VkPhysicalDevice best_device = VK_NULL_HANDLE;
+	VkPhysicalDevice best_device = NULL;
 	size_t best_score = 0;
 
 	for(size_t i = 0; i < physical_device_count; ++i) {
@@ -968,7 +1013,7 @@ GEN_INTERNAL_ERRORABLE gen_internal_gfx_evaluate_surface_format(const gen_gfx_fo
 	GEN_ALL_OK;
 }
 
-GEN_INTERNAL_ERRORABLE gen_internal_vk_create_swapchain(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targetable_t* const restrict targetable, const gint2 surface_extent) {
+GEN_INTERNAL_ERRORABLE gen_internal_vk_create_swapchain(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targetable_t* const restrict targetable) {
 	GEN_FRAME_BEGIN(gen_internal_vk_create_swapchain);
 
 	GEN_NULL_CHECK(context);
@@ -1062,11 +1107,11 @@ GEN_INTERNAL_ERRORABLE gen_internal_vk_create_swapchain(gen_gfx_context_t* const
 	error = gfree(present_modes);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 
-	const VkExtent2D extent = {(uint32_t) surface_extent.x, (uint32_t) surface_extent.y};
+	const VkExtent2D extent = surface_capabilities.maxImageExtent;
 
 	uint32_t image_count = surface_capabilities.minImageCount + 1;
 	if(surface_capabilities.maxImageCount && image_count > surface_capabilities.maxImageCount) image_count = surface_capabilities.maxImageCount;
-	const VkSwapchainCreateInfoKHR swapchain_create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR, NULL, 0, targetable->internal_surface, image_count, best_format.format, best_format.colorSpace, extent, 1, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_SHARING_MODE_EXCLUSIVE, 0, NULL, VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, best_mode, VK_FALSE, VK_NULL_HANDLE};
+	const VkSwapchainCreateInfoKHR swapchain_create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR, NULL, 0, targetable->internal_surface, image_count, best_format.format, best_format.colorSpace, extent, 1, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_SHARING_MODE_EXCLUSIVE, 0, NULL, VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, best_mode, VK_FALSE, NULL};
 	result = vkCreateSwapchainKHR(context->internal_device, &swapchain_create_info, context->internal_allocator, &targetable->internal_swapchain);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateSwapchainKHR);
 
@@ -1080,7 +1125,7 @@ GEN_INTERNAL_ERRORABLE gen_internal_vk_create_swapchain(gen_gfx_context_t* const
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkGetSwapchainImagesKHR);
 
 	targetable->internal_swapchain_image_format = gen_internal_gfx_format_from_vk_format(best_format.format);
-	targetable->internal_swapchain_image_extent = surface_extent;
+	targetable->internal_swapchain_image_extent = (gint2){(int) surface_capabilities.maxImageExtent.width, (int) surface_capabilities.maxImageExtent.height};
 	targetable->internal_swapchain_image_count = (size_t) image_count;
 	targetable->internal_viewport = (VkViewport){0.0f, 0.0f, (float) targetable->internal_swapchain_image_extent.x, (float) targetable->internal_swapchain_image_extent.y, 0.0f, 1.0f};
 	targetable->internal_scissor = (VkRect2D){{0, 0}, extent};
@@ -1119,17 +1164,14 @@ gen_error_t gen_gfx_targetable_create(gen_gfx_context_t* const restrict context,
 	GEN_NULL_CHECK(window);
 	GEN_NULL_CHECK(out_targetable);
 
-	gen_window_attribute_t attribute = {0};
-	gen_error_t error = gen_window_fetch(window_system, window, GEN_WINDOW_ATTRIBUTE_EXTENT, &attribute);
-	GEN_ERROR_OUT_IF(error, "`gen_window_fetch` failed");
-	error = gen_internal_vk_create_swapchain(context, window_system, window, out_targetable, attribute.extent);
+	gen_error_t error = gen_internal_vk_create_swapchain(context, window_system, window, out_targetable);
 	GEN_ERROR_OUT_IF(error, "`gen_internal_vk_create_swapchain` failed");
 
 	const VkCommandPoolCreateInfo command_pool_create_info = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO, NULL, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, context->internal_graphics_queue_index};
 	VkResult result = vkCreateCommandPool(context->internal_device, &command_pool_create_info, context->internal_allocator, &out_targetable->internal_command_pool);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateCommandPool);
 
-	const VkCommandBufferAllocateInfo command_buffer_allocate_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, NULL, out_targetable->internal_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, GEN_GFX_FRAMES_IN_FLIGHT};
+	const VkCommandBufferAllocateInfo command_buffer_allocate_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, NULL, out_targetable->internal_command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, GEN_GFX_FRAMES_IN_FLIGHT + 1 /* Allocate beyond array and into internal_out_of_line_transfer_command_buffer */};
 	result = vkAllocateCommandBuffers(context->internal_device, &command_buffer_allocate_info, out_targetable->internal_command_buffers);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkAllocateCommandBuffers);
 
@@ -1148,7 +1190,7 @@ gen_error_t gen_gfx_targetable_create(gen_gfx_context_t* const restrict context,
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_targetable_geometry_update(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targetable_t* const restrict targetable, const gint2 extent) {
+gen_error_t gen_gfx_targetable_geometry_update(gen_gfx_context_t* const restrict context, gen_window_system_t* const restrict window_system, gen_window_t* const restrict window, gen_gfx_targetable_t* const restrict targetable) {
 	GEN_FRAME_BEGIN(gen_gfx_targetable_geometry_update);
 
 	GEN_NULL_CHECK(context);
@@ -1179,8 +1221,57 @@ gen_error_t gen_gfx_targetable_geometry_update(gen_gfx_context_t* const restrict
 	error = gfree(targetable->internal_swapchain_image_views);
 	GEN_ERROR_OUT_IF(error, "`gfree` failed");
 
-	error = gen_internal_vk_create_swapchain(context, window_system, window, targetable, extent);
+	error = gen_internal_vk_create_swapchain(context, window_system, window, targetable);
 	GEN_ERROR_OUT_IF(error, "`gen_internal_vk_create_swapchain` failed");
+
+	GEN_ALL_OK;
+}
+
+gen_error_t gen_gfx_targetable_data_upload_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_data_upload_scope_t* const restrict out_scope, const gen_gfx_data_upload_mode_t mode) {
+	GEN_FRAME_BEGIN(gen_gfx_targetable_data_upload_scope_begin);
+
+	GEN_NULL_CHECK(context);
+	GEN_NULL_CHECK(targetable);
+	GEN_NULL_CHECK(out_scope);
+
+	VkCommandBuffer buffer = NULL;
+	switch(mode) {
+		case GEN_GFX_DATA_UPLOAD_MODE_STREAMED: {
+			buffer = targetable->internal_transfer_command_buffer;
+			break;
+		}
+		case GEN_GFX_DATA_UPLOAD_MODE_OUT_OF_LINE: {
+			buffer = targetable->internal_out_of_line_transfer_command_buffer;
+			break;
+		}
+	}
+	out_scope->internal_command_buffer = buffer;
+
+	VkResult result = vkResetCommandBuffer(buffer, 0);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkResetCommandBuffer);
+
+	const VkCommandBufferBeginInfo command_buffer_begin_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, NULL, 0, NULL};
+	result = vkBeginCommandBuffer(buffer, &command_buffer_begin_info);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkBeginCommandBuffer);
+
+	GEN_ALL_OK;
+}
+
+gen_error_t gen_gfx_targetable_data_upload_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_data_upload_scope_t* const restrict scope) {
+	GEN_FRAME_BEGIN(gen_gfx_targetable_data_upload_scope_end);
+
+	GEN_NULL_CHECK(context);
+	GEN_NULL_CHECK(targetable);
+	GEN_NULL_CHECK(scope);
+
+	VkResult result = vkEndCommandBuffer(scope->internal_command_buffer);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkEndCommandBuffer);
+
+	const VkPipelineStageFlags flags[] = {VK_PIPELINE_STAGE_TRANSFER_BIT};
+	const VkSubmitInfo submit_info = {VK_STRUCTURE_TYPE_SUBMIT_INFO, NULL, 0, NULL, flags, 1, &scope->internal_command_buffer, 0, NULL};
+
+	result = vkQueueSubmit(context->internal_graphics_queue, 1, &submit_info, NULL);
+	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueueSubmit);
 
 	GEN_ALL_OK;
 }
@@ -1312,8 +1403,8 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, c
 
 	const VkPipelineViewportStateCreateInfo pipeline_viewport_state_create_info = {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO, NULL, 0, 1, &targetable->internal_viewport, 1, &targetable->internal_scissor};
 
-	const VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO, NULL, 0, (uint32_t) shaders_length, pipeline_shader_stage_create_infos, &pipeline_vertex_input_state_create_info, &pipeline_input_assembly_state_create_info, &pipeline_tessellation_state_create_info, &pipeline_viewport_state_create_info, &pipeline_rasterization_state_create_info, &pipeline_multisample_state_create_info, &pipeline_depth_stencil_state_create_info, &pipeline_color_blend_state_create_info, &pipeline_dynamic_state_create_info, out_pipeline->internal_layout, targetable->internal_render_pass, 0, VK_NULL_HANDLE, -1};
-	result = vkCreateGraphicsPipelines(context->internal_device, VK_NULL_HANDLE, 1, &graphics_pipeline_create_info, context->internal_allocator, &out_pipeline->internal_pipeline);
+	const VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO, NULL, 0, (uint32_t) shaders_length, pipeline_shader_stage_create_infos, &pipeline_vertex_input_state_create_info, &pipeline_input_assembly_state_create_info, &pipeline_tessellation_state_create_info, &pipeline_viewport_state_create_info, &pipeline_rasterization_state_create_info, &pipeline_multisample_state_create_info, &pipeline_depth_stencil_state_create_info, &pipeline_color_blend_state_create_info, &pipeline_dynamic_state_create_info, out_pipeline->internal_layout, targetable->internal_render_pass, 0, NULL, -1};
+	result = vkCreateGraphicsPipelines(context->internal_device, NULL, 1, &graphics_pipeline_create_info, context->internal_allocator, &out_pipeline->internal_pipeline);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateGraphicsPipelines);
 
 	error = gfree(pipeline_shader_stage_create_infos);
@@ -1339,13 +1430,13 @@ gen_error_t gen_gfx_pipeline_create(gen_gfx_context_t* const restrict context, c
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_pipeline_scope_t* const restrict out_frame) {
+gen_error_t gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gfloat4 clear_color, gen_gfx_pipeline_scope_t* const restrict out_scope) {
 	GEN_FRAME_BEGIN(gen_gfx_pipeline_scope_begin);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targetable);
 	GEN_NULL_CHECK(pipeline);
-	GEN_NULL_CHECK(out_frame);
+	GEN_NULL_CHECK(out_scope);
 
 	VkResult result = vkWaitForFences(context->internal_device, 1, &pipeline->internal_in_flight_fences[pipeline->internal_current_frame], VK_TRUE, UINT64_MAX);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkWaitForFences);
@@ -1353,7 +1444,7 @@ gen_error_t gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict conte
 	result = vkResetFences(context->internal_device, 1, &pipeline->internal_in_flight_fences[pipeline->internal_current_frame]);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkResetFences);
 
-	result = vkAcquireNextImageKHR(context->internal_device, targetable->internal_swapchain, UINT64_MAX, pipeline->internal_image_available_semaphores[pipeline->internal_current_frame], VK_NULL_HANDLE, &out_frame->internal_image_index);
+	result = vkAcquireNextImageKHR(context->internal_device, targetable->internal_swapchain, UINT64_MAX, pipeline->internal_image_available_semaphores[pipeline->internal_current_frame], NULL, &out_scope->internal_image_index);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkAcquireNextImageKHR);
 
 	result = vkResetCommandBuffer(targetable->internal_command_buffers[pipeline->internal_current_frame], 0);
@@ -1367,7 +1458,7 @@ gen_error_t gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict conte
 	vkCmdSetScissor(targetable->internal_command_buffers[pipeline->internal_current_frame], 0, 1, &targetable->internal_scissor);
 
 	const VkClearValue clear_value = {.color = {.float32 = {clear_color.x, clear_color.y, clear_color.z, clear_color.w}}};
-	const VkRenderPassBeginInfo render_pass_begin_info = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO, NULL, targetable->internal_render_pass, targetable->internal_framebuffers[out_frame->internal_image_index], {{0, 0}, {(uint32_t) targetable->internal_swapchain_image_extent.x, (uint32_t) targetable->internal_swapchain_image_extent.y}}, 1, &clear_value};
+	const VkRenderPassBeginInfo render_pass_begin_info = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO, NULL, targetable->internal_render_pass, targetable->internal_framebuffers[out_scope->internal_image_index], {{0, 0}, {(uint32_t) targetable->internal_swapchain_image_extent.x, (uint32_t) targetable->internal_swapchain_image_extent.y}}, 1, &clear_value};
 	vkCmdBeginRenderPass(targetable->internal_command_buffers[pipeline->internal_current_frame], &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
 	vkCmdBindPipeline(targetable->internal_command_buffers[pipeline->internal_current_frame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->internal_pipeline);
@@ -1375,14 +1466,14 @@ gen_error_t gen_gfx_pipeline_scope_begin(gen_gfx_context_t* const restrict conte
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_pipeline_scope_t* const restrict frame) {
+gen_error_t gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_draw_buffer_t* const restrict vertex_buffer, gen_gfx_pipeline_scope_t* const restrict scope) {
 	GEN_FRAME_BEGIN(gen_gfx_pipeline_scope_draw_vertex_buffer);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targetable);
 	GEN_NULL_CHECK(pipeline);
 	GEN_NULL_CHECK(vertex_buffer);
-	GEN_NULL_CHECK(frame);
+	GEN_NULL_CHECK(scope);
 
 	const VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers(targetable->internal_command_buffers[pipeline->internal_current_frame], 0, 1, &vertex_buffer->internal_buffer, &offset);
@@ -1391,13 +1482,13 @@ gen_error_t gen_gfx_pipeline_scope_draw_vertex_buffer(gen_gfx_context_t* const r
 	GEN_ALL_OK;
 }
 
-gen_error_t gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_pipeline_scope_t* const restrict frame) {
+gen_error_t gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context, gen_gfx_targetable_t* const restrict targetable, gen_gfx_pipeline_t* const restrict pipeline, const gen_gfx_pipeline_scope_t* const restrict scope) {
 	GEN_FRAME_BEGIN(gen_gfx_pipeline_scope_end);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(targetable);
 	GEN_NULL_CHECK(pipeline);
-	GEN_NULL_CHECK(frame);
+	GEN_NULL_CHECK(scope);
 
 	vkCmdEndRenderPass(targetable->internal_command_buffers[pipeline->internal_current_frame]);
 
@@ -1410,7 +1501,7 @@ gen_error_t gen_gfx_pipeline_scope_end(gen_gfx_context_t* const restrict context
 	result = vkQueueSubmit(context->internal_graphics_queue, 1, &submit_info, pipeline->internal_in_flight_fences[pipeline->internal_current_frame]);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueueSubmit);
 
-	const VkPresentInfoKHR present_info = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, NULL, 1, &pipeline->internal_render_finished_semaphores[pipeline->internal_current_frame], 1, &targetable->internal_swapchain, &frame->internal_image_index, NULL};
+	const VkPresentInfoKHR present_info = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, NULL, 1, &pipeline->internal_render_finished_semaphores[pipeline->internal_current_frame], 1, &targetable->internal_swapchain, &scope->internal_image_index, NULL};
 	result = vkQueuePresentKHR(context->internal_graphics_queue, &present_info);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkQueuePresentKHR);
 
@@ -1493,12 +1584,13 @@ static size_t gen_internal_vk_find_memory_type(const gen_gfx_context_t* const re
 	return SIZE_MAX;
 }
 
-gen_error_t gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict context, const uint8_t* const restrict data, const size_t size, gen_gfx_draw_buffer_t* const restrict out_buffer) {
+gen_error_t gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict context, const uint8_t* const restrict data, const size_t size, gen_gfx_draw_buffer_t* const restrict out_buffer, gen_gfx_data_upload_scope_t* const restrict scope) {
 	GEN_FRAME_BEGIN(gen_gfx_vertex_buffer_create);
 
 	GEN_NULL_CHECK(context);
 	GEN_NULL_CHECK(data);
 	GEN_NULL_CHECK(out_buffer);
+	GEN_NULL_CHECK(scope);
 
 	gen_error_t error = gzalloc((void**) &out_buffer->buffer.data, size, sizeof(uint8_t));
 	GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
@@ -1509,13 +1601,17 @@ gen_error_t gen_gfx_vertex_buffer_create(gen_gfx_context_t* const restrict conte
 	out_buffer->buffer.size = size;
 
 	VkSharingMode sharing_mode = VK_SHARING_MODE_EXCLUSIVE;
-	const uint32_t* queues = NULL;
-	size_t queues_length = 0;
-	const uint32_t concurrent_queues[] = {context->internal_graphics_queue_index, context->internal_transfer_queue_index};
-	if(context->internal_graphics_queue_index != context->internal_transfer_queue_index) {
-		sharing_mode = VK_SHARING_MODE_CONCURRENT;
-		queues = concurrent_queues;
-		queues_length = sizeof(concurrent_queues) / sizeof(concurrent_queues[0]);
+	size_t queues_length = 1;
+	const uint32_t queues[] = {context->internal_graphics_queue_index, context->internal_transfer_queue_index};
+	switch(scope->mode) {
+		case GEN_GFX_DATA_UPLOAD_MODE_OUT_OF_LINE: break;
+		case GEN_GFX_DATA_UPLOAD_MODE_STREAMED: {
+			if(context->internal_graphics_queue_index != context->internal_transfer_queue_index) {
+				sharing_mode = VK_SHARING_MODE_CONCURRENT;
+				queues_length = sizeof(queues) / sizeof(queues[0]);
+				break;
+			}
+		}
 	}
 
 	const VkBufferCreateInfo buffer_create_info = {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, NULL, 0, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, sharing_mode, (uint32_t) queues_length, queues};

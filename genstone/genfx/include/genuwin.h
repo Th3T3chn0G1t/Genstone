@@ -17,6 +17,8 @@
 GEN_DIAG_REGION_BEGIN
 GEN_DIAG_IGNORE_ALL
 #include <xcb/xcb.h>
+#include <xcb/xkb.h>
+#include <xcb/xcb_icccm.h>
 GEN_DIAG_REGION_END
 
 /**

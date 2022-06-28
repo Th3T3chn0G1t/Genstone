@@ -28,22 +28,6 @@ int main(void) {
 	error = gen_gfx_context_create(&context);
 	GEN_REQUIRE_NO_ERROR(error);
 
-	const struct {
-		gfloat4 position;
-		gfloat4 color;
-	} triangle_vertices[] = {
-		{{0.0f, -0.5f, 0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-		{{0.5f, 0.5f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}}};
-
-	// gen_gfx_data_upload_scope_begin
-
-	gen_gfx_draw_buffer_t triangle = {0};
-	error = gen_gfx_vertex_buffer_create(&context, (uint8_t*) triangle_vertices, sizeof(triangle_vertices), &triangle);
-	GEN_REQUIRE_NO_ERROR(error);
-
-	// gen_gfx_data_upload_scope_end
-
 	gen_gfx_shader_t vertex = {0};
 	gen_gfx_shader_t fragment = {0};
 	const gen_gfx_shader_t* shaders[] = {&vertex, &fragment};
@@ -90,6 +74,28 @@ int main(void) {
 	error = gen_gfx_targetable_create(&context, &window_system, &window, &targetable);
 	GEN_REQUIRE_NO_ERROR(error);
 
+	const struct __packed {
+		float position[2];
+		float color[3];
+	} triangle_vertices[] = {
+		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}};
+
+	gen_gfx_data_upload_scope_t upload_scope = {0};
+	error = gen_gfx_targetable_data_upload_scope_begin(&context, &targetable, &upload_scope, GEN_GFX_DATA_UPLOAD_MODE_OUT_OF_LINE);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	gen_gfx_draw_buffer_t triangle = {0};
+	error = gen_gfx_vertex_buffer_create(&context, (uint8_t*) triangle_vertices, sizeof(triangle_vertices), &triangle, &upload_scope);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	error = gen_gfx_targetable_data_upload_scope_end(&context, &targetable, &upload_scope);
+	GEN_REQUIRE_NO_ERROR(error);
+
+	error = gen_gfx_context_await(&context);
+	GEN_REQUIRE_NO_ERROR(error);
+
 	gen_gfx_pipeline_t pipeline = {0};
 	error = gen_gfx_pipeline_create(&context, &targetable, &pipeline, shaders, sizeof(shaders) / sizeof(shaders[0]));
 	GEN_REQUIRE_NO_ERROR(error);
@@ -123,7 +129,9 @@ int main(void) {
 						case GEN_WINDOW_ATTRIBUTE_DECORATION: break;
 						case GEN_WINDOW_ATTRIBUTE_POSITION: break;
 						case GEN_WINDOW_ATTRIBUTE_EXTENT: {
-							error = gen_gfx_targetable_geometry_update(&context, &window_system, &window, &targetable, event.attribute.extent);
+							error = gen_gfx_context_await(&context);
+							GEN_REQUIRE_NO_ERROR(error);
+							error = gen_gfx_targetable_geometry_update(&context, &window_system, &window, &targetable);
 							GEN_REQUIRE_NO_ERROR(error);
 							break;
 						}
@@ -137,7 +145,6 @@ int main(void) {
 		} while(event.type != GEN_WINDOW_SYSTEM_EVENT_NONE);
 
 		gen_gfx_pipeline_scope_t scope = {0};
-
 		error = gen_gfx_pipeline_scope_begin(&context, &targetable, &pipeline, (gfloat4){0.8f, 0.3f, 0.2f, 1.0f}, &scope);
 		GEN_REQUIRE_NO_ERROR(error);
 

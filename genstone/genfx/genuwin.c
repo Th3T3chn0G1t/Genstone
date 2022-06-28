@@ -5,7 +5,6 @@
 
 #include <gemory.h>
 #include <genstring.h>
-#include <xcb/xkb.h>
 
 enum {
 	GEN_INTERNAL_DATA_FORMAT_CHAR = 8,
@@ -213,6 +212,8 @@ GEN_INTERNAL_ERRORABLE gen_internal_window_system_validate_request_cookie(gen_wi
 __unused static const char* gen_internal_get_event_name(const xcb_generic_event_t* const restrict event) {
 	GEN_FRAME_BEGIN(gen_internal_get_event_name);
 
+	if(!event) return "(null)";
+
 	switch(event->response_type & ~0x80) {
 		case XCB_KEY_PRESS: return "XCB_KEY_PRESS";
 		case XCB_KEY_RELEASE: return "XCB_KEY_RELEASE";
@@ -386,14 +387,13 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 		GEN_ALL_OK;
 	}
 
+repoll : {
 	out_event->type = GEN_WINDOW_SYSTEM_EVENT_NONE;
 	out_event->window_id = 0;
 
 	xcb_generic_event_t* event = xcb_poll_for_event(window_system->internal_connection);
 
 	if(event) {
-		// glogf(DEBUG, "Event %s", gen_internal_get_event_name(event));
-
 		switch(event->response_type & ~0x80) {
 			case XCB_KEY_PRESS: {
 				out_event->type = GEN_WINDOW_SYSTEM_EVENT_KEY_STATE_CHANGED;
@@ -489,7 +489,7 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_focus_out_event_t* e = (xcb_focus_out_event_t*) event;
 				out_event->window_id = e->event;
 
-				out_event->focused = true;
+				out_event->focused = false;
 
 				break;
 			}
@@ -587,14 +587,15 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 				xcb_configure_notify_event_t* e = (xcb_configure_notify_event_t*) event;
 				out_event->window_id = e->window;
 
-				window_system->internal_event_queue_length += 2;
-				error = grealloc((void**) &window_system->internal_event_queue, window_system->internal_event_queue_length - 2, window_system->internal_event_queue_length, sizeof(gen_window_system_event_t));
+				window_system->internal_event_queue_length++;
+				error = grealloc((void**) &window_system->internal_event_queue, window_system->internal_event_queue_length - 1, window_system->internal_event_queue_length, sizeof(gen_window_system_event_t));
 				GEN_ERROR_OUT_IF(error, "`grealloc` failed");
 
-				window_system->internal_event_queue[window_system->internal_event_queue_length - 2].type = GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED;
-				window_system->internal_event_queue[window_system->internal_event_queue_length - 2].attribute = (gen_window_attribute_t){.type = GEN_WINDOW_ATTRIBUTE_POSITION, .position = (gint2){e->x, e->y}};
 				window_system->internal_event_queue[window_system->internal_event_queue_length - 1].type = GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED;
-				window_system->internal_event_queue[window_system->internal_event_queue_length - 1].attribute = (gen_window_attribute_t){.type = GEN_WINDOW_ATTRIBUTE_EXTENT, .extent = (gint2){e->width, e->height}};
+				window_system->internal_event_queue[window_system->internal_event_queue_length - 1].attribute = (gen_window_attribute_t){.type = GEN_WINDOW_ATTRIBUTE_POSITION, .position = (gint2){e->x, e->y}};
+
+				out_event->type = GEN_WINDOW_SYSTEM_EVENT_WINDOW_ATTRIBUTE_CHANGED;
+				out_event->attribute = (gen_window_attribute_t){.type = GEN_WINDOW_ATTRIBUTE_EXTENT, .extent = (gint2){e->width, e->height}};
 
 				break;
 			}
@@ -718,7 +719,9 @@ gen_error_t gen_window_system_poll(gen_window_system_t* const restrict window_sy
 			}
 		}
 		free(event);
+		if(out_event->type == GEN_WINDOW_SYSTEM_EVENT_NONE) goto repoll;
 	}
+}
 
 	flushed = xcb_flush(window_system->internal_connection);
 	if(flushed <= 0) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to flush the connection");
@@ -738,8 +741,7 @@ gen_error_t gen_window_create(gen_window_system_t* const restrict window_system,
 	if(flushed <= 0) GEN_ERROR_OUT(GEN_OPERATION_FAILED, "Failed to flush the connection");
 
 	out_window->window = xcb_generate_id(window_system->internal_connection);
-	xcb_create_window_value_list_t values = {
-		.event_mask = XCB_EVENT_MASK_NO_EVENT | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_POINTER_MOTION_HINT | XCB_EVENT_MASK_BUTTON_1_MOTION | XCB_EVENT_MASK_BUTTON_2_MOTION | XCB_EVENT_MASK_BUTTON_3_MOTION | XCB_EVENT_MASK_BUTTON_4_MOTION | XCB_EVENT_MASK_BUTTON_5_MOTION | XCB_EVENT_MASK_BUTTON_MOTION | XCB_EVENT_MASK_KEYMAP_STATE | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_VISIBILITY_CHANGE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_RESIZE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_FOCUS_CHANGE | XCB_EVENT_MASK_PROPERTY_CHANGE | XCB_EVENT_MASK_COLOR_MAP_CHANGE | XCB_EVENT_MASK_OWNER_GRAB_BUTTON};
+	xcb_create_window_value_list_t values = {.event_mask = XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_POINTER_MOTION_HINT | XCB_EVENT_MASK_BUTTON_1_MOTION | XCB_EVENT_MASK_BUTTON_2_MOTION | XCB_EVENT_MASK_BUTTON_3_MOTION | XCB_EVENT_MASK_BUTTON_4_MOTION | XCB_EVENT_MASK_BUTTON_5_MOTION | XCB_EVENT_MASK_BUTTON_MOTION | XCB_EVENT_MASK_KEYMAP_STATE | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_VISIBILITY_CHANGE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY | XCB_EVENT_MASK_FOCUS_CHANGE | XCB_EVENT_MASK_PROPERTY_CHANGE | XCB_EVENT_MASK_COLOR_MAP_CHANGE | XCB_EVENT_MASK_OWNER_GRAB_BUTTON};
 	xcb_void_cookie_t cookie = xcb_create_window_aux_checked(window_system->internal_connection, bitdepth == GEN_GFX_BITDEPTH_INHERIT ? XCB_COPY_FROM_PARENT : (uint8_t) bitdepth, out_window->window, window_system->internal_screen->root, (int16_t) position.x, (int16_t) position.y, (uint16_t) extent.x, (uint16_t) extent.y, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT, window_system->internal_screen->root_visual, XCB_CW_EVENT_MASK, &values);
 	error = gen_internal_window_system_validate_request_cookie(window_system, cookie);
 	GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_validate_request_cookie` failed");
@@ -838,8 +840,7 @@ gen_error_t gen_window_modify(gen_window_system_t* const restrict window_system,
 			size_t length = 0;
 			error = gen_string_length(attribute->name, GEN_STRING_NO_BOUND, GEN_STRING_NO_BOUND, &length);
 			GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
-
-			cookie = xcb_change_property_checked(window_system->internal_connection, XCB_PROP_MODE_REPLACE, window->window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, GEN_INTERNAL_DATA_FORMAT_CHAR, (uint32_t) length, attribute->name);
+			cookie = xcb_icccm_set_wm_name_checked(window_system->internal_connection, window->window, XCB_ATOM_STRING, 8, (uint32_t) length, attribute->name);
 			error = gen_internal_window_system_validate_request_cookie(window_system, cookie);
 			GEN_ERROR_OUT_IF(error, "`gen_internal_window_system_validate_request_cookie` failed");
 

@@ -44,7 +44,7 @@
 - Add tests for `genstring`
 - Remove superfluous `-Llib`
 - Add a `PORTING.md` info file or put in `README.md`
-- Async IO using `aio(7)` (`aio_read` `aio_write`)
+- Async IO using `aio(7)` (`aio_read` `aio_write`) - or io_uring ;^)
 - `timer_create` (https://linux.die.net/man/2/timer_create)
 - Time-formats
 - `generator` (editor)
