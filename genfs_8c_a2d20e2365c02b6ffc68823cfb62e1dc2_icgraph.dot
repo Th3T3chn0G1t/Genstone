@@ -1,0 +1,15 @@
+digraph "gen_filesystem_handle_close"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="gen_filesystem_handle\l_close",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="gen_filesystem_handle\l_close",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genfs_8h.html#a322b19e37828c97b2e8683059e9db489",tooltip=" "];
+  Node2 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="gen_filewatch_destroy",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genfs_8h.html#a62dd87931c61c14240484e60dc0dcaef",tooltip=" "];
+  Node3 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

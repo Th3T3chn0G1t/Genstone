@@ -1,0 +1,55 @@
+digraph "genstone/gencore/include/generrors.h"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="genstone/gencore/include\l/generrors.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="genstone/gencore/include\l/gencommon.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gencommon_8h.html",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="genstone/gencore/gemory.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gemory_8c.html",tooltip=" "];
+  Node2 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="genstone/gencore/include\l/genargs.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genargs_8h.html",tooltip=" "];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="genstone/gencore/genargs.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genargs_8c.html",tooltip=" "];
+  Node2 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="genstone/gencore/include\l/genstring.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8h.html",tooltip=" "];
+  Node6 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="genstone/gencore/gendl.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gendl_8c.html",tooltip=" "];
+  Node6 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="genstone/gencore/genfs.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genfs_8c.html",tooltip=" "];
+  Node6 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="genstone/gencore/genstring.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8c.html",tooltip=" "];
+  Node2 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="genstone/gencore/gencommon.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gencommon_8c.html",tooltip=" "];
+  Node2 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="genstone/gencore/include\l/gendl.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gendl_8h.html",tooltip=" "];
+  Node11 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node12 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="genstone/gencore/include\l/genfs.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genfs_8h.html",tooltip=" "];
+  Node12 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 -> Node13 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="genstone/gencore/include\l/genproc.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genproc_8h.html",tooltip=" "];
+  Node2 -> Node14 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="genstone/gencore/generrors.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$generrors_8c.html",tooltip=" "];
+  Node2 -> Node15 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node15 [label="genstone/gencore/include\l/genlocale.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genlocale_8h.html",tooltip=" "];
+  Node15 -> Node16 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node16 [label="genstone/gencore/genlocale.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genlocale_8c.html",tooltip=" "];
+  Node2 -> Node17 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node17 [label="genstone/gencore/gentooling.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gentooling_8c.html",tooltip=" "];
+  Node2 -> Node13 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node18 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node18 [label="genstone/gencore/threademu\l/threads.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$threads_8c.html",tooltip=" "];
+  Node2 -> Node19 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node19 [label="genstone/gencalc/include\l/gencalc.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gencalc_8h.html",tooltip=" "];
+  Node19 -> Node20 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node20 [label="genstone/genuine/include\l/genuine.h",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genuine_8h.html",tooltip=" "];
+  Node20 -> Node21 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node21 [label="genstone/genuine/genuine.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genuine_8c.html",tooltip=" "];
+  Node2 -> Node20 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

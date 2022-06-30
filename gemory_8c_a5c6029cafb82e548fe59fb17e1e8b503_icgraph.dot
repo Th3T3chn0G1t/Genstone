@@ -1,0 +1,25 @@
+digraph "gzalloc"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="gzalloc",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="gen_dylib_load",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gendl_8h.html#aaed6d7f3e9066255d1e1d642f1248b26",tooltip=" "];
+  Node2 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="gen_string_duplicate",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8h.html#a370886eac3f6e57695b6eb96fcaa9947",tooltip=" "];
+  Node3 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="gen_string_number",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8h.html#adc2f6b2b86f0116dfc3c2d2b1a820d34",tooltip=" "];
+  Node4 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="gzalloc",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gemory_8h.html#a551d862cfaba9c2a431a2e6028754690",tooltip=" "];
+  Node5 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="thrd_create",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$threads_8c.html#a1a52b6cd2d15cc6c4741d5124f85d183",tooltip=" "];
+  Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

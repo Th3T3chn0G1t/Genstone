@@ -1,0 +1,21 @@
+digraph "gen_string_copy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="gen_string_copy",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="gen_string_append",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8h.html#afa44ed82a24ecfc443d2d4f38ba68270",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="gen_dylib_load",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$gendl_8h.html#aaed6d7f3e9066255d1e1d642f1248b26",tooltip=" "];
+  Node3 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="gen_string_duplicate",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8h.html#a370886eac3f6e57695b6eb96fcaa9947",tooltip=" "];
+  Node4 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="gen_string_number",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$genstring_8h.html#adc2f6b2b86f0116dfc3c2d2b1a820d34",tooltip=" "];
+  Node5 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}
