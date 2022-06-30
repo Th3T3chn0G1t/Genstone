@@ -11,7 +11,7 @@
                 "variable": "LD_LIBRARY_PATH"
             }
         ],
-        "executable": "/home/ttg/dev/Genstone/sample.out",
+        "executable": "sample.out",
         "inject": false,
         "numQueuedFrames": 0,
         "options": {
