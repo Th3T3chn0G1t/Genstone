@@ -196,8 +196,6 @@
 #define GEN_MICROSECONDS_PER_SECOND 1000000
 #define GEN_MILLISECONDS_PER_SECOND 1000
 
-#include <sys/time.h>
-
 /**
  * Converts a timeval to seconds as a `long double`.
  * @param[in] timeval the `struct timeval` to convert.

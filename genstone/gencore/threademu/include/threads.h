@@ -6,8 +6,6 @@
 #ifndef THREADS_H
 #define THREADS_H
 
-#include <pthread.h>
-
 #define thread_local _Thread_local
 
 typedef pthread_cond_t cnd_t;

@@ -11,8 +11,6 @@
 
 #include "gencommon.h"
 
-#include <dlfcn.h>
-
 /**
  * A handle for a dynamically loaded library.
  */

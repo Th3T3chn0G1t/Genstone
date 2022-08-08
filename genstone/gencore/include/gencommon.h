@@ -18,6 +18,7 @@ GEN_DIAG_IGNORE_ALL
 #include <complex.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <fenv.h>
@@ -46,7 +47,9 @@ GEN_DIAG_IGNORE_ALL
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include <tgmath.h>
+#include <pthread.h>
 #include <threads.h>
 #include <time.h>
 #include <unistd.h>

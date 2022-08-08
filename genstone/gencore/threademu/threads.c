@@ -30,8 +30,6 @@
  *  DEALINGS IN THE SOFTWARE.
  */
 
-#include "include/threads.h"
-
 #include "../include/gencommon.h"
 
 void* impl_thrd_routine(void* p) {
