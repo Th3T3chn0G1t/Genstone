@@ -20,15 +20,17 @@ gen_error_t gen_parse_args(const int argc, const char* const restrict* restrict 
 	GEN_FOREACH_PTR(i, arg, argc - 1, argv + 1) {
 		if((*arg)[0] == '-' && (*arg)[1] == '-' && n_long_args) {
 			GEN_FOREACH_PTR(j, long_arg, n_long_args, long_args) {
+				size_t long_arg_len = 0;
+				error = gen_string_length(*long_arg, GEN_STRING_NO_BOUND, GEN_STRING_NO_BOUND, &long_arg_len);
+				GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 				bool equal = false;
-				error = gen_string_compare(*long_arg, GEN_STRING_NO_BOUND, *arg, GEN_STRING_NO_BOUND, GEN_STRING_NO_BOUND, &equal);
+				error = gen_string_compare(*long_arg, GEN_STRING_NO_BOUND, *arg + 2, GEN_STRING_NO_BOUND, long_arg_len, &equal);
 				GEN_ERROR_OUT_IF(error, "`gen_string_compare` failed");
 				if(equal) {
-					const char* param = 0;
+					const char* param = NULL;
 					error = gen_string_character_first(*arg, GEN_STRING_NO_BOUND, '=', GEN_STRING_NO_BOUND, &param);
 					GEN_ERROR_OUT_IF(error, "`gen_string_character_first` failed");
-					const size_t param_offset = (size_t) (param - *arg);
-					error = handler(GEN_ARG_LONG, j, (*arg)[param_offset + 1] ? &(*arg)[param_offset + 1] : NULL, passthrough);
+					error = handler(GEN_ARG_LONG, j, param ? param + 1 : NULL, passthrough);
 					GEN_ERROR_OUT_IF(error, "Call to arg handler failed");
 				}
 			}

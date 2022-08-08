@@ -24,6 +24,11 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 	error = gen_string_length(b, b_bound, limit, &b_length);
 	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
 
+	if(limit == GEN_STRING_NO_BOUND && a_length != b_length) {
+		*out_equal = false;
+		GEN_ALL_OK;
+	}
+
 	size_t compare_length = a_length;
 	if(limit < compare_length) compare_length = limit;
 	if(compare_length > b_length) compare_length = b_length;
