@@ -1,5 +1,6 @@
 # TODO
 
+- stdin wrapper akin to `glogX`
 - Fix build system with changes in Alonira
 - Clean up output of error messages
 - `gfree` sets pointers to `NULL`
