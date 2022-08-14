@@ -171,8 +171,15 @@ gen_error_t gen_filesystem_handle_read(unsigned char* restrict output_buffer, co
 
 	GEN_NULL_CHECK(handle);
 	if(handle->is_directory) GEN_ERROR_OUT(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
-	if(start >= end) GEN_ERROR_OUT(GEN_TOO_SHORT, "`start` >= `end`");
+	if(start > end) GEN_ERROR_OUT(GEN_TOO_SHORT, "`start` > `end`");
 	GEN_NULL_CHECK(output_buffer);
+
+	if(start == end) {
+		lseek(handle->file_handle, 0, SEEK_SET);
+		GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
+
+		GEN_ALL_OK;
+	}
 
 	lseek(handle->file_handle, (long) start, SEEK_SET);
 	GEN_ERROR_OUT_IF_ERRNO(lseek, errno);
