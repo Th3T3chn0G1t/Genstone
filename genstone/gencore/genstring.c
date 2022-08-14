@@ -112,7 +112,6 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 		if(!*c) GEN_ALL_OK;
 		++*out_length;
 	}
-	if(*out_length > limit) *out_length = limit;
 
 	if(*out_length > limit) *out_length = limit;
 	if(limit == GEN_STRING_NO_BOUND) GEN_ERROR_OUT(GEN_TOO_SHORT, "String length exceeded string bounds");
