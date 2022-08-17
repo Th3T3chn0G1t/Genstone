@@ -1034,9 +1034,13 @@ GEN_INTERNAL_ERRORABLE gen_internal_vk_create_swapchain(gen_gfx_context_t* const
 	GEN_NULL_CHECK(window);
 	GEN_NULL_CHECK(targetable);
 
+#if WINSYS == XCB
 	const VkXcbSurfaceCreateInfoKHR surface_create_info = {VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR, NULL, 0, window_system->internal_connection, window->window};
 	VkResult result = vkCreateXcbSurfaceKHR(context->internal_instance, &surface_create_info, context->internal_allocator, &targetable->internal_surface);
 	GEN_INTERNAL_ERROR_OUT_IF_VKRESULT(result, vkCreateXcbSurfaceKHR);
+#else
+	VkResult result = VK_SUCCESS;
+#endif
 
 	VkSurfaceCapabilitiesKHR surface_capabilities = {0};
 	result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(context->internal_physical_device, targetable->internal_surface, &surface_capabilities);

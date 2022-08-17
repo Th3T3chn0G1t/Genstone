@@ -1,7 +1,7 @@
 _VULKAN_COMMON_DEFINES = -DAPI_NAME="Vulkan" -DVK_ENABLE_BETA_EXTENSIONS -DVULKAN_NON_CMAKE_BUILD -DSYSCONFDIR=\"/etc\" -DFALLBACK_CONFIG_DIRS=\"/etc/xdg\" -DFALLBACK_DATA_DIRS=\"/usr/local/share:/usr/share\"
 _VULKAN_COMMON_CFLAGS = $(_VULKAN_COMMON_DEFINES) -Igenstone/vendor/Vulkan-Headers/include -Igenstone/vendor/Vulkan-Loader/loader -Igenstone/vendor/Vulkan-Loader/loader/generated
 
-_VULKAN_CFLAGS = $(_VULKAN_COMMON_CFLAGS) -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-missing-field-initializers -Wno-typedef-redefinition -fno-strict-aliasing -fno-builtin-memcmp
+_VULKAN_CFLAGS = $(_VULKAN_COMMON_CFLAGS) -Wno-implicit-fallthrough -Wno-unused-parameter -Wno-missing-field-initializers -Wno-typedef-redefinition -Wno-availability -Wno-nullability-completeness -Wno-expansion-to-defined -DTARGET_OS_IPHONE=0 -fno-strict-aliasing -fno-builtin-memcmp
 _VULKAN_LFLAGS =
 ifeq ($(PLATFORM),DWN)
 _VULKAN_CFLAGS += -DVK_USE_PLATFORM_MACOS_MVK -DVK_USE_PLATFORM_METAL_EXT
