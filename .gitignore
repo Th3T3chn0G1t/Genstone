@@ -1,8 +1,6 @@
 *.o
 *.obj
 
-*.spv
-
 *.a
 *.lib
 
@@ -13,35 +11,11 @@
 
 *.out
 *.exe
-*.app
 
 *.def
 *.exp
 
-*.dSYM
-
-*.depfile
-
-*.tmp
-*.log
-
-*.plist
-
-*.gcda
-*.gcno
-*.profraw
-
-vgcore.*
-
-docs/*
-out/*
-tmp/*
-vulkan/*
-
-genstone/vendor/tmp/*
-
-filename
-test.c
+*.spv
 
 .vscode
 .vs

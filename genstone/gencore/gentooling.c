@@ -3,12 +3,36 @@
 
 #include "include/gencommon.h"
 
-thread_local gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
-thread_local gen_tooling_freq_profile_t gen_tooling_freq_profiles[GEN_FREQ_PROFILE_MAX] = {0};
-thread_local size_t gen_tooling_freq_profile_next = 0;
+#ifndef GEN_TOOLING_DEPTH
+/**
+ * The maximum depth of a tooled call stack.
+ */
+#define GEN_TOOLING_DEPTH 64
+#endif
 
-thread_local gen_tooling_stack_push_handler_t gen_tooling_push_handler = NULL;
-thread_local gen_tooling_stack_pop_handler_t gen_tooling_pop_handler = NULL;
+/**
+ * A tooled call stack.
+ */
+typedef struct {
+	/**
+     * Offset of the next free space in the stack.
+     */
+	size_t next;
+	/**
+     * A buffer of function names.
+     */
+	const char* functions[GEN_TOOLING_DEPTH];
+	/**
+     * A buffer of function addresses.
+     */
+	uintptr_t addresses[GEN_TOOLING_DEPTH];
+	/**
+     * A buffer of source files for functions.
+     */
+	const char* files[GEN_TOOLING_DEPTH];
+} gen_tooling_stack_t;
+
+thread_local gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
 
 void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file) {
 	if(gen_tooling_call_stack.next >= GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");

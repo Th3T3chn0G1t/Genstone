@@ -40,7 +40,7 @@
  * @param[in] cents the cents part of the currency amount.
  * @return an error code.
  */
-GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const size_t buffer_size, size_t* const restrict out_size, const uint64_t units, const uint64_t cents);
+extern gen_error_t gen_locale_convert_currency(char* const restrict out_string, const size_t buffer_size, size_t* const restrict out_size, const uint64_t units, const uint64_t cents);
 /**
  * @example{lineno} example/gencore/gen_locale_convert_currency.c
  * Example for how to use `gen_locale_convert_currency`.
@@ -60,6 +60,6 @@ GEN_ERRORABLE gen_locale_convert_currency(char* const restrict out_string, const
 //  * @param flags the aspects of the string to generate, or'd together
 //  * @return an error code.
 //  */
-// GEN_ERRORABLE gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const unsigned char day, const unsigned char hours, const unsigned char minutes, const unsigned char seconds, const gen_dt_fmt_flags_t flags);
+// extern gen_error_t gen_locale_convert_date_and_time(char* const out_string, size_t* const restrict out_size, const uint64_t year, const gen_month_t month, const unsigned char day, const unsigned char hours, const unsigned char minutes, const unsigned char seconds, const gen_dt_fmt_flags_t flags);
 
 #endif

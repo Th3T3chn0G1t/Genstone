@@ -9,57 +9,45 @@
 #ifndef GEN_COMMON_H
 #define GEN_COMMON_H
 
-#include "gendiag.h"
-#include "generrors.h"
+/**
+ * Begins a diagnostic region.
+ */
+#define GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN clang diagnostic push
+/**
+ * Ends a diagnostic region.
+ */
+#define GEN_PRAGMA_DIAGNOSTIC_REGION_END clang diagnostic pop
+/**
+ * Ignores a class of compiler warnings in a diagnostic region.
+ * @param w The compiler flag for the warning to ignore.
+ */
+#define GEN_DIAGNOSTIC_REGION_IGNORE(w) clang diagnostic ignored w
+/**
+ * Forcibly stringifies its parameter. Used for preprocessor ordering shenanigans.
+ * @param s The parameter to be stringified.
+ */
+#define GEN_STRINGIFY(s) #s
+/**
+ * Wraps `#pragma`/`_Pragma` to allow use of `GEN_PRAGMA_*` wrappers.
+ * @param p The pragma statement to wrap.
+ */
+#define GEN_PRAGMA(p) _Pragma(GEN_STRINGIFY(p))
+/**
+ * Pretty wrapper for `__FILE__`.
+ */
+#define GEN_FILENAME __FILE__
+/**
+ * Pretty wrapper for `__LINE__`.
+ */
+#define GEN_LINENO __LINE__
 
-GEN_DIAG_REGION_BEGIN
-GEN_DIAG_IGNORE_ALL
-#include <assert.h>
-#include <complex.h>
-#include <ctype.h>
-#include <dirent.h>
-#include <dlfcn.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <fenv.h>
-#include <float.h>
-#include <inttypes.h>
-#include <iso646.h>
-#include <limits.h>
-#include <locale.h>
-#include <math.h>
-#include <poll.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <stdalign.h>
-#include <stdarg.h>
-#include <stdatomic.h>
-#include <stdbool.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdnoreturn.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/time.h>
-#include <tgmath.h>
-#include <pthread.h>
-#include <threads.h>
-#include <time.h>
-#include <unistd.h>
-#include <wchar.h>
-#include <wctype.h>
-GEN_DIAG_REGION_END
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-#include "gemory.h"
+#include "generrors.h"
 #include "gentooling.h"
-#include "genutil.h"
-#include "glog.h"
 
 #endif

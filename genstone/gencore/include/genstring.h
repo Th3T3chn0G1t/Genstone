@@ -28,7 +28,7 @@
  * @param[out] out_equal pointer to storage for the result of the comparison.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_compare(const char* const restrict a, const size_t a_bound, const char* const restrict b, const size_t b_bound, const size_t limit, bool* const restrict out_equal);
+extern gen_error_t gen_string_compare(const char* const restrict a, const size_t a_bound, const char* const restrict b, const size_t b_bound, const size_t limit, bool* const restrict out_equal);
 /**
  * Copies the contents of a string into another.
  * @param[in] destination the destination for the copied data.
@@ -38,7 +38,7 @@ GEN_ERRORABLE gen_string_compare(const char* const restrict a, const size_t a_bo
  * @param[in] limit the number of characters to copy.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_copy(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit);
+extern gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit);
 /**
  * Appends one string to another.
  * @param[in] destination the destination to append to.
@@ -48,7 +48,7 @@ GEN_ERRORABLE gen_string_copy(char* const restrict destination, const size_t des
  * @param[in] limit the number of characters to append.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_append(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit);
+extern gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit);
 /**
  * Gets the length of a string.
  * @param[in] string the string whose length should be found.
@@ -56,7 +56,7 @@ GEN_ERRORABLE gen_string_append(char* const restrict destination, const size_t d
  * @param[out] out_length pointer to storage for the length of the string.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length);
+extern gen_error_t gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length);
 /**
  * Duplicates a string onto the heap.
  * @param[in] string the string to duplicate.
@@ -65,7 +65,7 @@ GEN_ERRORABLE gen_string_length(const char* const restrict string, const size_t 
  * @param[out] out_duplicated pointer to storage for a pointer to the duplicated string. Must be freed.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated);
+extern gen_error_t gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated);
 /**
  * Finds the first occurrence of a character in a string.
  * @param[in] string the string to search in.
@@ -75,7 +75,7 @@ GEN_ERRORABLE gen_string_duplicate(const char* const restrict string, const size
  * @param[out] out_found pointer to storage for a pointer to the found occurrence, or NULL if the character was not found.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found);
+extern gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found);
 /**
  * Finds the last occurrence of a character in a string.
  * @param[in] string the string to search in.
@@ -85,7 +85,7 @@ GEN_ERRORABLE gen_string_character_first(const char* const restrict string, cons
  * @param[out] out_found pointer to storage for a pointer to the found occurrence, or NULL if the character was not found.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found);
+extern gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found);
 
 /**
  * Creates a number from a numeric string.
@@ -94,6 +94,6 @@ GEN_ERRORABLE gen_string_character_last(const char* const restrict string, const
  * @param[out] out_number a pointer to storage for the created number.
  * @return an error code.
  */
-GEN_ERRORABLE gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number);
+extern gen_error_t gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number);
 
 #endif

@@ -31,7 +31,7 @@ typedef pid_t gen_process_t;
  * @param[in] redirect the handle to redirect output to.
  * @return an error code. 
  */
-GEN_ERRORABLE gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect);
+extern gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect);
 
 /**
  * Blocks the current thread until the specified subprocess exits.
@@ -39,13 +39,13 @@ GEN_ERRORABLE gen_proc_create_redirected_to(gen_process_t* const restrict out_pr
  * @param out_exitcode pointer to storage for the exit code of the subprocess.
  * @return an error code.
  */
-GEN_ERRORABLE gen_proc_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
+extern gen_error_t gen_proc_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
 
 /**
  * Attempts to kill a subprocess.
  * @param process the subprocess to kill.
  * @return an error code.
  */
-GEN_ERRORABLE gen_proc_kill(const gen_process_t* const restrict process);
+extern gen_error_t gen_proc_kill(const gen_process_t* const restrict process);
 
 #endif

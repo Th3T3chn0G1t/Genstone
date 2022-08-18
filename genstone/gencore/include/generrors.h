@@ -3,30 +3,18 @@
 
 /**
  * @file generrors.h
- * Contains error value enumerations.
- * These error values are reported across the library so most headers transiently include this one.
+ * Contains error value enumerations and API for interacting with errors.
  */
 
 #ifndef GEN_ERRORS_H
 #define GEN_ERRORS_H
 
-GEN_DIAG_REGION_BEGIN
-GEN_DIAG_IGNORE_ALL
-#include <errno.h>
-GEN_DIAG_REGION_END
-
-#ifndef EOK
-#define EOK (0)
-#endif
-
-typedef int errno_t;
-
 /**
- * Return values for errorable functions.
- * The descriptions on `gen_error_t` enumerations are *hints*, they may be used in other contexts.
+ * The generic type of error encountered.
+ * The descriptions on `gen_error_t` enumerations are hints, they may be used in other contexts.
  * @note Some errors will become `GEN_UNKNOWN` on platforms that do not support them or report them nontrivially.
  */
-typedef enum
+typedef enum : size_t
 {
 	/**
      * No error occurred.
@@ -120,131 +108,48 @@ typedef enum
 	 * An operation timed out.
 	 */
 	GEN_TIMEOUT
+} gen_error_type_t;
+
+/**
+ * The return value for an errorable function.
+ */
+typedef struct {
+	/**
+	 * The generic type of error encountered.
+	 */
+	gen_error_type_t type;
+	/**
+	 * A string explaining the context behind an error.
+	 */
+	const char* context;
 } gen_error_t;
 
 /**
- * Gets the name of a `gen_error_t`.
+ * Gets the name of a `gen_error_type_t`.
+ * @param[in] error The error type to get the name of.
+ * @return The name of the error.
  */
-extern const char* gen_error_name(const gen_error_t error);
-/**
- * @example{lineno} example/gencore/gen_error_name.c
- * Example for how to use `gen_error_name`.
- * `gen_error_name` is used for getting the name of a Genstone error.
- */
+extern const char* gen_error_name(const gen_error_type_t error);
 
 /**
- * Gets the generic description of a `gen_error_t`.
+ * Gets the generic description of a `gen_error_type_t`.
+ * @param[in] error The error type to get the description of.
+ * @return A description of the error.
  */
-extern const char* gen_error_description(const gen_error_t error);
-/**
- * @example{lineno} example/gencore/gen_error_description.c
- * Example for how to use `gen_error_description`.
- * `gen_error_description` is used for getting the description of a Genstone error.
- */
+extern const char* gen_error_description(const gen_error_type_t error);
 
 /**
- * Return value specification for function declarations which use `generror` for error reporting.
+ * Converts the value of errno into a genstone error type.
+ * @return The converted error enumeration.
  */
-#define GEN_ERRORABLE extern __nodiscard gen_error_t
-/**
- * Return value specification for internal functions which use `generror` for error reporting.
- */
-#define GEN_INTERNAL_ERRORABLE static __nodiscard gen_error_t
+extern gen_error_type_t gen_error_from_errno();
 
 /**
- * Aborts the program with a fatal error.
- * Avoids `gtrace`.
- * Avoids triggering error hander.
- * @param[in] error an error code.
- * @param[in] msg contextual error message.
+ * Constructs an error and attaches a backtrace down to the caller.
+ * @param[in] type The generic type of the error to construct.
+ * @param[in] context The context behind the error.
+ * @return The constructed error.
  */
-#define GEN_FATAL_ERROR(error, msg) \
-	do { \
-		glogf(ERROR, "%s: %s", gen_error_name(error), msg); \
-		GEN_REQUIRE_NO_REACH; \
-	} while(0)
-
-/**
- * Errors out of a function marked `GEN_ERRORABLE`.
- * @param[in] error an error code.
- * @param[in] msg contextual error message.
- */
-#define GEN_ERROR_OUT(error, msg) \
-	do { \
-		glogf(ERROR, "%s: %s at %s:%i", gen_error_name(error), msg, __FILE__, __LINE__); \
-		return error; \
-	} while(0)
-
-/**
- * Returns from a function marked `GEN_ERRORABLE`.
- */
-#define GEN_ALL_OK return GEN_OK
-
-/**
- * Errors out of a function marked `GEN_ERRORABLE` if `error` is not `GEN_OK`.
- * @param[in] error an error code.
- * @param[in] msg contextual error message.
- */
-#define GEN_ERROR_OUT_IF(error, msg) \
-	do { \
-		if(error != GEN_OK) { \
-			glogf(ERROR, "%s: %s at %s:%i", gen_error_name(error), msg, __FILE__, __LINE__); \
-			return error; \
-		} \
-	} while(0)
-
-/**
- * Errors out of a function marked `GEN_ERRORABLE` if `native_errno` is not `EOK` or equivalent.
- * Horrible macro string manipulation to get some nice output on your errno.
- * @param[in] proc the function which set errno.
- * @param[in] native_errno the errno value.
- */
-#define GEN_ERROR_OUT_IF_ERRNO(proc, native_errno) \
-	if(native_errno) GEN_ERROR_OUT_ERRNO(proc, native_errno)
-
-/**
- * Horrible macro string manipulation to get some nice output on your errno.
- * Pretty assertion for errno == EOK.
- * @param[in] proc the function which set errno.
- * @param[in] native_errno the errno value.
- */
-#define GEN_REQUIRE_NO_ERRNO(proc, native_errno) \
-	do { \
-		const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
-		const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
-		if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "Require failed - %s: `%s` failed: %s", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno)); \
-		GEN_REQUIRE_EQUAL(GEN_OK, gen_internal_gen_require_no_errno_gen_error); \
-	} while(0)
-
-/**
- * Horrible macro string manipulation to get some nice output on your errno.
- * @param[in] proc the function which set errno.
- * @param[in] native_errno the errno value.
- */
-#define GEN_ERROR_OUT_ERRNO(proc, native_errno) \
-	do { \
-		const errno_t gen_internal_gen_require_no_errno_ernno = native_errno; \
-		const gen_error_t gen_internal_gen_require_no_errno_gen_error = gen_convert_errno(gen_internal_gen_require_no_errno_ernno); \
-		if(gen_internal_gen_require_no_errno_ernno) glogf(FATAL, "%s: `%s` failed: %s at %s:%i", gen_error_name(gen_internal_gen_require_no_errno_gen_error), #proc, strerror(gen_internal_gen_require_no_errno_ernno), __FILE__, __LINE__); \
-		return gen_internal_gen_require_no_errno_gen_error; \
-	} while(0)
-
-/**
- * This is to make the static analyzer happy.
- */
-#define GEN_NULL_CHECK(param) \
-	if(!param) GEN_ERROR_OUT(GEN_INVALID_PARAMETER, "`" #param "` was NULL")
-
-/**
- * Converts an errno into a genstone error.
- * @param[in] error the errno value to convert.
- * @return the converted error enumeration.
- */
-GEN_ERRORABLE gen_convert_errno(errno_t error);
-/**
- * @example{lineno} example/gencore/gen_convert_errno.c
- * Example for how to use `gen_convert_errno`.
- * `gen_convert_errno` is used for getting a libc errno error as a Genstone error.
- */
+extern gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const char* const restrict context);
 
 #endif
