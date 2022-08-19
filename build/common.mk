@@ -1,11 +1,12 @@
-CONFIG ?= build/config.mk
+CONFIG ?= $(GENSTONE_DIR)/build/config.mk
 include $(CONFIG)
 
-include build/platform.mk
+PLATFORM_MK ?= $(GENSTONE_DIR)/build/platform.mk
+include $(PLATFORM_MK)
 
 CLINKER = $(CLANGXX) -fuse-ld=lld
 
-GLOBAL_CFLAGS += -std=gnu2x
+GLOBAL_CFLAGS += -std=c2x
 GLOBAL_CFLAGS += -flto
 GLOBAL_CFLAGS += -DGEN_DISABLED=0 -DGEN_ENABLED=1
 GLOBAL_CFLAGS += -DGEN_DEBUG=0 -DGEN_RELEASE=1 -DGEN_BUILD_MODE=GEN_$(MODE)
@@ -48,10 +49,11 @@ ACTION_SUFFIX = \\033[0m
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<
 
-	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) --analyze $(GLOBAL_CFLAGS) $(CFLAGS) $(SAFLAGS) $<$(ACTION_SUFFIX)"
-	@$(CLANG) --analyze $(GLOBAL_CFLAGS) $(CFLAGS) $(SAFLAGS) $<
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<$(ACTION_SUFFIX)"
+	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
 
-	@$(CD) genstone $(AND) $(CLANG_FORMAT) -i $<
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+	@$(CD) genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
 
 %$(STATIC_LIB_SUFFIX):
 	@$(ECHO) "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
@@ -64,3 +66,18 @@ ACTION_SUFFIX = \\033[0m
 %$(EXECUTABLE_SUFFIX):
 	@$(ECHO) "$(ACTION_PREFIX)$(EXECUTABLE_TOOL)$(ACTION_SUFFIX)"
 	@$(EXECUTABLE_TOOL)
+
+.PHONY: clean_common
+clean_common:
+	-$(RMDIR) lib
+
+lib:
+	-$(MKDIR) $@
+
+MODULES = $(wildcard $(GENSTONE_DIR)/genstone/*.mk)
+MODULE_NAMES = $(subst $(GENSTONE_DIR)/genstone/,,$(subst .mk,,$(MODULES)))
+CLEAN_TARGETS = $(addprefix clean_,$(MODULE_NAMES)) clean_common
+TEST_TARGETS = $(addprefix test_,$(MODULE_NAMES))
+
+include $(MODULES)
+

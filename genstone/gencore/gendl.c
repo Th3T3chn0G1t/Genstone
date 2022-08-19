@@ -4,7 +4,7 @@
 #include "include/gendl.h"
 
 #include "include/gencommon.h"
-#include "include/genfs.h"
+#include "include/genfilesystem.h"
 #include "include/genstring.h"
 #include "include/gentooling.h"
 
@@ -16,7 +16,7 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 	// Just ignore it for now
 
 	GEN_NULL_CHECK(output_dylib);
-	if(!lib_name) gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`lib_name` was invalid");
+	if(!lib_name) gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`lib_name` was invalid");
 
 	size_t lib_name_length = 0;
 	gen_error_t error = gen_string_length(lib_name, GEN_PATH_MAX + 1, GEN_PATH_MAX, &lib_name_length);
@@ -40,21 +40,21 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 		gen_error_t free_error = gfree(lib_file_name);
 		gen_error_attach_backtrace_IF(free_error, "`gfree` failed");
 
-		gen_error_attach_backtrace(error, "`gen_string_append` failed");
+		gen_error_attach_backtrace(error, GEN_LINENO, "`gen_string_append` failed");
 	}
 	error = gen_string_append(lib_file_name, lib_file_name_length, lib_name, lib_name_length + 1, lib_name_length);
 	if(error != GEN_OK) {
 		gen_error_t free_error = gfree(lib_file_name);
 		gen_error_attach_backtrace_IF(free_error, "`gfree` failed");
 
-		gen_error_attach_backtrace(error, "`gen_string_append` failed");
+		gen_error_attach_backtrace(error, GEN_LINENO, "`gen_string_append` failed");
 	}
 	error = gen_string_append(lib_file_name, lib_file_name_length, lib_suffix, sizeof(lib_suffix), sizeof(lib_suffix) - 1);
 	if(error != GEN_OK) {
 		gen_error_t free_error = gfree(lib_file_name);
 		gen_error_attach_backtrace_IF(free_error, "`gfree` failed");
 
-		gen_error_attach_backtrace(error, "`gen_string_append` failed");
+		gen_error_attach_backtrace(error, GEN_LINENO, "`gen_string_append` failed");
 	}
 
 	if(!(*output_dylib = dlopen(lib_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
@@ -62,13 +62,13 @@ gen_error_t gen_dylib_load(gen_dylib_t* const restrict output_dylib, const char*
 		gen_error_t free_error = gfree(lib_file_name);
 		gen_error_attach_backtrace_IF(free_error, "`gfree` failed");
 
-		gen_error_attach_backtrace(GEN_UNKNOWN, "`dlopen` failed");
+		gen_error_attach_backtrace(GEN_UNKNOWN, GEN_LINENO, "`dlopen` failed");
 	}
 
 	gen_error_t free_error = gfree(lib_file_name);
 	gen_error_attach_backtrace_IF(free_error, "`gfree` failed");
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname) {
@@ -81,10 +81,10 @@ gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, cons
 
 	if(!(*output_address = dlsym(dylib, symname))) {
 		glogf(ERROR, "Failed to locate symbol `%s`: %s", symname, dlerror());
-		gen_error_attach_backtrace(GEN_UNKNOWN, "`dlsym` failed");
+		gen_error_attach_backtrace(GEN_UNKNOWN, GEN_LINENO, "`dlsym` failed");
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
@@ -92,8 +92,8 @@ gen_error_t gen_dylib_unload(const gen_dylib_t dylib) {
 
 	if(dlclose(dylib)) {
 		glogf(ERROR, "Failed to unload library: %s", dlerror());
-		gen_error_attach_backtrace(GEN_UNKNOWN, "`dlclose` failed");
+		gen_error_attach_backtrace(GEN_UNKNOWN, GEN_LINENO, "`dlclose` failed");
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }

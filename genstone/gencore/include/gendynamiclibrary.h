@@ -2,12 +2,12 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
- * @file gendl.h
+ * @file gendynamiclibrary.h
  * Utility for managing dynamic libraries.
  */
 
-#ifndef GEN_DL_H
-#define GEN_DL_H
+#ifndef GEN_DYNAMIC_LIBRARY_H
+#define GEN_DYNAMIC_LIBRARY_H
 
 #include "gencommon.h"
 
@@ -17,16 +17,10 @@
 typedef void* gen_dylib_t;
 
 /**
- * @example{lineno} example/gencore/gen_dylib.c
- * Example for how to use `gen_dylib_load` `gen_dylib_symbol` and `gen_dylib_unload`.
- * The `gen_dylib*` family of functions is used to manage dynamic libraries in a platform agnostic way.
- */
-
-/**
  * Loads a dynamic library.
  * @param[out] output_dylib a pointer to storage for the loaded dylib handle.
  * @param[in] lib_name the name of the library to load.
- * @return an error code.
+ * @return An error code.
  * @note The library name should be provided as just the significant portion of the name. e.g. to load `libfoo.so`, `lib_name` would be `foo`. This is to ensure that the same name can be used to load libraries on multiple platforms (i.e. on macOS `foo` would load `libfoo.dylib`).
  */
 extern gen_error_t gen_dylib_load(gen_dylib_t* restrict output_dylib, const char* const restrict lib_name);
@@ -35,13 +29,13 @@ extern gen_error_t gen_dylib_load(gen_dylib_t* restrict output_dylib, const char
  * @param[out] output_address a pointer to storage for the loaded symbol address.
  * @param[in] dylib the library to get the symbol from.
  * @param[in] symname the name of the symbol to get.
- * @return an error code.
+ * @return An error code.
  */
 extern gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname);
 /**
  * Unloads a dynamic library.
  * @param[in] dylib the library to unload.
- * @return an error code.
+ * @return An error code.
  * @note This may not immediately remove the library from memory depending on the dynamic linker and program state.
  */
 extern gen_error_t gen_dylib_unload(const gen_dylib_t dylib);

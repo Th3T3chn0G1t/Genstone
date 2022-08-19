@@ -29,7 +29,7 @@ typedef pid_t gen_process_t;
  * @param[out] out_process pointer to storage for the created process.
  * @param[in] exec the command line to start the process. This goes through the shell so caution should be taken regarding arbitrary shell execution.
  * @param[in] redirect the handle to redirect output to.
- * @return an error code. 
+ * @return An error code. 
  */
 extern gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect);
 
@@ -37,14 +37,14 @@ extern gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict o
  * Blocks the current thread until the specified subprocess exits.
  * @param process the subprocess to wait for.
  * @param out_exitcode pointer to storage for the exit code of the subprocess.
- * @return an error code.
+ * @return An error code.
  */
 extern gen_error_t gen_proc_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
 
 /**
  * Attempts to kill a subprocess.
  * @param process the subprocess to kill.
- * @return an error code.
+ * @return An error code.
  */
 extern gen_error_t gen_proc_kill(const gen_process_t* const restrict process);
 

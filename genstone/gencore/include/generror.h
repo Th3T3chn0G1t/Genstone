@@ -119,6 +119,10 @@ typedef struct {
 	 */
 	gen_error_type_t type;
 	/**
+	 * The line number at which the error occurred.
+	 */
+	size_t line;
+	/**
 	 * A string explaining the context behind an error.
 	 */
 	const char* context;
@@ -142,14 +146,26 @@ extern const char* gen_error_description(const gen_error_type_t error);
  * Converts the value of errno into a genstone error type.
  * @return The converted error enumeration.
  */
-extern gen_error_type_t gen_error_from_errno();
+extern gen_error_type_t gen_error_from_errno(void);
 
 /**
  * Constructs an error and attaches a backtrace down to the caller.
  * @param[in] type The generic type of the error to construct.
+ * @param[in] line The line number at which the error occurred.
  * @param[in] context The context behind the error.
  * @return The constructed error.
  */
-extern gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const char* const restrict context);
+extern gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict context);
+
+/**
+ * Constructs an error and attaches a backtrace down to the caller.
+ * Creates the context from a format string.
+ * @param[in] type The generic type of the error to construct.
+ * @param[in] line The line number at which the error occurred.
+ * @param[in] format The format string from which to create the context string.
+ * @param[in] ... The parameters to the format string.
+ * @return The constructed error.
+ */
+extern gen_error_t gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...);
 
 #endif

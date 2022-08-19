@@ -26,7 +26,7 @@
  * @param[in] size The size of the unit being allocated for.
  * @return An error code.
  */
-extern gen_error_t gen_allocate_zeroed(void* restrict* const restrict out_address, const size_t count, const size_t size);
+extern gen_error_t gen_memory_allocate_zeroed(void* restrict* const restrict out_address, const size_t count, const size_t size);
 
 /**
  * Allocates memory on the heap.
@@ -38,7 +38,7 @@ extern gen_error_t gen_allocate_zeroed(void* restrict* const restrict out_addres
  * @param[in] alignment The alignment to align the allocation to.
  * @return An error code.
  */
-extern gen_error_t gen_allocate_zeroed_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t alignment);
+extern gen_error_t gen_memory_allocate_zeroed_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t alignment);
 
 /**
  * Resizes a memory block on the heap.
@@ -50,7 +50,7 @@ extern gen_error_t gen_allocate_zeroed_aligned(void* restrict* const restrict ou
  * @param[in] size The size of the unit being allocated for.
  * @return An error code.
  */
-extern gen_error_t gen_reallocate_zeroed(void* restrict* const restrict address, const size_t old_count, const size_t count, const size_t size);
+extern gen_error_t gen_memory_reallocate_zeroed(void* restrict* const restrict address, const size_t old_count, const size_t count, const size_t size);
 
 /**
  * Frees a block of heap memory.
@@ -58,7 +58,7 @@ extern gen_error_t gen_reallocate_zeroed(void* restrict* const restrict address,
  * @param[in,out] address The heap pointer to free. Set to `NULL` once the block is freed.
  * @return An error code.
  */
-extern gen_error_t gen_free(void* restrict* const restrict address);
+extern gen_error_t gen_memory_free(void* restrict* const restrict address);
 
 /**
  * Sets a block of memory to a value.

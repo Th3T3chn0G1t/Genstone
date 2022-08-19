@@ -39,59 +39,59 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #define GEN_MEMORY_FREE free
 #endif
 
-gen_error_t gen_allocate_zeroed(void* restrict* const restrict out_address, const size_t count, const size_t size) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_allocate_zeroed", (void*) gen_allocate_zeroed, GEN_FILENAME);
+gen_error_t gen_memory_allocate_zeroed(void* restrict* const restrict out_address, const size_t count, const size_t size) {
+	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_memory_allocate_zeroed", (void*) gen_memory_allocate_zeroed, GEN_FILENAME);
 	if(error.type) return error;
 
-	if(!out_address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`out_address` was `NULL`");
-	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`size` was 0");
-	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`count` was 0");
-	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
+	if(!out_address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`out_address` was `NULL`");
+	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`size` was 0");
+	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`count` was 0");
+	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`size` was `SIZE_MAX`");
+	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`count` was `SIZE_MAX`");
 
 	void* const allocated = GEN_MEMORY_CALLOC(count, size);
-	if(!allocated) return gen_error_attach_backtrace(gen_error_from_errno(), "`" GEN_STRINGIFY(GEN_MEMORY_CALLOC) "` returned `NULL`");
+	if(!allocated) return gen_error_attach_backtrace(gen_error_from_errno(), GEN_LINENO, "`" GEN_STRINGIFY(GEN_MEMORY_CALLOC) "` returned `NULL`");
 
 	*out_address = allocated;
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
-gen_error_t gen_allocate_zeroed_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t alignment) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_allocate_zeroed_aligned", (void*) gen_allocate_zeroed_aligned, GEN_FILENAME);
+gen_error_t gen_memory_allocate_zeroed_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t alignment) {
+	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_memory_allocate_zeroed_aligned", (void*) gen_memory_allocate_zeroed_aligned, GEN_FILENAME);
 	if(error.type) return error;
 
-	if(!out_address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`out_address` was `NULL`");
-	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`size` was 0");
-	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`count` was 0");
-	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
-	if(!alignment) gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`alignment` was 0");
-	if(alignment & (alignment - 1)) gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`alignment` was not a power of 2");
+	if(!out_address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`out_address` was `NULL`");
+	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`size` was 0");
+	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`count` was 0");
+	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`size` was `SIZE_MAX`");
+	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`count` was `SIZE_MAX`");
+	if(!alignment) gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`alignment` was 0");
+	if(alignment & (alignment - 1)) gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`alignment` was not a power of 2");
 
 	// Size must be a multiple of alignment
 	const size_t aligned_size = (((count * size) / alignment) + 1) * alignment;
 
 	void* const allocated = GEN_MEMORY_ALIGNED_ALLOC(alignment, aligned_size);
-	if(!allocated) return gen_error_attach_backtrace(gen_error_from_errno(), "`" GEN_STRINGIFY(GEN_MEMORY_ALIGNED_ALLOC) "` returned `NULL`");
+	if(!allocated) return gen_error_attach_backtrace(gen_error_from_errno(), GEN_LINENO, "`" GEN_STRINGIFY(GEN_MEMORY_ALIGNED_ALLOC) "` returned `NULL`");
 
 	*out_address = allocated;
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
-gen_error_t gen_reallocate_zeroed(void* restrict* const restrict address, const size_t old_count, const size_t count, const size_t size) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_reallocate_zeroed", (void*) gen_reallocate_zeroed, GEN_FILENAME);
+gen_error_t gen_memory_reallocate_zeroed(void* restrict* const restrict address, const size_t old_count, const size_t count, const size_t size) {
+	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_memory_reallocate_zeroed", (void*) gen_memory_reallocate_zeroed, GEN_FILENAME);
 	if(error.type) return error;
 
-	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`address` was `NULL`");
-	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`size` was 0");
-	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`count` was 0");
-	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`count` was `SIZE_MAX`");
+	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`address` was `NULL`");
+	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`size` was 0");
+	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`count` was 0");
+	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`size` was `SIZE_MAX`");
+	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`count` was `SIZE_MAX`");
 	
 	void* const allocated = GEN_MEMORY_REALLOC(*address, count * size);
-	if(!allocated) return gen_error_attach_backtrace(gen_error_from_errno(), "`" GEN_STRINGIFY(GEN_MEMORY_REALLOC) "` returned `NULL`");
+	if(!allocated) return gen_error_attach_backtrace(gen_error_from_errno(), GEN_LINENO, "`" GEN_STRINGIFY(GEN_MEMORY_REALLOC) "` returned `NULL`");
 	if(count > old_count) {
 		error = gen_memory_set(allocated + (size * old_count), size * (count - old_count), 0);
 		if(error.type) return error;
@@ -99,43 +99,43 @@ gen_error_t gen_reallocate_zeroed(void* restrict* const restrict address, const 
 
 	*address = allocated;
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
-gen_error_t gen_free(void* restrict* const restrict address) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_free", (void*) gen_free, GEN_FILENAME);
+gen_error_t gen_memory_free(void* restrict* const restrict address) {
+	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_memory_free", (void*) gen_memory_free, GEN_FILENAME);
 	if(error.type) return error;
 
-	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`address` was `NULL`");
+	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`address` was `NULL`");
 
 	GEN_MEMORY_FREE(*address);
 
 	*address = NULL;
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_memory_set(void* const restrict address, const size_t length, const unsigned char value) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_memory_set", (void*) gen_memory_set, GEN_FILENAME);
 	if(error.type) return error;
 
-	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`address` was `NULL`");
+	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`address` was `NULL`");
 
 	memset(address, 0, value);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_memory_copy(const void* const restrict from, const size_t from_size, void* const restrict to, const size_t to_size, const size_t limit) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_memory_copy", (void*) gen_memory_copy, GEN_FILENAME);
 	if(error.type) return error;
 
-	if(!from) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`from` was `NULL`");
-	if(!to) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, "`to` was `NULL`");
-	if(limit > from_size) return gen_error_attach_backtrace(GEN_OUT_OF_BOUNDS, "`limit` exceeded `from_size`");
-	if(limit > to_size) return gen_error_attach_backtrace(GEN_OUT_OF_BOUNDS, "`limit` exceeded `to_size`");
+	if(!from) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`from` was `NULL`");
+	if(!to) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINENO, "`to` was `NULL`");
+	if(limit > from_size) return gen_error_attach_backtrace(GEN_OUT_OF_BOUNDS, GEN_LINENO, "`limit` exceeded `from_size`");
+	if(limit > to_size) return gen_error_attach_backtrace(GEN_OUT_OF_BOUNDS, GEN_LINENO, "`limit` exceeded `to_size`");
 
 	memcpy(to, from, limit);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }

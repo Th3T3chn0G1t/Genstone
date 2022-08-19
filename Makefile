@@ -1,10 +1,6 @@
-include build/common.mk
+GENSTONE_DIR = .
 
-MODULES = $(wildcard genstone/*.mk)
-MODULE_NAMES = $(subst genstone/,,$(subst .mk,,$(MODULES)))
-CLEAN_TARGETS = $(addprefix clean_,$(MODULE_NAMES))
-TEST_TARGETS = $(addprefix test_,$(MODULE_NAMES))
-include $(MODULES)
+include build/common.mk
 
 .PHONY: all
 .DEFAULT_GOAL := all
@@ -15,6 +11,3 @@ all: $(MODULE_NAMES)
 
 .PHONY: clean
 clean: $(CLEAN_TARGETS)
-
-lib:
-	-mkdir $@

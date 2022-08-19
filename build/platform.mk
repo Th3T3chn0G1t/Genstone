@@ -29,6 +29,7 @@ ifeq ($(PLATFORM), LINUX)
 	ECHO = echo -e
 	CD = cd
 	AND = &&
+	MKDIR = mkdir
 endif
 
 ifeq ($(PLATFORM), OSX)
@@ -49,6 +50,7 @@ ifeq ($(PLATFORM), OSX)
 	ECHO = echo
 	CD = cd
 	AND = &&
+	MKDIR = mkdir
 endif
 
 ifeq ($(PLATFORM), WINDOWS)
@@ -67,4 +69,5 @@ ifeq ($(PLATFORM), WINDOWS)
 	ECHO = echo
 	CD = cd
 	AND = &&
+	MKDIR = mkdir
 endif

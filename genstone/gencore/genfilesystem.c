@@ -2,25 +2,16 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 #include "include/genfs.h"
-
 #include "include/genstring.h"
-#include "include/gentooling.h"
 
-#if GEN_PATH_VALIDATION == ENABLED
-/**
- * Validates the path parameter to filesystem functions
- * @param[in] path the path to validate
- * @see GEN_PATH_VALIDATION
- */
-#define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) \
-	do { \
-		GEN_NULL_CHECK(path); \
-		gen_error_t path_error = gen_path_validate(path); \
-		if(path_error) gen_error_attach_backtrace(path_error, "`" #path "` was invalid"); \
-	} while(0)
-#else
-#define GEN_INTERNAL_FS_PATH_PARAMETER_VALIDATION(path) (void) path
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <unistd.h>
+
+#if GEN_PLATFORM == GEN_LINUX
+#include <sys/inotify.h>
 #endif
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 gen_error_t gen_path_canonical(char* restrict output_path, const char* const restrict path) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push("gen_path_canonical", (void*) gen_path_canonical, GEN_FILENAME);
@@ -32,7 +23,7 @@ gen_error_t gen_path_canonical(char* restrict output_path, const char* const res
 	realpath(path, output_path);
 	gen_error_attach_backtrace_IF_ERRNO(realpath, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_path_exists(const char* const restrict path, bool* const restrict out_exists) {
@@ -47,7 +38,7 @@ gen_error_t gen_path_exists(const char* const restrict path, bool* const restric
 
 	errno = EOK;
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_path_validate(const char* const restrict path) {
@@ -55,7 +46,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	if(error.type) return error;
 
 	GEN_NULL_CHECK(path);
-	if(!path[0]) gen_error_attach_backtrace(GEN_TOO_SHORT, "`path` was too short (`length(path)` was 0)");
+	if(!path[0]) gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINENO, "`path` was too short (`length(path)` was 0)");
 
 	// This is a kinda nonsensical test but it feels like the best way to do this
 	// Testing if length of path is less than GEN_PATH_MAX
@@ -63,7 +54,7 @@ gen_error_t gen_path_validate(const char* const restrict path) {
 	gen_error_t error = gen_string_length(path, GEN_PATH_MAX + 1, GEN_PATH_MAX, &path_length);
 	gen_error_attach_backtrace_IF(error, "`gen_string_length` failed");
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_path_create_file(const char* const restrict path) {
@@ -77,7 +68,7 @@ gen_error_t gen_path_create_file(const char* const restrict path) {
 	close(descriptor);
 	gen_error_attach_backtrace_IF_ERRNO(close, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_path_create_dir(const char* const restrict path) {
@@ -89,7 +80,7 @@ gen_error_t gen_path_create_dir(const char* const restrict path) {
 	mkdir(path, 0777);
 	gen_error_attach_backtrace_IF_ERRNO(mkdir, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_path_delete(const char* const restrict path) {
@@ -103,11 +94,11 @@ gen_error_t gen_path_delete(const char* const restrict path) {
 		unlink(path);
 		gen_error_attach_backtrace_IF_ERRNO(unlink, errno);
 
-		return (gen_error_t){GEN_OK, ""};
+		return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 	}
 	gen_error_attach_backtrace_IF_ERRNO(rmdir, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_filesystem_handle_open(gen_filesystem_handle_t* restrict output_handle, const char* const restrict path) {
@@ -127,7 +118,7 @@ gen_error_t gen_filesystem_handle_open(gen_filesystem_handle_t* restrict output_
 		output_handle->is_directory = false;
 		output_handle->file_handle = fd;
 
-		return (gen_error_t){GEN_OK, ""};
+		return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 	}
 
 	gen_error_attach_backtrace_IF_ERRNO(open, errno);
@@ -136,7 +127,7 @@ gen_error_t gen_filesystem_handle_open(gen_filesystem_handle_t* restrict output_
 	output_handle->directory_handle = fdopendir(fd);
 	gen_error_attach_backtrace_IF_ERRNO(fdopendir, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict handle) {
@@ -154,7 +145,7 @@ gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict 
 		gen_error_attach_backtrace_IF_ERRNO(close, errno);
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_filesystem_handle_size(size_t* const restrict out_size, const gen_filesystem_handle_t* const restrict handle) {
@@ -162,7 +153,7 @@ gen_error_t gen_filesystem_handle_size(size_t* const restrict out_size, const ge
 	if(error.type) return error;
 
 	GEN_NULL_CHECK(handle);
-	if(handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINENO, "`handle` was a directory");
 
 	size_t mark = (size_t) lseek(handle->file_handle, 0, SEEK_END);
 	gen_error_attach_backtrace_IF_ERRNO(lseek, errno);
@@ -172,7 +163,7 @@ gen_error_t gen_filesystem_handle_size(size_t* const restrict out_size, const ge
 
 	*out_size = mark;
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_filesystem_handle_read(unsigned char* restrict output_buffer, const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end) {
@@ -180,15 +171,15 @@ gen_error_t gen_filesystem_handle_read(unsigned char* restrict output_buffer, co
 	if(error.type) return error;
 
 	GEN_NULL_CHECK(handle);
-	if(handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
-	if(start > end) gen_error_attach_backtrace(GEN_TOO_SHORT, "`start` > `end`");
+	if(handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINENO, "`handle` was a directory");
+	if(start > end) gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINENO, "`start` > `end`");
 	GEN_NULL_CHECK(output_buffer);
 
 	if(start == end) {
 		lseek(handle->file_handle, 0, SEEK_SET);
 		gen_error_attach_backtrace_IF_ERRNO(lseek, errno);
 
-		return (gen_error_t){GEN_OK, ""};
+		return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 	}
 
 	lseek(handle->file_handle, (long) start, SEEK_SET);
@@ -200,7 +191,7 @@ gen_error_t gen_filesystem_handle_read(unsigned char* restrict output_buffer, co
 	lseek(handle->file_handle, 0, SEEK_SET);
 	gen_error_attach_backtrace_IF_ERRNO(lseek, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_filesystem_handle_write(const gen_filesystem_handle_t* const restrict handle, const size_t bytes_length, const unsigned char* const restrict buffer) {
@@ -208,7 +199,7 @@ gen_error_t gen_filesystem_handle_write(const gen_filesystem_handle_t* const res
 	if(error.type) return error;
 
 	GEN_NULL_CHECK(handle);
-	if(handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, "`handle` was a directory");
+	if(handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINENO, "`handle` was a directory");
 	GEN_NULL_CHECK(buffer);
 
 	write(handle->file_handle, buffer, bytes_length);
@@ -217,7 +208,7 @@ gen_error_t gen_filesystem_handle_write(const gen_filesystem_handle_t* const res
 	lseek(handle->file_handle, 0, SEEK_SET);
 	gen_error_attach_backtrace_IF_ERRNO(lseek, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict handle, const gen_directory_list_handler_t handler, void* const restrict passthrough) {
@@ -225,7 +216,7 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 	if(error.type) return error;
 
 	GEN_NULL_CHECK(handle);
-	if(!handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, "`handle` was a file");
+	if(!handle->is_directory) gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINENO, "`handle` was a file");
 	GEN_NULL_CHECK(handler);
 
 	rewinddir(handle->directory_handle);
@@ -244,14 +235,14 @@ gen_error_t gen_directory_list(const gen_filesystem_handle_t* const restrict han
 
 	rewinddir(handle->directory_handle);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
-#if GEN_FS_FILEWATCH_USE_SYSLIB == DISABLED
+#if GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == DISABLED
 GEN_INTERNAL_ERRORABLE gen_internal_filewatch_dwn_dircount(__unused const char* const restrict path, void* const restrict passthrough) {
 	GEN_NULL_CHECK(passthrough);
 	++(*(size_t*) passthrough);
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 #endif
 
@@ -262,7 +253,7 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 	GEN_NULL_CHECK(out_handle);
 	GEN_NULL_CHECK(handle);
 
-#if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
+#if PLATFORM == LNX && GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == ENABLED
 	out_handle->is_directory = false;
 
 	char pipe_name[GEN_PATH_MAX + 1] = {0};
@@ -293,7 +284,7 @@ gen_error_t gen_filewatch_create(gen_filesystem_handle_t* const restrict out_han
 	gen_error_attach_backtrace_IF_ERRNO(fstat, errno);
 #endif
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
@@ -305,7 +296,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 
 	*out_event = GEN_FILEWATCH_NONE;
 
-#if GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
+#if GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == ENABLED
 	struct pollfd fd = {handle->file_handle, POLLIN, 0};
 
 	fd.revents = 0;
@@ -344,7 +335,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 		gen_error_attach_backtrace_IF(error, "`gfree` failed");
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 #else
 	struct stat file_info;
 	fstat(handle->file_handle, &file_info);
@@ -377,7 +368,7 @@ gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, g
 	handle->internal_descriptor_details = file_info;
 	gen_error_attach_backtrace_IF_ERRNO(memcpy_s, errno);
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 #endif
 }
 
@@ -387,7 +378,7 @@ gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle
 
 	GEN_NULL_CHECK(handle);
 
-#if PLATFORM == LNX && GEN_FS_FILEWATCH_USE_SYSLIB == ENABLED
+#if PLATFORM == LNX && GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == ENABLED
 	close(handle->file_handle);
 	gen_error_attach_backtrace_IF_ERRNO(close, errno);
 #else
@@ -395,5 +386,5 @@ gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle
 	gen_error_attach_backtrace_IF(error, "`gen_filesystem_handle_close` failed");
 #endif
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }

@@ -15,7 +15,7 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 
 	*out_equal = true;
 
-	if(!limit) return (gen_error_t){GEN_OK, ""};
+	if(!limit) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 
 	size_t a_length = 0;
 	gen_error_t error = gen_string_length(a, a_bound, limit, &a_length);
@@ -27,7 +27,7 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 
 	if(limit == GEN_STRING_NO_BOUND && a_length != b_length) {
 		*out_equal = false;
-		return (gen_error_t){GEN_OK, ""};
+		return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 	}
 
 	size_t compare_length = a_length;
@@ -37,11 +37,11 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 	GEN_STRING_FOREACH(c, compare_length, a) {
 		if(*c != b[c - a]) {
 			*out_equal = false;
-			return (gen_error_t){GEN_OK, ""};
+			return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 		}
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
@@ -51,7 +51,7 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 	GEN_NULL_CHECK(destination);
 	GEN_NULL_CHECK(source);
 
-	if(!limit) return (gen_error_t){GEN_OK, ""};
+	if(!limit) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 
 	GEN_STRING_FOREACH(c, limit < destination_bound ? limit : destination_bound, destination)* c = '\0';
 
@@ -70,7 +70,7 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 		*c = source[c - destination];
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
@@ -80,7 +80,7 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 	GEN_NULL_CHECK(destination);
 	GEN_NULL_CHECK(source);
 
-	if(!limit) return (gen_error_t){GEN_OK, ""};
+	if(!limit) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 
 	size_t destination_length = 0;
 	gen_error_t error = gen_string_length(destination, destination_bound, GEN_STRING_NO_BOUND, &destination_length);
@@ -93,12 +93,12 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 	size_t append_length = source_length;
 	if(limit < append_length) append_length = limit;
 
-	if(destination_length + append_length + 1 > destination_bound) gen_error_attach_backtrace(GEN_TOO_SHORT, "Length of data to append was greater than string bounds");
+	if(destination_length + append_length + 1 > destination_bound) gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINENO, "Length of data to append was greater than string bounds");
 
 	error = gen_string_copy(destination + destination_length, destination_bound - destination_length, source, source_bound, append_length);
 	gen_error_attach_backtrace_IF(error, "`gen_string_copy` failed");
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length) {
@@ -108,19 +108,19 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 	GEN_NULL_CHECK(string);
 	GEN_NULL_CHECK(out_length);
 
-	if(!limit) return (gen_error_t){GEN_OK, ""};
+	if(!limit) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 
 	*out_length = 0;
 
 	GEN_STRING_FOREACH(c, string_bound, string) {
-		if(!*c) return (gen_error_t){GEN_OK, ""};
+		if(!*c) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 		++*out_length;
 	}
 
 	if(*out_length > limit) *out_length = limit;
-	if(limit == GEN_STRING_NO_BOUND) gen_error_attach_backtrace(GEN_TOO_SHORT, "String length exceeded string bounds");
+	if(limit == GEN_STRING_NO_BOUND) gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINENO, "String length exceeded string bounds");
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated) {
@@ -131,7 +131,7 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 
 	*out_duplicated = NULL;
 
-	if(!limit) gen_error_attach_backtrace(GEN_TOO_SHORT, "`limit` was 0");
+	if(!limit) gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINENO, "`limit` was 0");
 
 	size_t string_length = 0;
 	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
@@ -145,7 +145,7 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 	error = gen_string_copy(*out_duplicated, duplicate_length + 1, string, string_bound, limit);
 	gen_error_attach_backtrace_IF(error, "`gen_string_copy` failed");
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found) {
@@ -157,7 +157,7 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 
 	*out_found = NULL;
 
-	if(!limit) return (gen_error_t){GEN_OK, ""};
+	if(!limit) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 
 	size_t string_length = 0;
 	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
@@ -169,11 +169,11 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 	GEN_STRING_FOREACH(c, search_length, string) {
 		if(*c == character) {
 			*out_found = c;
-			return (gen_error_t){GEN_OK, ""};
+			return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 		}
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found) {
@@ -185,7 +185,7 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 	*out_found = NULL;
 	GEN_NULL_CHECK(out_found);
 
-	if(!limit) return (gen_error_t){GEN_OK, ""};
+	if(!limit) return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 
 	size_t string_length = 0;
 	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
@@ -198,11 +198,11 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 		const char* const current = ((string + (string_length - 1)) - (c - string));
 		if(*current == character) {
 			*out_found = current;
-			return (gen_error_t){GEN_OK, ""};
+			return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 		}
 	}
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }
 
 gen_error_t gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number) {
@@ -220,5 +220,5 @@ gen_error_t gen_string_number(const char* const restrict string, const size_t st
 	error = gfree(copy);
 	gen_error_attach_backtrace_IF(error, "`gfree` failed");
 
-	return (gen_error_t){GEN_OK, ""};
+	return (gen_error_t){GEN_OK, GEN_LINENO, ""};
 }

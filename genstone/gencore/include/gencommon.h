@@ -43,11 +43,12 @@
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-#include "generrors.h"
+#include "generror.h"
 #include "gentooling.h"
 
 #endif
