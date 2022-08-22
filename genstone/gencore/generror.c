@@ -9,10 +9,6 @@ GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <string.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-#ifndef EOK
-#define EOK (0)
-#endif
-
 const char* gen_error_type_name(const gen_error_type_t error) {
 	switch(error) {
 		case GEN_OK: return "GEN_OK";

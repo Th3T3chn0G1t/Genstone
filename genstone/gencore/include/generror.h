@@ -9,6 +9,10 @@
 #ifndef GEN_ERRORS_H
 #define GEN_ERRORS_H
 
+#ifndef EOK
+#define EOK (0)
+#endif
+
 /**
  * The generic type of error encountered.
  * The descriptions on `gen_error_t` enumerations are hints, they may be used in other contexts.

@@ -2,10 +2,19 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 #include "include/genstring.h"
+#include "include/genmemory.h"
 
-#include "include/gemory.h"
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <string.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-gen_error_t gen_string_compare(const char* const restrict a, const size_t a_bound, const char* const restrict b, const size_t b_bound, const size_t limit, bool* const restrict out_equal) {
+// TODO: We do not error out with bad bounding and instead just
+//       Silently use the minimum safe operation.
+//       We really should be reporting bounding issues to
+//       The user.
+
+gen_error_t gen_string_compare(const char* const restrict a, const size_t a_bounds, const char* const restrict b, const size_t b_bounds, const size_t limit, bool* const restrict out_equal) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_compare, GEN_FILE_NAME);
 	if(error.type) return error;
 
@@ -18,33 +27,24 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 	if(!limit) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 
 	size_t a_length = 0;
-	gen_error_t error = gen_string_length(a, a_bound, limit, &a_length);
+	error = gen_string_length(a, a_bounds, limit, &a_length);
 	if(error.type) return error;
 
 	size_t b_length = 0;
-	error = gen_string_length(b, b_bound, limit, &b_length);
+	error = gen_string_length(b, b_bounds, limit, &b_length);
 	if(error.type) return error;
 
-	if(limit == GEN_STRING_NO_BOUND && a_length != b_length) {
+	if(limit == GEN_STRING_NO_BOUNDS && a_length != b_length) {
 		*out_equal = false;
 		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 	}
 
-	size_t compare_length = a_length;
-	if(limit < compare_length) compare_length = limit;
-	if(compare_length > b_length) compare_length = b_length;
-
-	GEN_STRING_FOREACH(c, compare_length, a) {
-		if(*c != b[c - a]) {
-			*out_equal = false;
-			return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
-		}
-	}
+	*out_equal = !strncmp(a, b, GEN_MINIMUM(limit, GEN_MAXIMUM(GEN_MINIMUM(a_length, b_bounds), GEN_MINIMUM(b_length, a_bounds))));
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }
 
-gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
+gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bounds, const char* const restrict source, const size_t source_bounds, const size_t limit) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_copy, GEN_FILE_NAME);
 	if(error.type) return error;
 
@@ -53,27 +53,19 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 
 	if(!limit) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 
-	GEN_STRING_FOREACH(c, limit < destination_bound ? limit : destination_bound, destination)* c = '\0';
-
-	size_t destination_length = 0;
-	gen_error_t error = gen_string_length(destination, destination_bound, limit, &destination_length);
+	error = gen_memory_set(destination, GEN_MINIMUM(limit, destination_bounds), '\0');
 	if(error.type) return error;
 
 	size_t source_length = 0;
-	error = gen_string_length(source, source_bound, limit, &source_length);
+	error = gen_string_length(source, source_bounds, limit, &source_length);
 	if(error.type) return error;
 
-	size_t copy_length = source_length;
-	if(limit < copy_length) copy_length = limit;
-
-	GEN_STRING_FOREACH(c, copy_length, destination) {
-		*c = source[c - destination];
-	}
+	strncpy(destination, source, GEN_MINIMUM(limit, GEN_MINIMUM(source_length, destination_bounds)));
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }
 
-gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
+gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bounds, const char* const restrict source, const size_t source_bounds, const size_t limit) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_append, GEN_FILE_NAME);
 	if(error.type) return error;
 
@@ -83,7 +75,7 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 	if(!limit) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 
 	size_t destination_length = 0;
-	gen_error_t error = gen_string_length(destination, destination_bound, GEN_STRING_NO_BOUND, &destination_length);
+	gen_error_t error = gen_string_length(destination, destination_bound, GEN_STRING_NO_BOUNDS, &destination_length);
 	if(error.type) return error;
 
 	size_t source_length = 0;
@@ -118,7 +110,7 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 	}
 
 	if(*out_length > limit) *out_length = limit;
-	if(limit == GEN_STRING_NO_BOUND) return gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINE_NUMBER, "String length exceeded string bounds");
+	if(limit == GEN_STRING_NO_BOUNDS) return gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINE_NUMBER, "String length exceeded string bounds");
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }

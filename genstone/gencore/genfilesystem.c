@@ -3,21 +3,24 @@
 
 #include "include/genfilesystem.h"
 
-#include "include/genstring.h"
 #include "include/genmemory.h"
+#include "include/genstring.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <stdlib.h> // TODO: For realpath
 #include <errno.h>
+#include <stdlib.h>
 
 #if GEN_PLATFORM != GEN_WINDOWS
+#include <fcntl.h>
+#include <limits.h>
+#include <poll.h>
+#include <sys/file.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include <sys/file.h>
-#include <limits.h>
 #include <unistd.h>
-#include <fcntl.h>
 #endif
 
 #if GEN_PLATFORM == GEN_LINUX
@@ -25,11 +28,11 @@ GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_handle_t* const * handle) {
+void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_handle_t** handle) {
 	gen_error_t error = gen_filesystem_handle_unlock(*handle);
 	if(error.type) {
-        gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
 	}
 }
 
@@ -45,7 +48,8 @@ gen_error_t gen_filesystem_path_canonicalize(const char* const restrict path, co
 	if(error.type) return error;
 
 	const char* canonicalized = realpath(path, NULL); // TODO: Replace with in-house implementation
-												//       Maybe use `fcntl`'s `F_GETPATH` as described in the Darwin manpage?
+		//       Maybe use `fcntl`'s `F_GETPATH` as described in the Darwin manpage?
+		//       Remove `stdlib.h` include.
 	if(!canonicalized) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Failed to resolve canonical representation for path `%zs`: %s", path, path_length, gen_error_description_from_errno());
 
 	size_t canonicalized_length = 0;
@@ -151,10 +155,10 @@ gen_error_t gen_filesystem_path_delete(const char* const restrict path, const si
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }
 
-static void gen_filesystem_internal_handle_open_cleanup_lock(gen_threads_mutex_t* const restrict * const restrict * const restrict mutex) {
+static void gen_filesystem_internal_handle_open_cleanup_lock(gen_threads_mutex_t** mutex) {
 	if(!*mutex) return;
 
-	gen_error_t error = gen_threads_mutex_unlock_and_destroy(**mutex);
+	gen_error_t error = gen_threads_mutex_unlock_and_destroy(*mutex);
 	if(error.type) {
 		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
@@ -167,7 +171,7 @@ static void gen_filesystem_internal_handle_open_cleanup_file_handle(gen_filesyst
 
 	int result = close(**file_handle);
 	if(result == -1) {
-		gen_error_t error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %s", path, path_length, gen_error_description_from_errno());
+		gen_error_t error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %s", gen_error_description_from_errno());
 		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
@@ -178,7 +182,7 @@ static void gen_filesystem_internal_handle_open_cleanup_directory_handle(gen_fil
 
 	int result = closedir(**directory_handle);
 	if(result == -1) {
-		gen_error_t error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %s", path, path_length, gen_error_description_from_errno());
+		gen_error_t error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %s", gen_error_description_from_errno());
 		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
@@ -195,23 +199,17 @@ gen_error_t gen_filesystem_handle_open(const char* const restrict path, const si
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
 
-	error = gen_threads_mutex_create(&out_handle->lock);
+	error = gen_threads_mutex_create_and_lock(&out_handle->lock);
 	if(error.type) return error;
 
-	error = gen_threads_mutex_lock(&out_handle->lock);
-	if(error.type) {
-		gen_error_t free_error = gen_threads_mutex_destroy(&out_handle->lock);
-		if(free_error.type) return free_error;
-
-		return error;
-	}
-
-	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock) gen_threads_mutex_t** lock_scope_variable = &out_handle->lock;
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
+	gen_threads_mutex_t* lock_scope_variable = &out_handle->lock;
 
 	int result = open(path, O_DIRECTORY | O_RDONLY | O_CLOEXEC);
 	if(result == -1 && errno != ENOTDIR) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%zs`: %s", path, path_length, gen_error_description_from_errno());
 
-	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle) gen_filesystem_file_handle_t* file_handle_scope_variable = &result;
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &result;
 
 	if(result == -1 && errno == ENOTDIR) {
 		result = open(path, O_RDWR | O_CLOEXEC);
@@ -240,7 +238,8 @@ gen_error_t gen_filesystem_handle_open(const char* const restrict path, const si
 	out_handle->directory_handle = fdopendir(result);
 	if(!out_handle->directory_handle) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%zs`: %s", path, path_length, gen_error_description_from_errno());
 
-	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_directory_handle) gen_filesystem_directory_handle_t* directory_handle_scope_variable = &out_handle->directory_handle;
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_directory_handle)
+	gen_filesystem_directory_handle_t* directory_handle_scope_variable = &out_handle->directory_handle;
 
 	lock_scope_variable = NULL;
 
@@ -271,10 +270,9 @@ gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict 
 		int result = closedir(handle->directory_handle);
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %s", gen_error_description_from_errno());
 	}
-	else {
-		int result = close(handle->file_handle);
-		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %s", gen_error_description_from_errno());
-	}
+
+	int result = close(handle->file_handle);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %s", gen_error_description_from_errno());
 
 	// TODO: Expose this in a nicer API?
 	gen_threads_internal_mutex_scoped_lock_scope_variable = NULL;
@@ -354,41 +352,26 @@ gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* const rest
 	ssize_t result = pwrite(handle->file_handle, buffer, buffer_size, 0);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %s", gen_error_description_from_errno());
 
-	offset = lseek(handle->file_handle, 0, SEEK_SET);
+	off_t offset = lseek(handle->file_handle, 0, SEEK_SET);
 	if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %s", gen_error_description_from_errno());
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }
 
-typedef struct {
-	char*** entries;
-	size_t* length;
-} gen_filesystem_internal_handle_directory_list_entries_cleanup_context_t;
-
-static void gen_filesystem_internal_handle_directory_list_entries_cleanup(gen_filesystem_internal_handle_directory_list_entries_cleanup_context_t* context) {
-	char** entries = *context->entries;
-	for(size_t i = 0; i < context->length; ++i) {
-		if(!entries[i]) continue;
-		gen_error_t error = gen_memory_free((void**) &entries[i]);
-		if(error.type) {
-			gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-			gen_error_abort();
-		}
-	}
-
-	gen_error_t error = gen_memory_free((void**) context->entries);
+static void gen_filesystem_internal_handle_directory_list_entries_cleanup(char** entries) {
+	gen_error_t error = gen_memory_free((void**) entries);
 	if(error.type) {
 		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
 }
 
-gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const restrict handle, char* restrict * const restrict out_list, size_t* const restrict out_lengths, size_t* const restrict out_length) {
+gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const restrict handle, char* restrict* const restrict out_list, size_t* const restrict out_length) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_directory_list, GEN_FILE_NAME);
 	if(error.type) return error;
 
 	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
-	if(!out_list && !out_lengths && !out_length) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_list`, `out_lengths` and `out_length` were `NULL`");
+	if(!out_list && !out_length) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_list` and `out_length` were `NULL`");
 
 	if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY) return gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
 
@@ -397,67 +380,50 @@ gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const 
 
 	rewinddir(handle->directory_handle);
 
-	const long name_max = fpathconf(handle->file_handle, _PC_NAME_MAX);
-	if(name_max == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not list directory: %s", gen_error_description_from_errno());
-
 	size_t entries_length = 0;
-	GEN_CLEANUP_FUNCTION(gen_memory_free) size_t* entries_lengths = NULL;
-	char** entries = NULL;
-	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_directory_list_entries_cleanup) gen_filesystem_internal_handle_directory_list_entries_cleanup_context_t = {&entries, &entries_length};
-
-	GEN_CLEANUP_FUNCTION(gen_memory_free) unsigned char* buffer = NULL;
-	const size_t entry_size = offsetof(struct dirent, d_name) + name_max + 1;
-	error = gen_memory_allocate_zeroed_aligned((void**) &buffer, entry_size, sizeof(unsigned char), GEN_ALIGNOF(struct dirent));
-	if(error.type) return error;
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_directory_list_entries_cleanup)
+	char* entries = NULL;
 
 	struct dirent* entry = NULL;
 	while(true) {
-		int result = readdir_r(handle->directory_handle, (struct dirent*) buffer, &entry);
-		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not list directory: %s", gen_error_description_from_errno());
-
-		if(!entry) break;
+		// This looks hacky but it's actually what the manpage
+		// Says is the correct way to check for errors in `readdir`.
+		errno = EOK;
+		entry = readdir(handle->directory_handle);
+		if(!entry && errno)
+			return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not list directory: %s", gen_error_description_from_errno());
+		else if(!entry)
+			break;
 
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '\0') continue;
 		if(entry->d_name[0] == '.' && entry->d_name[1] == '.' && entry->d_name[2] == '\0') continue;
 
-		size_t length = 0;
-		error = gen_string_length(entry->d_name, name_max + 1, GEN_STRING_NO_BOUNDS, &length);
-		if(error.type) return error;
-
-		if(out_list || out_lengths) {
-			error = gen_memory_reallocate_zeroed((void**) &entries_lengths, entries_length, entries_length + 1, sizeof(size_t));
-			if(error.type) return error;
-
-			entries_lengths[entries_length] = length;
-		}
 		if(out_list) {
-			error = gen_memory_reallocate_zeroed((void**) &entries, entries_length, entries_length + 1, sizeof(char*));
+			error = gen_memory_reallocate_zeroed((void**) &entries, entries_length, entries_length + 1, sizeof(char[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX]));
 			if(error.type) return error;
 
-			error = gen_memory_allocate_zeroed((void**) &entries[entries_length], length + 1, sizeof(char));
-			if(error.type) return error;
-
-			error = gen_string_copy(entries[entries_length], length + 1, entry->d_name, name_max + 1, length);
+			error = gen_string_copy(&entries[entries_length * sizeof(char[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX])], GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX, entry->d_name, GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX, GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX - 1);
 			if(error.type) return error;
 		}
 		++entries_length;
 	}
 
-	*out_length = entries_length;
+	if(out_length) {
+		*out_length = entries_length;
+	}
 
 	if(out_list) {
 		for(size_t i = 0; i < entries_length; ++i) {
-			error = gen_string_copy(out_list[i], GEN_MEMORY_NO_BOUNDS, entries[i], entries_lengths[i] + 1, entries_lengths[i]);
+			error = gen_string_copy(out_list[i], GEN_MEMORY_NO_BOUNDS, &entries[i * sizeof(char[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX])], GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX, GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX - 1);
 			if(error.type) return error;
 
+			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+			GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Wcast-align"))
 			error = gen_memory_free((void**) &entries[i]);
+			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+
 			if(error.type) return error;
 		}
-	}
-
-	if(out_lengths) {
-		error = gen_memory_copy(out_lengths, GEN_MEMORY_NO_BOUNDS, entries_lengths, entries_length, entries_length);
-		if(error.type) return error;
 	}
 
 	rewinddir(handle->directory_handle);
@@ -465,7 +431,7 @@ gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }
 
-gen_error_t gen_filesystem_watcher_create(const gen_filesystem_handle_t* const restrict handle, gen_filesystem_watcher_t* const restrict out_watcher) {
+gen_error_t gen_filesystem_watcher_create(gen_filesystem_handle_t* const restrict handle, gen_filesystem_watcher_t* const restrict out_watcher) {
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_watcher_create, GEN_FILE_NAME);
 	if(error.type) return error;
 
@@ -475,142 +441,240 @@ gen_error_t gen_filesystem_watcher_create(const gen_filesystem_handle_t* const r
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
 
-#if GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == ENABLED
-	#if GEN_PLATFORM == GEN_LINUX
-		out_watcher->type = GEN_FILESYSTEM_HANDLE_DIRECTORY;
+	error = gen_threads_mutex_create_and_lock(&out_watcher->lock);
+	if(error.type) return error;
 
-		char pipe_name[GEN_PATH_MAX + 1] = {0};
-		snprintf(pipe_name, GEN_PATH_MAX, "/proc/self/fd/%i", handle->file_handle);
-		gen_error_attach_backtrace_IF_ERRNO(snprintf, errno);
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
+	gen_threads_mutex_t* lock_scope_variable = &out_watcher->lock;
 
-		char path[GEN_PATH_MAX + 1] = {0};
-		readlink(pipe_name, path, GEN_PATH_MAX);
-		gen_error_attach_backtrace_IF_ERRNO(readlink, errno);
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX
+	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
-		out_handle->file_handle = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
-		gen_error_attach_backtrace_IF_ERRNO(inotify_init1, errno);
-		inotify_add_watch(out_handle->file_handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
-		gen_error_attach_backtrace_IF_ERRNO(inotify_add_watch, errno);
-	#else
-		#error No system library available
-	#endif
+	size_t formatted_length = 0;
+	error = gen_string_format(NULL, &formatted_length, "/proc/self/fd/%i", handle->file_handle);
+	if(error.type) return error;
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_directory_list_entries_cleanup)
+	char* link = NULL;
+	error = gen_memory_allocate_zeroed((void**) &link, formatted_length + 1, sizeof(char));
+	if(error.type) return error;
+
+	error = gen_string_format(link, NULL, "/proc/self/fd/%i", handle->file_handle);
+	if(error.type) return error;
+
+	struct stat link_stat = {0};
+	int result = lstat(link, &link_stat);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+	size_t path_size = (size_t) link_stat.st_size + 1;
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_directory_list_entries_cleanup)
+	char* path = NULL;
+	error = gen_memory_allocate_zeroed((void**) &path, path_size, sizeof(char));
+	if(error.type) return error;
+
+	ssize_t path_length_result = readlink(link, path, path_size);
+	if(path_length_result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+	result = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &result;
+	out_watcher->file_handle = result;
+
+	// TODO: Watchers being handle-agnostic and adding watched paths to the watcher?
+	//       Would be a more sensible use of inotify/other syslibs.
+	result = inotify_add_watch(out_watcher->file_handle, path, IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+	lock_scope_variable = NULL;
+
+	error = gen_threads_mutex_unlock(&out_watcher->lock);
+	if(error.type) {
+		gen_error_t free_error = gen_threads_mutex_destroy(&out_watcher->lock);
+		if(free_error.type) return free_error;
+
+		return error;
+	}
+
+	file_handle_scope_variable = NULL;
+
+	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 #else
-	out_handle->file_handle = dup(handle->file_handle);
-	gen_error_attach_backtrace_IF_ERRNO(dup, errno);
-	out_handle->is_directory = handle->is_directory;
-	if(out_handle->is_directory) {
-		out_handle->directory_handle = fdopendir(out_handle->file_handle);
-		gen_error_attach_backtrace_IF_ERRNO(fdopendir, errno);
+#error No system library available for file watching
+#endif
+#else
+	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
-		gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &out_handle->internal_directory_length);
+	int result = fcntl(handle->file_handle, F_DUPFD_CLOEXEC);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &result;
+	out_watcher->file_handle = result;
+
+	if(handle->type == GEN_FILESYSTEM_HANDLE_DIRECTORY) {
+		out_watcher->directory_handle = fdopendir(out_watcher->file_handle);
+		if(!out_watcher->directory_handle) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+		error = gen_filesystem_handle_directory_list(handle, NULL, &out_watcher->internal_directory_length_cached);
 		if(error.type) return error;
 	}
 
-	fstat(out_handle->file_handle, &out_handle->internal_descriptor_details);
-	gen_error_attach_backtrace_IF_ERRNO(fstat, errno);
-#endif
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_directory_handle)
+	gen_filesystem_directory_handle_t* directory_handle_scope_variable = &out_watcher->directory_handle;
+
+	result = fstat(out_watcher->file_handle, &out_watcher->internal_stat_cached);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %s", gen_error_description_from_errno());
+
+	lock_scope_variable = NULL;
+
+	error = gen_threads_mutex_unlock(&out_watcher->lock);
+	if(error.type) {
+		gen_error_t free_error = gen_threads_mutex_destroy(&out_watcher->lock);
+		if(free_error.type) return free_error;
+
+		return error;
+	}
+
+	file_handle_scope_variable = NULL;
+	directory_handle_scope_variable = NULL;
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+#endif
 }
 
-gen_error_t gen_filewatch_poll(gen_filesystem_handle_t* const restrict handle, gen_filewatch_event_t* const restrict out_event) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filewatch_poll, GEN_FILE_NAME);
+gen_error_t gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* const restrict watcher) {
+	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_watcher_destroy, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!watcher) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was `NULL`");
+	if(watcher->type != GEN_FILESYSTEM_HANDLE_WATCHER) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was not a watcher");
+
+	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&watcher->lock);
+	if(error.type) return error;
+
+	watcher->type = watcher->directory_handle ? GEN_FILESYSTEM_HANDLE_DIRECTORY : GEN_FILESYSTEM_HANDLE_FILE;
+
+	gen_threads_internal_mutex_scoped_lock_scope_variable = NULL;
+
+	error = gen_threads_mutex_unlock(&watcher->lock);
+	if(error.type) return error;
+
+	// TODO: The space here feels very racey.
+
+	error = gen_filesystem_handle_close(watcher);
+	if(error.type) return error;
+
+	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	/*
+// TODO: This will need separation when we have more backends to deal with.
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
+	#if GEN_PLATFORM == GEN_LINUX
+	#else
+		#error No system library available for file watching
+	#endif
+#else
+*/
+}
+
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED && GEN_PLATFORM == GEN_LINUX
+static void gen_filesystem_internal_watcher_poll_raw_events_cleanup(unsigned char** raw_events) {
+	gen_error_t error = gen_memory_free((void**) raw_events);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+}
+#endif
+
+gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict watcher, gen_filesystem_watcher_event_t* const restrict out_event) {
+	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_watcher_poll, GEN_FILE_NAME);
+	if(error.type) return error;
+
+	if(!watcher) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was `NULL`");
 	if(!out_event) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_event` was `NULL`");
 
-	*out_event = GEN_FILEWATCH_NONE;
+	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&watcher->lock);
+	if(error.type) return error;
 
-#if GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == ENABLED
-	struct pollfd fd = {handle->file_handle, POLLIN, 0};
+	*out_event = GEN_FILESYSTEM_WATCHER_EVENT_NONE;
 
-	fd.revents = 0;
-	poll(&fd, 1, 0);
-	gen_error_attach_backtrace_IF_ERRNO(poll, errno);
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX
+	struct pollfd fd = {watcher->file_handle, POLLIN, 0};
+	int result = poll(&fd, 1, 0);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %s", gen_error_description_from_errno());
 
 	if(fd.revents & POLLIN) {
-		unsigned int events_size;
-		ioctl(handle->file_handle, FIONREAD, &events_size);
-		gen_error_attach_backtrace_IF_ERRNO(ioctl, errno);
+		unsigned int events_size = 0;
+		result = ioctl(watcher->file_handle, FIONREAD, &events_size);
+		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %s", gen_error_description_from_errno());
 
-		unsigned char* raw_events = NULL;
-		gen_error_t error = gzalloc_aligned((void**) &raw_events, events_size, sizeof(unsigned char), alignof(struct inotify_event));
+		GEN_CLEANUP_FUNCTION(gen_filesystem_internal_watcher_poll_raw_events_cleanup)
+		alignas(alignof(struct inotify_event*)) unsigned char* raw_events = NULL;
+		error = gen_memory_allocate_zeroed_aligned((void**) &raw_events, events_size, sizeof(unsigned char), alignof(struct inotify_event));
 		if(error.type) return error;
 
-		read(handle->file_handle, raw_events, events_size);
-		if(errno != EOK) {
-			error = gfree(raw_events);
-			if(error.type) return error;
-
-			gen_error_attach_backtrace_ERRNO(read, errno);
-		}
+		ssize_t events_size_result = read(watcher->file_handle, raw_events, events_size);
+		if(events_size_result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %s", gen_error_description_from_errno());
 
 		unsigned int offset = 0;
 		while(offset < events_size) {
-			struct inotify_event* const event = (struct inotify_event*) (raw_events + offset);
+			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+			GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Wcast-align")) // TODO: Appears to be a clang bug as the pointer is correctly `alignas`'d
+			//       But we still get a diagnostic here.
+			struct inotify_event* const event = (struct inotify_event*) &raw_events[offset];
+			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-			if(event->mask & IN_ATTRIB || event->mask & IN_MODIFY) *out_event |= GEN_FILEWATCH_MODIFIED;
-			if(event->mask & IN_CREATE) *out_event |= GEN_FILEWATCH_CREATED;
-			if(event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) *out_event |= GEN_FILEWATCH_DELETED;
-			if(event->mask & IN_MOVE_SELF || event->mask & IN_MOVED_FROM || event->mask & IN_MOVED_TO) *out_event |= GEN_FILEWATCH_MOVED;
+			if(event->mask & IN_ATTRIB || event->mask & IN_MODIFY) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED;
+			if(event->mask & IN_CREATE) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_CREATED;
+			if(event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_DELETED;
+			if(event->mask & IN_MOVE_SELF || event->mask & IN_MOVED_FROM || event->mask & IN_MOVED_TO) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_MOVED;
 
 			offset += sizeof(struct inotify_event) + event->len;
 		}
-		error = gfree(raw_events);
-		if(error.type) return error;
 	}
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 #else
-	struct stat file_info;
-	fstat(handle->file_handle, &file_info);
-	gen_error_attach_backtrace_IF_ERRNO(fstat, errno);
-
-#if PLATFORM == DWN
-	if(!(file_info.st_mtimespec.tv_sec == handle->internal_descriptor_details.st_mtimespec.tv_sec && file_info.st_mtimespec.tv_nsec == handle->internal_descriptor_details.st_mtimespec.tv_nsec) || !(file_info.st_ctimespec.tv_sec == handle->internal_descriptor_details.st_ctimespec.tv_sec && file_info.st_ctimespec.tv_nsec == handle->internal_descriptor_details.st_ctimespec.tv_nsec)) {
-#else
-	if(file_info.st_mtime != handle->internal_descriptor_details.st_mtime || file_info.st_ctime != handle->internal_descriptor_details.st_ctime) {
+#error No system library available for file watching
 #endif
-		if(handle->is_directory) {
+#else
+	// TODO: We really need to handle "delete self" as at the moment
+	//       It probably just produces errors
+
+	struct stat watcher_stat = {0};
+	int result = fstat(watcher->file_handle, &watcher_stat);
+	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %s", gen_error_description_from_errno());
+
+#if GEN_PLATFORM == GEN_OSX
+	if(!(watcher_stat.st_mtimespec.tv_sec == watcher->internal_stat_cached.st_mtimespec.tv_sec && watcher_stat.st_mtimespec.tv_nsec == watcher->internal_stat_cached.st_mtimespec.tv_nsec) || !(watcher_stat.st_ctimespec.tv_sec == watcher->internal_stat_cached.st_ctimespec.tv_sec && watcher_stat.st_ctimespec.tv_nsec == watcher->internal_stat_cached.st_ctimespec.tv_nsec)) {
+#else
+	if(watcher_stat.st_mtime != watcher->internal_stat_cached.st_mtime || watcher_stat.st_ctime != watcher->internal_stat_cached.st_ctime) {
+#endif
+		if(watcher->directory_handle) {
 			size_t items_length = 0;
-			gen_error_t error = gen_directory_list(handle, gen_internal_filewatch_dwn_dircount, &items_length);
+			error = gen_filesystem_handle_directory_list(watcher, NULL, &items_length);
 			if(error.type) return error;
 
-			if(handle->internal_directory_length > items_length)
-				*out_event |= GEN_FILEWATCH_DELETED;
-			else if(handle->internal_directory_length < items_length)
-				*out_event |= GEN_FILEWATCH_CREATED;
+			if(watcher->internal_directory_length_cached > items_length)
+				*out_event |= GEN_FILESYSTEM_WATCHER_EVENT_DELETED;
+			else if(watcher->internal_directory_length_cached < items_length)
+				*out_event |= GEN_FILESYSTEM_WATCHER_EVENT_CREATED;
 			else
-				*out_event |= GEN_FILEWATCH_MODIFIED;
+				*out_event |= GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED;
 
-			handle->internal_directory_length = items_length;
+			watcher->internal_directory_length_cached = items_length;
 		}
 		else {
-			*out_event |= GEN_FILEWATCH_MODIFIED;
+			*out_event |= GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED;
 		}
 	}
 
-	handle->internal_descriptor_details = file_info;
-	gen_error_attach_backtrace_IF_ERRNO(memcpy_s, errno);
+	watcher->internal_stat_cached = watcher_stat;
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 #endif
-}
-
-gen_error_t gen_filewatch_destroy(gen_filesystem_handle_t* const restrict handle) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filewatch_destroy, GEN_FILE_NAME);
-	if(error.type) return error;
-
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
-
-#if PLATFORM == LNX && GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == ENABLED
-	close(handle->file_handle);
-	gen_error_attach_backtrace_IF_ERRNO(close, errno);
-#else
-	gen_error_t error = gen_filesystem_handle_close(handle);
-	if(error.type) return error;
-#endif
-
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }

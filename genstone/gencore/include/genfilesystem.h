@@ -20,44 +20,49 @@ GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <sys/stat.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-#ifndef GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY
+#ifndef GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY
 #if GEN_PLATFORM == GEN_LINUX
 /**
- * Whether to use the system library where implemented to get filewatch functionality.
+ * Whether to use the system library where implemented to get file watcher functionality.
  * @note Disabling may make results more consistent across platforms as the alternative uses UNIX standard utilities.
  */
-#define GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY GEN_ENABLED
+#define GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY GEN_ENABLED
 #else
-#define GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY GEN_DISABLED
+#define GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY GEN_DISABLED
 #endif
 #endif
 
 /**
- * Bitmasks for filewatch event reporting.
+ * The maximum size of a directory listing.
+ */
+#define GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX (sizeof(((struct dirent*) NULL)->d_name))
+
+/**
+ * Bitmasks for file watcher event reporting.
  */
 typedef enum
 {
 	/**
      * No event occurred.
      */
-	GEN_FILESYSTEM_FILEWATCH_NONE = 1 << 0,
+	GEN_FILESYSTEM_WATCHER_EVENT_NONE = 1 << 0,
 	/**
      * A file was created.
      */
-	GEN_FILESYSTEM_FILEWATCH_CREATED = 1 << 1,
+	GEN_FILESYSTEM_WATCHER_EVENT_CREATED = 1 << 1,
 	/**
      * A file was modified.
      */
-	GEN_FILESYSTEM_FILEWATCH_MODIFIED = 1 << 2,
+	GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED = 1 << 2,
 	/**
      * A file was deleted.
      */
-	GEN_FILESYSTEM_FILEWATCH_DELETED = 1 << 3,
+	GEN_FILESYSTEM_WATCHER_EVENT_DELETED = 1 << 3,
 	/**
      * A file was moved.
      */
-	GEN_FILESYSTEM_FILEWATCH_MOVED = 1 << 4
-} gen_filesystem_filewatch_event_t;
+	GEN_FILESYSTEM_WATCHER_EVENT_MOVED = 1 << 4
+} gen_filesystem_watcher_event_t;
 
 /**
  * The native file handle type.
@@ -80,7 +85,11 @@ typedef enum {
      /**
       * A directory.
       */
-     GEN_FILESYSTEM_HANDLE_DIRECTORY
+     GEN_FILESYSTEM_HANDLE_DIRECTORY,
+     /**
+      * A watcher.
+      */
+     GEN_FILESYSTEM_HANDLE_WATCHER
 } gen_filesystem_handle_type_t;
 
 /**
@@ -105,21 +114,21 @@ typedef struct {
      /**
       * Structure access and operation lock.
       */
-     gen_threads_mutex_t lock;
+     gen_threads_mutex_t lock; // TODO: Switch directory listing to `getdents` and remove need for lock/move into non-syslib watching.
 
-#if GEN_FILESYSTEM_FILEWATCH_USE_SYSTEM_LIBRARY == GEN_DISABLED
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
 	/**
-      * Internal caching of `stat` for filewatching.
+      * Internal caching of `stat` for file watching.
       */
 	struct stat internal_stat_cached;
 	/**
-      * Intenal caching of directory length for filewatching.
+      * Intenal caching of directory length for file watching.
       */
 	size_t internal_directory_length_cached;
 #endif
 } gen_filesystem_handle_t;
 
-extern void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_handle_t* const restrict * const restrict handle);
+extern void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_handle_t** handle);
 
 /**
  * Locks a file for the current scope.
@@ -127,7 +136,7 @@ extern void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_hand
  */
 #define GEN_FILESYSTEM_HANDLE_SCOPED_LOCK(handle) \
 	gen_filesystem_handle_lock(handle); \
-	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_scoped_file_lock_cleanup) GEN_UNUSED gen_filesystem_handle_t* const gen_filesystem_internal_scoped_file_lock_scope_variable = handle
+	GEN_MAYBE_UNUSED GEN_CLEANUP_FUNCTION(gen_filesystem_internal_scoped_file_lock_cleanup) gen_filesystem_handle_t* gen_filesystem_internal_scoped_file_lock_scope_variable = handle
 
 /**
  * Handle to a filesystem watcher.
@@ -244,12 +253,11 @@ extern gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* con
 /**
  * Lists the contents of a directory.
  * @param[in] handle The handle to list from.
- * @param[out] out_list A pointer to pointers for storage each list entry.
- * @param[out] out_lengths A pointer to storage for the lengths of the list members.
+ * @param[out] out_list A pointer to pointers for storage each list entry. Each entry should be `GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX` in size.
  * @param[out] out_length A pointer to storage for the length of the list.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const restrict handle, char* restrict * const restrict out_list, size_t* const restrict out_lengths, size_t* const restrict out_length);
+extern gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const restrict handle, char* restrict * const restrict out_list, size_t* const restrict out_length);
 
 /**
  * Locks a file.
@@ -271,7 +279,7 @@ extern gen_error_t gen_filesystem_handle_unlock(gen_filesystem_handle_t* const r
  * @param[out] out_watcher A pointer to storage for the created watcher.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_watcher_create(const gen_filesystem_handle_t* const restrict handle, gen_filesystem_watcher_t* const restrict out_watcher);
+extern gen_error_t gen_filesystem_watcher_create(gen_filesystem_handle_t* const restrict handle, gen_filesystem_watcher_t* const restrict out_watcher);
 
 /**
  * Destroys an update watcher.
@@ -286,6 +294,6 @@ extern gen_error_t gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* cons
  * @param[out] out_event A pointer to storage for events which have occurred.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict watcher, gen_filesystem_filewatch_event_t* const restrict out_event);
+extern gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict watcher, gen_filesystem_watcher_event_t* const restrict out_event);
 
 #endif

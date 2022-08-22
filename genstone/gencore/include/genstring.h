@@ -97,6 +97,10 @@ extern gen_error_t gen_string_number(const char* const restrict string, const si
 /**
  * Formats a string to a buffer.
  * @param[out] out_buffer A pointer to storage for the formatted string.
+ * @param[out] out_length A pointer to storage for the length of the formatted string.
+ * @param[in] format The format specification to apply format arguments to.
+ * @param[in] ... The format arguments to apply to `format`.
+ * @return An error code.
  */
 extern gen_error_t gen_string_format(char* const restrict out_buffer, size_t* out_length, const char* const restrict format, ...);
 

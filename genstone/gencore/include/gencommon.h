@@ -49,25 +49,43 @@
  */
 #define GEN_NORETURN _Noreturn
 /**
- * Pretty wrapper for `_Alignof`. Alternative to `stdalign.h`.
- * @param[in] p The argument to `_Alignof`.
- */
-#define GEN_ALIGNOF(p) _Alignof(p)
-/**
  * Pretty wrapper for `__attribute__((unused))`.
  */
 #define GEN_UNUSED __attribute__((unused))
+#ifndef __INTELLISENSE
+/**
+ * Pretty wrapper for `__attribute__((maybe_unused))`.
+ */
+#define GEN_MAYBE_UNUSED [[maybe_unused]]
+#else
+#define GEN_MAYBE_UNUSED
+#endif
 /**
  * Pretty wrapper for `__attribute__((cleanup))`.
  * @param[in] function The cleanup function to call.
  */
 #define GEN_CLEANUP_FUNCTION(function) __attribute__((cleanup(function)))
+/**
+ * Returns the lowest of 2 values.
+ * @param[in] a The first value.
+ * @param[in] b The second value.
+ * @return The lower value.
+ */
+#define GEN_MINIMUM(a, b) ((a) < (b) ? (a) : (b))
+/**
+ * Returns the highest of 2 values.
+ * @param[in] a The first value.
+ * @param[in] b The second value.
+ * @return The higher value.
+ */
+#define GEN_MAXIMUM(a, b) ((a) > (b) ? (a) : (b))
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdalign.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 #include "generror.h"

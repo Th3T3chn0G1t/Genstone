@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
-
 /**
  * @file gemory.h
  * Provides wrappers and abstraction for heap functions.

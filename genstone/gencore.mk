@@ -1,5 +1,5 @@
 GEN_CORE_COMMON_CFLAGS = -Werror -Weverything
-GEN_CORE_COMMON_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement -Wno-padded
+GEN_CORE_COMMON_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement -Wno-padded -Wno-c++98-compat -Wno-pointer-arith
 # TODO: This is standard behaviour in C23
 GEN_CORE_COMMON_CFLAGS += -Wno-fixed-enum-extension
 GEN_CORE_COMMON_LFLAGS =

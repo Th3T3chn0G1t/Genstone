@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
-#include "include/gemory.h"
+#include "include/genmemory.h"
+
 #include "include/gencommon.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
@@ -47,7 +48,7 @@ gen_error_t gen_memory_allocate_zeroed(void* restrict* const restrict out_addres
 	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`size` was 0");
 	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was 0");
 	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was `SIZE_MAX`");
+	if(count == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was `SIZE_MAX`");
 
 	void* const allocated = GEN_MEMORY_CALLOC(count, size);
 	if(!allocated) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "`" GEN_STRINGIFY(GEN_MEMORY_CALLOC) "` returned `NULL`: %s", gen_error_description_from_errno());
@@ -65,7 +66,7 @@ gen_error_t gen_memory_allocate_zeroed_aligned(void* restrict* const restrict ou
 	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`size` was 0");
 	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was 0");
 	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was `SIZE_MAX`");
+	if(count == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was `SIZE_MAX`");
 	if(!alignment) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`alignment` was 0");
 	if(alignment & (alignment - 1)) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`alignment` was not a power of 2");
 
@@ -88,13 +89,18 @@ gen_error_t gen_memory_reallocate_zeroed(void* restrict* const restrict address,
 	if(!size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`size` was 0");
 	if(!count) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was 0");
 	if(size == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`size` was `SIZE_MAX`");
-	if(count == SIZE_MAX)  return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was `SIZE_MAX`");
-	
-	void* const allocated = GEN_MEMORY_REALLOC(*address, count * size);
+	if(count == SIZE_MAX) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`count` was `SIZE_MAX`");
+
+	void* allocated = GEN_MEMORY_REALLOC(*address, count * size);
 	if(!allocated) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "`" GEN_STRINGIFY(GEN_MEMORY_REALLOC) "` returned `NULL`: %s", gen_error_description_from_errno());
 	if(count > old_count) {
 		error = gen_memory_set(allocated + (size * old_count), size * (count - old_count), 0);
-		if(error.type) return error;
+		if(error.type) {
+			gen_error_t free_error = gen_memory_free(&allocated);
+			if(free_error.type) return free_error;
+
+			return error;
+		}
 	}
 
 	*address = allocated;
@@ -121,7 +127,7 @@ gen_error_t gen_memory_set(void* const restrict address, const size_t length, co
 
 	if(!address) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`address` was `NULL`");
 
-	memset(address, 0, value);
+	memset(address, value, length);
 
 	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 }
