@@ -71,13 +71,13 @@ extern gen_error_t gen_memory_set(void* const restrict address, const size_t len
 
 /**
  * Copies the data from one block of memory to another.
- * @param[in] from The block from which to source the data.
- * @param[in] from_size The size of the source block in bytes.
  * @param[out] to The block to which to copy the data.
  * @param[in] to_size The size of the destination block in bytes.
+ * @param[in] from The block from which to source the data.
+ * @param[in] from_size The size of the source block in bytes.
  * @param[in] limit The number of bytes to copy.
  * @return An error code.
  */
-extern gen_error_t gen_memory_copy(const void* const restrict from, const size_t from_size, void* const restrict to, const size_t to_size, const size_t limit);
+extern gen_error_t gen_memory_copy(void* const restrict to, const size_t to_size, const void* const restrict from, const size_t from_size, const size_t limit);
 
 #endif

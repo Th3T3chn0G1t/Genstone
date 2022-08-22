@@ -34,6 +34,14 @@ typedef struct {
 
 thread_local gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
 
+void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p) {
+    gen_error_t error = gen_tooling_pop();
+    if(error.type) {
+        gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+        gen_error_abort();
+    }
+}
+
 void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file) {
 	if(gen_tooling_call_stack.next >= GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
 	if(!frame) GEN_FATAL_ERROR(GEN_INVALID_PARAMETER, "`frame` was NULL");

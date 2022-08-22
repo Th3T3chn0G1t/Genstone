@@ -14,7 +14,6 @@
 
 /**
  * Handle type for a process.
- * @note Size and type may vary across systems.
  */
 typedef pid_t gen_process_t;
 

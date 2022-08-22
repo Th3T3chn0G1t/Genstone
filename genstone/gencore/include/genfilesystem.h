@@ -60,9 +60,9 @@ typedef enum
 } gen_filesystem_filewatch_event_t;
 
 /**
- * The native file descriptor type.
+ * The native file handle type.
  */
-typedef int gen_filesystem_file_descriptor_t;
+typedef int gen_filesystem_file_handle_t;
 
 /**
  * The native directory handle type.
@@ -72,7 +72,7 @@ typedef DIR* gen_filesystem_directory_handle_t;
 /**
  * The type of filesystem entry a filesystem handle refers to.
  */
-typedef struct {
+typedef enum {
      /**
       * A regular file.
       */
@@ -93,9 +93,9 @@ typedef struct {
 	gen_filesystem_handle_type_t type;
 
      /**
-      * The underlying file descriptor for the handle.
+      * The underlying file handle for the handle.
       */
-     gen_filesystem_file_descriptor_t file_descriptor;
+     gen_filesystem_file_handle_t file_handle;
      /**
       * The underlying directory handle for the handle.
       * Invalid if `type` is not `GEN_FILESYSTEM_HANDLE_DIRECTORY`.
@@ -118,6 +118,16 @@ typedef struct {
 	size_t internal_directory_length_cached;
 #endif
 } gen_filesystem_handle_t;
+
+extern void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_handle_t* const restrict * const restrict handle);
+
+/**
+ * Locks a file for the current scope.
+ * @param[in,out] handle The handle to the file to lock.
+ */
+#define GEN_FILESYSTEM_HANDLE_SCOPED_LOCK(handle) \
+	gen_filesystem_handle_lock(handle); \
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_scoped_file_lock_cleanup) GEN_UNUSED gen_filesystem_handle_t* const gen_filesystem_internal_scoped_file_lock_scope_variable = handle
 
 /**
  * Handle to a filesystem watcher.
@@ -151,7 +161,7 @@ extern gen_error_t gen_filesystem_path_canonicalize(const char* const restrict p
  * Returns whether a filesystem entry exists at a path.
  * @param[in] path The path to check.
  * @param[in] path_length The length of the path to check.
- * @param[out] out_exsts A pointer to storage for the result of whether a filesystem entry exists at `path`.
+ * @param[out] out_exists A pointer to storage for the result of whether a filesystem entry exists at `path`.
  * @return An error code.
  */
 extern gen_error_t gen_filesystem_path_exists(const char* const restrict path, const size_t path_length, bool* const restrict out_exists);
@@ -210,7 +220,7 @@ extern gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const re
  * @param[out] out_size A pointer to storage for the size of the handle.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_handle_file_size(const gen_filesystem_handle_t* const restrict handle, size_t* const restrict out_size);
+extern gen_error_t gen_filesystem_handle_file_size(gen_filesystem_handle_t* const restrict handle, size_t* const restrict out_size);
 
 /**
  * Reads a file's content.
@@ -220,7 +230,7 @@ extern gen_error_t gen_filesystem_handle_file_size(const gen_filesystem_handle_t
  * @param[out] out_buffer A pointer to storage for the read bytes.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_handle_file_read(const gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end, unsigned char* restrict out_buffer);
+extern gen_error_t gen_filesystem_handle_file_read(gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end, unsigned char* restrict out_buffer);
 
 /**
  * Writes to a file.
@@ -229,16 +239,31 @@ extern gen_error_t gen_filesystem_handle_file_read(const gen_filesystem_handle_t
  * @param[in] buffer_size The number of bytes of buffer to write.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_handle_file_write(const gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t buffer_size);
+extern gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t buffer_size);
 
 /**
  * Lists the contents of a directory.
  * @param[in] handle The handle to list from.
- * @param[out] out_list A pointer to storage for the list
+ * @param[out] out_list A pointer to pointers for storage each list entry.
+ * @param[out] out_lengths A pointer to storage for the lengths of the list members.
  * @param[out] out_length A pointer to storage for the length of the list.
  * @return An error code.
  */
-extern gen_error_t gen_filesystem_handle_directory_list(const gen_filesystem_handle_t* const restrict handle, char* restrict * const restrict out_list, size_t* const restrict out_length);
+extern gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const restrict handle, char* restrict * const restrict out_list, size_t* const restrict out_lengths, size_t* const restrict out_length);
+
+/**
+ * Locks a file.
+ * @param[in] handle The handle to the file to lock.
+ * @return An error code.
+ */
+extern gen_error_t gen_filesystem_handle_lock(gen_filesystem_handle_t* const restrict handle);
+
+/**
+ * Unlocks a file.
+ * @param[in] handle The handle to the file to lock.
+ * @return An error code.
+ */
+extern gen_error_t gen_filesystem_handle_unlock(gen_filesystem_handle_t* const restrict handle);
 
 /**
  * Creates an update watcher for a handle.
@@ -250,7 +275,7 @@ extern gen_error_t gen_filesystem_watcher_create(const gen_filesystem_handle_t* 
 
 /**
  * Destroys an update watcher.
- * @param[in] handle The watcher to destroy.
+ * @param[in] watcher The watcher to destroy.
  * @return An error code.
  */
 extern gen_error_t gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* const restrict watcher);

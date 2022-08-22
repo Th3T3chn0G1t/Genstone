@@ -14,30 +14,33 @@
 /**
  * A handle for a dynamically loaded library.
  */
-typedef void* gen_dylib_t;
+typedef void* gen_dynamic_library_handle_t;
 
 /**
- * Loads a dynamic library.
- * @param[out] output_dylib a pointer to storage for the loaded dylib handle.
- * @param[in] lib_name the name of the library to load.
+ * Opens a dynamic library handle.
+ * @note The library name should be provided as just the significant portion of the name. e.g. to load `libfoo.so`, `library_name` would be `foo`. This is to ensure that the same name can be used to load libraries on multiple platforms (i.e. on macOS `foo` would load `libfoo.dylib`).
+ * @param[in] library_name The name of the library to open.
+ * @param[in] library_name_length The length of the name of the library to open.
+ * @param[out] out_dynamic_library A pointer to storage for the opened dynamic library handle.
  * @return An error code.
- * @note The library name should be provided as just the significant portion of the name. e.g. to load `libfoo.so`, `lib_name` would be `foo`. This is to ensure that the same name can be used to load libraries on multiple platforms (i.e. on macOS `foo` would load `libfoo.dylib`).
  */
-extern gen_error_t gen_dylib_load(gen_dylib_t* restrict output_dylib, const char* const restrict lib_name);
+extern gen_error_t gen_dynamic_library_handle_open(const char* const restrict library_name, const size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library);
+
 /**
- * Gets a symbol's address from a loaded dynamic library.
- * @param[out] output_address a pointer to storage for the loaded symbol address.
- * @param[in] dylib the library to get the symbol from.
- * @param[in] symname the name of the symbol to get.
+ * Closes a dynamic library handle.
+ * @param[in,out] dynamic_library The dynamic library handle to unload.
  * @return An error code.
  */
-extern gen_error_t gen_dylib_symbol(void* restrict* const restrict output_address, const gen_dylib_t dylib, const char* const restrict symname);
+extern gen_error_t gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t* const restrict dynamic_library);
+
 /**
- * Unloads a dynamic library.
- * @param[in] dylib the library to unload.
+ * Gets a symbol's address from a dynamic library.
+ * @param[in] dynamic_library The dynamic library to get a symbol from.
+ * @param[in] symbol_name The symbol to get.
+ * @param[in] symbol_name_length The length of the symbol to get.
+ * @param[out] out_address A pointer to storage for the symbol's address.
  * @return An error code.
- * @note This may not immediately remove the library from memory depending on the dynamic linker and program state.
  */
-extern gen_error_t gen_dylib_unload(const gen_dylib_t dylib);
+extern gen_error_t gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, const void* restrict* const restrict out_address);
 
 #endif

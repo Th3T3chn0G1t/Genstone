@@ -23,6 +23,17 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
  */
 typedef pthread_mutex_t gen_threads_mutex_t; 
 
+extern void gen_threads_internal_mutex_scoped_lock_cleanup(gen_threads_mutex_t* const restrict * const restrict * const restrict mutex);
+
+/**
+ * Locks a mutex for the current scope.
+ * @param[in,out] mutex The mutex to lock.
+ * @returns An error code.
+ */
+#define GEN_THREADS_MUTEX_SCOPED_LOCK(mutex) \
+    gen_threads_mutex_lock(mutex); \
+    GEN_CLEANUP_FUNCTION(gen_threads_internal_mutex_scoped_lock_cleanup) GEN_UNUSED gen_threads_mutex_t** const gen_threads_internal_mutex_scoped_lock_scope_variable = &mutex
+
 /**
  * Creates a mutex.
  * @param[out] out_mutex A pointer to storage for the created mutex.
@@ -36,6 +47,13 @@ extern gen_error_t gen_threads_mutex_create(gen_threads_mutex_t* const restrict 
  * @return An error code.
  */
 extern gen_error_t gen_threads_mutex_destroy(gen_threads_mutex_t* const restrict mutex);
+
+/**
+ * Unlocks and destroys a mutex.
+ * @param[in,out] mutex The mutex to unlock and destroy.
+ * @return An error code.
+ */
+extern gen_error_t gen_threads_mutex_unlock_and_destroy(gen_threads_mutex_t* const restrict mutex);
 
 /**
  * Locks a mutex.

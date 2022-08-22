@@ -3,7 +3,17 @@
 
 #include "include/gencommon.h"
 
-const char* gen_error_name(const gen_error_t error) {
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <errno.h>
+#include <string.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+
+#ifndef EOK
+#define EOK (0)
+#endif
+
+const char* gen_error_type_name(const gen_error_type_t error) {
 	switch(error) {
 		case GEN_OK: return "GEN_OK";
 		case GEN_UNKNOWN: return "GEN_UNKNOWN";
@@ -31,7 +41,7 @@ const char* gen_error_name(const gen_error_t error) {
 	}
 }
 
-const char* gen_error_description(const gen_error_t error) {
+const char* gen_error_type_description(const gen_error_type_t error) {
 	switch(error) {
 		case GEN_OK: return "No error occurred";
 		case GEN_UNKNOWN: return "An unknown error occurred";
@@ -59,8 +69,8 @@ const char* gen_error_description(const gen_error_t error) {
 	}
 }
 
-gen_error_t gen_convert_errno(errno_t error) {
-	switch(error) {
+gen_error_type_t gen_error_type_from_errno(void) {
+	switch(errno) {
 		case EACCES: return GEN_PERMISSION;
 		case EINVAL: return GEN_INVALID_PARAMETER;
 		case EIO: return GEN_IO;
@@ -86,4 +96,10 @@ gen_error_t gen_convert_errno(errno_t error) {
 		case ECHILD: return GEN_NO_SUCH_OBJECT;
 		default: return GEN_UNKNOWN;
 	}
+}
+
+const char* gen_error_description_from_errno(void) {
+	return strerror(errno); // This is okay over `strerror_r` as the only thread-unsafe case is
+		// Where the supplied `errno` value is outside of `errno`'s accepted
+		// Range - which we can presume will never be relevant to us
 }

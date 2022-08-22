@@ -69,7 +69,9 @@ ACTION_SUFFIX = \\033[0m
 
 .PHONY: clean_common
 clean_common:
+	@$(ECHO) "$(ACTION_PREFIX)"
 	-$(RMDIR) lib
+	@$(ECHO) "$(ACTION_SUFFIX)"
 
 lib:
 	-$(MKDIR) $@

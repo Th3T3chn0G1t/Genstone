@@ -14,7 +14,7 @@
  * The descriptions on `gen_error_t` enumerations are hints, they may be used in other contexts.
  * @note Some errors will become `GEN_UNKNOWN` on platforms that do not support them or report them nontrivially.
  */
-typedef enum : size_t
+typedef enum
 {
 	/**
      * No error occurred.
@@ -111,6 +111,15 @@ typedef enum : size_t
 } gen_error_type_t;
 
 /**
+ * Severity levels for an error.
+ */
+typedef enum {
+	GEN_ERROR_SEVERITY_WARNING,
+	GEN_ERROR_SEVERITY_NORMAL,
+	GEN_ERROR_SEVERITY_FATAL
+} gen_error_severity_t;
+
+/**
  * The return value for an errorable function.
  */
 typedef struct {
@@ -133,20 +142,26 @@ typedef struct {
  * @param[in] error The error type to get the name of.
  * @return The name of the error.
  */
-extern const char* gen_error_name(const gen_error_type_t error);
+extern const char* gen_error_type_name(const gen_error_type_t error);
 
 /**
  * Gets the generic description of a `gen_error_type_t`.
  * @param[in] error The error type to get the description of.
  * @return A description of the error.
  */
-extern const char* gen_error_description(const gen_error_type_t error);
+extern const char* gen_error_type_description(const gen_error_type_t error);
 
 /**
  * Converts the value of errno into a genstone error type.
- * @return The converted error enumeration.
+ * @return The converted error type.
  */
-extern gen_error_type_t gen_error_from_errno(void);
+extern gen_error_type_t gen_error_type_from_errno(void);
+
+/**
+ * Converts the value of errno into a string description.
+ * @return The converted error description.
+ */
+const char* gen_error_description_from_errno(void);
 
 /**
  * Constructs an error and attaches a backtrace down to the caller.
@@ -167,5 +182,17 @@ extern gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const
  * @return The constructed error.
  */
 extern gen_error_t gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...);
+
+/**
+ * Prints out an errors details and backtrace.
+ * @param[in] error The error to print.
+ * @param[in] severity The severity of the error.
+ */
+extern void gen_error_print(const gen_error_t* const restrict error, const gen_error_severity_t severity);
+
+/**
+ * Aborts the program.
+ */
+extern GEN_NORETURN void gen_error_abort(void);
 
 #endif

@@ -70,7 +70,7 @@ extern gen_error_t gen_string_duplicate(const char* const restrict string, const
  * @param[in] string_bounds The bounds of the string to seach in.
  * @param[in] character The character to search for.
  * @param[in] limit The number of characters in string from its beginning to search in.
- * @param[out] out_found A pointer to storage for a pointer to the found occurrence, or NULL if the character was not found.
+ * @param[out] out_found A pointer to storage for a pointer to the found occurrence.
  * @return An error code.
  */
 extern gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bounds, const char character, const size_t limit, const char** const restrict out_found);
@@ -80,7 +80,7 @@ extern gen_error_t gen_string_character_first(const char* const restrict string,
  * @param[in] string_bounds The bounds of the string to seach in.
  * @param[in] character The character to search for.
  * @param[in] limit The number of characters in string from its beginning to search in.
- * @param[out] out_found A pointer to storage for a pointer to the found occurrence, or NULL if the character was not found.
+ * @param[out] out_found A pointer to storage for a pointer to the found occurrence.
  * @return An error code.
  */
 extern gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bounds, const char character, const size_t limit, const char** const restrict out_found);
@@ -93,5 +93,11 @@ extern gen_error_t gen_string_character_last(const char* const restrict string, 
  * @return An error code.
  */
 extern gen_error_t gen_string_number(const char* const restrict string, const size_t string_bounds, const size_t limit, size_t* const restrict out_number);
+
+/**
+ * Formats a string to a buffer.
+ * @param[out] out_buffer A pointer to storage for the formatted string.
+ */
+extern gen_error_t gen_string_format(char* const restrict out_buffer, size_t* out_length, const char* const restrict format, ...);
 
 #endif
