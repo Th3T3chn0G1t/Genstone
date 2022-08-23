@@ -40,9 +40,9 @@ gen_error_t gen_filesystem_path_canonicalize(const char* const restrict path, co
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_canonicalize, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(!out_canonical && !out_length) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "Both `out_canonical` and `out_length` were `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(!out_canonical && !out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "Both `out_canonical` and `out_length` were `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
@@ -70,9 +70,9 @@ gen_error_t gen_filesystem_path_exists(const char* const restrict path, const si
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_exists, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(!out_exists) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_exists` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(!out_exists) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_exists` was `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
@@ -89,11 +89,11 @@ gen_error_t gen_filesystem_path_validate(const char* const restrict path, const 
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_validate, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
-	if(path_length == 0) return gen_error_attach_backtrace_formatted(GEN_TOO_SHORT, GEN_LINE_NUMBER, "Path `%zs` was too short", path, path_length);
-	if(path_length > PATH_MAX /* TODO: This number is usually bogus - Use `pathconf` instead */) return gen_error_attach_backtrace_formatted(GEN_TOO_LONG, GEN_LINE_NUMBER, "Path `%zs` was too long", path, path_length);
+	if(path_length == 0) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "Path `%zs` was too short", path, path_length);
+	if(path_length > PATH_MAX /* TODO: This number is usually bogus - Use `pathconf` instead */) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%zs` was too long", path, path_length);
 
 	// TODO: Windows has path content limitations
 
@@ -104,8 +104,8 @@ gen_error_t gen_filesystem_path_create_file(const char* const restrict path, con
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_create_file, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
@@ -122,8 +122,8 @@ gen_error_t gen_filesystem_path_create_directory(const char* const restrict path
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_create_directory, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
@@ -138,8 +138,8 @@ gen_error_t gen_filesystem_path_delete(const char* const restrict path, const si
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_delete, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
@@ -192,9 +192,9 @@ gen_error_t gen_filesystem_handle_open(const char* const restrict path, const si
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_open, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!path) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(!out_handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_handle` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
+	if(!out_handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_handle` was `NULL`");
+	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error.type) return error;
@@ -261,7 +261,7 @@ gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict 
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_close, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
@@ -287,10 +287,10 @@ gen_error_t gen_filesystem_handle_file_size(gen_filesystem_handle_t* const restr
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_file_size, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
-	if(!out_size) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_size` was `NULL`");
+	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!out_size) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_size` was `NULL`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
@@ -310,11 +310,11 @@ gen_error_t gen_filesystem_handle_file_read(gen_filesystem_handle_t* const restr
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_file_read, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
-	if(!out_buffer) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`output_buffer` was `NULL`");
-	if(start > end) return gen_error_attach_backtrace(GEN_TOO_SHORT, GEN_LINE_NUMBER, "`start` > `end`");
+	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!out_buffer) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`output_buffer` was `NULL`");
+	if(start > end) return gen_error_attach_backtrace(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "`start` > `end`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
@@ -339,10 +339,10 @@ gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* const rest
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_file_write, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
-	if(!buffer) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`buffer` was `NULL`");
+	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!buffer) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`buffer` was `NULL`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
 	if(!buffer_size) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
 
@@ -370,10 +370,10 @@ gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const 
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_directory_list, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
-	if(!out_list && !out_length) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_list` and `out_length` were `NULL`");
+	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!out_list && !out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_list` and `out_length` were `NULL`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY) return gen_error_attach_backtrace(GEN_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
@@ -417,11 +417,7 @@ gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const 
 			error = gen_string_copy(out_list[i], GEN_MEMORY_NO_BOUNDS, &entries[i * sizeof(char[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX])], GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX, GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX - 1);
 			if(error.type) return error;
 
-			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-			GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Wcast-align"))
 			error = gen_memory_free((void**) &entries[i]);
-			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
-
 			if(error.type) return error;
 		}
 	}
@@ -435,8 +431,8 @@ gen_error_t gen_filesystem_watcher_create(gen_filesystem_handle_t* const restric
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_watcher_create, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!out_watcher) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_watcher` was `NULL`");
-	if(!handle) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+	if(!out_watcher) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_watcher` was `NULL`");
+	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
@@ -549,8 +545,8 @@ gen_error_t gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* const restr
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_watcher_destroy, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!watcher) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was `NULL`");
-	if(watcher->type != GEN_FILESYSTEM_HANDLE_WATCHER) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was not a watcher");
+	if(!watcher) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was `NULL`");
+	if(watcher->type != GEN_FILESYSTEM_HANDLE_WATCHER) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was not a watcher");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&watcher->lock);
 	if(error.type) return error;
@@ -593,8 +589,8 @@ gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict
 	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_watcher_poll, GEN_FILE_NAME);
 	if(error.type) return error;
 
-	if(!watcher) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was `NULL`");
-	if(!out_event) return gen_error_attach_backtrace(GEN_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_event` was `NULL`");
+	if(!watcher) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`watcher` was `NULL`");
+	if(!out_event) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_event` was `NULL`");
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&watcher->lock);
 	if(error.type) return error;
@@ -622,11 +618,7 @@ gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict
 
 		unsigned int offset = 0;
 		while(offset < events_size) {
-			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-			GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Wcast-align")) // TODO: Appears to be a clang bug as the pointer is correctly `alignas`'d
-			//       But we still get a diagnostic here.
 			struct inotify_event* const event = (struct inotify_event*) &raw_events[offset];
-			GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 			if(event->mask & IN_ATTRIB || event->mask & IN_MODIFY) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED;
 			if(event->mask & IN_CREATE) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_CREATED;

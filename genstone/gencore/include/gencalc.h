@@ -42,12 +42,14 @@ typedef __fp16 gfloat16;
  * @param[in] n the number of elements in the vector.
  */
 #define GEN_VECTOR_TYPE_NAMED(base, n, name) typedef base name __attribute__((ext_vector_type(n)))
+
 /**
  * Internal type declarator for clang vectors (OpenCL-style).
  * @param[in] base the base type of the vector.
  * @param[in] n the number of elements in the vector.
  */
 #define GEN_INTERNAL_VECTOR_TYPE(base, n) GEN_VECTOR_TYPE_NAMED(base, n, g##base##n)
+
 /**
  * Internal type declarator for clang matrices.
  * @param[in] base the base type of the matrix.
@@ -81,10 +83,12 @@ typedef __fp16 gfloat16;
  * A 2-component vector of floats.
  */
 GEN_INTERNAL_VECTOR_TYPE(float, 2);
+
 /**
  * A 3-component vector of floats.
  */
 GEN_INTERNAL_VECTOR_TYPE(float, 3);
+
 /**
  * A 4-component vector of floats.
  */
@@ -94,6 +98,7 @@ GEN_INTERNAL_VECTOR_TYPE(float, 4);
  * A 3x3 matrix of floats.
  */
 GEN_INTERNAL_MATRIX_TYPE(float, 3, 3);
+
 /**
  * A 4x4 matrix of floats.
  */
@@ -103,10 +108,12 @@ GEN_INTERNAL_MATRIX_TYPE(float, 4, 4);
  * A 2-component vector of ints.
  */
 GEN_INTERNAL_VECTOR_TYPE(int, 2);
+
 /**
  * A 3-component vector of ints.
  */
 GEN_INTERNAL_VECTOR_TYPE(int, 3);
+
 /**
  * A 4-component vector of ints.
  */
@@ -116,6 +123,7 @@ GEN_INTERNAL_VECTOR_TYPE(int, 4);
  * A 3x3 matrix of ints.
  */
 GEN_INTERNAL_MATRIX_TYPE(int, 3, 3);
+
 /**
  * A 4x4 matrix of ints.
  */

@@ -23,6 +23,11 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
  */
 typedef pthread_mutex_t gen_threads_mutex_t; 
 
+/**
+ * Pretty wrapper for `_Thread_local`.
+ */
+#define GEN_THREAD_LOCAL _Thread_local
+
 extern void gen_threads_internal_mutex_scoped_lock_cleanup(gen_threads_mutex_t** mutex);
 
 /**

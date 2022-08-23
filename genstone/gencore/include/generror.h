@@ -16,129 +16,164 @@
 /**
  * The generic type of error encountered.
  * The descriptions on `gen_error_t` enumerations are hints, they may be used in other contexts.
- * @note Some errors will become `GEN_UNKNOWN` on platforms that do not support them or report them nontrivially.
+ * @note Some errors will become `GEN_ERROR_UNKNOWN` on platforms that do not support them or report them nontrivially.
  */
 typedef enum
 {
-	/**
+    /**
      * No error occurred.
      */
-	GEN_OK = 0,
-	/**
+    GEN_OK = 0,
+
+    /**
      * An unknown error occurred.
      */
-	GEN_UNKNOWN,
-	/**
+    GEN_ERROR_UNKNOWN,
+
+    /**
      * A permission error occurred.
      */
-	GEN_PERMISSION,
-	/**
+    GEN_ERROR_PERMISSION,
+
+    /**
      * The provided parameter was invalid.
      */
-	GEN_INVALID_PARAMETER,
-	/**
+    GEN_ERROR_INVALID_PARAMETER,
+
+    /**
      * An IO error occurred.
      */
-	GEN_IO,
-	/**
+    GEN_ERROR_IO,
+
+    /**
      * The provided argument is too long.
      */
-	GEN_TOO_LONG,
-	/**
+    GEN_ERROR_TOO_LONG,
+
+    /**
      * A nonexistent object was referenced.
      */
-	GEN_NO_SUCH_OBJECT,
-	/**
+    GEN_ERROR_NO_SUCH_OBJECT,
+
+    /**
      * Program ran out of usable memory.
      */
-	GEN_OUT_OF_MEMORY,
-	/**
+    GEN_ERROR_OUT_OF_MEMORY,
+
+    /**
      * An object of the wrong type was provided.
      */
-	GEN_WRONG_OBJECT_TYPE,
-	/**
+    GEN_ERROR_WRONG_OBJECT_TYPE,
+
+    /**
      * An object already exists by the provided identifier.
      */
-	GEN_ALREADY_EXISTS,
-	/**
+    GEN_ERROR_ALREADY_EXISTS,
+
+    /**
      * The specified destination is out of space.
      */
-	GEN_OUT_OF_SPACE,
-	/**
+    GEN_ERROR_OUT_OF_SPACE,
+
+    /**
      * Too many platform handles are open.
      */
-	GEN_OUT_OF_HANDLES,
-	/**
+    GEN_ERROR_OUT_OF_HANDLES,
+
+    /**
      * The provided argument is too short.
      */
-	GEN_TOO_SHORT,
-	/**
+    GEN_ERROR_TOO_SHORT,
+
+    /**
      * The provided argument contains bad or invalid content.
      */
-	GEN_BAD_CONTENT,
-	/**
+    GEN_ERROR_BAD_CONTENT,
+
+    /**
      * A bad or invalid operation was requested.
      */
-	GEN_BAD_OPERATION,
-	/**
+    GEN_ERROR_BAD_OPERATION,
+
+    /**
      * The specified target is in use elsewhere.
      */
-	GEN_IN_USE,
-	/**
-	 * An unimplemented feature was used.
-	 */
-	GEN_NOT_IMPLEMENTED,
-	/**
-	 * The specified value is out of bounds.
-	 */
-	GEN_OUT_OF_BOUNDS,
-	/**
-	 * The program reached an invalid control path.
-	 */
-	GEN_INVALID_CONTROL,
-	/**
-	 * The provided data was misaligned.
-	 */
-	GEN_BAD_ALIGNMENT,
-	/**
-	 * An operation could not be performed.
-	 */
-	GEN_OPERATION_FAILED,
-	/**
-	 * An operation was performed untimely manner.
-	 */
-	GEN_BAD_TIMING,
-	/**
-	 * An operation timed out.
-	 */
-	GEN_TIMEOUT
+    GEN_ERROR_IN_USE,
+
+    /**
+     * An unimplemented feature was used.
+     */
+    GEN_ERROR_NOT_IMPLEMENTED,
+
+    /**
+     * The specified value is out of bounds.
+     */
+    GEN_ERROR_OUT_OF_BOUNDS,
+
+    /**
+     * The program reached an invalid control path.
+     */
+    GEN_ERROR_INVALID_CONTROL,
+
+    /**
+     * The provided data was misaligned.
+     */
+    GEN_ERROR_BAD_ALIGNMENT,
+
+    /**
+     * An operation could not be performed.
+     */
+    GEN_ERROR_OPERATION_FAILED,
+
+    /**
+     * An operation was performed untimely manner.
+     */
+    GEN_ERROR_BAD_TIMING,
+
+    /**
+     * An operation timed out.
+     */
+    GEN_ERROR_TIMEOUT
 } gen_error_type_t;
 
 /**
  * Severity levels for an error.
  */
 typedef enum {
-	GEN_ERROR_SEVERITY_WARNING,
-	GEN_ERROR_SEVERITY_NORMAL,
-	GEN_ERROR_SEVERITY_FATAL
+    /**
+     * A non-failure case issue.
+     */
+    GEN_ERROR_SEVERITY_WARNING,
+
+    /**
+     * A failure case issue.
+     */
+    GEN_ERROR_SEVERITY_NORMAL,
+
+    /**
+     * A falure case issue causing program termination.
+     */
+    GEN_ERROR_SEVERITY_FATAL
 } gen_error_severity_t;
 
 /**
  * The return value for an errorable function.
  */
 typedef struct {
-	/**
-	 * The generic type of error encountered.
-	 */
-	gen_error_type_t type;
-	/**
-	 * The line number at which the error occurred.
-	 */
-	size_t line;
-	/**
-	 * A string explaining the context behind an error.
-	 */
-	const char* context;
+    /**
+     * The generic type of error encountered.
+     */
+    gen_error_type_t type;
+
+    /**
+     * The line number at which the error occurred.
+     */
+    size_t line;
+
+    /**
+     * A string explaining the context behind an error.
+     */
+    const char* context;
 } gen_error_t;
 
 /**

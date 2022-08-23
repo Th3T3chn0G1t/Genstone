@@ -2,6 +2,7 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 #include "include/gencommon.h"
+#include "include/genthreads.h"
 
 #ifndef GEN_TOOLING_DEPTH
 /**
@@ -32,7 +33,7 @@ typedef struct {
 	const char* files[GEN_TOOLING_DEPTH];
 } gen_tooling_stack_t;
 
-thread_local gen_tooling_stack_t gen_tooling_call_stack = {0, {0}, {0}, {0}};
+static GEN_THREAD_LOCAL gen_tooling_stack_t gen_tooling_call_stack = {0};
 
 void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p) {
     gen_error_t error = gen_tooling_pop();
@@ -43,10 +44,10 @@ void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p) 
 }
 
 void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file) {
-	if(gen_tooling_call_stack.next >= GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
-	if(!frame) GEN_FATAL_ERROR(GEN_INVALID_PARAMETER, "`frame` was NULL");
-	if(!address) GEN_FATAL_ERROR(GEN_INVALID_PARAMETER, "`address` was NULL");
-	if(!file) GEN_FATAL_ERROR(GEN_INVALID_PARAMETER, "`file` was NULL");
+	if(gen_tooling_call_stack.next >= GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
+	if(!frame) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`frame` was NULL");
+	if(!address) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`address` was NULL");
+	if(!file) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`file` was NULL");
 
 	if(gen_tooling_push_handler) gen_tooling_push_handler();
 	gen_tooling_call_stack.functions[gen_tooling_call_stack.next] = frame;
@@ -56,7 +57,7 @@ void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t ad
 }
 
 void gen_tooling_stack_pop(void) {
-	if(gen_tooling_call_stack.next == 0) GEN_FATAL_ERROR(GEN_BAD_OPERATION, "Tooling stack is empty but tried to pop");
+	if(gen_tooling_call_stack.next == 0) GEN_FATAL_ERROR(GEN_ERROR_BAD_OPERATION, "Tooling stack is empty but tried to pop");
 
 	if(gen_tooling_pop_handler) gen_tooling_pop_handler();
 	--gen_tooling_call_stack.next;
@@ -69,8 +70,8 @@ void gen_internal_tooling_frame_scope_end(__unused const char* const restrict pa
 }
 
 void gen_tooling_freq_profile_ping(const char* const restrict name) {
-	if(gen_tooling_freq_profile_next > GEN_FREQ_PROFILE_MAX) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Frequency profile buffer is full. Increase `GEN_FREQ_PROFILE_MAX` if this was legitimately reached");
-	if(!name) GEN_FATAL_ERROR(GEN_INVALID_PARAMETER, "`name` was NULL");
+	if(gen_tooling_freq_profile_next > GEN_FREQ_PROFILE_MAX) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Frequency profile buffer is full. Increase `GEN_FREQ_PROFILE_MAX` if this was legitimately reached");
+	if(!name) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`name` was NULL");
 
 	GEN_FOREACH_PTR(i, profile, gen_tooling_freq_profile_next, gen_tooling_freq_profiles) {
 		if(profile->name == name) {
@@ -88,7 +89,7 @@ void gen_tooling_freq_profile_ping(const char* const restrict name) {
 		}
 	}
 
-	if(gen_tooling_freq_profile_next >= GEN_FREQ_PROFILE_MAX) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Frequency profile buffer is full. Increase `GEN_FREQ_PROFILE_MAX` if this was legitimately reached");
+	if(gen_tooling_freq_profile_next >= GEN_FREQ_PROFILE_MAX) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Frequency profile buffer is full. Increase `GEN_FREQ_PROFILE_MAX` if this was legitimately reached");
 
 	gen_tooling_freq_profile_t* const new_profile = &gen_tooling_freq_profiles[gen_tooling_freq_profile_next++];
 
@@ -105,7 +106,7 @@ void gen_tooling_freq_profile_ping(const char* const restrict name) {
 }
 
 void gen_tooling_print_backtrace(void) {
-	if(gen_tooling_call_stack.next > GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
+	if(gen_tooling_call_stack.next > GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
 
 	GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions) {
 		(void) trace;

@@ -16,7 +16,7 @@ GLOBAL_CFLAGS += $(EXTRA_CFLAGS)
 GLOBAL_LFLAGS += -flto
 GLOBAL_LFLAGS += $(EXTRA_LFLAGS)
 
-SAFLAGS = -Xanalyzer -analyzer-output=text
+SAFLAGS = -D__ANALYZER -Xanalyzer -analyzer-output=text
 SAFLAGS += -Xanalyzer -analyzer-checker=core -Xanalyzer -analyzer-checker=deadcode
 SAFLAGS += -Xanalyzer -analyzer-checker=optin
 SAFLAGS += -Xanalyzer -analyzer-checker=unix

@@ -42,26 +42,30 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
  */
 typedef enum
 {
-	/**
+    /**
      * No event occurred.
      */
-	GEN_FILESYSTEM_WATCHER_EVENT_NONE = 1 << 0,
-	/**
+    GEN_FILESYSTEM_WATCHER_EVENT_NONE = 1 << 0,
+
+    /**
      * A file was created.
      */
-	GEN_FILESYSTEM_WATCHER_EVENT_CREATED = 1 << 1,
-	/**
+    GEN_FILESYSTEM_WATCHER_EVENT_CREATED = 1 << 1,
+
+    /**
      * A file was modified.
      */
-	GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED = 1 << 2,
-	/**
+    GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED = 1 << 2,
+
+    /**
      * A file was deleted.
      */
-	GEN_FILESYSTEM_WATCHER_EVENT_DELETED = 1 << 3,
-	/**
+    GEN_FILESYSTEM_WATCHER_EVENT_DELETED = 1 << 3,
+
+    /**
      * A file was moved.
      */
-	GEN_FILESYSTEM_WATCHER_EVENT_MOVED = 1 << 4
+    GEN_FILESYSTEM_WATCHER_EVENT_MOVED = 1 << 4
 } gen_filesystem_watcher_event_t;
 
 /**
@@ -78,53 +82,57 @@ typedef DIR* gen_filesystem_directory_handle_t;
  * The type of filesystem entry a filesystem handle refers to.
  */
 typedef enum {
-     /**
-      * A regular file.
-      */
-     GEN_FILESYSTEM_HANDLE_FILE,
-     /**
-      * A directory.
-      */
-     GEN_FILESYSTEM_HANDLE_DIRECTORY,
-     /**
-      * A watcher.
-      */
-     GEN_FILESYSTEM_HANDLE_WATCHER
+    /**
+     * A regular file.
+     */
+    GEN_FILESYSTEM_HANDLE_FILE,
+
+    /**
+     * A directory.
+     */
+    GEN_FILESYSTEM_HANDLE_DIRECTORY,
+
+    /**
+     * A watcher.
+     */
+    GEN_FILESYSTEM_HANDLE_WATCHER
 } gen_filesystem_handle_type_t;
 
 /**
  * A handle to a filesystem entry.
  */
 typedef struct {
-	/**
-      * The type of entry this handle references.
-      */
-	gen_filesystem_handle_type_t type;
+    /**
+     * The type of entry this handle references.
+     */
+    gen_filesystem_handle_type_t type;
 
-     /**
-      * The underlying file handle for the handle.
-      */
-     gen_filesystem_file_handle_t file_handle;
-     /**
-      * The underlying directory handle for the handle.
-      * Invalid if `type` is not `GEN_FILESYSTEM_HANDLE_DIRECTORY`.
-      */
-     gen_filesystem_directory_handle_t directory_handle;
+    /**
+     * The underlying file handle for the handle.
+     */
+    gen_filesystem_file_handle_t file_handle;
 
-     /**
-      * Structure access and operation lock.
-      */
-     gen_threads_mutex_t lock; // TODO: Switch directory listing to `getdents` and remove need for lock/move into non-syslib watching.
+    /**
+     * The underlying directory handle for the handle.
+     * Invalid if `type` is not `GEN_FILESYSTEM_HANDLE_DIRECTORY`.
+     */
+    gen_filesystem_directory_handle_t directory_handle;
+
+    /**
+     * Structure access and operation lock.
+     */
+    gen_threads_mutex_t lock; // TODO: Switch directory listing to `getdents` and remove need for lock/move into non-syslib watching.
 
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
-	/**
-      * Internal caching of `stat` for file watching.
-      */
-	struct stat internal_stat_cached;
-	/**
-      * Intenal caching of directory length for file watching.
-      */
-	size_t internal_directory_length_cached;
+    /**
+     * Internal caching of `stat` for file watching.
+     */
+    struct stat internal_stat_cached;
+
+    /**
+     * Intenal caching of directory length for file watching.
+     */
+    size_t internal_directory_length_cached;
 #endif
 } gen_filesystem_handle_t;
 
@@ -135,8 +143,8 @@ extern void gen_filesystem_internal_scoped_file_lock_cleanup(gen_filesystem_hand
  * @param[in,out] handle The handle to the file to lock.
  */
 #define GEN_FILESYSTEM_HANDLE_SCOPED_LOCK(handle) \
-	gen_filesystem_handle_lock(handle); \
-	GEN_MAYBE_UNUSED GEN_CLEANUP_FUNCTION(gen_filesystem_internal_scoped_file_lock_cleanup) gen_filesystem_handle_t* gen_filesystem_internal_scoped_file_lock_scope_variable = handle
+    gen_filesystem_handle_lock(handle); \
+    GEN_MAYBE_UNUSED GEN_CLEANUP_FUNCTION(gen_filesystem_internal_scoped_file_lock_cleanup) gen_filesystem_handle_t* gen_filesystem_internal_scoped_file_lock_scope_variable = handle
 
 /**
  * Handle to a filesystem watcher.
@@ -147,10 +155,12 @@ typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
  * `gen_filesystem_handle_t` wrapper for stdin.
  */
 #define gen_filesystem_stdin_handle ((gen_filesystem_handle_t){0, NULL, false})
+
 /**
  * `gen_filesystem_handle_t` wrapper for stdout.
  */
 #define gen_filesystem_stdout_handle ((gen_filesystem_handle_t){1, NULL, false})
+
 /**
  * `gen_filesystem_handle_t` wrapper for stderr.
  */

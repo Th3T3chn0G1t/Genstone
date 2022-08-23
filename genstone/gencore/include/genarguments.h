@@ -16,50 +16,57 @@
  * Parsed out argument information.
  */
 typedef struct {
-     /**
-      * Indices into the `short_arguments` array passed to `gen_arguments_parse` parsed out of the argument array.
-      */
-     size_t* short_argument_indices;
-     /**
-      * Parameters to short arguments in `short_argument_indices` parsed out of the argument array passed to `gen_arguments_parse`.
-      * Each entry corresponds to an entry in `short_argument_indices` - for arguments which recieved no parameter, the entry will be `NULL`.
-      */
-     const char** short_argument_parameters;
-     /**
-      * The lengths of parameters in `short_argument_parameters`.
-      */
-     size_t* short_argument_parameter_lengths;
-     /**
-      * The number of indices in `short_argument_indices`, the number of parameters in `short_argument_parameters`, and the number of lengths in `short_argument_parameter_lengths`.
-      */
-     size_t short_argument_count;
+    /**
+     * Indices into the `short_arguments` array passed to `gen_arguments_parse` parsed out of the argument array.
+     */
+    size_t* short_argument_indices;
 
-     /**
-      * Indices into the `long_arguments` array passed to `gen_arguments_parse` parsed out of the argument array.
-      */
-     size_t* long_argument_indices;
-     /**
-      * Parameters to short arguments in `long_argument_indices` parsed out of the argument array passed to `gen_arguments_parse`.
-      * Each entry corresponds to an entry in `long_argument_indices` - for arguments which recieved no parameter, the entry will be `NULL`.
-      */
-     const char** long_argument_parameters;
-     /**
-      * The lengths of parameters in `long_argument_parameters`.
-      */
-     size_t* long_argument_parameter_lengths;
-     /**
-      * The number of indices in `long_argument_indices`, the number of parameters in `long_argument_parameters`, and the number of lengths in `long_argument_parameter_lengths`.
-      */
-     size_t long_argument_count;
+    /**
+     * Parameters to short arguments in `short_argument_indices` parsed out of the argument array passed to `gen_arguments_parse`.
+     * Each entry corresponds to an entry in `short_argument_indices` - for arguments which recieved no parameter, the entry will be `NULL`.
+     */
+    const char** short_argument_parameters;
 
-     /**
-      * Indices into the argument array passed to `gen_arguments_parse` for raw arguments.
-      */
-     size_t* raw_argument_indices;
-     /**
-      * The number of indices in raw_argument_indices.
-      */
-     size_t raw_argument_count;
+    /**
+     * The lengths of parameters in `short_argument_parameters`.
+     */
+    size_t* short_argument_parameter_lengths;
+
+    /**
+     * The number of indices in `short_argument_indices`, the number of parameters in `short_argument_parameters`, and the number of lengths in `short_argument_parameter_lengths`.
+     */
+    size_t short_argument_count;
+
+    /**
+     * Indices into the `long_arguments` array passed to `gen_arguments_parse` parsed out of the argument array.
+     */
+    size_t* long_argument_indices;
+
+    /**
+     * Parameters to short arguments in `long_argument_indices` parsed out of the argument array passed to `gen_arguments_parse`.
+     * Each entry corresponds to an entry in `long_argument_indices` - for arguments which recieved no parameter, the entry will be `NULL`.
+     */
+    const char** long_argument_parameters;
+
+    /**
+     * The lengths of parameters in `long_argument_parameters`.
+     */
+    size_t* long_argument_parameter_lengths;
+
+    /**
+     * The number of indices in `long_argument_indices`, the number of parameters in `long_argument_parameters`, and the number of lengths in `long_argument_parameter_lengths`.
+     */
+    size_t long_argument_count;
+
+    /**
+     * Indices into the argument array passed to `gen_arguments_parse` for raw arguments.
+     */
+    size_t* raw_argument_indices;
+
+    /**
+     * The number of indices in raw_argument_indices.
+     */
+    size_t raw_argument_count;
 } gen_arguments_parsed_t;
 
 /**
