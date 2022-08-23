@@ -25,7 +25,7 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 
 	if(!limit) {
 		*out_equal = true;
-		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+		return (gen_error_t){GEN_OK};
 	}
 
 	size_t a_length = 0;
@@ -38,12 +38,12 @@ gen_error_t gen_string_compare(const char* const restrict a, const size_t a_boun
 
 	if(limit == GEN_STRING_NO_BOUNDS && a_length != b_length) {
 		*out_equal = false;
-		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+		return (gen_error_t){GEN_OK};
 	}
 
 	*out_equal = !strncmp(a, b, GEN_MAXIMUM(GEN_MINIMUM(a_length, b_bounds), GEN_MINIMUM(b_length, a_bounds)));
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bounds, const char* const restrict source, const size_t source_bounds, const size_t limit) {
@@ -53,7 +53,7 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 	if(!destination) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`destination` was `NULL`");
 	if(!source) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`source` was `NULL`");
 
-	if(!limit) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	if(!limit) return (gen_error_t){GEN_OK};
 
 	error = gen_memory_set(destination, GEN_MINIMUM(limit, destination_bounds), '\0');
 	if(error.type) return error;
@@ -64,7 +64,7 @@ gen_error_t gen_string_copy(char* const restrict destination, const size_t desti
 
 	strncpy(destination, source, GEN_MINIMUM(source_length, destination_bounds));
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bounds, const char* const restrict source, const size_t source_bounds, const size_t limit) {
@@ -74,7 +74,7 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 	if(!destination) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`destination` was `NULL`");
 	if(!source) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`source` was `NULL`");
 
-	if(!limit) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	if(!limit) return (gen_error_t){GEN_OK};
 
 	size_t destination_length = 0;
 	error = gen_string_length(destination, destination_bounds, limit, &destination_length);
@@ -86,7 +86,7 @@ gen_error_t gen_string_append(char* const restrict destination, const size_t des
 
 	strncat(destination, source, GEN_MINIMUM(source_length, destination_bounds - destination_length));
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_string_length(const char* const restrict string, const size_t string_bounds, const size_t limit, size_t* const restrict out_length) {
@@ -96,9 +96,9 @@ gen_error_t gen_string_length(const char* const restrict string, const size_t st
 	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
 	if(!out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_length` was `NULL`");
 
-	strnlen(string, GEN_MINIMUM(limit, string_bounds));
+	*out_length = strnlen(string, GEN_MINIMUM(limit, string_bounds));
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 static void gen_string_duplicate_duplicated_cleanup(char** duplicated) {
@@ -138,7 +138,7 @@ gen_error_t gen_string_duplicate(const char* const restrict string, const size_t
 	*out_duplicated = duplicated;
 	*out_length = string_length;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bounds, const char character, const size_t limit, size_t* const restrict out_found) {
@@ -150,24 +150,25 @@ gen_error_t gen_string_character_first(const char* const restrict string, const 
 
 	if(!limit) {
 		*out_found = SIZE_MAX;
-		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+		return (gen_error_t){GEN_OK};
 	}
 
 	size_t string_length = 0;
 	error = gen_string_length(string, string_bounds, limit, &string_length);
 	if(error.type) return error;
 
-#ifndef __ANALYZER
+#ifdef __ANALYZER
+#else
 	for(size_t i = 0; i < string_length; ++i) {
 		if(string[i] == character) {
 			*out_found = i;
-			return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+			return (gen_error_t){GEN_OK};
 		}
 	}
 #endif
 
 	*out_found = SIZE_MAX;
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bounds, const char character, const size_t limit, size_t* const restrict out_found) {
@@ -179,7 +180,7 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 
 	if(!limit) {
 		*out_found = SIZE_MAX;
-		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+		return (gen_error_t){GEN_OK};
 	}
 
 	size_t string_length = 0;
@@ -189,12 +190,12 @@ gen_error_t gen_string_character_last(const char* const restrict string, const s
 	for(size_t i = string_length - 1; i != SIZE_MAX; --i) {
 		if(string[i] == character) {
 			*out_found = i;
-			return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+			return (gen_error_t){GEN_OK};
 		}
 	}
 
 	*out_found = SIZE_MAX;
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_string_number(const char* const restrict string, const size_t string_bounds, const size_t limit, size_t* const restrict out_number) {
@@ -209,7 +210,8 @@ gen_error_t gen_string_number(const char* const restrict string, const size_t st
 	if(error.type) return error;
 
 	size_t accumulate = 0;
-#ifndef __ANALYZER
+#ifdef __ANALYZER
+#else
 	for(size_t i = 0; i < string_length; ++i) {
 		if(string[i] < '0' || string[i] > '9') return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Encountered non-numeric character `%c`", string[i]);
 		accumulate += (size_t) (string[i] - '0');
@@ -218,5 +220,5 @@ gen_error_t gen_string_number(const char* const restrict string, const size_t st
 
 	*out_number = accumulate;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }

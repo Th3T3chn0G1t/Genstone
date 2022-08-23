@@ -63,7 +63,7 @@ gen_error_t gen_filesystem_path_canonicalize(const char* const restrict path, co
 		if(error.type) return error;
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_path_exists(const char* const restrict path, const size_t path_length, bool* const restrict out_exists) {
@@ -82,7 +82,7 @@ gen_error_t gen_filesystem_path_exists(const char* const restrict path, const si
 
 	*out_exists = !result;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_path_validate(const char* const restrict path, const size_t path_length) {
@@ -97,7 +97,7 @@ gen_error_t gen_filesystem_path_validate(const char* const restrict path, const 
 
 	// TODO: Windows has path content limitations
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_path_create_file(const char* const restrict path, const size_t path_length) {
@@ -115,7 +115,7 @@ gen_error_t gen_filesystem_path_create_file(const char* const restrict path, con
 	result = close(result);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file at path `%zs`: %s", path, path_length, gen_error_description_from_errno());
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_path_create_directory(const char* const restrict path, const size_t path_length) {
@@ -131,7 +131,7 @@ gen_error_t gen_filesystem_path_create_directory(const char* const restrict path
 	int result = mkdir(path, 0777);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create directory at path `%zs`: %s", path, path_length, gen_error_description_from_errno());
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_path_delete(const char* const restrict path, const size_t path_length) {
@@ -152,7 +152,7 @@ gen_error_t gen_filesystem_path_delete(const char* const restrict path, const si
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not remove path `%zs`: %s", path, path_length, gen_error_description_from_errno());
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 static void gen_filesystem_internal_handle_open_cleanup_lock(gen_threads_mutex_t** mutex) {
@@ -230,7 +230,7 @@ gen_error_t gen_filesystem_handle_open(const char* const restrict path, const si
 
 		file_handle_scope_variable = NULL; // Prevent error-cleanup
 
-		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+		return (gen_error_t){GEN_OK};
 	}
 
 	out_handle->type = GEN_FILESYSTEM_HANDLE_DIRECTORY;
@@ -254,7 +254,7 @@ gen_error_t gen_filesystem_handle_open(const char* const restrict path, const si
 	file_handle_scope_variable = NULL;
 	directory_handle_scope_variable = NULL;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict handle) {
@@ -280,7 +280,7 @@ gen_error_t gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict 
 	error = gen_threads_mutex_unlock_and_destroy(&handle->lock);
 	if(error.type) return error;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_handle_file_size(gen_filesystem_handle_t* const restrict handle, size_t* const restrict out_size) {
@@ -303,7 +303,7 @@ gen_error_t gen_filesystem_handle_file_size(gen_filesystem_handle_t* const restr
 	offset = lseek(handle->file_handle, 0, SEEK_SET);
 	if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not get file size: %s", gen_error_description_from_errno());
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_handle_file_read(gen_filesystem_handle_t* const restrict handle, const size_t start, const size_t end, unsigned char* restrict out_buffer) {
@@ -323,7 +323,7 @@ gen_error_t gen_filesystem_handle_file_read(gen_filesystem_handle_t* const restr
 		off_t offset = lseek(handle->file_handle, 0, SEEK_SET);
 		if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not read file: %s", gen_error_description_from_errno());
 
-		return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+		return (gen_error_t){GEN_OK};
 	}
 
 	ssize_t result = pread(handle->file_handle, out_buffer, (size_t) (end - start), (off_t) start);
@@ -332,7 +332,7 @@ gen_error_t gen_filesystem_handle_file_read(gen_filesystem_handle_t* const restr
 	off_t offset = lseek(handle->file_handle, 0, SEEK_SET);
 	if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not read file: %s", gen_error_description_from_errno());
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t buffer_size) {
@@ -344,7 +344,7 @@ gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* const rest
 
 	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
-	if(!buffer_size) return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	if(!buffer_size) return (gen_error_t){GEN_OK};
 
 	error = GEN_THREADS_MUTEX_SCOPED_LOCK(&handle->lock);
 	if(error.type) return error;
@@ -355,7 +355,7 @@ gen_error_t gen_filesystem_handle_file_write(gen_filesystem_handle_t* const rest
 	off_t offset = lseek(handle->file_handle, 0, SEEK_SET);
 	if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %s", gen_error_description_from_errno());
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 static void gen_filesystem_internal_handle_directory_list_entries_cleanup(char** entries) {
@@ -424,7 +424,7 @@ gen_error_t gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const 
 
 	rewinddir(handle->directory_handle);
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_filesystem_watcher_create(gen_filesystem_handle_t* const restrict handle, gen_filesystem_watcher_t* const restrict out_watcher) {
@@ -496,7 +496,7 @@ gen_error_t gen_filesystem_watcher_create(gen_filesystem_handle_t* const restric
 
 	file_handle_scope_variable = NULL;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 #else
 #error No system library available for file watching
 #endif
@@ -537,7 +537,7 @@ gen_error_t gen_filesystem_watcher_create(gen_filesystem_handle_t* const restric
 	file_handle_scope_variable = NULL;
 	directory_handle_scope_variable = NULL;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 #endif
 }
 
@@ -563,7 +563,7 @@ gen_error_t gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* const restr
 	error = gen_filesystem_handle_close(watcher);
 	if(error.type) return error;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 	/*
 // TODO: This will need separation when we have more backends to deal with.
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
@@ -618,7 +618,12 @@ gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict
 
 		unsigned int offset = 0;
 		while(offset < events_size) {
+#ifdef __ANALYZER
+			struct inotify_event const e = {0};
+			struct inotify_event* const event = &e;
+#else
 			struct inotify_event* const event = (struct inotify_event*) &raw_events[offset];
+#endif
 
 			if(event->mask & IN_ATTRIB || event->mask & IN_MODIFY) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED;
 			if(event->mask & IN_CREATE) *out_event |= GEN_FILESYSTEM_WATCHER_EVENT_CREATED;
@@ -629,7 +634,7 @@ gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict
 		}
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 #else
 #error No system library available for file watching
 #endif
@@ -667,6 +672,6 @@ gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict
 
 	watcher->internal_stat_cached = watcher_stat;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 #endif
 }

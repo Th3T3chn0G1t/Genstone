@@ -10,6 +10,14 @@
 
 #include "gencommon.h"
 
+extern void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p);
+
+/**
+ * Attaches the current tooling frame to a variable's lifetime.
+ * When the prefixed variable goes out of scope, the call frame is destroyed.
+ */
+#define GEN_TOOLING_AUTO GEN_CLEANUP_FUNCTION(gen_tooling_internal_auto_cleanup)
+
 /**
  * Pushes a new entry onto the tooled call stack.
  * @param[in] frame The name of the frame.
@@ -24,14 +32,6 @@ extern gen_error_t gen_tooling_push(const char* const restrict frame, const void
  * @return An error code.
  */
 extern gen_error_t gen_tooling_pop(void);
-
-extern void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p);
-
-/**
- * Attaches the current tooling frame to a variable's lifetime.
- * When the prefixed variable goes out of scope, the call frame is destroyed.
- */
-#define GEN_TOOLING_AUTO GEN_CLEANUP_FUNCTION(gen_tooling_internal_auto_cleanup)
 
 /**
  * Gets a formatted backtrace of the current tooled call stack.

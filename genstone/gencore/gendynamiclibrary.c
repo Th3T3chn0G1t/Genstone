@@ -71,7 +71,7 @@ gen_error_t gen_dynamic_library_handle_open(const char* const restrict library_n
 	error = gen_memory_free((void**) &library_file_name);
 	if(error.type) return error;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t* const restrict dynamic_library) {
@@ -84,7 +84,7 @@ gen_error_t gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t*
 		return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to close library: %s", dlerror());
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, const void* restrict* const restrict out_address) {
@@ -101,5 +101,5 @@ gen_error_t gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_hand
 		return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to locate symbol `%zs`: %s", symbol_name, symbol_name_length, dlerror());
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }

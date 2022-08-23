@@ -113,7 +113,7 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 		continue;
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_arguments_free_parsed(gen_arguments_parsed_t* const restrict parsed) {
@@ -151,5 +151,5 @@ gen_error_t gen_arguments_free_parsed(gen_arguments_parsed_t* const restrict par
 		if(error.type) return error;
 	}
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }

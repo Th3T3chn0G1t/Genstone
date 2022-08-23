@@ -55,7 +55,7 @@ gen_error_t gen_memory_allocate_zeroed(void* restrict* const restrict out_addres
 
 	*out_address = allocated;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_memory_allocate_zeroed_aligned(void* restrict* const restrict out_address, const size_t count, const size_t size, const size_t alignment) {
@@ -78,7 +78,7 @@ gen_error_t gen_memory_allocate_zeroed_aligned(void* restrict* const restrict ou
 
 	*out_address = allocated;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_memory_reallocate_zeroed(void* restrict* const restrict address, const size_t old_count, const size_t count, const size_t size) {
@@ -109,7 +109,7 @@ gen_error_t gen_memory_reallocate_zeroed(void* restrict* const restrict address,
 
 	*address = allocated;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_memory_free(void* restrict* const restrict address) {
@@ -122,7 +122,7 @@ gen_error_t gen_memory_free(void* restrict* const restrict address) {
 
 	*address = NULL;
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_memory_set(void* const restrict address, const size_t length, const unsigned char value) {
@@ -133,7 +133,7 @@ gen_error_t gen_memory_set(void* const restrict address, const size_t length, co
 
 	memset(address, value, length);
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }
 
 gen_error_t gen_memory_copy(void* const restrict to, const size_t to_size, const void* const restrict from, const size_t from_size, const size_t limit) {
@@ -147,5 +147,5 @@ gen_error_t gen_memory_copy(void* const restrict to, const size_t to_size, const
 
 	memcpy(to, from, limit);
 
-	return (gen_error_t){GEN_OK, GEN_LINE_NUMBER, ""};
+	return (gen_error_t){GEN_OK};
 }

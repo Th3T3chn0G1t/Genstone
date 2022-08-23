@@ -19,97 +19,51 @@ typedef struct {
      * Offset of the next free space in the stack.
      */
 	size_t next;
+
 	/**
      * A buffer of function names.
      */
 	const char* functions[GEN_TOOLING_DEPTH];
+
 	/**
      * A buffer of function addresses.
      */
-	uintptr_t addresses[GEN_TOOLING_DEPTH];
+	const void* addresses[GEN_TOOLING_DEPTH];
+
 	/**
      * A buffer of source files for functions.
      */
 	const char* files[GEN_TOOLING_DEPTH];
 } gen_tooling_stack_t;
 
-static GEN_THREAD_LOCAL gen_tooling_stack_t gen_tooling_call_stack = {0};
+static GEN_THREAD_LOCAL gen_tooling_stack_t call_stack = {0};
 
 void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p) {
-    gen_error_t error = gen_tooling_pop();
-    if(error.type) {
-        gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
-}
-
-void gen_tooling_stack_push(const char* const restrict frame, const uintptr_t address, const char* const restrict file) {
-	if(gen_tooling_call_stack.next >= GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
-	if(!frame) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`frame` was NULL");
-	if(!address) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`address` was NULL");
-	if(!file) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`file` was NULL");
-
-	if(gen_tooling_push_handler) gen_tooling_push_handler();
-	gen_tooling_call_stack.functions[gen_tooling_call_stack.next] = frame;
-	gen_tooling_call_stack.addresses[gen_tooling_call_stack.next] = address;
-	gen_tooling_call_stack.files[gen_tooling_call_stack.next] = file;
-	++gen_tooling_call_stack.next;
-}
-
-void gen_tooling_stack_pop(void) {
-	if(gen_tooling_call_stack.next == 0) GEN_FATAL_ERROR(GEN_ERROR_BAD_OPERATION, "Tooling stack is empty but tried to pop");
-
-	if(gen_tooling_pop_handler) gen_tooling_pop_handler();
-	--gen_tooling_call_stack.next;
-}
-
-void gen_internal_tooling_frame_scope_end(__unused const char* const restrict passthrough) {
-	//	if(*passthrough != '\0')
-
-	gen_tooling_stack_pop();
-}
-
-void gen_tooling_freq_profile_ping(const char* const restrict name) {
-	if(gen_tooling_freq_profile_next > GEN_FREQ_PROFILE_MAX) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Frequency profile buffer is full. Increase `GEN_FREQ_PROFILE_MAX` if this was legitimately reached");
-	if(!name) GEN_FATAL_ERROR(GEN_ERROR_INVALID_PARAMETER, "`name` was NULL");
-
-	GEN_FOREACH_PTR(i, profile, gen_tooling_freq_profile_next, gen_tooling_freq_profiles) {
-		if(profile->name == name) {
-			struct timeval current_time;
-			gettimeofday(&current_time, NULL);
-
-			struct timeval delta;
-			gen_timeval_sub(&current_time, &profile->last, &delta);
-			gen_timeval_add(&profile->running, &delta, &profile->running);
-			profile->last.tv_sec = current_time.tv_sec;
-			profile->last.tv_usec = current_time.tv_usec;
-			++profile->calls_length;
-
-			return;
-		}
+	gen_error_t error = gen_tooling_pop();
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
 	}
-
-	if(gen_tooling_freq_profile_next >= GEN_FREQ_PROFILE_MAX) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Frequency profile buffer is full. Increase `GEN_FREQ_PROFILE_MAX` if this was legitimately reached");
-
-	gen_tooling_freq_profile_t* const new_profile = &gen_tooling_freq_profiles[gen_tooling_freq_profile_next++];
-
-	new_profile->name = name;
-
-	struct timeval current_time;
-	gettimeofday(&current_time, NULL);
-
-	new_profile->first.tv_sec = current_time.tv_sec;
-	new_profile->first.tv_usec = current_time.tv_usec;
-	new_profile->last.tv_sec = current_time.tv_sec;
-	new_profile->last.tv_usec = current_time.tv_usec;
-	++new_profile->calls_length;
 }
 
-void gen_tooling_print_backtrace(void) {
-	if(gen_tooling_call_stack.next > GEN_TOOLING_DEPTH) GEN_FATAL_ERROR(GEN_ERROR_OUT_OF_SPACE, "Tooling stack is full. Increase `GEN_TOOLING_DEPTH` if this was legitimately reached");
+gen_error_t gen_tooling_push(const char* const restrict frame, const void* const restrict address, const char* const restrict file) {
+	if(call_stack.next >= GEN_TOOLING_DEPTH) return gen_error_attach_backtrace(GEN_ERROR_OUT_OF_SPACE, GEN_LINE_NUMBER, "Tooling stack is full");
+	if(!frame) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`frame` was NULL");
+	if(!address) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`address` was NULL");
+	if(!file) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`file` was NULL");
 
-	GEN_FOREACH(i, trace, gen_tooling_call_stack.next, gen_tooling_call_stack.functions) {
-		(void) trace;
-		glogf(TRACE, "frame #%zu: 0x%p %s() %s", i, (void*) gen_tooling_call_stack.addresses[gen_tooling_call_stack.next - (i + 1)], gen_tooling_call_stack.functions[gen_tooling_call_stack.next - (i + 1)], gen_tooling_call_stack.files[gen_tooling_call_stack.next - (i + 1)]);
-	}
+	call_stack.functions[call_stack.next] = frame;
+	call_stack.addresses[call_stack.next] = address;
+	call_stack.files[call_stack.next] = file;
+	++call_stack.next;
+
+	return (gen_error_t){GEN_OK};
+}
+
+gen_error_t gen_tooling_pop(void) {
+	if(call_stack.next == 0) return gen_error_attach_backtrace(GEN_ERROR_BAD_OPERATION, GEN_LINE_NUMBER, "Tooling stack is empty but tried to pop");
+
+	--call_stack.next;
+
+	return (gen_error_t){GEN_OK};
 }

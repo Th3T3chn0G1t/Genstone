@@ -74,7 +74,8 @@ clean_common:
 	@$(ECHO) "$(ACTION_SUFFIX)"
 
 lib:
-	-$(MKDIR) $@
+	@$(ECHO) "$(ACTION_PREFIX)$(MKDIR) $@$(ACTION_SUFFIX)"
+	-@$(MKDIR) $@
 
 MODULES = $(wildcard $(GENSTONE_DIR)/genstone/*.mk)
 MODULE_NAMES = $(subst $(GENSTONE_DIR)/genstone/,,$(subst .mk,,$(MODULES)))
