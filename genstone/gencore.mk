@@ -1,4 +1,4 @@
-GEN_CORE_COMMON_CFLAGS = -Werror -Weverything
+GEN_CORE_COMMON_CFLAGS = -fenable-matrix -Werror -Weverything
 GEN_CORE_COMMON_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
 GEN_CORE_COMMON_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
 GEN_CORE_COMMON_CFLAGS += -Wno-missing-field-initializers # TODO: This might be desirable for genfx/vk

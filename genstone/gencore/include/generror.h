@@ -2,12 +2,12 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
- * @file generrors.h
+ * @file generror.h
  * Contains error value enumerations and API for interacting with errors.
  */
 
-#ifndef GEN_ERRORS_H
-#define GEN_ERRORS_H
+#ifndef GEN_ERROR_H
+#define GEN_ERROR_H
 
 #ifndef EOK
 #define EOK (0)

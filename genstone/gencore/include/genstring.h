@@ -2,7 +2,7 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
- * @file genstr.h
+ * @file genstring.h
  * String manipulation utilities.
  */
 

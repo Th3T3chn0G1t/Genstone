@@ -72,6 +72,11 @@
 #endif
 
 /**
+ * Pretty wrapper for `_Generic`.
+ */
+#define GEN_GENERIC _Generic
+
+/**
  * Pretty wrapper for `__attribute__((cleanup))`.
  * @param[in] function The cleanup function to call.
  */

@@ -620,7 +620,7 @@ gen_error_t gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restrict
 		while(offset < events_size) {
 #ifdef __ANALYZER
 			struct inotify_event const e = {0};
-			struct inotify_event* const event = &e;
+			struct inotify_event* const event = &e	;
 #else
 			struct inotify_event* const event = (struct inotify_event*) &raw_events[offset];
 #endif

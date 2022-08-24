@@ -2,7 +2,7 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
- * @file gemory.h
+ * @file genmemory.h
  * Provides wrappers and abstraction for heap functions.
  * Utility for managing memory.
  */

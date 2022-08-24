@@ -2,12 +2,12 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
- * @file genfs.h
+ * @file genfilesystem.h
  * Includes filesystem utilities for manipulation and introspection.
  */
 
-#ifndef GEN_FS_H
-#define GEN_FS_H
+#ifndef GEN_FILESYSTEM_H
+#define GEN_FILESYSTEM_H
 
 #include "gencommon.h"
 #include "genthreads.h"

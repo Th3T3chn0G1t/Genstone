@@ -10,7 +10,7 @@
 #define GEN_PROC_H
 
 #include "gencommon.h"
-#include "genfs.h"
+#include "genfilesystem.h"
 
 /**
  * Handle type for a process.

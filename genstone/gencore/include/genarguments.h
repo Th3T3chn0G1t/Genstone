@@ -2,7 +2,7 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 /**
- * @file genargs.h
+ * @file genarguments.h
  * Utility for parsing UNIX-style arguments.
  * Defines basic types used for managing the parser.
  */
