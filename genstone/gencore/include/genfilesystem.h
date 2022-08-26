@@ -227,6 +227,13 @@ extern gen_error_t gen_filesystem_path_delete(const char* const restrict path, c
 extern gen_error_t gen_filesystem_handle_open(const char* const restrict path, const size_t path_length, gen_filesystem_handle_t* restrict out_handle);
 
 /**
+ * Opens an anonymous file as a filesystem handle for use by filesystem operations.
+ * @param[out] out_handle A pointer to storage for the handle.
+ * @return An error code.
+ */
+extern gen_error_t gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restrict out_handle);
+
+/**
  * Closes a filesystem handle.
  * @param[in,out] handle The handle to close.
  * @return An error code.

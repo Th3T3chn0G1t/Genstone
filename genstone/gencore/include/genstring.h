@@ -11,6 +11,11 @@
 
 #include "gencommon.h"
 
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <stdarg.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+
 /**
  * A value which can be used in place of string bounds in the event that no bounding should be performed.
  */
@@ -110,5 +115,15 @@ extern gen_error_t gen_string_number(const char* const restrict string, const si
  * @return An error code.
  */
 extern gen_error_t gen_string_format(char* const restrict out_buffer, size_t* out_length, const char* const restrict format, ...);
+
+/**
+ * Formats a string to a buffer.
+ * @param[out] out_buffer A pointer to storage for the formatted string.
+ * @param[out] out_length A pointer to storage for the length of the formatted string.
+ * @param[in] format The format specification to apply format arguments to.
+ * @param[in] list The format arguments to apply to `format`.
+ * @return An error code.
+ */
+extern gen_error_t gen_string_formatv(char* const restrict out_buffer, size_t* out_length, const char* const restrict format, va_list list);
 
 #endif

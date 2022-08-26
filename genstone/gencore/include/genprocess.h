@@ -12,39 +12,54 @@
 #include "gencommon.h"
 #include "genfilesystem.h"
 
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <unistd.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+
 /**
  * Handle type for a process.
  */
 typedef pid_t gen_process_t;
 
 /**
- * @example{lineno} example/gencore/gen_proc.c
- * Example for how to use the `gen_proc*` family of functions.
- * The `gen_proc*` family of functions is used for managing subprocesses in a platform agnostic way.
+ * Creates a subprocess.
+ * @param[in] executable_path The path to the executable to create the subprocess with. 
+ * @param[in] executable_path_length The length of the path to the executable to create the subprocess with. 
+ * @param[in] arguments The arguments to pass to the created subprocess.
+ * @param[in] argument_lengths The lengths of the arguments to pass to the created subprocess.
+ * @param[in] arguments_length The length of the `arguments` buffer.
+ * @param[out] out_process A pointer to storage for a handle to the created subprocess.
+ * @return An error code.
  */
+extern gen_error_t gen_process_create(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_process_t* const restrict out_process);
 
 /**
- * Creates a subprocess and redirects output to a given redirect handle.
- * @param[out] out_process pointer to storage for the created process.
- * @param[in] exec the command line to start the process. This goes through the shell so caution should be taken regarding arbitrary shell execution.
- * @param[in] redirect the handle to redirect output to.
- * @return An error code. 
+ * Creates a subprocess redirected to a filesystem handle.
+ * @param[in] executable_path The path to the executable to create the subprocess with. 
+ * @param[in] executable_path_length The length of the path to the executable to create the subprocess with. 
+ * @param[in] arguments The arguments to pass to the created subprocess.
+ * @param[in] argument_lengths The lengths of the arguments to pass to the created subprocess.
+ * @param[in] arguments_length The length of the `arguments` buffer.
+ * @param[in,out] filesystem_handle The filesystem handle to redirect output to.
+ * @param[out] out_process A pointer to storage for a handle to the created subprocess.
+ * @return An error code.
  */
-extern gen_error_t gen_proc_create_redirected_to(gen_process_t* const restrict out_process, const char* const restrict exec, const gen_filesystem_handle_t* const restrict redirect);
+extern gen_error_t gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
 
 /**
  * Blocks the current thread until the specified subprocess exits.
- * @param process the subprocess to wait for.
- * @param out_exitcode pointer to storage for the exit code of the subprocess.
+ * @param process The subprocess to wait for.
+ * @param out_exitcode A pointer to storage for the exit code of the subprocess.
  * @return An error code.
  */
-extern gen_error_t gen_proc_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
+extern gen_error_t gen_process_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
 
 /**
  * Attempts to kill a subprocess.
- * @param process the subprocess to kill.
+ * @param process The subprocess to kill.
  * @return An error code.
  */
-extern gen_error_t gen_proc_kill(const gen_process_t* const restrict process);
+extern gen_error_t gen_process_kill(const gen_process_t* const restrict process);
 
 #endif

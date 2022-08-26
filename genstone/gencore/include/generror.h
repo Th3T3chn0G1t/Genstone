@@ -9,6 +9,8 @@
 #ifndef GEN_ERROR_H
 #define GEN_ERROR_H
 
+#include "gentoolingframe.h"
+
 #ifndef EOK
 #define EOK (0)
 #endif
@@ -172,8 +174,20 @@ typedef struct {
 
     /**
      * A string explaining the context behind an error.
+     * Must be freed if not `NULL`.
      */
-    const char* context;
+    char* context;
+
+    /**
+     * An array of tooling frames forming a backtrace.
+     * Must be freed if not `NULL`.
+     */
+    gen_tooling_frame_t* backtrace;
+
+    /**
+     * The length of the backtrace.
+     */
+    size_t backtrace_length;
 } gen_error_t;
 
 /**

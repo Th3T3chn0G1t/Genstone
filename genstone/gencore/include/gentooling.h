@@ -5,9 +5,11 @@
  * @file gentooling.h
  * Provides utilities for tooling and profiling.
  */
+
 #ifndef GEN_TOOLING_H
 #define GEN_TOOLING_H
 
+#include "gentoolingframe.h"
 #include "gencommon.h"
 
 extern void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p);
@@ -34,11 +36,11 @@ extern gen_error_t gen_tooling_push(const char* const restrict frame, const void
 extern gen_error_t gen_tooling_pop(void);
 
 /**
- * Gets a formatted backtrace of the current tooled call stack.
+ * Gets a backtrace of the current tooled call stack.
  * @param[out] out_backtrace A pointer to storage for the backtrace.
  * @param[out] out_length A pointer to storage for length of the backtrace.
  * @return An error code.
  */
-extern gen_error_t gen_tooling_get_backtrace(char* const restrict out_backtrace, size_t* const restrict out_length);
+extern gen_error_t gen_tooling_get_backtrace(gen_tooling_frame_t* const restrict out_backtrace, size_t* const restrict out_length);
 
 #endif

@@ -2,10 +2,14 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 #include "include/gencommon.h"
+#include "include/genmemory.h"
+#include "include/genstring.h"
+#include "include/genlog.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
@@ -98,4 +102,86 @@ const char* gen_error_description_from_errno(void) {
 	return strerror(errno); // This is okay over `strerror_r` as the only thread-unsafe case is
 		// Where the supplied `errno` value is outside of `errno`'s accepted
 		// Range - which we can presume will never be relevant to us
+}
+
+gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {
+	gen_error_t retval = {type, line, NULL, NULL, 0};
+
+	gen_error_t error = gen_string_duplicate(string, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &retval.context, NULL);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	error = gen_tooling_get_backtrace(NULL, &retval.backtrace_length);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+	error = gen_memory_allocate_zeroed((void**) &retval.backtrace, retval.backtrace_length, sizeof(gen_tooling_frame_t));
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+	error = gen_tooling_get_backtrace(retval.backtrace, NULL);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	return retval;
+}
+
+gen_error_t gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...) {
+	gen_error_t retval = {0};
+
+	va_list list;
+	va_start(list, format);
+	va_list list_copy;
+	va_copy(list_copy, list);
+
+	size_t formatted_length = 0;
+	gen_error_t error = gen_string_format(NULL, &formatted_length, format, list);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	char* formatted = NULL;
+	error = gen_memory_allocate_zeroed((void**) &formatted, formatted_length + 1, sizeof(char));
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	error = gen_string_format(formatted, NULL, format, list_copy);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	error = gen_error_attach_backtrace(type, line, formatted);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	error = gen_memory_free((void**) &formatted);
+	if(error.type) {
+		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	return retval;
+}
+
+#ifndef GEN_ERROR_ABORT_FUNCTION
+/**
+ * The function to call to exit the program in the case of a fatal error.
+ */
+#define GEN_ERROR_ABORT_FUNCTION abort
+#endif
+
+void gen_error_abort(void) {
+	GEN_ERROR_ABORT_FUNCTION();
 }
