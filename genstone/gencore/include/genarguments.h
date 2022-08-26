@@ -80,15 +80,15 @@ typedef struct {
  * @param[in] long_argument_lengths An array of lengths for `long_arguments`.
  * @param[in] long_argument_count The number of long arguments in `long_arguments` and the number of lengths in `long_arguments_lengths`.
  * @param[out] out_parsed A pointer to storage for the parsed arguments' information. Should be passed to `gen_arguments_free_parsed` once used.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_arguments_parse(const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t argument_count, const char* const restrict short_arguments, const size_t short_argument_count, const char* const restrict * const restrict long_arguments, const size_t* const restrict long_argument_lengths, const size_t long_argument_count, gen_arguments_parsed_t* const restrict out_parsed);
+extern gen_error_t* gen_arguments_parse(const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t argument_count, const char* const restrict short_arguments, const size_t short_argument_count, const char* const restrict * const restrict long_arguments, const size_t* const restrict long_argument_lengths, const size_t long_argument_count, gen_arguments_parsed_t* const restrict out_parsed);
 
 /**
  * Frees parsed arguments' information.
  * @param[in,out] parsed The parsed arguments' information to free.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_arguments_free_parsed(gen_arguments_parsed_t* const restrict parsed);
+extern gen_error_t* gen_arguments_free_parsed(gen_arguments_parsed_t* const restrict parsed);
 
 #endif

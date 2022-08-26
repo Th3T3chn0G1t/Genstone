@@ -30,9 +30,9 @@ typedef pid_t gen_process_t;
  * @param[in] argument_lengths The lengths of the arguments to pass to the created subprocess.
  * @param[in] arguments_length The length of the `arguments` buffer.
  * @param[out] out_process A pointer to storage for a handle to the created subprocess.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_process_create(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_process_t* const restrict out_process);
+extern gen_error_t* gen_process_create(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_process_t* const restrict out_process);
 
 /**
  * Creates a subprocess redirected to a filesystem handle.
@@ -43,23 +43,23 @@ extern gen_error_t gen_process_create(const char* const restrict executable_path
  * @param[in] arguments_length The length of the `arguments` buffer.
  * @param[in,out] filesystem_handle The filesystem handle to redirect output to.
  * @param[out] out_process A pointer to storage for a handle to the created subprocess.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
+extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
 
 /**
  * Blocks the current thread until the specified subprocess exits.
  * @param process The subprocess to wait for.
  * @param out_exitcode A pointer to storage for the exit code of the subprocess.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_process_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
+extern gen_error_t* gen_process_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
 
 /**
  * Attempts to kill a subprocess.
  * @param process The subprocess to kill.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_process_kill(const gen_process_t* const restrict process);
+extern gen_error_t* gen_process_kill(const gen_process_t* const restrict process);
 
 #endif

@@ -23,11 +23,6 @@
 typedef enum
 {
     /**
-     * No error occurred.
-     */
-    GEN_OK = 0,
-
-    /**
      * An unknown error occurred.
      */
     GEN_ERROR_UNKNOWN,
@@ -158,6 +153,13 @@ typedef enum {
     GEN_ERROR_SEVERITY_FATAL
 } gen_error_severity_t;
 
+#ifndef GEN_ERROR_MAXIMUM_CONTEXT_LENGTH
+/**
+ * The maximum length for an error context string.
+ */
+#define GEN_ERROR_MAXIMUM_CONTEXT_LENGTH 128
+#endif
+
 /**
  * The return value for an errorable function.
  */
@@ -174,15 +176,13 @@ typedef struct {
 
     /**
      * A string explaining the context behind an error.
-     * Must be freed if not `NULL`.
      */
-    char* context;
+    char context[GEN_ERROR_MAXIMUM_CONTEXT_LENGTH + 1];
 
     /**
      * An array of tooling frames forming a backtrace.
-     * Must be freed if not `NULL`.
      */
-    gen_tooling_frame_t* backtrace;
+    gen_tooling_frame_t backtrace[GEN_TOOLING_DEPTH];
 
     /**
      * The length of the backtrace.
@@ -223,7 +223,7 @@ const char* gen_error_description_from_errno(void);
  * @param[in] context The context behind the error.
  * @return The constructed error.
  */
-extern gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict context);
+extern gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict context);
 
 /**
  * Constructs an error and attaches a backtrace down to the caller.
@@ -234,14 +234,15 @@ extern gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const
  * @param[in] ... The parameters to the format string.
  * @return The constructed error.
  */
-extern gen_error_t gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...);
+extern gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...);
 
 /**
  * Prints out an errors details and backtrace.
+ * @param[in] context The context/location in which the error occurred.
  * @param[in] error The error to print.
  * @param[in] severity The severity of the error.
  */
-extern void gen_error_print(const gen_error_t* const restrict error, const gen_error_severity_t severity);
+extern void gen_error_print(const char* const restrict context, const gen_error_t* const restrict error, const gen_error_severity_t severity);
 
 /**
  * Aborts the program.

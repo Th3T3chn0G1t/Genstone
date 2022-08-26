@@ -9,6 +9,13 @@
 #ifndef GEN_TOOLING_FRAME_H
 #define GEN_TOOLING_FRAME_H
 
+#ifndef GEN_TOOLING_DEPTH
+/**
+ * The maximum depth of a tooled call stack.
+ */
+#define GEN_TOOLING_DEPTH 256
+#endif
+
 /**
  * A single frame of tooling.
  */

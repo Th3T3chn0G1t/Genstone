@@ -7,9 +7,9 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-gen_error_t gen_arguments_parse(const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t argument_count, const char* const restrict short_arguments, const size_t short_argument_count, const char* const restrict* const restrict long_arguments, const size_t* const restrict long_argument_lengths, const size_t long_argument_count, gen_arguments_parsed_t* const restrict out_parsed) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_arguments_parse, GEN_FILE_NAME);
-	if(error.type) return error;
+gen_error_t* gen_arguments_parse(const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t argument_count, const char* const restrict short_arguments, const size_t short_argument_count, const char* const restrict* const restrict long_arguments, const size_t* const restrict long_argument_lengths, const size_t long_argument_count, gen_arguments_parsed_t* const restrict out_parsed) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_arguments_parse, GEN_FILE_NAME);
+	if(error) return error;
 
 	if(!arguments) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`arguments` was NULL");
 	if(!argument_lengths) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`argument_lengths` was NULL");
@@ -27,7 +27,7 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 			for(size_t j = 0; j < long_argument_count; ++j) {
 				size_t occurrence = 0;
 				error = gen_string_character_first(argument, argument_length + 1, '=', GEN_STRING_NO_BOUNDS, &occurrence);
-				if(error.type) return error;
+				if(error) return error;
 
 				size_t limit = argument_length - 1 /* NULL terminator */;
 
@@ -41,15 +41,15 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 
 				bool equal = false;
 				error = gen_string_compare(argument, argument_length + 1, long_arguments[j], long_argument_lengths[j], limit, &equal);
-				if(error.type) return error;
+				if(error) return error;
 
 				if(equal) {
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->long_argument_indices, out_parsed->long_argument_count, out_parsed->long_argument_count + 1, sizeof(size_t));
-					if(error.type) return error;
+					if(error) return error;
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->long_argument_parameters, out_parsed->long_argument_count, out_parsed->long_argument_count + 1, sizeof(const char*));
-					if(error.type) return error;
+					if(error) return error;
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->long_argument_parameter_lengths, out_parsed->long_argument_count, out_parsed->long_argument_count + 1, sizeof(size_t));
-					if(error.type) return error;
+					if(error) return error;
 
 					out_parsed->long_argument_indices[out_parsed->long_argument_count] = j;
 					out_parsed->long_argument_parameters[out_parsed->long_argument_count] = parameter;
@@ -61,7 +61,7 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 				}
 			}
 
-			return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Invalid argument `%zs`", arguments[i], argument_lengths[i]);
+			return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Invalid argument `%tz`", arguments[i], argument_lengths[i]);
 		}
 		// Handle short arguments (`-fbar` style arguments)
 		else if(argument_lengths[i] >= 2 && arguments[i][0] == '-') {
@@ -72,7 +72,7 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 				if(argument[0] == short_arguments[j]) {
 					size_t occurrence = 0;
 					error = gen_string_character_first(argument, argument_length + 1, '=', GEN_STRING_NO_BOUNDS, &occurrence);
-					if(error.type) return error;
+					if(error) return error;
 
 					const char* parameter = NULL;
 					size_t parameter_length = 0;
@@ -82,11 +82,11 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 					}
 
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->short_argument_indices, out_parsed->short_argument_count, out_parsed->short_argument_count + 1, sizeof(size_t));
-					if(error.type) return error;
+					if(error) return error;
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->short_argument_parameters, out_parsed->short_argument_count, out_parsed->short_argument_count + 1, sizeof(const char*));
-					if(error.type) return error;
+					if(error) return error;
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->short_argument_parameter_lengths, out_parsed->short_argument_count, out_parsed->short_argument_count + 1, sizeof(size_t));
-					if(error.type) return error;
+					if(error) return error;
 
 					out_parsed->short_argument_indices[out_parsed->short_argument_count] = j;
 					out_parsed->short_argument_parameters[out_parsed->short_argument_count] = parameter;
@@ -98,11 +98,11 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 				}
 			}
 
-			return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Invalid argument `%zs`", arguments[i], argument_lengths[i]);
+			return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Invalid argument `%tz`", arguments[i], argument_lengths[i]);
 		}
 		else {
 			error = gen_memory_reallocate_zeroed((void**) &out_parsed->raw_argument_indices, out_parsed->raw_argument_count, out_parsed->raw_argument_count + 1, sizeof(size_t));
-			if(error.type) return error;
+			if(error) return error;
 
 			out_parsed->raw_argument_indices[out_parsed->raw_argument_count] = i;
 
@@ -113,43 +113,43 @@ gen_error_t gen_arguments_parse(const char* const restrict* const restrict argum
 		continue;
 	}
 
-	return (gen_error_t){GEN_OK};
+	return NULL;
 }
 
-gen_error_t gen_arguments_free_parsed(gen_arguments_parsed_t* const restrict parsed) {
-	GEN_TOOLING_AUTO gen_error_t error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_arguments_free_parsed, GEN_FILE_NAME);
-	if(error.type) return error;
+gen_error_t* gen_arguments_free_parsed(gen_arguments_parsed_t* const restrict parsed) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_arguments_free_parsed, GEN_FILE_NAME);
+	if(error) return error;
 
 	if(!parsed) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`parsed` was `NULL`");
 
 	if(parsed->short_argument_indices) {
 		error = gen_memory_free((void**) &parsed->short_argument_indices);
-		if(error.type) return error;
+		if(error) return error;
 	}
 	if(parsed->short_argument_parameters) {
 		error = gen_memory_free((void**) &parsed->short_argument_parameters);
-		if(error.type) return error;
+		if(error) return error;
 	}
 	if(parsed->short_argument_parameter_lengths) {
 		error = gen_memory_free((void**) &parsed->short_argument_parameter_lengths);
-		if(error.type) return error;
+		if(error) return error;
 	}
 	if(parsed->long_argument_indices) {
 		error = gen_memory_free((void**) &parsed->long_argument_indices);
-		if(error.type) return error;
+		if(error) return error;
 	}
 	if(parsed->long_argument_parameters) {
 		error = gen_memory_free((void**) &parsed->long_argument_parameters);
-		if(error.type) return error;
+		if(error) return error;
 	}
 	if(parsed->long_argument_parameter_lengths) {
 		error = gen_memory_free((void**) &parsed->long_argument_parameter_lengths);
-		if(error.type) return error;
+		if(error) return error;
 	}
 	if(parsed->raw_argument_indices) {
 		error = gen_memory_free((void**) &parsed->raw_argument_indices);
-		if(error.type) return error;
+		if(error) return error;
 	}
 
-	return (gen_error_t){GEN_OK};
+	return NULL;
 }

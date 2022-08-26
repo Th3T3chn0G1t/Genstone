@@ -46,9 +46,9 @@ typedef enum {
  * @param[in] severity The log level to print at.
  * @param[in] context A string containing the context/location of the log.
  * @param[in] string The string to output to the log.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_log(const gen_log_level_t severity, const char* const restrict context, const char* const restrict string);
+extern gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict context, const char* const restrict string);
 
 /**
  * Prints a line of formatted log output to stdout.
@@ -56,8 +56,8 @@ extern gen_error_t gen_log(const gen_log_level_t severity, const char* const res
  * @param[in] context A string containing the context/location of the log.
  * @param[in] format The format string to apply format arguments to.
  * @param[in] ... The format parameters to apply to `format`.
- * @return An error code.
+ * @return An error, otherwise `NULL`.
  */
-extern gen_error_t gen_log_formatted(const gen_log_level_t severity, const char* const restrict context, const char* const restrict format, ...);
+extern gen_error_t* gen_log_formatted(const gen_log_level_t severity, const char* const restrict context, const char* const restrict format, ...);
 
 #endif

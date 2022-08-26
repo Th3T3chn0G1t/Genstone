@@ -2,9 +2,9 @@
 // Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
 
 #include "include/gencommon.h"
+#include "include/genlog.h"
 #include "include/genmemory.h"
 #include "include/genstring.h"
-#include "include/genlog.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
@@ -15,7 +15,6 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 const char* gen_error_type_name(const gen_error_type_t error) {
 	switch(error) {
-		case GEN_OK: return "GEN_OK";
 		case GEN_ERROR_UNKNOWN: return "GEN_ERROR_UNKNOWN";
 		case GEN_ERROR_PERMISSION: return "GEN_ERROR_PERMISSION";
 		case GEN_ERROR_INVALID_PARAMETER: return "GEN_ERROR_INVALID_PARAMETER";
@@ -43,7 +42,6 @@ const char* gen_error_type_name(const gen_error_type_t error) {
 
 const char* gen_error_type_description(const gen_error_type_t error) {
 	switch(error) {
-		case GEN_OK: return "No error occurred";
 		case GEN_ERROR_UNKNOWN: return "An unknown error occurred";
 		case GEN_ERROR_PERMISSION: return "A permission error occurred";
 		case GEN_ERROR_INVALID_PARAMETER: return "The provided parameter was invalid";
@@ -79,7 +77,6 @@ gen_error_type_t gen_error_type_from_errno(void) {
 		case ENOENT: return GEN_ERROR_NO_SUCH_OBJECT;
 		case ENOMEM: return GEN_ERROR_OUT_OF_MEMORY;
 		case ENOTDIR: return GEN_ERROR_WRONG_OBJECT_TYPE;
-		case EOK: return GEN_OK;
 		case EDQUOT: return GEN_ERROR_OUT_OF_SPACE;
 		case EEXIST: return GEN_ERROR_ALREADY_EXISTS;
 		case EMLINK: return GEN_ERROR_TOO_LONG;
@@ -104,75 +101,72 @@ const char* gen_error_description_from_errno(void) {
 		// Range - which we can presume will never be relevant to us
 }
 
-gen_error_t gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {
-	gen_error_t retval = {type, line, NULL, NULL, 0};
+gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {
+	gen_error_t* retval = NULL;
 
-	gen_error_t error = gen_string_duplicate(string, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &retval.context, NULL);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+	gen_error_t* error = gen_memory_allocate_zeroed((void**) &retval, 1, sizeof(gen_error_t));
+	if(error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
 
-	error = gen_tooling_get_backtrace(NULL, &retval.backtrace_length);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+	retval->type = type;
+	retval->line = line;
+
+	error = gen_string_copy(retval->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, string, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS);
+	if(error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
-	error = gen_memory_allocate_zeroed((void**) &retval.backtrace, retval.backtrace_length, sizeof(gen_tooling_frame_t));
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+
+	error = gen_tooling_get_backtrace(NULL, &retval->backtrace_length);
+	if(error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
-	error = gen_tooling_get_backtrace(retval.backtrace, NULL);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+	error = gen_tooling_get_backtrace(retval->backtrace, NULL);
+	if(error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
 
 	return retval;
 }
 
-gen_error_t gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...) {
-	gen_error_t retval = {0};
+gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...) {
+	gen_error_t* retval = gen_error_attach_backtrace(type, line, "");
 
 	va_list list;
 	va_start(list, format);
-	va_list list_copy;
-	va_copy(list_copy, list);
 
-	size_t formatted_length = 0;
-	gen_error_t error = gen_string_format(NULL, &formatted_length, format, list);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
-
-	char* formatted = NULL;
-	error = gen_memory_allocate_zeroed((void**) &formatted, formatted_length + 1, sizeof(char));
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
-
-	error = gen_string_format(formatted, NULL, format, list_copy);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
-
-	error = gen_error_attach_backtrace(type, line, formatted);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
-
-	error = gen_memory_free((void**) &formatted);
-	if(error.type) {
-		gen_error_print(&error, GEN_ERROR_SEVERITY_FATAL);
+	gen_error_t* error = gen_string_format(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, NULL, format, list);
+	if(error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
 
 	return retval;
+}
+
+static gen_log_level_t level_map[] = {
+	[GEN_ERROR_SEVERITY_WARNING] = GEN_LOG_LEVEL_WARNING,
+	[GEN_ERROR_SEVERITY_NORMAL] = GEN_LOG_LEVEL_ERROR,
+	[GEN_ERROR_SEVERITY_FATAL] = GEN_LOG_LEVEL_FATAL};
+
+void gen_error_print(const char* const restrict context, const gen_error_t* const restrict error, const gen_error_severity_t severity) {
+	gen_error_t* internal_error = gen_log_formatted(level_map[severity], context, "`%t`: %tz - %t at %t:%uz", gen_error_type_name(error->type), error->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, gen_error_type_description(error->type), error->backtrace[error->backtrace_length - 1].file, error->line);
+	if(internal_error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	for(size_t i = 0; i < error->backtrace_length; ++i) {
+		internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t");
+		if(internal_error) {
+			gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
+			gen_error_abort();
+		}
+	}
 }
 
 #ifndef GEN_ERROR_ABORT_FUNCTION
