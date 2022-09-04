@@ -10,4 +10,4 @@ all: $(MODULE_NAMES)
 clean: $(CLEAN_TARGETS)
 
 .PHONY: test
-test: $(TEST_TARGETS)
+test: all $(TEST_TARGETS)

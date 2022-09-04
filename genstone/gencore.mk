@@ -28,7 +28,7 @@ $(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) | lib
 gencore: $(GEN_CORE_LIB)
 
 .PHONY: gencore
-test_gencore: $(GEN_CORE_LIB)
+test_gencore: $(GEN_CORE_LIB) # TODO: Write tests
 
 .PHONY: clean_gencore
 clean_gencore:
