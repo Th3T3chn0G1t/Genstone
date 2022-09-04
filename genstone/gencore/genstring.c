@@ -1,216 +1,489 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2021 TTG <prs.ttg+genstone@pm.me>
+// Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
 #include "include/genstring.h"
 
-#include "include/gemory.h"
+#include "include/genmemory.h"
 
-gen_error_t gen_string_compare(const char* const restrict a, const size_t a_bound, const char* const restrict b, const size_t b_bound, const size_t limit, bool* const restrict out_equal) {
-	GEN_FRAME_BEGIN(gen_string_compare);
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <string.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-	GEN_NULL_CHECK(a);
-	GEN_NULL_CHECK(b);
-	GEN_NULL_CHECK(out_equal);
+// TODO: We do not error out with bad bounding and instead just
+//       Silently use the minimum safe operation.
+//       We really should be reporting bounding issues to
+//       The user.
 
-	*out_equal = true;
+gen_error_t* gen_string_compare(const char* const restrict a, const size_t a_bounds, const char* const restrict b, const size_t b_bounds, const size_t limit, bool* const restrict out_equal) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_compare, GEN_FILE_NAME);
+	if(error) return error;
 
-	if(!limit) GEN_ALL_OK;
+	if(!a) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`a` was `NULL`");
+	if(!b) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`b` was `NULL`");
+	if(!out_equal) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_equal` was `NULL`");
+
+	if(!limit) {
+		*out_equal = true;
+		return NULL;
+	}
 
 	size_t a_length = 0;
-	gen_error_t error = gen_string_length(a, a_bound, limit, &a_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(a, a_bounds, limit, &a_length);
+	if(error) return error;
 
 	size_t b_length = 0;
-	error = gen_string_length(b, b_bound, limit, &b_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(b, b_bounds, limit, &b_length);
+	if(error) return error;
 
-	if(limit == GEN_STRING_NO_BOUND && a_length != b_length) {
+	if(limit == GEN_STRING_NO_BOUNDS && a_length != b_length) {
 		*out_equal = false;
-		GEN_ALL_OK;
+		return NULL;
 	}
 
-	size_t compare_length = a_length;
-	if(limit < compare_length) compare_length = limit;
-	if(compare_length > b_length) compare_length = b_length;
+	*out_equal = !strncmp(a, b, GEN_MAXIMUM(GEN_MINIMUM(a_length, b_bounds), GEN_MINIMUM(b_length, a_bounds)));
 
-	GEN_STRING_FOREACH(c, compare_length, a) {
-		if(*c != b[c - a]) {
-			*out_equal = false;
-			GEN_ALL_OK;
-		}
-	}
-
-	GEN_ALL_OK;
+	return NULL;
 }
 
-gen_error_t gen_string_copy(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
-	GEN_FRAME_BEGIN(gen_string_copy);
+gen_error_t* gen_string_copy(char* const restrict destination, const size_t destination_bounds, const char* const restrict source, const size_t source_bounds, const size_t limit) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_copy, GEN_FILE_NAME);
+	if(error) return error;
 
-	GEN_NULL_CHECK(destination);
-	GEN_NULL_CHECK(source);
+	if(!destination) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`destination` was `NULL`");
+	if(!source) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`source` was `NULL`");
 
-	if(!limit) GEN_ALL_OK;
+	if(!limit) return NULL;
 
-	GEN_STRING_FOREACH(c, limit < destination_bound ? limit : destination_bound, destination)* c = '\0';
-
-	size_t destination_length = 0;
-	gen_error_t error = gen_string_length(destination, destination_bound, limit, &destination_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_memory_set(destination, GEN_MINIMUM(limit, destination_bounds), '\0');
+	if(error) return error;
 
 	size_t source_length = 0;
-	error = gen_string_length(source, source_bound, limit, &source_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(source, source_bounds, limit, &source_length);
+	if(error) return error;
 
-	size_t copy_length = source_length;
-	if(limit < copy_length) copy_length = limit;
+	strncpy(destination, source, GEN_MINIMUM(source_length, destination_bounds));
 
-	GEN_STRING_FOREACH(c, copy_length, destination) {
-		*c = source[c - destination];
-	}
-
-	GEN_ALL_OK;
+	return NULL;
 }
 
-gen_error_t gen_string_append(char* const restrict destination, const size_t destination_bound, const char* const restrict source, const size_t source_bound, const size_t limit) {
-	GEN_FRAME_BEGIN(gen_string_append);
+gen_error_t* gen_string_append(char* const restrict destination, const size_t destination_bounds, const char* const restrict source, const size_t source_bounds, const size_t limit) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_append, GEN_FILE_NAME);
+	if(error) return error;
 
-	GEN_NULL_CHECK(destination);
-	GEN_NULL_CHECK(source);
+	if(!destination) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`destination` was `NULL`");
+	if(!source) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`source` was `NULL`");
 
-	if(!limit) GEN_ALL_OK;
+	if(!limit) return NULL;
 
 	size_t destination_length = 0;
-	gen_error_t error = gen_string_length(destination, destination_bound, GEN_STRING_NO_BOUND, &destination_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(destination, destination_bounds, limit, &destination_length);
+	if(error) return error;
 
 	size_t source_length = 0;
-	error = gen_string_length(source, source_bound, limit, &source_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(source, source_bounds, limit, &source_length);
+	if(error) return error;
 
-	size_t append_length = source_length;
-	if(limit < append_length) append_length = limit;
+	strncat(destination, source, GEN_MINIMUM(source_length, destination_bounds - destination_length));
 
-	if(destination_length + append_length + 1 > destination_bound) GEN_ERROR_OUT(GEN_TOO_SHORT, "Length of data to append was greater than string bounds");
-
-	error = gen_string_copy(destination + destination_length, destination_bound - destination_length, source, source_bound, append_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_copy` failed");
-
-	GEN_ALL_OK;
+	return NULL;
 }
 
-gen_error_t gen_string_length(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_length) {
-	GEN_FRAME_BEGIN(gen_string_length);
+gen_error_t* gen_string_length(const char* const restrict string, const size_t string_bounds, const size_t limit, size_t* const restrict out_length) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_length, GEN_FILE_NAME);
+	if(error) return error;
 
-	GEN_NULL_CHECK(string);
-	GEN_NULL_CHECK(out_length);
+	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+	if(!out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_length` was `NULL`");
 
-	if(!limit) GEN_ALL_OK;
+	*out_length = strnlen(string, GEN_MINIMUM(limit, string_bounds));
 
-	*out_length = 0;
+	return NULL;
+}
 
-	GEN_STRING_FOREACH(c, string_bound, string) {
-		if(!*c) GEN_ALL_OK;
-		++*out_length;
+static void gen_string_duplicate_duplicated_cleanup(char** duplicated) {
+	if(*duplicated) return;
+
+	gen_error_t* error = gen_memory_free((void**) duplicated);
+	if(error) {
+		gen_error_print("genstring", error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+}
+
+gen_error_t* gen_string_duplicate(const char* const restrict string, const size_t string_bounds, const size_t limit, char* restrict* const restrict out_duplicated, size_t* const restrict out_length) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_duplicate, GEN_FILE_NAME);
+	if(error) return error;
+
+	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+	if(!limit) return gen_error_attach_backtrace(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "`limit` was 0");
+	if(!out_duplicated) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_duplicated` was `NULL`");
+	if(!out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_length` was `NULL`");
+
+	size_t string_length = 0;
+	error = gen_string_length(string, string_bounds, limit, &string_length);
+	if(error) return error;
+
+	char* duplicated = NULL;
+	GEN_CLEANUP_FUNCTION(gen_string_duplicate_duplicated_cleanup)
+	char* duplicated_scope_variable = duplicated;
+	error = gen_memory_allocate_zeroed((void**) &duplicated, string_length + 1, sizeof(char));
+	if(error) return error;
+
+	error = gen_string_copy(duplicated, string_length + 1, string, string_bounds, string_length);
+	if(error) return error;
+
+	duplicated_scope_variable = NULL;
+
+	*out_duplicated = duplicated;
+	*out_length = string_length;
+
+	return NULL;
+}
+
+gen_error_t* gen_string_character_first(const char* const restrict string, const size_t string_bounds, const char character, const size_t limit, size_t* const restrict out_found) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_character_first, GEN_FILE_NAME);
+	if(error) return error;
+
+	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+	if(!out_found) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_found` was `NULL`");
+
+	if(!limit) {
+		*out_found = SIZE_MAX;
+		return NULL;
 	}
 
-	if(*out_length > limit) *out_length = limit;
-	if(limit == GEN_STRING_NO_BOUND) GEN_ERROR_OUT(GEN_TOO_SHORT, "String length exceeded string bounds");
+	size_t string_length = 0;
+	error = gen_string_length(string, string_bounds, limit, &string_length);
+	if(error) return error;
 
-	GEN_ALL_OK;
+#ifdef __ANALYZER
+#else
+	for(size_t i = 0; i < string_length; ++i) {
+		if(string[i] == character) {
+			*out_found = i;
+			return NULL;
+		}
+	}
+#endif
+
+	*out_found = SIZE_MAX;
+	return NULL;
 }
 
-gen_error_t gen_string_duplicate(const char* const restrict string, const size_t string_bound, const size_t limit, char* restrict* const restrict out_duplicated) {
-	GEN_FRAME_BEGIN(gen_string_duplicate);
+gen_error_t* gen_string_character_last(const char* const restrict string, const size_t string_bounds, const char character, const size_t limit, size_t* const restrict out_found) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_character_last, GEN_FILE_NAME);
+	if(error) return error;
 
-	GEN_NULL_CHECK(string);
+	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+	if(!out_found) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_found` was `NULL`");
 
-	*out_duplicated = NULL;
-
-	if(!limit) GEN_ERROR_OUT(GEN_TOO_SHORT, "`limit` was 0");
-
-	size_t string_length = 0;
-	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
-
-	size_t duplicate_length = string_length;
-	if(limit < duplicate_length) duplicate_length = limit;
-
-	error = gzalloc((void* restrict*) out_duplicated, duplicate_length + 1, sizeof(char));
-	GEN_ERROR_OUT_IF(error, "`gzalloc` failed");
-	error = gen_string_copy(*out_duplicated, duplicate_length + 1, string, string_bound, limit);
-	GEN_ERROR_OUT_IF(error, "`gen_string_copy` failed");
-
-	GEN_ALL_OK;
-}
-
-gen_error_t gen_string_character_first(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found) {
-	GEN_FRAME_BEGIN(gen_string_character_first);
-
-	GEN_NULL_CHECK(string);
-	GEN_NULL_CHECK(out_found);
-
-	*out_found = NULL;
-
-	if(!limit) GEN_ALL_OK;
+	if(!limit) {
+		*out_found = SIZE_MAX;
+		return NULL;
+	}
 
 	size_t string_length = 0;
-	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(string, string_bounds, limit, &string_length);
+	if(error) return error;
 
-	size_t search_length = string_length;
-	if(limit < search_length) search_length = limit;
-
-	GEN_STRING_FOREACH(c, search_length, string) {
-		if(*c == character) {
-			*out_found = c;
-			GEN_ALL_OK;
+	for(size_t i = string_length - 1; i != SIZE_MAX; --i) {
+		if(string[i] == character) {
+			*out_found = i;
+			return NULL;
 		}
 	}
 
-	GEN_ALL_OK;
+	*out_found = SIZE_MAX;
+	return NULL;
 }
 
-gen_error_t gen_string_character_last(const char* const restrict string, const size_t string_bound, const char character, const size_t limit, const char** const restrict out_found) {
-	GEN_FRAME_BEGIN(gen_string_character_last);
+gen_error_t* gen_string_number(const char* const restrict string, const size_t string_bounds, const size_t limit, size_t* const restrict out_number) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_number, GEN_FILE_NAME);
+	if(error) return error;
 
-	GEN_NULL_CHECK(string);
-
-	*out_found = NULL;
-	GEN_NULL_CHECK(out_found);
-
-	if(!limit) GEN_ALL_OK;
+	if(!out_number) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_number` was `NULL`");
+	if(!string_bounds) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string_bounds` was 0");
 
 	size_t string_length = 0;
-	gen_error_t error = gen_string_length(string, string_bound, limit, &string_length);
-	GEN_ERROR_OUT_IF(error, "`gen_string_length` failed");
+	error = gen_string_length(string, string_bounds, limit, &string_length);
+	if(error) return error;
 
-	size_t search_length = string_length;
-	if(limit < search_length) search_length = limit;
+	size_t accumulate = 0;
+#ifdef __ANALYZER
+#else
+	for(size_t i = 0; i < string_length; ++i) {
+		if(string[i] < '0' || string[i] > '9') return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Encountered non-numeric character `%c`", string[i]);
+		accumulate += (size_t) (string[i] - '0');
+	}
+#endif
 
-	GEN_STRING_FOREACH(c, search_length, string) {
-		const char* const current = ((string + (string_length - 1)) - (c - string));
-		if(*current == character) {
-			*out_found = current;
-			GEN_ALL_OK;
+	*out_number = accumulate;
+
+	return NULL;
+}
+
+gen_error_t* gen_string_format(const size_t limit, char* const restrict out_buffer, size_t* out_length, const char* const restrict format, const size_t format_length, ...) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_format, GEN_FILE_NAME);
+	if(error) return error;
+
+	va_list list;
+	va_start(list, format_length);
+
+	return gen_string_formatv(limit, out_buffer, out_length, format, format_length, list);
+}
+
+static void gen_string_state_format_number_base10_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+	size_t accumulate = value;
+	char out[20] = {0}; // "18446744073709551615" (i.e. `SIZE_MAX`) is 20 characters
+	size_t idx = 0;
+	do {
+		out[idx++] = '0' + (accumulate % 10);
+		accumulate /= 10;
+	} while(accumulate);
+
+	size_t copied = len - *offset < idx ? len - *offset : idx;
+	if(out_buffer) {
+		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
+			out_buffer[*offset + i] = out[copied - (i + 1)];
+		}
+	}
+	*offset += copied;
+}
+
+static void gen_string_state_format_number_base16_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+	static const char hex_table[] = "0123456789ABCDEF";
+
+	size_t accumulate = value;
+	char out[16] = {0}; // "FFFFFFFFFFFFFFFF" (i.e. `SIZE_MAX` in hex) is 16 characters
+	size_t idx = 0;
+	do {
+		out[idx++] = hex_table[accumulate % 16];
+		accumulate /= 16;
+	} while(accumulate);
+
+	size_t copied = len - *offset < idx ? len - *offset : idx;
+	if(out_buffer) {
+		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
+			out_buffer[*offset + i] = out[copied - (i + 1)];
+		}
+	}
+	*offset += copied;
+}
+
+static void gen_string_state_format_number_base10_signed(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const ssize_t value) {
+	ssize_t accumulate = value;
+	char out[20] = {0}; // "-9223372036854775808" (i.e. `LONG_MIN`) is 20 characters
+	size_t idx = 0;
+	if(value < 0) {
+		accumulate = -value;
+		out[idx++] = '-';
+	}
+	do {
+		out[idx++] = '0' + (accumulate % 10);
+		accumulate /= 10;
+	} while(accumulate);
+
+	size_t copied = len - *offset < idx ? len - *offset : idx;
+	if(out_buffer) {
+		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
+			out_buffer[*offset + i] = out[copied - (i + 1)];
+		}
+	}
+	*offset += copied;
+}
+
+gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buffer, size_t* const restrict out_length, const char* const restrict format, const size_t format_length, va_list list) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_formatv, GEN_FILE_NAME);
+	if(error) return error;
+
+	if(!format) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`format` was `NULL`");
+
+	size_t out_pos = 0;
+	for(size_t i = 0; i < format_length; ++i) {
+		if(format[i] != '%') {
+			if(out_buffer) out_buffer[out_pos] = format[i];
+			out_pos++;
+			continue;
+		}
+
+		if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+
+		switch(format[++i]) {
+			case '%': {
+				if(out_buffer) out_buffer[out_pos] = '%';
+				out_pos++;
+				break;
+			}
+
+			case 'p': {
+				if(out_buffer) {
+					error = gen_string_append(out_buffer, limit, "0x", 3, 2);
+					if(error) return error;
+				}
+				out_pos += 2;
+
+				gen_string_state_format_number_base16_unsigned(limit, out_buffer, &out_pos, (size_t) va_arg(list, void*));
+
+				break;
+			}
+
+			// TODO: Implement missing specifiers
+			case 'f': {
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				switch(format[++i]) {
+					case 's': {
+						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fs` not implemented");
+					}
+					case 'd': {
+						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fd` not implemented");
+					}
+					case 'e': {
+						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fe` not implemented");
+					}
+					default: {
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+					}
+				}
+				// break;
+			}
+			case 'u': {
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				switch(format[++i]) {
+					case 'z': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, size_t));
+						break;
+					}
+					case 'l': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned long));
+						break;
+					}
+					case 'i': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int));
+						break;
+					}
+					case 's': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned short` - promotion */));
+						break;
+					}
+					case 'c': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned char` - promotion */));
+						break;
+					}
+					default: {
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 2, format);
+					}
+				}
+				break;
+			}
+			case 's': {
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				switch(format[++i]) {
+					case 'z': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, ssize_t));
+						break;
+					}
+					case 'l': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, long));
+						break;
+					}
+					case 'i': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int));
+						break;
+					}
+					case 's': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `short` - promotion */));
+						break;
+					}
+					case 'c': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `char` - promotion */));
+						break;
+					}
+					default: {
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 2, format);
+					}
+				}
+				break;
+			}
+			case 't': {
+				if(i + 1 == format_length) {
+					const char* string = va_arg(list, const char*);
+					size_t string_length = 0;
+					error = gen_string_length(string, GEN_STRING_NO_BOUNDS, limit - out_pos, &string_length);
+					if(error) return error;
+					if(out_buffer) {
+						error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+						if(error) return error;
+					}
+					out_pos += string_length;
+					break;
+				}
+				switch(format[++i]) {
+					case 'z': {
+						const char* string = va_arg(list, const char*);
+						size_t string_bounds = va_arg(list, size_t);
+						size_t string_length = 0;
+						error = gen_string_length(string, string_bounds, GEN_STRING_NO_BOUNDS, &string_length);
+						if(error) return error;
+						if(out_buffer) {
+							error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+							if(error) return error;
+						}
+						out_pos += string_length;
+						break;
+					}
+					default: {
+						--i;
+						const char* string = va_arg(list, const char*);
+						size_t string_length = 0;
+						error = gen_string_length(string, GEN_STRING_NO_BOUNDS, limit - out_pos, &string_length);
+						if(error) return error;
+						if(out_buffer) {
+							error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+							if(error) return error;
+						}
+						out_pos += string_length;
+					}
+				}
+				break;
+			}
+			case 'c': {
+				if(i + 1 == format_length) {
+					char c = (char) va_arg(list, int /* `char` - promotion */);
+					if(out_buffer) out_buffer[out_pos] = c;
+					out_pos++;
+					break;
+				}
+				switch(format[++i]) {
+					case 'z': {
+						char c = (char) va_arg(list, int /* `char` - promotion */);
+						size_t repetitions = va_arg(list, size_t);
+
+						for(size_t j = 0; j < GEN_MINIMUM(repetitions, limit - out_pos); ++j) {
+							if(out_buffer) out_buffer[out_pos] = c;
+							out_pos++;
+						}
+						break;
+					}
+					default: {
+						--i;
+						char c = (char) va_arg(list, int /* `char` - promotion */);
+						if(out_buffer) out_buffer[out_pos] = c;
+						out_pos++;
+					}
+				}
+
+				break;
+			}
+			default: {
+				return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 1, format);
+			}
 		}
 	}
 
-	GEN_ALL_OK;
-}
+	if(out_pos > limit) return gen_error_attach_backtrace(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Something went wrong while formatting string");
 
-gen_error_t gen_string_number(const char* const restrict string, const size_t string_bound, const size_t limit, size_t* const restrict out_number) {
-	GEN_FRAME_BEGIN(gen_string_number);
+	if(out_length) *out_length = out_pos;
 
-	GEN_NULL_CHECK(string_bound);
-	GEN_NULL_CHECK(out_number);
-
-	char* copy = NULL;
-	gen_error_t error = gen_string_duplicate(string, string_bound, limit, &copy);
-	GEN_ERROR_OUT_IF(error, "`gen_string_duplicate` failed");
-	*out_number = strtoul(copy, NULL, 10);
-	GEN_ERROR_OUT_IF_ERRNO(strtoul, errno);
-	error = gfree(copy);
-	GEN_ERROR_OUT_IF(error, "`gfree` failed");
-
-	GEN_ALL_OK;
+	return NULL;
 }
