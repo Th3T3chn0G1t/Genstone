@@ -437,7 +437,7 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 #if GEN_PLATFORM == GEN_LINUX
 	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
-    static const char format[] = "/proc/self/fd/%si";
+	static const char format[] = "/proc/self/fd/%si";
 
 	size_t formatted_length = 0;
 	error = gen_string_format(GEN_STRING_NO_BOUNDS, NULL, &formatted_length, format, sizeof(format) - 1, handle->file_handle);

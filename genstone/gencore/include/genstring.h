@@ -59,6 +59,7 @@ extern gen_error_t* gen_string_append(char* const restrict destination, const si
  * Gets the length of a string.
  * @param[in] string The string whose length should be found.
  * @param[in] string_bounds The bounds of the string whose length should be found.
+ * @param[in] limit The maximum length to output.
  * @param[out] out_length A pointer to storage for the length of the string.
  * @return An error, otherwise `NULL`.
  */
@@ -101,6 +102,7 @@ extern gen_error_t* gen_string_character_last(const char* const restrict string,
  * Creates a number from a numeric string.
  * @param[in] string The numeric string to create from.
  * @param[in] string_bounds The bounds of the numeric string.
+ * @param[in] limit The maximum number of characters to process.
  * @param[out] out_number A pointer to storage for the created number.
  * @return An error, otherwise `NULL`.
  */

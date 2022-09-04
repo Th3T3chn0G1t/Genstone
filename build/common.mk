@@ -45,7 +45,7 @@ endif
 ACTION_PREFIX = \\033[1;30m
 ACTION_SUFFIX = \\033[0m
 
-%$(OBJECT_SUFFIX): %.c
+%$(OBJECT_SUFFIX): %.c # TODO: Disabling SA as an option
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<
 
