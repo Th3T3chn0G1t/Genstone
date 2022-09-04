@@ -3,7 +3,7 @@
 
 /**
  * @file gentoolingframe.h
- * Provides utilities for tooling and profiling.
+ * Provides common definitions for tooling between generror and gentooling.
  */
 
 #ifndef GEN_TOOLING_FRAME_H

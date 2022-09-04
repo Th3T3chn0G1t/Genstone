@@ -2,7 +2,7 @@
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
 /**
- * @file gencalc.h
+ * @file genmathtypes.h
  * Includes mathematics utilities.
  */
 

@@ -2,9 +2,11 @@
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
 /**
- * @file genproc.h
+ * @file genprocess.h
  * Utility for starting and managing subprocesses.
  */
+
+// TODO: Implement genprocess
 
 #ifndef GEN_PROC_H
 #define GEN_PROC_H
