@@ -23,10 +23,11 @@
 
 #### Floating Point Numeric
 
-- `%f` - `float`
-- `%d` - `double`
-- `%e` - `long double`
+- `%fs` - `float`
+- `%fd` - `double`
+- `%fe` - `long double`
 
 #### Other
 
 - `%p` - `void*`
+- `%%` - `void` (`'%'`)

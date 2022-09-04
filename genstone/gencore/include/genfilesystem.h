@@ -16,8 +16,9 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #if GEN_PLATFORM != GEN_WINDOWS
 #include <dirent.h>
-#endif
+#include <unistd.h>
 #include <sys/stat.h>
+#endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 #ifndef GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY
@@ -144,17 +145,17 @@ typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
 /**
  * `gen_filesystem_handle_t` wrapper for stdin.
  */
-#define gen_filesystem_stdin_handle ((gen_filesystem_handle_t){0, NULL, false})
+#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDIN_FILENO, NULL})
 
 /**
  * `gen_filesystem_handle_t` wrapper for stdout.
  */
-#define gen_filesystem_stdout_handle ((gen_filesystem_handle_t){1, NULL, false})
+#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDOUT_FILENO, NULL})
 
 /**
  * `gen_filesystem_handle_t` wrapper for stderr.
  */
-#define gen_filesystem_stderr_handle ((gen_filesystem_handle_t){2, NULL, false})
+#define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDERR_FILENO, NULL})
 
 /**
  * Gets the canonical representation of a path.

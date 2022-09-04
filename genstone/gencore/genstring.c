@@ -222,3 +222,268 @@ gen_error_t* gen_string_number(const char* const restrict string, const size_t s
 
 	return NULL;
 }
+
+gen_error_t* gen_string_format(const size_t limit, char* const restrict out_buffer, size_t* out_length, const char* const restrict format, const size_t format_length, ...) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_format, GEN_FILE_NAME);
+	if(error) return error;
+
+	va_list list;
+	va_start(list, format_length);
+
+	return gen_string_formatv(limit, out_buffer, out_length, format, format_length, list);
+}
+
+static void gen_string_state_format_number_base10_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+	size_t accumulate = value;
+	char out[20] = {0}; // "18446744073709551615" (i.e. `SIZE_MAX`) is 20 characters
+	size_t idx = 0;
+	do {
+		out[idx++] = '0' + (accumulate % 10);
+		accumulate /= 10;
+	} while(accumulate);
+
+	size_t copied = len - *offset < idx ? len - *offset : idx;
+	if(out_buffer) {
+		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
+			out_buffer[*offset + i] = out[copied - (i + 1)];
+		}
+	}
+	*offset += copied;
+}
+
+static void gen_string_state_format_number_base16_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+	static const char hex_table[] = "0123456789ABCDEF";
+
+	size_t accumulate = value;
+	char out[16] = {0}; // "FFFFFFFFFFFFFFFF" (i.e. `SIZE_MAX` in hex) is 16 characters
+	size_t idx = 0;
+	do {
+		out[idx++] = hex_table[accumulate % 16];
+		accumulate /= 16;
+	} while(accumulate);
+
+	size_t copied = len - *offset < idx ? len - *offset : idx;
+	if(out_buffer) {
+		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
+			out_buffer[*offset + i] = out[copied - (i + 1)];
+		}
+	}
+	*offset += copied;
+}
+
+static void gen_string_state_format_number_base10_signed(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const ssize_t value) {
+	ssize_t accumulate = value;
+	char out[20] = {0}; // "-9223372036854775808" (i.e. `LONG_MIN`) is 20 characters
+	size_t idx = 0;
+	if(value < 0) {
+		accumulate = -value;
+		out[idx++] = '-';
+	}
+	do {
+		out[idx++] = '0' + (accumulate % 10);
+		accumulate /= 10;
+	} while(accumulate);
+
+	size_t copied = len - *offset < idx ? len - *offset : idx;
+	if(out_buffer) {
+		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
+			out_buffer[*offset + i] = out[copied - (i + 1)];
+		}
+	}
+	*offset += copied;
+}
+
+gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buffer, size_t* const restrict out_length, const char* const restrict format, const size_t format_length, va_list list) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_formatv, GEN_FILE_NAME);
+	if(error) return error;
+
+	if(!format) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`format` was `NULL`");
+
+	size_t out_pos = 0;
+	for(size_t i = 0; i < format_length; ++i) {
+		if(format[i] != '%') {
+			if(out_buffer) out_buffer[out_pos] = format[i];
+			out_pos++;
+			continue;
+		}
+
+		if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+
+		switch(format[++i]) {
+			case '%': {
+				if(out_buffer) out_buffer[out_pos] = '%';
+				out_pos++;
+				break;
+			}
+
+			case 'p': {
+				if(out_buffer) {
+					error = gen_string_append(out_buffer, limit, "0x", 3, 2);
+					if(error) return error;
+				}
+				out_pos += 2;
+
+				gen_string_state_format_number_base16_unsigned(limit, out_buffer, &out_pos, (size_t) va_arg(list, void*));
+
+				break;
+			}
+
+			// TODO: Implement missing specifiers
+			case 'f': {
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				switch(format[++i]) {
+					case 's': {
+						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fs` not implemented");
+					}
+					case 'd': {
+						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fd` not implemented");
+					}
+					case 'e': {
+						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fe` not implemented");
+					}
+					default: {
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+					}
+				}
+				// break;
+			}
+			case 'u': {
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				switch(format[++i]) {
+					case 'z': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, size_t));
+						break;
+					}
+					case 'l': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned long));
+						break;
+					}
+					case 'i': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int));
+						break;
+					}
+					case 's': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned short` - promotion */));
+						break;
+					}
+					case 'c': {
+						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned char` - promotion */));
+						break;
+					}
+					default: {
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 2, format);
+					}
+				}
+				break;
+			}
+			case 's': {
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				switch(format[++i]) {
+					case 'z': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, ssize_t));
+						break;
+					}
+					case 'l': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, long));
+						break;
+					}
+					case 'i': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int));
+						break;
+					}
+					case 's': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `short` - promotion */));
+						break;
+					}
+					case 'c': {
+						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `char` - promotion */));
+						break;
+					}
+					default: {
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 2, format);
+					}
+				}
+				break;
+			}
+			case 't': {
+				if(i + 1 == format_length) {
+					const char* string = va_arg(list, const char*);
+					size_t string_length = 0;
+					error = gen_string_length(string, GEN_STRING_NO_BOUNDS, limit - out_pos, &string_length);
+					if(error) return error;
+					if(out_buffer) {
+						error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+						if(error) return error;
+					}
+					out_pos += string_length;
+					break;
+				}
+				switch(format[++i]) {
+					case 'z': {
+						const char* string = va_arg(list, const char*);
+						size_t string_bounds = va_arg(list, size_t);
+						size_t string_length = 0;
+						error = gen_string_length(string, string_bounds, GEN_STRING_NO_BOUNDS, &string_length);
+						if(error) return error;
+						if(out_buffer) {
+							error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+							if(error) return error;
+						}
+						out_pos += string_length;
+						break;
+					}
+					default: {
+						--i;
+						const char* string = va_arg(list, const char*);
+						size_t string_length = 0;
+						error = gen_string_length(string, GEN_STRING_NO_BOUNDS, limit - out_pos, &string_length);
+						if(error) return error;
+						if(out_buffer) {
+							error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+							if(error) return error;
+						}
+						out_pos += string_length;
+					}
+				}
+				break;
+			}
+			case 'c': {
+				if(i + 1 == format_length) {
+					char c = (char) va_arg(list, int /* `char` - promotion */);
+					if(out_buffer) out_buffer[out_pos] = c;
+					out_pos++;
+					break;
+				}
+				switch(format[++i]) {
+					case 'z': {
+						char c = (char) va_arg(list, int /* `char` - promotion */);
+						size_t repetitions = va_arg(list, size_t);
+
+						for(size_t j = 0; j < GEN_MINIMUM(repetitions, limit - out_pos); ++j) {
+							if(out_buffer) out_buffer[out_pos] = c;
+							out_pos++;
+						}
+						break;
+					}
+					default: {
+						--i;
+						char c = (char) va_arg(list, int /* `char` - promotion */);
+						if(out_buffer) out_buffer[out_pos] = c;
+						out_pos++;
+					}
+				}
+
+				break;
+			}
+			default: {
+				return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 1, format);
+			}
+		}
+	}
+
+	if(out_pos > limit) return gen_error_attach_backtrace(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Something went wrong while formatting string");
+
+	if(out_length) *out_length = out_pos;
+
+	return NULL;
+}

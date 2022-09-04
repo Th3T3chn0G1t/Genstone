@@ -112,10 +112,11 @@ extern gen_error_t* gen_string_number(const char* const restrict string, const s
  * @param[out] out_buffer A pointer to storage for the formatted string.
  * @param[out] out_length A pointer to storage for the length of the formatted string.
  * @param[in] format The format specification to apply format arguments to.
+ * @param[in] format_length The length of the format specification to apply format arguments to.
  * @param[in] ... The format arguments to apply to `format`.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_string_format(const size_t limit, char* const restrict out_buffer, size_t* out_length, const char* const restrict format, ...);
+extern gen_error_t* gen_string_format(const size_t limit, char* const restrict out_buffer, size_t* out_length, const char* const restrict format, const size_t format_length, ...);
 
 /**
  * Formats a string to a buffer.
@@ -123,9 +124,10 @@ extern gen_error_t* gen_string_format(const size_t limit, char* const restrict o
  * @param[out] out_buffer A pointer to storage for the formatted string.
  * @param[out] out_length A pointer to storage for the length of the formatted string.
  * @param[in] format The format specification to apply format arguments to.
+ * @param[in] format_length The length of the format specification to apply format arguments to.
  * @param[in] list The format arguments to apply to `format`.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buffer, size_t* out_length, const char* const restrict format, va_list list);
+extern gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buffer, size_t* const restrict out_length, const char* const restrict format, const size_t format_length, va_list list);
 
 #endif

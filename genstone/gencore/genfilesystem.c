@@ -20,7 +20,6 @@ GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include <unistd.h>
 #endif
 
 #if GEN_PLATFORM == GEN_LINUX
@@ -310,8 +309,14 @@ gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const res
 
 	if(!buffer_size) return NULL;
 
-	ssize_t result = pwrite(handle->file_handle, buffer, buffer_size, 0);
-	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());
+	if(handle->file_handle <= STDERR_FILENO) {
+		ssize_t result = write(handle->file_handle, buffer, buffer_size);
+		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());
+	}
+	else {
+		ssize_t result = pwrite(handle->file_handle, buffer, buffer_size, 0);
+		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());
+	}
 
 	off_t offset = lseek(handle->file_handle, 0, SEEK_SET);
 	if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());

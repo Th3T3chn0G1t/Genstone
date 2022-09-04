@@ -62,8 +62,9 @@ gen_error_t* gen_tooling_pop(void) {
 }
 
 gen_error_t* gen_tooling_get_backtrace(gen_tooling_frame_t* const restrict out_backtrace, size_t* const restrict out_length) {
-	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_tooling_get_backtrace, GEN_FILE_NAME);
-	if(error) return error;
+	// If this function ever gets a failure condition then this will be needed *in the failing paths*
+	// GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_tooling_get_backtrace, GEN_FILE_NAME);
+	// if(error) return error;
 
 	if(out_length) *out_length = call_stack.next;
 

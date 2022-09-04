@@ -4,7 +4,7 @@ include $(CONFIG)
 PLATFORM_MK ?= $(GENSTONE_DIR)/build/platform.mk
 include $(PLATFORM_MK)
 
-CLINKER = $(CLANGXX) -fuse-ld=lld
+CLINKER = $(CLANG) -fuse-ld=lld
 
 GLOBAL_CFLAGS += -std=gnu2x
 GLOBAL_CFLAGS += -flto

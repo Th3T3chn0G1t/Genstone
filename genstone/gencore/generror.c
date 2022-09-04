@@ -139,7 +139,14 @@ gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, c
 	va_list list;
 	va_start(list, format);
 
-	gen_error_t* error = gen_string_format(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, NULL, format, list);
+	size_t length = 0;
+	gen_error_t* error = gen_string_length(format, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &length);
+	if(error) {
+		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+
+	error = gen_string_formatv(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, NULL, format, length, list);
 	if(error) {
 		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
@@ -154,16 +161,18 @@ static gen_log_level_t level_map[] = {
 	[GEN_ERROR_SEVERITY_FATAL] = GEN_LOG_LEVEL_FATAL};
 
 void gen_error_print(const char* const restrict context, const gen_error_t* const restrict error, const gen_error_severity_t severity) {
-	gen_error_t* internal_error = gen_log_formatted(level_map[severity], context, "`%t`: %tz - %t at %t:%uz", gen_error_type_name(error->type), error->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, gen_error_type_description(error->type), error->backtrace[error->backtrace_length - 1].file, error->line);
+	gen_error_t* internal_error = gen_log_formatted(level_map[severity], context, "`%t`: %t - \"%tz\" %t:%uz", gen_error_type_name(error->type), gen_error_type_description(error->type), error->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, error->backtrace[error->backtrace_length - 1].file, error->line);
 	if(internal_error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
 
 	for(size_t i = 0; i < error->backtrace_length; ++i) {
-		internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t");
+		size_t backtrace_index = error->backtrace_length - (i + 1);
+		internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
 		if(internal_error) {
-			gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
+			// printf("%s (%s) %s %zu\n", gen_error_type_name(internal_error->type), gen_error_type_description(internal_error->type), internal_error->context, internal_error->line);
+			gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
 			gen_error_abort();
 		}
 	}

@@ -35,7 +35,7 @@ gen_error_t* gen_arguments_parse(const char* const restrict* const restrict argu
 				size_t parameter_length = 0;
 				if(occurrence != SIZE_MAX) {
 					parameter = &argument[occurrence + 1];
-					parameter_length = argument_length - ((size_t) (parameter - argument) + 1 /* Removed `=` */);
+					parameter_length = argument_length - ((size_t) (parameter - argument));
 					limit = argument_length - (parameter_length + 1 /* Include `=` for removing parameter for comparison */);
 				}
 
@@ -70,15 +70,11 @@ gen_error_t* gen_arguments_parse(const char* const restrict* const restrict argu
 
 			for(size_t j = 0; j < short_argument_count; ++j) {
 				if(argument[0] == short_arguments[j]) {
-					size_t occurrence = 0;
-					error = gen_string_character_first(argument, argument_length + 1, '=', GEN_STRING_NO_BOUNDS, &occurrence);
-					if(error) return error;
-
 					const char* parameter = NULL;
 					size_t parameter_length = 0;
-					if(occurrence != SIZE_MAX) {
-						parameter = &argument[occurrence + 1];
-						parameter_length = argument_length - ((size_t) (parameter - argument) + 1 /* Removed `=` */);
+					if(argument_length > 1) {
+						parameter = argument + 1;
+						parameter_length = argument_length - 1;
 					}
 
 					error = gen_memory_reallocate_zeroed((void**) &out_parsed->short_argument_indices, out_parsed->short_argument_count, out_parsed->short_argument_count + 1, sizeof(size_t));
