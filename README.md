@@ -4,6 +4,8 @@
 *A C Application Framework*
 
 [![Discord](https://img.shields.io/discord/1005150056015482890?color=4e5d94&label=discord&logo=discord&logoColor=4e5d94)](https://discord.gg/uw5rp8SVM8)
+[![CI](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml/badge.svg)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/CI.yml)
+[![CodeQL](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/codeql.yml/badge.svg)](https://github.com/Th3T3chn0G1t/Genstone/actions/workflows/codeql.yml)
 
 Genstone is a set of C utilities intended to be more modern and friendly than the standard library and also go further in terms of features.
 
