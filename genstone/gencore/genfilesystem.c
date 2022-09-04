@@ -437,8 +437,10 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 #if GEN_PLATFORM == GEN_LINUX
 	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
+    static const char format[] = "/proc/self/fd/%i";
+
 	size_t formatted_length = 0;
-	error = gen_string_format(NULL, &formatted_length, "/proc/self/fd/%i", handle->file_handle);
+	error = gen_string_format(NULL, &formatted_length, format, sizeof(format) - 1, handle->file_handle);
 	if(error) return error;
 
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_directory_list_entries_cleanup)
@@ -446,7 +448,7 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 	error = gen_memory_allocate_zeroed((void**) &link, formatted_length + 1, sizeof(char));
 	if(error) return error;
 
-	error = gen_string_format(link, NULL, "/proc/self/fd/%i", handle->file_handle);
+	error = gen_string_format(link, NULL, format, sizeof(format) - 1, handle->file_handle);
 	if(error) return error;
 
 	struct stat link_stat = {0};
