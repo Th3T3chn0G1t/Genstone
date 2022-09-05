@@ -53,7 +53,7 @@ ACTION_SUFFIX = \\033[0m
 	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
 
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
-	@$(CD) genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
+	@$(CD) $(GENSTONE_DIR)/genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
 
 %$(STATIC_LIB_SUFFIX):
 	@$(ECHO) "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
@@ -70,10 +70,10 @@ ACTION_SUFFIX = \\033[0m
 .PHONY: clean_common
 clean_common:
 	@$(ECHO) "$(ACTION_PREFIX)"
-	-$(RMDIR) lib
+	-$(RMDIR) $(GENSTONE_DIR)/lib
 	@$(ECHO) "$(ACTION_SUFFIX)"
 
-lib:
+$(GENSTONE_DIR)/lib:
 	@$(ECHO) "$(ACTION_PREFIX)$(MKDIR) $@$(ACTION_SUFFIX)"
 	-@$(MKDIR) $@
 
@@ -83,4 +83,3 @@ CLEAN_TARGETS = $(addprefix clean_,$(MODULE_NAMES)) clean_common
 TEST_TARGETS = $(addprefix test_,$(MODULE_NAMES))
 
 include $(MODULES)
-
