@@ -122,7 +122,7 @@ typedef struct {
     /**
      * Structure access and operation lock.
      */
-    gen_threads_mutex_t lock; // TODO: Switch directory listing to `getdents` and remove need for lock/move into non-syslib watching.
+    gen_threads_mutex_t lock;
 
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
     /**
