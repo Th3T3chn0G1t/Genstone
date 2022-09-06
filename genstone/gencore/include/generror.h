@@ -157,7 +157,7 @@ typedef enum {
 /**
  * The maximum length for an error context string.
  */
-#define GEN_ERROR_MAXIMUM_CONTEXT_LENGTH 128
+#define GEN_ERROR_MAXIMUM_CONTEXT_LENGTH 2048
 #endif
 
 /**

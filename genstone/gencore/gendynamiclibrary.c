@@ -7,11 +7,21 @@
 #include "include/genstring.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #if GEN_PLATFORM != GEN_WINDOWS
 #include <dlfcn.h>
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+
+static void gen_dynamic_library_internal_handle_open_cleanup_library_name(char** library_name) {
+    if(!*library_name) return;
+
+    gen_error_t* error = gen_memory_free((void**) library_name);
+    if(error) {
+        gen_error_print("gendynamiclibrary", error, GEN_ERROR_SEVERITY_FATAL);
+        gen_error_abort();
+    }
+}
 
 gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_open, GEN_FILE_NAME);
@@ -33,43 +43,22 @@ gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_
 	static const char library_suffix[] = ".dll";
 #endif
 
-	char* library_file_name = NULL;
+	GEN_CLEANUP_FUNCTION(gen_dynamic_library_internal_handle_open_cleanup_library_name) char* library_file_name = NULL;
 	const size_t library_file_name_length = (sizeof(library_prefix) - 1) + library_name_length + (sizeof(library_suffix) - 1);
 
 	error = gen_memory_allocate_zeroed((void**) &library_file_name, library_file_name_length + 1, sizeof(char));
 	if(error) return error;
 
 	error = gen_string_append(library_file_name, library_file_name_length + 1, library_prefix, sizeof(library_prefix), sizeof(library_prefix) - 1);
-	if(error) {
-		gen_error_t* free_error = gen_memory_free((void**) &library_file_name);
-		if(free_error) return free_error;
-
-		return error;
-	}
+	if(error) return error;
 	error = gen_string_append(library_file_name, library_file_name_length + 1, library_name, library_name_length + 1, library_name_length);
-	if(error) {
-		gen_error_t* free_error = gen_memory_free((void**) &library_file_name);
-		if(free_error) return free_error;
-
-		return error;
-	}
+	if(error) return error;
 	error = gen_string_append(library_file_name, library_file_name_length, library_suffix, sizeof(library_suffix), sizeof(library_suffix) - 1);
-	if(error) {
-		gen_error_t* free_error = gen_memory_free((void**) &library_file_name);
-		if(free_error) return free_error;
-
-		return error;
-	}
+	if(error) return error;
 
 	if(!(*out_dynamic_library = dlopen(library_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
-		error = gen_memory_free((void**) &library_file_name);
-		if(error) return error;
-
-		return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to open library `%tz`: %t", library_file_name, library_file_name_length, dlerror());
+        return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to open library `%tz`: %t", library_file_name, library_file_name_length, dlerror());
 	}
-
-	error = gen_memory_free((void**) &library_file_name);
-	if(error) return error;
 
 	return NULL;
 }

@@ -13,7 +13,7 @@
 #include "genthreads.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #if GEN_PLATFORM != GEN_WINDOWS
 #include <dirent.h>
 #include <unistd.h>

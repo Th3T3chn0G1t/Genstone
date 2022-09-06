@@ -6,9 +6,8 @@
 #include "include/genmemory.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <string.h>
-#include <sys/types.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 // TODO: We do not error out with bad bounding and instead just
@@ -119,7 +118,6 @@ gen_error_t* gen_string_duplicate(const char* const restrict string, const size_
 	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
 	if(!limit) return gen_error_attach_backtrace(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "`limit` was 0");
 	if(!out_duplicated) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_duplicated` was `NULL`");
-	if(!out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_length` was `NULL`");
 
 	size_t string_length = 0;
 	error = gen_string_length(string, string_bounds, limit, &string_length);
@@ -137,7 +135,7 @@ gen_error_t* gen_string_duplicate(const char* const restrict string, const size_
 	duplicated_scope_variable = NULL;
 
 	*out_duplicated = duplicated;
-	*out_length = string_length;
+	if(out_length) *out_length = string_length;
 
 	return NULL;
 }
@@ -213,9 +211,11 @@ gen_error_t* gen_string_number(const char* const restrict string, const size_t s
 	size_t accumulate = 0;
 #ifdef __ANALYZER
 #else
-	for(size_t i = 0; i < string_length; ++i) {
+    size_t pow = 1;
+	for(size_t i = string_length - 1; i != SIZE_MAX; --i) {
 		if(string[i] < '0' || string[i] > '9') return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Encountered non-numeric character `%c`", string[i]);
-		accumulate += (size_t) (string[i] - '0');
+		accumulate += (size_t) (string[i] - '0') * pow;
+        pow *= 10;
 	}
 #endif
 
@@ -234,7 +234,7 @@ gen_error_t* gen_string_format(const size_t limit, char* const restrict out_buff
 	return gen_string_formatv(limit, out_buffer, out_length, format, format_length, list);
 }
 
-static void gen_string_state_format_number_base10_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+static void gen_string_internal_format_number_base10_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
 	size_t accumulate = value;
 	char out[20] = {0}; // "18446744073709551615" (i.e. `SIZE_MAX`) is 20 characters
 	size_t idx = 0;
@@ -243,7 +243,7 @@ static void gen_string_state_format_number_base10_unsigned(const size_t len, cha
 		accumulate /= 10;
 	} while(accumulate);
 
-	size_t copied = len - *offset < idx ? len - *offset : idx;
+	size_t copied = GEN_MINIMUM(len - *offset, idx);
 	if(out_buffer) {
 		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
 			out_buffer[*offset + i] = out[copied - (i + 1)];
@@ -252,27 +252,36 @@ static void gen_string_state_format_number_base10_unsigned(const size_t len, cha
 	*offset += copied;
 }
 
-static void gen_string_state_format_number_base16_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+static gen_error_t* gen_string_internal_format_number_base16_unsigned(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const size_t value) {
+    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_internal_format_number_base16_unsigned, GEN_FILE_NAME);
+    if(error) return error;
+
 	static const char hex_table[] = "0123456789ABCDEF";
 
 	size_t accumulate = value;
-	char out[16] = {0}; // "FFFFFFFFFFFFFFFF" (i.e. `SIZE_MAX` in hex) is 16 characters
+	char out[16]; // "FFFFFFFFFFFFFFFF" (i.e. `SIZE_MAX` in hex) is 16 characters
+
+    error = gen_memory_set(out, sizeof(out), '0');
+    if(error) return error;
+
 	size_t idx = 0;
 	do {
 		out[idx++] = hex_table[accumulate % 16];
 		accumulate /= 16;
 	} while(accumulate);
 
-	size_t copied = len - *offset < idx ? len - *offset : idx;
+	size_t copied = GEN_MINIMUM(len - *offset, 16);
 	if(out_buffer) {
 		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
 			out_buffer[*offset + i] = out[copied - (i + 1)];
 		}
 	}
 	*offset += copied;
+
+    return NULL;
 }
 
-static void gen_string_state_format_number_base10_signed(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const ssize_t value) {
+static void gen_string_internal_format_number_base10_signed(const size_t len, char* const restrict out_buffer, size_t* const restrict offset, const ssize_t value) {
 	ssize_t accumulate = value;
 	char out[20] = {0}; // "-9223372036854775808" (i.e. `LONG_MIN`) is 20 characters
 	size_t idx = 0;
@@ -285,7 +294,7 @@ static void gen_string_state_format_number_base10_signed(const size_t len, char*
 		accumulate /= 10;
 	} while(accumulate);
 
-	size_t copied = len - *offset < idx ? len - *offset : idx;
+	size_t copied = GEN_MINIMUM(len - *offset, idx);
 	if(out_buffer) {
 		for(size_t i = copied - 1; i != SIZE_MAX; --i) {
 			out_buffer[*offset + i] = out[copied - (i + 1)];
@@ -300,8 +309,12 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 
 	if(!format) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`format` was `NULL`");
 
+    // TODO: I don't trust that this applies NULL termination properly - should it?
+
 	size_t out_pos = 0;
 	for(size_t i = 0; i < format_length; ++i) {
+        if(out_pos == limit) break;
+
 		if(format[i] != '%') {
 			if(out_buffer) out_buffer[out_pos] = format[i];
 			out_pos++;
@@ -324,7 +337,8 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 				}
 				out_pos += 2;
 
-				gen_string_state_format_number_base16_unsigned(limit, out_buffer, &out_pos, (size_t) va_arg(list, void*));
+				error = gen_string_internal_format_number_base16_unsigned(limit, out_buffer, &out_pos, (size_t) va_arg(list, void*));
+                if(error) return error;
 
 				break;
 			}
@@ -352,23 +366,23 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
 				switch(format[++i]) {
 					case 'z': {
-						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, size_t));
+						gen_string_internal_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, size_t));
 						break;
 					}
 					case 'l': {
-						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned long));
+						gen_string_internal_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned long));
 						break;
 					}
 					case 'i': {
-						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int));
+						gen_string_internal_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int));
 						break;
 					}
 					case 's': {
-						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned short` - promotion */));
+						gen_string_internal_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned short` - promotion */));
 						break;
 					}
 					case 'c': {
-						gen_string_state_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned char` - promotion */));
+						gen_string_internal_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, unsigned int /* `unsigned char` - promotion */));
 						break;
 					}
 					default: {
@@ -381,23 +395,23 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
 				switch(format[++i]) {
 					case 'z': {
-						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, ssize_t));
+						gen_string_internal_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, ssize_t));
 						break;
 					}
 					case 'l': {
-						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, long));
+						gen_string_internal_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, long));
 						break;
 					}
 					case 'i': {
-						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int));
+						gen_string_internal_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int));
 						break;
 					}
 					case 's': {
-						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `short` - promotion */));
+						gen_string_internal_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `short` - promotion */));
 						break;
 					}
 					case 'c': {
-						gen_string_state_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `char` - promotion */));
+						gen_string_internal_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, int /* `char` - promotion */));
 						break;
 					}
 					default: {
@@ -408,15 +422,15 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 			}
 			case 't': {
 				if(i + 1 == format_length) {
-					const char* string = va_arg(list, const char*);
-					size_t string_length = 0;
-					error = gen_string_length(string, GEN_STRING_NO_BOUNDS, limit - out_pos, &string_length);
-					if(error) return error;
-					if(out_buffer) {
-						error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
-						if(error) return error;
-					}
-					out_pos += string_length;
+                    const char* string = va_arg(list, const char*);
+                    size_t string_length = 0;
+                    error = gen_string_length(string, GEN_STRING_NO_BOUNDS, limit - out_pos, &string_length);
+                    if(error) return error;
+                    if(out_buffer) {
+                        error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
+                        if(error) return error;
+                    }
+                    out_pos += string_length;
 					break;
 				}
 				switch(format[++i]) {
@@ -424,7 +438,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 						const char* string = va_arg(list, const char*);
 						size_t string_bounds = va_arg(list, size_t);
 						size_t string_length = 0;
-						error = gen_string_length(string, string_bounds, GEN_STRING_NO_BOUNDS, &string_length);
+						error = gen_string_length(string, string_bounds, limit - out_pos, &string_length);
 						if(error) return error;
 						if(out_buffer) {
 							error = gen_string_append(out_buffer, limit, string, string_length + 1, string_length);
@@ -444,7 +458,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 							if(error) return error;
 						}
 						out_pos += string_length;
-					}
+    				}
 				}
 				break;
 			}

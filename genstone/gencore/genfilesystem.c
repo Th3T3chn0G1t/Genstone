@@ -7,7 +7,7 @@
 #include "include/genstring.h"
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
 #include <stdlib.h>
 
@@ -18,7 +18,6 @@ GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <sys/file.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/uio.h>
 #endif
 
@@ -33,7 +32,7 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
 	if(!out_canonical && !out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "Both `out_canonical` and `out_length` were `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
@@ -63,7 +62,7 @@ gen_error_t* gen_filesystem_path_exists(const char* const restrict path, const s
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
 	if(!out_exists) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_exists` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
@@ -81,7 +80,9 @@ gen_error_t* gen_filesystem_path_validate(const char* const restrict path, const
 	if(error) return error;
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+
+    if(path_length == GEN_STRING_NO_BOUNDS) return NULL;
 
 	if(path_length == 0) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "Path `%tz` was too short", path, path_length);
 	if(path_length > PATH_MAX /* TODO: This number is usually bogus - Use `pathconf` instead */) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` was too long", path, path_length);
@@ -96,7 +97,7 @@ gen_error_t* gen_filesystem_path_create_file(const char* const restrict path, co
 	if(error) return error;
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
@@ -114,7 +115,7 @@ gen_error_t* gen_filesystem_path_create_directory(const char* const restrict pat
 	if(error) return error;
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
@@ -130,7 +131,7 @@ gen_error_t* gen_filesystem_path_delete(const char* const restrict path, const s
 	if(error) return error;
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
@@ -185,7 +186,7 @@ gen_error_t* gen_filesystem_handle_open(const char* const restrict path, const s
 
 	if(!path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was `NULL`");
 	if(!out_handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_handle` was `NULL`");
-	if(path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
+	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;

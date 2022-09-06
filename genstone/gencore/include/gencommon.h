@@ -23,7 +23,7 @@
  * Ignores a class of compiler warnings in a diagnostic region.
  * @param[in] w The compiler flag for the warning to ignore.
  */
-#define GEN_DIAGNOSTIC_REGION_IGNORE(w) clang diagnostic ignored w
+#define GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE(w) clang diagnostic ignored w
 
 /**
  * Forcibly stringifies its parameter. Used for preprocessor ordering shenanigans.
@@ -99,11 +99,12 @@
 #define GEN_MAXIMUM(a, b) ((a) > (b) ? (a) : (b))
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdalign.h>
+#include <sys/types.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 #include "generror.h"

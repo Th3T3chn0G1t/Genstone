@@ -2197,12 +2197,7 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = DEBUG=1 \
-                         RELEASE=0 \
-                         MODE=DEBUG \
-                         DWN=2 \
-                         LNX=3 \
-                         PLATFORM=LNX
+PREDEFINED             = GEN_DISABLED=0 GEN_ENABLED=1 GEN_DEBUG=0 GEN_RELEASE=1 GEN_BUILD_MODE=GEN_DEBUG GEN_LINUX=0 GEN_OSX=1 GEN_WINDOWS=2 GEN_PLATFORM=GEN_LINUX
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

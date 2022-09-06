@@ -7,7 +7,7 @@ include $(PLATFORM_MK)
 CLINKER = $(CLANG) -fuse-ld=lld
 
 GLOBAL_CFLAGS += -std=gnu2x
-GLOBAL_CFLAGS += -flto
+GLOBAL_CFLAGS += -flto -fvisibility=default
 GLOBAL_CFLAGS += -DGEN_DISABLED=0 -DGEN_ENABLED=1
 GLOBAL_CFLAGS += -DGEN_DEBUG=0 -DGEN_RELEASE=1 -DGEN_BUILD_MODE=GEN_$(MODE)
 GLOBAL_CFLAGS += -DGEN_LINUX=0 -DGEN_OSX=1 -DGEN_WINDOWS=2 -DGEN_PLATFORM=GEN_$(PLATFORM)
@@ -32,9 +32,6 @@ endif
 ifeq ($(MODE), DEBUG)
 	GLOBAL_CFLAGS += -glldb -O0
 	GLOBAL_CFLAGS += -fstandalone-debug -fno-eliminate-unused-debug-types -fdebug-macro -fno-omit-frame-pointer
-	GLOBAL_CFLAGS += -fsanitize=undefined,address,cfi -fvisibility=default
-
-	GLOBAL_LFLAGS += -fsanitize=undefined,address,cfi
 endif
 
 ifeq ($(MODE), RELEASE)
@@ -52,6 +49,7 @@ ACTION_SUFFIX = \\033[0m
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<$(ACTION_SUFFIX)"
 	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
 
+$(GENSTONE_DIR)/genstone/%$(OBJECT_SUFFIX): $(GENSTONE_DIR)/genstone/%.c
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
 	@$(CD) $(GENSTONE_DIR)/genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
 
