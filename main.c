@@ -15,8 +15,7 @@ static gen_error_t* gen_main(const size_t argc, const char* const restrict * con
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_main, GEN_FILE_NAME);
 	if(error) return error;
  
-    if(!argc - 1) {
-
+    if(argc - 1) {
         size_t* argument_lengths = NULL;
         error = gen_memory_allocate_zeroed((void**) &argument_lengths, argc - 1, sizeof(size_t));
         if(error) return error;

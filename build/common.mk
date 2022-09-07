@@ -49,9 +49,9 @@ ACTION_SUFFIX = \\033[0m
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<$(ACTION_SUFFIX)"
 	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
 
-$(GENSTONE_DIR)/genstone/%$(OBJECT_SUFFIX): $(GENSTONE_DIR)/genstone/%.c
-	@$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
-	@$(CD) $(GENSTONE_DIR)/genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
+# TODO: Work this out
+# @$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
+# @$(CD) $(GENSTONE_DIR)/genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
 
 %$(STATIC_LIB_SUFFIX):
 	@$(ECHO) "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"

@@ -13,6 +13,8 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <string.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
+// TODO: Add some sort of `setjmp`/`longjmp` mechanism for returning errors after cleanup attribute
+
 const char* gen_error_type_name(const gen_error_type_t error) {
 	switch(error) {
 		case GEN_ERROR_UNKNOWN: return "GEN_ERROR_UNKNOWN";
