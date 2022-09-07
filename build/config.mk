@@ -1,5 +1,12 @@
+# Set build host platform
+# `DEFAULT`: Detect OS
+# `LINUX`: Linux
+# `OSX`: macOS
+# `WINDOWS`: Windows
+HOST ?= DEFAULT
+
 # Set build target platform
-# `DEFAULT`: Detect host OS
+# `DEFAULT`: Use `HOST`
 # `LINUX`: Linux
 # `OSX`: macOS
 # `WINDOWS`: Windows
@@ -10,6 +17,7 @@ PLATFORM ?= DEFAULT
 # `RELEASE`: Excludes debug symbols and enables optimizations
 MODE ?= DEBUG
 
+# TODO: Support *user* compilers other than clang (i.e. just headers)
 # The C compiler to use
 CLANG ?= clang
 

@@ -1,16 +1,28 @@
-ifeq ($(PLATFORM), DEFAULT)
+ifeq ($(HOST), DEFAULT)
 	ifeq ($(OS), Windows_NT)
-		PLATFORM = WINDOWS
+		HOST = WINDOWS
 	else
 		ifeq ($(shell uname -s), Linux)
-			PLATFORM = LINUX
+			HOST = LINUX
 		endif
 		ifeq ($(shell uname -s), Darwin)
-			PLATFORM = OSX
+			HOST = OSX
 		endif
 	endif
 endif
 
+ifeq ($(PLATFORM), DEFAULT)
+	PLATFORM = $(HOST)
+endif
+
+ifeq ($(HOST), LINUX)
+	RM = rm
+	RMDIR = rm -rf
+	ECHO = echo -e
+	CD = cd
+	AND = &&
+	MKDIR = mkdir
+endif
 ifeq ($(PLATFORM), LINUX)
 	LIB_PREFIX = lib
 	STATIC_LIB_SUFFIX = .a
@@ -24,15 +36,16 @@ ifeq ($(PLATFORM), LINUX)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
 	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+endif
 
+ifeq ($(HOST),OSX)
 	RM = rm
 	RMDIR = rm -rf
-	ECHO = echo -e
+	ECHO = echo
 	CD = cd
 	AND = &&
 	MKDIR = mkdir
 endif
-
 ifeq ($(PLATFORM), OSX)
 	LIB_PREFIX = lib
 	STATIC_LIB_SUFFIX = .a
@@ -46,15 +59,16 @@ ifeq ($(PLATFORM), OSX)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
 	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+endif
 
-	RM = rm
-	RMDIR = rm -rf
+ifeq ($(HOST), WINDOWS)
+	RM = del
+	RMDIR = rmdir
 	ECHO = echo
 	CD = cd
 	AND = &&
 	MKDIR = mkdir
 endif
-
 ifeq ($(PLATFORM), WINDOWS)
 	LIB_PREFIX =
 	STATIC_LIB_SUFFIX = .lib
@@ -65,11 +79,4 @@ ifeq ($(PLATFORM), WINDOWS)
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-
-	RM = del
-	RMDIR = rmdir
-	ECHO = echo
-	CD = cd
-	AND = &&
-	MKDIR = mkdir
 endif
