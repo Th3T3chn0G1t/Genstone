@@ -6,15 +6,20 @@ GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-af
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-missing-field-initializers # TODO: This might be desirable for genfx/vk
 
-GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS) -fsanitize=undefined,address,cfi
-GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS) -fsanitize=undefined,address,cfi
+GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
+GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
+
+ifeq ($(SANITIZERS),ENABLED)
+	GEN_CORE_INTERNAL_CFLAGS = -fsanitize=undefined,address,cfi
+	GEN_CORE_INTERNAL_LFLAGS = -fsanitize=undefined,address,cfi
+endif
 
 ifneq ($(PLATFORM),WINDOWS)
-GEN_CORE_COMMON_LFLAGS += -lpthread
+	GEN_CORE_COMMON_LFLAGS += -lpthread
 endif
 
 ifeq ($(PLATFORM),LINUX)
-GEN_CORE_COMMON_LFLAGS += -ldl
+	GEN_CORE_COMMON_LFLAGS += -ldl
 endif
 
 GEN_CORE_CFLAGS = -I$(GENSTONE_DIR)/genstone/gencore/include $(GEN_CORE_COMMON_CFLAGS)

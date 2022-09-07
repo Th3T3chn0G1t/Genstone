@@ -14,7 +14,7 @@
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#if GEN_PLATFORM != GEN_WINDOWS
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>

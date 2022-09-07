@@ -17,6 +17,11 @@ PLATFORM ?= DEFAULT
 # `RELEASE`: Excludes debug symbols and enables optimizations
 MODE ?= DEBUG
 
+# Set whether to enable sanitizers
+# `ENABLED`: Enables sanitizers
+# `DISABLED`: Disables sanitizers
+SANITIZERS = ENABLED
+
 # TODO: Support *user* compilers other than clang (i.e. just headers)
 # The C compiler to use
 CLANG ?= clang

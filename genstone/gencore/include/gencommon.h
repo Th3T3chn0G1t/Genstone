@@ -104,7 +104,9 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stddef.h>
 #include <stdint.h>
 #include <stdalign.h>
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 #include <sys/types.h>
+#endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 #include "generror.h"
