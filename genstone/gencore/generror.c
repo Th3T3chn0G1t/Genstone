@@ -6,12 +6,14 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+#endif
 
 // TODO: Add some sort of `setjmp`/`longjmp` mechanism for returning errors after cleanup attribute
 
@@ -70,6 +72,7 @@ const char* gen_error_type_description(const gen_error_type_t error) {
 }
 
 gen_error_type_t gen_error_type_from_errno(void) {
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
 	switch(errno) {
 		case EACCES: return GEN_ERROR_PERMISSION;
 		case EINVAL: return GEN_ERROR_INVALID_PARAMETER;
@@ -95,12 +98,19 @@ gen_error_type_t gen_error_type_from_errno(void) {
 		case ECHILD: return GEN_ERROR_NO_SUCH_OBJECT;
 		default: return GEN_ERROR_UNKNOWN;
 	}
+#else
+    return GEN_ERROR_UNKNOWN;
+#endif
 }
 
 const char* gen_error_description_from_errno(void) {
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
 	return strerror(errno); // This is okay over `strerror_r` as the only thread-unsafe case is
 		// Where the supplied `errno` value is outside of `errno`'s accepted
 		// Range - which we can presume will never be relevant to us
+#else
+    return "Unknown error";
+#endif
 }
 
 gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {

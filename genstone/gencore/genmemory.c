@@ -5,12 +5,16 @@
 
 #include "include/gencommon.h"
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stdlib.h>
 #include <string.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+#endif
 
+// TODO: Figure out a nice mechanism for allowing includes or declarations for
+//       these overrides. Similar case for `gen_error_abort()`.
 #ifndef GEN_MEMORY_CALLOC
 /**
  * The function to use for allocation.

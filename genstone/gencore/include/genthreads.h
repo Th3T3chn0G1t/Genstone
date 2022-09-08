@@ -11,22 +11,26 @@
 
 #include "gencommon.h"
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 #include <pthread.h>
-#endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 /**
  * Lockable synchronization mechanism.
  */
 typedef pthread_mutex_t gen_threads_mutex_t; 
+#else
+typedef void* gen_threads_mutex_t;
+#endif
 
+#ifndef GEN_THREAD_LOCAL
 /**
  * Pretty wrapper for `_Thread_local`.
  */
 #define GEN_THREAD_LOCAL _Thread_local
+#endif
 
 /**
  * Creates a mutex.

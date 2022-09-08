@@ -33,10 +33,14 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #endif
 #endif
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 /**
  * The maximum size of a directory listing.
  */
 #define GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX (sizeof(((struct dirent*) NULL)->d_name))
+#else
+#define GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX 1024 /* TODO: Use PATH_MAX or pathconf mins from path validate */
+#endif
 
 /**
  * Bitmasks for file watcher event reporting.
@@ -69,6 +73,7 @@ typedef enum
     GEN_FILESYSTEM_WATCHER_EVENT_MOVED = 1 << 4
 } gen_filesystem_watcher_event_t;
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 /**
  * The native file handle type.
  */
@@ -78,6 +83,10 @@ typedef int gen_filesystem_file_handle_t;
  * The native directory handle type.
  */
 typedef DIR* gen_filesystem_directory_handle_t;
+#else
+typedef void* gen_filesystem_file_handle_t;
+typedef void* gen_filesystem_directory_handle_t;
+#endif
 
 /**
  * The type of filesystem entry a filesystem handle refers to.
@@ -125,6 +134,7 @@ typedef struct {
     gen_threads_mutex_t lock;
 
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
     /**
      * Internal caching of `stat` for file watching.
      */
@@ -135,6 +145,7 @@ typedef struct {
      */
     size_t internal_directory_length_cached;
 #endif
+#endif
 } gen_filesystem_handle_t;
 
 /**
@@ -142,6 +153,7 @@ typedef struct {
  */
 typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 /**
  * `gen_filesystem_handle_t` wrapper for stdin.
  */
@@ -156,6 +168,22 @@ typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
  * `gen_filesystem_handle_t` wrapper for stderr.
  */
 #define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDERR_FILENO, NULL})
+#else
+/**
+ * `gen_filesystem_handle_t` wrapper for stdin.
+ */
+#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){0})
+
+/**
+ * `gen_filesystem_handle_t` wrapper for stdout.
+ */
+#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){0})
+
+/**
+ * `gen_filesystem_handle_t` wrapper for stderr.
+ */
+#define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){0})
+#endif
 
 /**
  * Gets the canonical representation of a path.

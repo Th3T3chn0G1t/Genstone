@@ -6,6 +6,8 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
+// TODO: Return error inn null platform cases
+
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #if GEN_PLATFORM != GEN_WINDOWS
@@ -41,6 +43,9 @@ gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_
 #elif GEN_PLATFORM == GEN_WINDOWS
 	static const char library_prefix[] = "";
 	static const char library_suffix[] = ".dll";
+#else
+	static const char library_prefix[] = "";
+	static const char library_suffix[] = "";
 #endif
 
 	GEN_CLEANUP_FUNCTION(gen_dynamic_library_internal_handle_open_cleanup_library_name) char* library_file_name = NULL;

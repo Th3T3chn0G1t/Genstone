@@ -5,10 +5,44 @@
 
 #include "include/genmemory.h"
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <string.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+#endif
+
+#ifndef GEN_STRING_STRNLEN
+/**
+ * The function to use for measuring string length.
+ * Must match the signature of `strnlen` and follow equivalent semantics.
+ */
+#define GEN_STRING_STRNLEN strnlen
+#endif
+
+#ifndef GEN_STRING_STRNCMP
+/**
+ * The function to use for comparing strings.
+ * Must match the signature of `strncmp` and follow equivalent semantics.
+ */
+#define GEN_STRING_STRNCMP strncmp
+#endif
+
+#ifndef GEN_STRING_STRNCPY
+/**
+ * The function to use for copying strings.
+ * Must match the signature of `strncpy` and follow equivalent semantics.
+ */
+#define GEN_STRING_STRNCPY strncpy
+#endif
+
+#ifndef GEN_STRING_STRNCAT
+/**
+ * The function to use for concatonating strings.
+ * Must match the signature of `strncat` and follow equivalent semantics.
+ */
+#define GEN_STRING_STRNCAT strncat
+#endif
 
 // TODO: We do not error out with bad bounding and instead just
 //       Silently use the minimum safe operation.
@@ -41,7 +75,7 @@ gen_error_t* gen_string_compare(const char* const restrict a, const size_t a_bou
 		return NULL;
 	}
 
-	*out_equal = !strncmp(a, b, GEN_MAXIMUM(GEN_MINIMUM(a_length, b_bounds), GEN_MINIMUM(b_length, a_bounds)));
+	*out_equal = !GEN_STRING_STRNCMP(a, b, GEN_MAXIMUM(GEN_MINIMUM(a_length, b_bounds), GEN_MINIMUM(b_length, a_bounds)));
 
 	return NULL;
 }
@@ -62,7 +96,7 @@ gen_error_t* gen_string_copy(char* const restrict destination, const size_t dest
 	error = gen_string_length(source, source_bounds, limit, &source_length);
 	if(error) return error;
 
-	strncpy(destination, source, GEN_MINIMUM(source_length, destination_bounds));
+	GEN_STRING_STRNCPY(destination, source, GEN_MINIMUM(source_length, destination_bounds));
 
 	return NULL;
 }
@@ -84,7 +118,7 @@ gen_error_t* gen_string_append(char* const restrict destination, const size_t de
 	error = gen_string_length(source, source_bounds, limit, &source_length);
 	if(error) return error;
 
-	strncat(destination, source, GEN_MINIMUM(source_length, destination_bounds - destination_length));
+	GEN_STRING_STRNCAT(destination, source, GEN_MINIMUM(source_length, destination_bounds - destination_length));
 
 	return NULL;
 }
@@ -96,7 +130,7 @@ gen_error_t* gen_string_length(const char* const restrict string, const size_t s
 	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
 	if(!out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_length` was `NULL`");
 
-	*out_length = strnlen(string, GEN_MINIMUM(limit, string_bounds));
+	*out_length = GEN_STRING_STRNLEN(string, GEN_MINIMUM(limit, string_bounds));
 
 	return NULL;
 }

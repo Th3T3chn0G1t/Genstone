@@ -14,7 +14,10 @@ ifeq ($(SANITIZERS),ENABLED)
 	GEN_CORE_INTERNAL_LFLAGS = -fsanitize=undefined,address,cfi
 endif
 
-ifneq ($(PLATFORM),WINDOWS)
+ifeq ($(PLATFORM),LINUX)
+	GEN_CORE_COMMON_LFLAGS += -lpthread
+endif
+ifeq ($(PLATFORM),OSX)
 	GEN_CORE_COMMON_LFLAGS += -lpthread
 endif
 
@@ -26,7 +29,7 @@ GEN_CORE_CFLAGS = -I$(GENSTONE_DIR)/genstone/gencore/include $(GEN_CORE_COMMON_C
 GEN_CORE_LFLAGS = -lgencore $(GEN_CORE_COMMON_LFLAGS)
 GEN_CORE_LIBDIRS = $(GENSTONE_DIR)/lib
 
-GEN_CORE_SOURCES = $(wildcard $(GENSTONE_DIR)/genstone/gencore/*.c)
+GEN_CORE_SOURCES = $(filter-out $(addprefix $(GENSTONE_DIR)/genstone/gencore/,$(GEN_CORE_DISABLED_SOURCES)),$(wildcard $(GENSTONE_DIR)/genstone/gencore/*.c))
 GEN_CORE_OBJECTS = $(GEN_CORE_SOURCES:.c=$(OBJECT_SUFFIX))
 
 GEN_CORE_LIB = $(GENSTONE_DIR)/lib/$(LIB_PREFIX)gencore$(DYNAMIC_LIB_SUFFIX)

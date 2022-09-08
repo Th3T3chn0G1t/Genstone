@@ -106,6 +106,8 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stdalign.h>
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 #include <sys/types.h>
+#else
+typedef long ssize_t;
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 

@@ -7,8 +7,12 @@ gen_error_t* gen_threads_mutex_create(gen_threads_mutex_t* const restrict out_mu
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_threads_mutex_create, GEN_FILE_NAME);
 	if(error) return error;
 
+    if(!out_mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_mutex` was `NULL`");
+
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	int result = pthread_mutex_init(out_mutex, NULL);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create mutex: %t", gen_error_description_from_errno());
+#endif
 
 	return NULL;
 }
@@ -17,8 +21,12 @@ gen_error_t* gen_threads_mutex_destroy(gen_threads_mutex_t* const restrict mutex
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_threads_mutex_destroy, GEN_FILE_NAME);
 	if(error) return error;
 
+    if(!mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`mutex` was `NULL`");
+
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	int result = pthread_mutex_destroy(mutex);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not destroy mutex: %t", gen_error_description_from_errno());
+#endif
 
 	return NULL;
 }
@@ -53,8 +61,12 @@ gen_error_t* gen_threads_mutex_lock(gen_threads_mutex_t* const restrict mutex) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_threads_mutex_lock, GEN_FILE_NAME);
 	if(error) return error;
 
+    if(!mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`mutex` was `NULL`");
+
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	int result = pthread_mutex_lock(mutex);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not lock mutex: %t", gen_error_description_from_errno());
+#endif
 
 	return NULL;
 }
@@ -63,8 +75,12 @@ gen_error_t* gen_threads_mutex_unlock(gen_threads_mutex_t* const restrict mutex)
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_threads_mutex_unlock, GEN_FILE_NAME);
 	if(error) return error;
 
+    if(!mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`mutex` was `NULL`");
+
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	int result = pthread_mutex_unlock(mutex);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not lock mutex: %t", gen_error_description_from_errno());
+#endif
 
 	return NULL;
 }
