@@ -12,5 +12,7 @@ clean: $(CLEAN_TARGETS)
 .PHONY: test
 test: all $(TEST_TARGETS)
 
-documentation: all # TODO: Custom CSS on Doxygen
+# TODO: Custom CSS on Doxygen
+# TODO: Generate and publish documentation automatically with GHCI
+documentation: all
 	doxygen build/documentation/Doxyfile

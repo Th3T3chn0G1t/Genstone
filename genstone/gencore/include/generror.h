@@ -148,7 +148,7 @@ typedef enum {
     GEN_ERROR_SEVERITY_NORMAL,
 
     /**
-     * A falure case issue causing program termination.
+     * A failure case issue causing program termination.
      */
     GEN_ERROR_SEVERITY_FATAL
 } gen_error_severity_t;
