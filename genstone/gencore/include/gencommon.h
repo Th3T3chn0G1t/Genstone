@@ -62,6 +62,11 @@
  */
 #define GEN_UNUSED __attribute__((unused))
 
+/**
+ * Pretty wrapper for `__attribute__((packed))`.
+ */
+#define GEN_PACKED __attribute__((packed))
+
 #ifndef __INTELLISENSE
 /**
  * Pretty wrapper for `__attribute__((maybe_unused))`.
