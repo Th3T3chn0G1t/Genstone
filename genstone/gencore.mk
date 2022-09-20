@@ -4,6 +4,7 @@ GEN_CORE_COMMON_LFLAGS =
 GEN_CORE_DIAGNOSTIC_CFLAGS = -Werror -Weverything
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
+GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-missing-field-initializers # TODO: This might be desirable for genfx/vk
 
 GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
