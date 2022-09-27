@@ -7,6 +7,7 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
+// TODO: `--foo` will activate `--foobar`
 gen_error_t* gen_arguments_parse(const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t argument_count, const char* const restrict short_arguments, const size_t short_argument_count, const char* const restrict* const restrict long_arguments, const size_t* const restrict long_argument_lengths, const size_t long_argument_count, gen_arguments_parsed_t* const restrict out_parsed) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_arguments_parse, GEN_FILE_NAME);
 	if(error) return error;
