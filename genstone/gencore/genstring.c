@@ -536,3 +536,35 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 
 	return NULL;
 }
+
+gen_error_t* gen_string_contains(const char* const restrict string, const size_t string_bounds, const char* const restrict target, const size_t target_bounds, const size_t limit, bool* const restrict out_contains) {
+    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_contains, GEN_FILE_NAME);
+	if(error) return error;
+
+    if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+    if(!target) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`target` was `NULL`");
+    if(!out_contains) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_contains` was `NULL`");
+
+    size_t target_length = 0;
+    error = gen_string_length(target, target_bounds, GEN_STRING_NO_BOUNDS, &target_length);
+	if(error) return error;
+
+    size_t string_length = 0;
+    error = gen_string_length(string, string_bounds, GEN_STRING_NO_BOUNDS, &string_length);
+	if(error) return error;
+
+    for(size_t i = 0; i < GEN_MINIMUM(string_length, limit); ++i) {
+        bool equal = false;
+        error = gen_string_compare(&string[i], string_bounds - i, target, target_length, target_length, &equal);
+        if(error) return error;
+
+        if(equal) {
+            *out_contains = true;
+            return NULL;
+        }
+    }
+
+    *out_contains = false;
+
+    return NULL;
+}
