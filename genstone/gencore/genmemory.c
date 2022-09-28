@@ -13,8 +13,10 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #endif
 
-// TODO: Figure out a nice mechanism for allowing includes or declarations for
-//       these overrides. Similar case for `gen_error_abort()`.
+#ifdef GEN_MEMORY_INCLUDE
+#include <GEN_MEMORY_INCLUDE>
+#endif
+
 #ifndef GEN_MEMORY_CALLOC
 /**
  * The function to use for allocation.

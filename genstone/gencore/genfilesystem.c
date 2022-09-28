@@ -724,9 +724,6 @@ gen_error_t* gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restric
 #endif
 #else
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
-	// TODO: We really need to handle "delete self" as at the moment
-	//       It probably just produces errors
-
 	struct stat watcher_stat = {0};
 	int result = fstat(watcher->file_handle, &watcher_stat);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %t", gen_error_description_from_errno());

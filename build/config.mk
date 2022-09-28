@@ -27,7 +27,6 @@ SANITIZERS ?= ENABLED
 # `DISABLED`: Disables static analysis
 STATIC_ANALYSIS ?= DISABLED
 
-# TODO: Support *user* compilers other than clang (i.e. just headers)
 # The C compiler to use
 CLANG ?= clang
 

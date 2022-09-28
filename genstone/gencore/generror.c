@@ -222,6 +222,10 @@ void gen_error_free(gen_error_t* restrict * const restrict error) {
     }
 }
 
+#ifdef GEN_ERROR_INCLUDE
+#include <GEN_ERROR_INCLUDE>
+#endif
+
 #ifndef GEN_ERROR_ABORT_FUNCTION
 /**
  * The function to call to exit the program in the case of a fatal error.

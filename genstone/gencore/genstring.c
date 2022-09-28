@@ -12,6 +12,10 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #endif
 
+#ifdef GEN_STRING_INCLUDE
+#include <GEN_STRING_INCLUDE>
+#endif
+
 #ifndef GEN_STRING_STRNLEN
 /**
  * The function to use for measuring string length.

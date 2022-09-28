@@ -51,10 +51,6 @@ ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
 endif
 
-# TODO: Work this out
-# @$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
-# @$(CD) $(GENSTONE_DIR)/genstone $(AND) $(CLANG_FORMAT) -i $(realpath $<)
-
 %$(STATIC_LIB_SUFFIX):
 	@$(ECHO) "$(ACTION_PREFIX)$(STATIC_LIB_TOOL)$(ACTION_SUFFIX)"
 	@$(STATIC_LIB_TOOL)
