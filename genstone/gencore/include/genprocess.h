@@ -6,8 +6,6 @@
  * Utility for starting and managing processes.
  */
 
-// TODO: Implement genprocess
-
 #ifndef GEN_PROC_H
 #define GEN_PROC_H
 

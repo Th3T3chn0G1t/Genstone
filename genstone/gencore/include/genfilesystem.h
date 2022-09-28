@@ -279,10 +279,11 @@ extern gen_error_t* gen_filesystem_handle_file_read(gen_filesystem_handle_t* con
  * Writes to a file.
  * @param[in] handle The handle to write to.
  * @param[in] buffer the buffer to source bytes from for writing.
+ * @param[in] offset The offset into the buffer to write at.
  * @param[in] buffer_size The number of bytes of buffer to write.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t buffer_size);
+extern gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t offset, const size_t buffer_size);
 
 /**
  * Lists the contents of a directory.

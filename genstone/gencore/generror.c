@@ -199,9 +199,9 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 
 	for(size_t i = 0; i < error->backtrace_length; ++i) {
 		size_t backtrace_index = error->backtrace_length - (i + 1);
+        // printf("#%zu: %p %s() %s\n", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
 		internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
 		if(internal_error) {
-			// printf("%s (%s) %s %zu\n", gen_error_type_name(internal_error->type), gen_error_type_description(internal_error->type), internal_error->context, internal_error->line);
 			gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
 			gen_error_abort();
 		}
@@ -209,7 +209,13 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 }
 
 void gen_error_free(gen_error_t* restrict * const restrict error) {
-    gen_error_t* internal_error = gen_memory_free((void* restrict * const restrict) error);
+	GEN_TOOLING_AUTO gen_error_t* internal_error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_error_free, GEN_FILE_NAME);
+    if(internal_error) {
+        gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+    }
+    
+    internal_error = gen_memory_free((void* restrict * const restrict) error);
     if(internal_error) {
 		gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();

@@ -111,7 +111,7 @@ gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict 
 	error = gen_string_format(GEN_STRING_NO_BOUNDS, formatted, NULL, format, sizeof(format) - 1, context, context_length, ' ', GEN_LOG_CONTEXT_PAD - context_length, severity_names[severity], severity_lengths[severity], ' ', GEN_LOG_SEVERITY_PAD - severity_name_lengths[severity], string);
 	if(error) return error;
 
-	error = gen_filesystem_handle_file_write(&out, (const unsigned char*) formatted, formatted_length);
+	error = gen_filesystem_handle_file_write(&out, (const unsigned char*) formatted, 0, formatted_length);
 	if(error) return error;
 
 	return NULL;

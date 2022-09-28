@@ -412,8 +412,7 @@ gen_error_t* gen_filesystem_handle_file_read(gen_filesystem_handle_t* const rest
 	return NULL;
 }
 
-// TODO: This seriously needs a way to write at offset
-gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t buffer_size) {
+gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t offset, const size_t buffer_size) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_file_write, GEN_FILE_NAME);
 	if(error) return error;
 
@@ -430,7 +429,7 @@ gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const res
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());
 	}
 	else {
-		ssize_t result = pwrite(handle->file_handle, buffer, buffer_size, 0);
+		ssize_t result = pwrite(handle->file_handle, buffer, buffer_size, (off_t) offset);
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());
 	}
 #endif
