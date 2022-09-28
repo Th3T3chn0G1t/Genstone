@@ -3,7 +3,7 @@
 
 /**
  * @file genprocess.h
- * Utility for starting and managing subprocesses.
+ * Utility for starting and managing processes.
  */
 
 // TODO: Implement genprocess
@@ -21,49 +21,48 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 /**
  * Handle type for a process.
  */
 typedef pid_t gen_process_t;
+#endif
 
 /**
- * Creates a subprocess.
- * @param[in] executable_path The path to the executable to create the subprocess with. 
- * @param[in] executable_path_length The length of the path to the executable to create the subprocess with. 
- * @param[in] arguments The arguments to pass to the created subprocess.
- * @param[in] argument_lengths The lengths of the arguments to pass to the created subprocess.
- * @param[in] arguments_length The length of the `arguments` buffer.
- * @param[out] out_process A pointer to storage for a handle to the created subprocess.
- * @return An error, otherwise `NULL`.
- */
-extern gen_error_t* gen_process_create(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_process_t* const restrict out_process);
-
-/**
- * Creates a subprocess redirected to a filesystem handle.
- * @param[in] executable_path The path to the executable to create the subprocess with. 
- * @param[in] executable_path_length The length of the path to the executable to create the subprocess with. 
- * @param[in] arguments The arguments to pass to the created subprocess.
- * @param[in] argument_lengths The lengths of the arguments to pass to the created subprocess.
- * @param[in] arguments_length The length of the `arguments` buffer.
+ * Creates a process redirected to a filesystem handle.
+ * @param[in] executable_path The path to the executable to create the process with. May be taken as a suffix to `PATH`.
+ * @param[in] executable_path_length The length of the path to the executable to create the process with.
+ * @param[in] arguments The arguments to pass to the created process.
+ * @param[in] arguments_length The length of the list of arguments to pass to the created process.
+ * @param[in] environment The list of environment variables to pass to the created process.
+ * @param[in] environment_length The length of the list of environment variables to pass to the created process.
  * @param[in,out] filesystem_handle The filesystem handle to redirect output to.
- * @param[out] out_process A pointer to storage for a handle to the created subprocess.
+ * @param[out] out_process A pointer to storage for a handle to the created process.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const restrict* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
+extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t arguments_length, char** const restrict environment, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
 
 /**
- * Blocks the current thread until the specified subprocess exits.
- * @param process The subprocess to wait for.
- * @param out_exitcode A pointer to storage for the exit code of the subprocess.
+ * Blocks the current thread until the specified process exits.
+ * @param[in] process The process to wait for.
+ * @param[out] out_exitcode A pointer to storage for the exit code of the process.
  * @return An error, otherwise `NULL`.
  */
 extern gen_error_t* gen_process_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
 
 /**
- * Attempts to kill a subprocess.
- * @param process The subprocess to kill.
+ * Attempts to kill a process.
+ * @param[in] process The process to kill.
  * @return An error, otherwise `NULL`.
  */
 extern gen_error_t* gen_process_kill(const gen_process_t* const restrict process);
+
+/**
+ * Gets a pointer to the current process' environment.
+ * @param[out] out_environment A pointer to a pointer to a buffer of pointers to environment variables.
+ * @param[out] out_length A pointer to storage for the length of the environment.
+ * @return An error, otherwise `NULL`.
+ */
+extern gen_error_t* gen_process_get_environment(char*** const restrict out_environment, size_t* const restrict out_length);
 
 #endif

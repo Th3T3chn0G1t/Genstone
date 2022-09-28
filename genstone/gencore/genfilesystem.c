@@ -10,7 +10,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
 
-#if GEN_PLATFORM != GEN_WINDOWS
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 #include <fcntl.h>
 #include <limits.h>
 #include <poll.h>
@@ -22,6 +22,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 
 #if GEN_PLATFORM == GEN_LINUX
 #include <sys/inotify.h>
+#include <sys/mman.h>
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
@@ -69,22 +70,22 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
     else if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_fd)
-	gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
+	GEN_UNUSED gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
 
     long value = pathconf("/", _PC_PATH_MAX);
     if(value == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
     char* canonicalized = NULL;
-    error = gen_memory_allocate_zeroed((void**) &canonicalized, value + 1, sizeof(char));
+    error = gen_memory_allocate_zeroed((void**) &canonicalized, (size_t) (value + 1), sizeof(char));
     if(error) return error;
     
-    GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_path) char* path_cleanup_scope_var = canonicalized;
+    GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_path) GEN_UNUSED char* path_cleanup_scope_var = canonicalized;
 
     int result = fcntl(fd, F_GETPATH, canonicalized);
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
 	size_t canonicalized_length = 0;
-	error = gen_string_length(canonicalized, value + 1, value, &canonicalized_length);
+	error = gen_string_length(canonicalized, (size_t) (value + 1), (size_t) value, &canonicalized_length);
 	if(error) return error;
 
 	if(out_length) *out_length = canonicalized_length;
@@ -132,7 +133,7 @@ gen_error_t* gen_filesystem_path_validate(const char* const restrict path, const
     long value = pathconf("/", _PC_NAME_MAX);
     if(value == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not validate path `%tz`: %t", gen_error_description_from_errno());
 
-	if(path_length > value) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` exceeded the maximum number of characters in a path %uz", path, path_length, value);
+	if(path_length > (size_t) value) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` exceeded the maximum number of characters in a path %uz", path, path_length, value);
 #elif GEN_PLATFORM == GEN_WINDOWS
 	if(path_length > MAX_PATH) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` exceeded the maximum number of characters in a path %uz", path, path_length, MAX_PATH);
 	// TODO: Windows has path content limitations
@@ -153,7 +154,7 @@ gen_error_t* gen_filesystem_path_create_file(const char* const restrict path, co
 	if(error) return error;
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
-	int result = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0777);
+	int result = open(path, O_RDWR | O_CREAT, 0777);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file at path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 	result = close(result);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file at path `%tz`: %t", path, path_length, gen_error_description_from_errno());
@@ -239,6 +240,51 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_directo
 #endif
 }
 
+gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restrict out_handle) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_open_anonymous, GEN_FILE_NAME);
+	if(error) return error;
+
+	if(!out_handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_handle` was `NULL`");
+
+	error = gen_threads_mutex_create(&out_handle->lock);
+	if(error) return error;
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
+	gen_threads_mutex_t* lock_scope_variable = &out_handle->lock;
+
+#if GEN_PLATFORM == GEN_LINUX
+    gen_filesystem_file_handle_t fd = memfd_create("__genstone_anon_file", 0);
+	if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
+
+    out_handle->type = GEN_FILESYSTEM_HANDLE_FILE;
+    out_handle->file_handle = fd;
+
+    // Prevent error-cleanup
+    file_handle_scope_variable = NULL;
+#elif GEN_PLATFORM == GEN_OSX
+	gen_filesystem_file_handle_t fd = open("__genstone_anon_file", O_CREAT | O_RDWR, 0777);
+	if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
+
+    int result = unlink("__genstone_anon_file");
+    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
+
+    out_handle->type = GEN_FILESYSTEM_HANDLE_FILE;
+    out_handle->file_handle = fd;
+
+    // Prevent error-cleanup
+    file_handle_scope_variable = NULL;
+#endif
+    lock_scope_variable = NULL;
+
+	return NULL;
+}
+
 gen_error_t* gen_filesystem_handle_open(const char* const restrict path, const size_t path_length, gen_filesystem_handle_t* restrict out_handle) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_open, GEN_FILE_NAME);
 	if(error) return error;
@@ -253,22 +299,22 @@ gen_error_t* gen_filesystem_handle_open(const char* const restrict path, const s
 	error = gen_threads_mutex_create(&out_handle->lock);
 	if(error) return error;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
 	gen_threads_mutex_t* lock_scope_variable = &out_handle->lock;
 
-	int result = open(path, O_DIRECTORY | O_RDONLY | O_CLOEXEC);
-	if(result == -1 && errno != ENOTDIR) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+	gen_filesystem_file_handle_t fd = open(path, O_DIRECTORY | O_RDONLY);
+	if(fd == -1 && errno != ENOTDIR) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
-	gen_filesystem_file_handle_t* file_handle_scope_variable = &result;
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
 
-	if(result == -1 && errno == ENOTDIR) {
-		result = open(path, O_RDWR | O_CLOEXEC);
-		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+	if(fd == -1 && errno == ENOTDIR) {
+		fd = open(path, O_RDWR);
+		if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
 		out_handle->type = GEN_FILESYSTEM_HANDLE_FILE;
-		out_handle->file_handle = result;
+		out_handle->file_handle = fd;
 
 		// Prevent error-cleanup
 		lock_scope_variable = NULL;
@@ -278,18 +324,18 @@ gen_error_t* gen_filesystem_handle_open(const char* const restrict path, const s
 	}
 
 	out_handle->type = GEN_FILESYSTEM_HANDLE_DIRECTORY;
-	out_handle->file_handle = result;
-	out_handle->directory_handle = fdopendir(result);
+	out_handle->file_handle = fd;
+	out_handle->directory_handle = fdopendir(fd);
 	if(!out_handle->directory_handle) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_directory_handle)
 	gen_filesystem_directory_handle_t* directory_handle_scope_variable = &out_handle->directory_handle;
 
 	// Prevent error-cleanup
-	lock_scope_variable = NULL;
 	file_handle_scope_variable = NULL;
 	directory_handle_scope_variable = NULL;
 #endif
+	lock_scope_variable = NULL;
 
 	return NULL;
 }
@@ -563,7 +609,7 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
-	int result = fcntl(handle->file_handle, F_DUPFD_CLOEXEC);
+	int result = fcntl(handle->file_handle, F_DUPFD);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %t", gen_error_description_from_errno());
 
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)

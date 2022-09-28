@@ -11,8 +11,8 @@ GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAG
 GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
 
 ifeq ($(SANITIZERS),ENABLED)
-	GEN_CORE_INTERNAL_CFLAGS = -fsanitize=undefined,address,cfi
-	GEN_CORE_INTERNAL_LFLAGS = -fsanitize=undefined,address,cfi
+	GEN_CORE_INTERNAL_CFLAGS += -fsanitize=undefined,address,cfi
+	GEN_CORE_INTERNAL_LFLAGS += -fsanitize=undefined,address,cfi
 endif
 
 ifeq ($(PLATFORM),LINUX)
