@@ -11,6 +11,23 @@
 
 #include "gencommon.h"
 
+
+#ifndef GEN_LOG_CONTEXT_PAD
+/**
+ * The width the pad out context strings to.
+ */
+#define GEN_LOG_CONTEXT_PAD 18
+#endif
+
+#ifndef GEN_LOG_SEVERITY_PAD
+/**
+ * The width the pad out severity strings to.
+ */
+#define GEN_LOG_SEVERITY_PAD 8
+#endif
+
+#define GEN_LOG_RISING_EDGE_LENGTH (GEN_LOG_CONTEXT_PAD + 2 + 1 + GEN_LOG_SEVERITY_PAD + 2 + 1)
+
 /**
  * Logging severity levels.
  */

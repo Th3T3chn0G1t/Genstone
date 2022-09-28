@@ -40,20 +40,6 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Wunused-macros"))
 #define GEN_LOG_INTERNAL_ANSI_SEQUENCE_BOLD GEN_LOG_INTERNAL_ANSI_SEQUENCE_PREFIX GEN_LOG_INTERNAL_ANSI_BOLD GEN_LOG_INTERNAL_ANSI_SEQUENCE_SUFFIX
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-#ifndef GEN_LOG_CONTEXT_PAD
-/**
- * The width the pad out context strings to.
- */
-#define GEN_LOG_CONTEXT_PAD 18
-#endif
-
-#ifndef GEN_LOG_SEVERITY_PAD
-/**
- * The width the pad out severity strings to.
- */
-#define GEN_LOG_SEVERITY_PAD 8
-#endif
-
 static void gen_log_internal_cleanup_formatted(char** formatted) {
 	gen_error_t* error = gen_memory_free((void**) formatted);
 	if(error) {
