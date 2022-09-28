@@ -26,7 +26,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-static void gen_filesystem_internal_path_canonicalize_cleanup_path(char** path) {
+GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_path(char** path) {
     if(!*path) return;
 
     gen_error_t* error = gen_memory_free((void**) path);
@@ -36,7 +36,7 @@ static void gen_filesystem_internal_path_canonicalize_cleanup_path(char** path) 
     }
 }
 
-static void gen_filesystem_internal_path_canonicalize_cleanup_fd(gen_filesystem_file_handle_t** file_handle) {
+GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_fd(gen_filesystem_file_handle_t** file_handle) {
 	if(!*file_handle) return;
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
@@ -59,6 +59,7 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
 	if(!out_canonical && !out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "Both `out_canonical` and `out_length` were `NULL`");
 	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
@@ -94,6 +95,7 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
 		error = gen_string_copy(out_canonical, GEN_STRING_NO_BOUNDS, canonicalized, canonicalized_length + 1, canonicalized_length);
 		if(error) return error;
 	}
+#endif
 
 	return NULL;
 }
@@ -173,8 +175,10 @@ gen_error_t* gen_filesystem_path_create_directory(const char* const restrict pat
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
 	int result = mkdir(path, 0777);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create directory at path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+#endif
 
 	return NULL;
 }
@@ -412,7 +416,7 @@ gen_error_t* gen_filesystem_handle_file_read(gen_filesystem_handle_t* const rest
 	return NULL;
 }
 
-gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, const size_t offset, const size_t buffer_size) {
+gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const restrict handle, const unsigned char* const restrict buffer, GEN_MAYBE_UNUSED const size_t offset, const size_t buffer_size) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_handle_file_write, GEN_FILE_NAME);
 	if(error) return error;
 
