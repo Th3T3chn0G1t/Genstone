@@ -6,8 +6,6 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-// TODO: Return error inn null platform cases
-
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #if GEN_PLATFORM != GEN_WINDOWS

@@ -6,12 +6,9 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-// TODO: Return error inn null platform cases
-
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
-#include <stdlib.h>
 
 #if GEN_PLATFORM != GEN_WINDOWS
 #include <fcntl.h>
@@ -28,6 +25,31 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
+static void gen_filesystem_internal_path_canonicalize_cleanup_path(char** path) {
+    if(!*path) return;
+
+    gen_error_t* error = gen_memory_free((void**) path);
+    if(error) {
+        gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
+        gen_error_abort();
+    }
+}
+
+static void gen_filesystem_internal_path_canonicalize_cleanup_fd(gen_filesystem_file_handle_t** file_handle) {
+	if(!*file_handle) return;
+
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+	if(**file_handle == -1) return;
+
+	int result = close(**file_handle);
+	if(result == -1) {
+		gen_error_t* error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path: %t", gen_error_description_from_errno());
+		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+	}
+#endif
+}
+
 gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, const size_t path_length, char* restrict out_canonical, size_t* const restrict out_length) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_canonicalize, GEN_FILE_NAME);
 	if(error) return error;
@@ -39,13 +61,30 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
-	const char* canonicalized = realpath(path, NULL); // TODO: Replace with in-house implementation
-		//       Maybe use `fcntl`'s `F_GETPATH` as described in the Darwin manpage?
-		//       Remove `stdlib.h` include.
-	if(!canonicalized) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Failed to resolve canonical representation for path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+    gen_filesystem_file_handle_t fd = open(path, O_RDWR);
+    if(fd == -1 && errno == EISDIR) {
+        fd = open(path, O_RDONLY | O_DIRECTORY);
+        if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+    }
+    else if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+
+	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_fd)
+	gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
+
+    long value = pathconf("/", _PC_PATH_MAX);
+    if(value == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+
+    char* canonicalized = NULL;
+    error = gen_memory_allocate_zeroed((void**) &canonicalized, value + 1, sizeof(char));
+    if(error) return error;
+    
+    GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_path) char* path_cleanup_scope_var = canonicalized;
+
+    int result = fcntl(fd, F_GETPATH, canonicalized);
+    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
 	size_t canonicalized_length = 0;
-	error = gen_string_length(canonicalized, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &canonicalized_length);
+	error = gen_string_length(canonicalized, value + 1, value, &canonicalized_length);
 	if(error) return error;
 
 	if(out_length) *out_length = canonicalized_length;
@@ -90,9 +129,12 @@ gen_error_t* gen_filesystem_path_validate(const char* const restrict path, const
 
 	if(path_length == 0) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "Path `%tz` was too short", path, path_length);
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
-	if(path_length > PATH_MAX /* TODO: This number is usually bogus - Use `pathconf` instead */) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` was too long", path, path_length);
+    long value = pathconf("/", _PC_NAME_MAX);
+    if(value == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not validate path `%tz`: %t", gen_error_description_from_errno());
+
+	if(path_length > value) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` exceeded the maximum number of characters in a path %uz", path, path_length, value);
 #elif GEN_PLATFORM == GEN_WINDOWS
-	if(path_length > MAX_PATH) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` was too long", path, path_length);
+	if(path_length > MAX_PATH) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Path `%tz` exceeded the maximum number of characters in a path %uz", path, path_length, MAX_PATH);
 	// TODO: Windows has path content limitations
 #endif
 
@@ -306,13 +348,19 @@ gen_error_t* gen_filesystem_handle_file_read(gen_filesystem_handle_t* const rest
 
 	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
-	if(start == end) {
-		return NULL;
-	}
+    if(start == end) {
+        return NULL;
+    }
 
-	ssize_t result = pread(handle->file_handle, out_buffer, (size_t) (end - start), (off_t) start);
-	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not read file: %t", gen_error_description_from_errno());
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+	if(handle->file_handle <= STDERR_FILENO) {
+        ssize_t result = read(handle->file_handle, out_buffer, (size_t) (end - start));
+        if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not read file: %t", gen_error_description_from_errno());
+    }
+    else {
+        ssize_t result = pread(handle->file_handle, out_buffer, (size_t) (end - start), (off_t) start);
+        if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not read file: %t", gen_error_description_from_errno());
+    }
 #endif
 
 	return NULL;

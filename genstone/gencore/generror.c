@@ -208,6 +208,14 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 	}
 }
 
+void gen_error_free(gen_error_t* restrict * const restrict error) {
+    gen_error_t* internal_error = gen_memory_free((void**) error);
+    if(internal_error) {
+		gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
+		gen_error_abort();
+    }
+}
+
 #ifndef GEN_ERROR_ABORT_FUNCTION
 /**
  * The function to call to exit the program in the case of a fatal error.

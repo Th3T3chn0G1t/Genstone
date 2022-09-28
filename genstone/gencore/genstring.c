@@ -236,7 +236,6 @@ gen_error_t* gen_string_number(const char* const restrict string, const size_t s
 	if(error) return error;
 
 	if(!out_number) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_number` was `NULL`");
-	if(!string_bounds) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string_bounds` was 0");
 
 	size_t string_length = 0;
 	error = gen_string_length(string, string_bounds, limit, &string_length);

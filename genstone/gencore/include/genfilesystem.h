@@ -38,8 +38,6 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
  * The maximum size of a directory listing.
  */
 #define GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX (sizeof(((struct dirent*) NULL)->d_name))
-#else
-#define GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX 1024 /* TODO: Use PATH_MAX or pathconf mins from path validate */
 #endif
 
 /**

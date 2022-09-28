@@ -42,12 +42,14 @@ endif
 ACTION_PREFIX = \\033[1;30m
 ACTION_SUFFIX = \\033[0m
 
-%$(OBJECT_SUFFIX): %.c # TODO: Disabling SA as an option
+%$(OBJECT_SUFFIX): %.c
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<
 
+ifeq ($(STATIC_ANALYSIS),ENABLED)
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<$(ACTION_SUFFIX)"
 	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
+endif
 
 # TODO: Work this out
 # @$(ECHO) "$(ACTION_PREFIX)$(CLANG_FORMAT) -i $<$(ACTION_SUFFIX)"
