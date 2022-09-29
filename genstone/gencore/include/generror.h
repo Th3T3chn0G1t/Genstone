@@ -214,7 +214,7 @@ extern gen_error_type_t gen_error_type_from_errno(void);
  * Converts the value of errno into a string description.
  * @return The converted error description.
  */
-const char* gen_error_description_from_errno(void);
+extern const char* gen_error_description_from_errno(void);
 
 /**
  * Constructs an error and attaches a backtrace down to the caller.

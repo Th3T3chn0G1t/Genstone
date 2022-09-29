@@ -22,6 +22,7 @@ ifeq ($(HOST), LINUX)
 	CD = cd
 	AND = &&
 	MKDIR = mkdir
+	CAT = cat
 endif
 ifeq ($(PLATFORM), LINUX)
 	LIB_PREFIX = lib
@@ -45,6 +46,7 @@ ifeq ($(HOST),OSX)
 	CD = cd
 	AND = &&
 	MKDIR = mkdir
+	CAT = cat
 endif
 ifeq ($(PLATFORM), OSX)
 	LIB_PREFIX = lib
@@ -68,6 +70,7 @@ ifeq ($(HOST), WINDOWS)
 	CD = cd
 	AND = &&
 	MKDIR = mkdir
+	CAT = type
 endif
 ifeq ($(PLATFORM), WINDOWS)
 	LIB_PREFIX =
