@@ -82,8 +82,16 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
     
     GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_path) GEN_UNUSED char* path_cleanup_scope_var = canonicalized;
 
+#if GEN_PLATFORM == GEN_OSX
     int result = fcntl(fd, F_GETPATH, canonicalized);
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+#elif GEN_PLATFORM == GEN_LINUX
+    char fdpath[sizeof("/proc/self/fd/") + 4 /* We're just gonna presume a process will never have more than 9999 fds open at once */ + 1] = {0};
+    error = gen_string_format(sizeof(fdpath), fdpath, NULL, "/proc/self/fd/%si", sizeof("/proc/self/fd/%si") - 1, fd);
+    if(error) return error;
+    ssize_t result = readlink(fdpath, canonicalized, (size_t) (value + 1));
+    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
+#endif
 
 	size_t canonicalized_length = 0;
 	error = gen_string_length(canonicalized, (size_t) (value + 1), (size_t) value, &canonicalized_length);
