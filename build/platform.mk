@@ -36,11 +36,11 @@ ifeq ($(PLATFORM), LINUX)
 	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
-	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS))) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 
         ifeq ($(shell uname -o),Android)
                 GLOBAL_CFLAGS += -DGEN_LINUX_ANDROID
-		DYNAMIC_LIB_TOOL += $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS))
+		DYNAMIC_LIB_TOOL += $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS)))
         endif
 endif
 
