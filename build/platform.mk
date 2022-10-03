@@ -40,7 +40,7 @@ ifeq ($(PLATFORM), LINUX)
 
         ifeq ($(shell uname -o),Android)
                 GLOBAL_CFLAGS += -DGEN_LINUX_ANDROID
-		DYNAMIC_LIB_TOOL += $(INTERNAL_EXECUTABLE_TOOL_LFLAG)
+		DYNAMIC_LIB_TOOL += $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS))
         endif
 endif
 
