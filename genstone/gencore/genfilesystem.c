@@ -266,7 +266,7 @@ gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restr
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
 	gen_threads_mutex_t* lock_scope_variable = &out_handle->lock;
 
-#if GEN_PLATFORM == GEN_LINUX && (!defined(GEN_LINUX_ANDROID) || GEN_LINUX_ANDROID)
+#if GEN_PLATFORM == GEN_LINUX && (!defined(GEN_LINUX_ANDROID) || GEN_LINUX_ANDROID >= 30)
     gen_filesystem_file_handle_t fd = memfd_create("__genstone_anon_file", 0);
 	if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
 
