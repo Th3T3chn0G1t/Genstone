@@ -248,7 +248,7 @@ gen_error_t* gen_string_number(const char* const restrict string, const size_t s
 	size_t accumulate = 0;
 #ifdef __ANALYZER
 #else
-    size_t pow = 1;
+        size_t pow = 1;
 	for(size_t i = string_length - 1; i != SIZE_MAX; --i) {
 		if(string[i] < '0' || string[i] > '9') return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Encountered non-numeric character `%c`", string[i]);
 		accumulate += (size_t) (string[i] - '0') * pow;
@@ -276,7 +276,7 @@ static void gen_string_internal_format_number_base10_unsigned(const size_t len, 
 	char out[20] = {0}; // "18446744073709551615" (i.e. `SIZE_MAX`) is 20 characters
 	size_t idx = 0;
 	do {
-		out[idx++] = '0' + (accumulate % 10);
+		out[idx++] = '0' + (char) (accumulate % 10);
 		accumulate /= 10;
 	} while(accumulate);
 
@@ -327,7 +327,7 @@ static void gen_string_internal_format_number_base10_signed(const size_t len, ch
 		out[idx++] = '-';
 	}
 	do {
-		out[idx++] = '0' + (accumulate % 10);
+		out[idx++] = '0' + (char) (accumulate % 10);
 		accumulate /= 10;
 	} while(accumulate);
 

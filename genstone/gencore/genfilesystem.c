@@ -22,7 +22,9 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 
 #if GEN_PLATFORM == GEN_LINUX
 #include <sys/inotify.h>
+#if !defined(GEN_LINUX_ANDROID) || GEN_LINUX_ANDROID >= 30
 #include <sys/mman.h>
+#endif
 #endif
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
@@ -264,7 +266,7 @@ gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restr
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
 	gen_threads_mutex_t* lock_scope_variable = &out_handle->lock;
 
-#if GEN_PLATFORM == GEN_LINUX
+#if GEN_PLATFORM == GEN_LINUX && (!defined(GEN_LINUX_ANDROID) || GEN_LINUX_ANDROID >= 30)
     gen_filesystem_file_handle_t fd = memfd_create("__genstone_anon_file", 0);
 	if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
 
@@ -276,7 +278,7 @@ gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restr
 
     // Prevent error-cleanup
     file_handle_scope_variable = NULL;
-#elif GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#elif GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_LINUX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
 	gen_filesystem_file_handle_t fd = open("__genstone_anon_file", O_CREAT | O_RDWR, 0777);
 	if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
 
