@@ -5,6 +5,7 @@
 #include "include/genlog.h"
 #include "include/genmemory.h"
 #include "include/genstring.h"
+#include "include/genthreads.h"
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
@@ -113,25 +114,19 @@ const char* gen_error_description_from_errno(void) {
 #endif
 }
 
-gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {
-	gen_error_t* retval = NULL;
+static GEN_THREAD_LOCAL gen_error_t error_buffer = {0};
 
-	gen_error_t* error = gen_memory_allocate_zeroed((void**) &retval, 1, sizeof(gen_error_t));
-	if(error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {
+	gen_error_t* retval = &error_buffer;
+
+    error_buffer = (gen_error_t) {0};
 
 	retval->type = type;
 	retval->line = line;
 
-	error = gen_string_copy(retval->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, string, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS);
-	if(error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+    for(size_t i = 0; i < GEN_ERROR_MAXIMUM_CONTEXT_LENGTH && string[i]; ++i) retval->context[i] = string[i];
 
-	error = gen_tooling_get_backtrace(NULL, &retval->backtrace_length);
+	gen_error_t* error = gen_tooling_get_backtrace(NULL, &retval->backtrace_length);
 	if(error) {
 		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
@@ -173,25 +168,7 @@ static gen_log_level_t level_map[] = {
 	[GEN_ERROR_SEVERITY_FATAL] = GEN_LOG_LEVEL_FATAL};
 
 void gen_error_print(const char* const restrict context, const gen_error_t* const restrict error, const gen_error_severity_t severity) {
-	GEN_TOOLING_AUTO gen_error_t* internal_error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_error_print, GEN_FILE_NAME);
-    if(internal_error) {
-        gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-    }
-
-    if(!context) {
-        internal_error = gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`context` was `NULL`");
-        gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-    }
-
-    if(!error) {
-        internal_error = gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`error` was `NULL`");
-        gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-    }
-    
-    internal_error = gen_log_formatted(level_map[severity], context, "`%t`: %t - \"%tz\" %t:%uz", gen_error_type_name(error->type), gen_error_type_description(error->type), error->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, error->backtrace[error->backtrace_length - 1].file, error->line);
+    gen_error_t* internal_error = gen_log_formatted(level_map[severity], context, "`%t`: %t - \"%tz\" %t:%uz", gen_error_type_name(error->type), gen_error_type_description(error->type), error->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, error->backtrace[error->backtrace_length - 1].file, error->line);
 	if(internal_error) {
 		gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
@@ -206,20 +183,6 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 			gen_error_abort();
 		}
 	}
-}
-
-void gen_error_free(gen_error_t* restrict * const restrict error) {
-	GEN_TOOLING_AUTO gen_error_t* internal_error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_error_free, GEN_FILE_NAME);
-    if(internal_error) {
-        gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-    }
-    
-    internal_error = gen_memory_free((void* restrict * const restrict) error);
-    if(internal_error) {
-		gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-    }
 }
 
 #ifdef GEN_ERROR_INCLUDE

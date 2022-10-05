@@ -245,12 +245,6 @@ extern gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t 
 extern void gen_error_print(const char* const restrict context, const gen_error_t* const restrict error, const gen_error_severity_t severity);
 
 /**
- * Frees a backpropogated error.
- * @param[in] error A pointer to the error pointer to free.
- */
-extern void gen_error_free(gen_error_t* restrict * const restrict error);
-
-/**
  * Aborts the program.
  */
 extern GEN_NORETURN void gen_error_abort(void);
