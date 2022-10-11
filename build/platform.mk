@@ -23,6 +23,9 @@ ifeq ($(HOST), LINUX)
 	AND = &&
 	MKDIR = mkdir
 	CAT = cat
+	LS = ls
+	FIND = find
+	FIND_FNAME = -name
 endif
 ifeq ($(PLATFORM), LINUX)
 	LIB_PREFIX = lib
@@ -52,6 +55,9 @@ ifeq ($(HOST),OSX)
 	AND = &&
 	MKDIR = mkdir
 	CAT = cat
+	LS = ls
+	FIND = find
+	FIND_FNAME = -name
 endif
 ifeq ($(PLATFORM), OSX)
 	LIB_PREFIX = lib
@@ -76,6 +82,9 @@ ifeq ($(HOST), WINDOWS)
 	AND = &&
 	MKDIR = mkdir
 	CAT = type
+	LS = dir
+	FIND = tree
+	FIND_FNAME =
 endif
 ifeq ($(PLATFORM), WINDOWS)
 	LIB_PREFIX =
