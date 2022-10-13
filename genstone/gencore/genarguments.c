@@ -37,7 +37,7 @@ gen_error_t* gen_arguments_parse(const char* const restrict* const restrict argu
 				}
 
 				bool equal = false;
-				error = gen_string_compare(argument, argument_length + 1, long_arguments[j], long_argument_lengths[j], GEN_STRING_NO_BOUNDS, &equal);
+				error = gen_string_compare(argument, argument_length + 1, long_arguments[j], long_argument_lengths[j], occurrence, &equal);
 				if(error) return error;
 
 				if(equal) {
