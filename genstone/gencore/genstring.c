@@ -358,7 +358,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 			continue;
 		}
 
-		if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+		if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i, format);
 
 		switch(format[++i]) {
 			case '%': {
@@ -382,7 +382,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 
 			// TODO: Implement missing specifiers
 			case 'f': {
-				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i, format);
 				switch(format[++i]) {
 					case 's': {
 						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fs` not implemented");
@@ -394,13 +394,13 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 						return gen_error_attach_backtrace(GEN_ERROR_NOT_IMPLEMENTED, GEN_LINE_NUMBER, "Format specifier `%fe` not implemented");
 					}
 					default: {
-						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i, format);
 					}
 				}
 				// break;
 			}
 			case 'u': {
-				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i, format);
 				switch(format[++i]) {
 					case 'z': {
 						gen_string_internal_format_number_base10_unsigned(limit, out_buffer, &out_pos, va_arg(list, size_t));
@@ -423,13 +423,13 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 						break;
 					}
 					default: {
-						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 2, format);
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i - 2, format);
 					}
 				}
 				break;
 			}
 			case 's': {
-				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i, format);
+				if(i + 1 == format_length) return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i, format);
 				switch(format[++i]) {
 					case 'z': {
 						gen_string_internal_format_number_base10_signed(limit, out_buffer, &out_pos, va_arg(list, ssize_t));
@@ -452,7 +452,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 						break;
 					}
 					default: {
-						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 2, format);
+						return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i - 2, format);
 					}
 				}
 				break;
@@ -528,7 +528,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 				break;
 			}
 			default: {
-				return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%s`", i - 1, format);
+				return gen_error_attach_backtrace_formatted(GEN_ERROR_BAD_CONTENT, GEN_LINE_NUMBER, "Invalid format specifier at position %uz in string `%t`", i - 1, format);
 			}
 		}
 	}
