@@ -56,12 +56,12 @@ ifeq ($(STATIC_ANALYSIS),ENABLED)
 endif
 
 %$(OBJECT_SUFFIX): %.c
-	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
-	@$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -std=c2x -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<$(ACTION_SUFFIX)"
+	@$(CLANG) -std=c2x -c $(GLOBAL_CFLAGS) $(CFLAGS) -o $@ $<
 
 ifeq ($(STATIC_ANALYSIS),ENABLED)
-	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<$(ACTION_SUFFIX)"
-	@$(CLANG) $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
+	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -std=c2x $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<$(ACTION_SUFFIX)"
+	@$(CLANG) -std=c2x $(GLOBAL_CFLAGS) $(CFLAGS) --analyze $(SAFLAGS) $<
 endif
 
 %$(OBJECT_SUFFIX): %.m
