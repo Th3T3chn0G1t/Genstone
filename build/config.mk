@@ -30,6 +30,9 @@ STATIC_ANALYSIS ?= DISABLED
 # The C compiler to use
 CLANG ?= clang
 
+# The C+ compiler to use
+CLANGXX ?= clang++
+
 # The AR archiver to use
 AR ?= ar
 
