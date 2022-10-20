@@ -79,7 +79,7 @@ gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t
 	return NULL;
 }
 
-gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, const void* restrict* const restrict out_address) {
+gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, void* restrict* const restrict out_address) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_get_symbol, GEN_FILE_NAME);
 	if(error) return error;
 
@@ -90,7 +90,7 @@ gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_han
 	if(symbol_name[symbol_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was not NULL-terminated");
 
 	if(!(*out_address = dlsym(*dynamic_library, symbol_name))) {
-		return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to locate symbol `%tz`: %t", symbol_name, symbol_name_length, dlerror());
+		return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Failed to locate symbol `%tz`: %t", symbol_name, symbol_name_length, dlerror());
 	}
 
 	return NULL;

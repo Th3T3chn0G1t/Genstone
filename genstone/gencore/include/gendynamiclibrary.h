@@ -41,6 +41,6 @@ extern gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_h
  * @param[out] out_address A pointer to storage for the symbol's address.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, const void* restrict* const restrict out_address);
+extern gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, void* restrict* const restrict out_address);
 
 #endif
