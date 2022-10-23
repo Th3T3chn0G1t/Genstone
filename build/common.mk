@@ -94,10 +94,3 @@ clean_common:
 $(GENSTONE_DIR)/lib:
 	@$(ECHO) "$(ACTION_PREFIX)$(MKDIR) $@$(ACTION_SUFFIX)"
 	-@$(MKDIR) $@
-
-MODULES = $(wildcard $(GENSTONE_DIR)/genstone/*.mk)
-MODULE_NAMES = $(subst $(GENSTONE_DIR)/genstone/,,$(subst .mk,,$(MODULES)))
-CLEAN_TARGETS = $(addprefix clean_,$(MODULE_NAMES)) clean_common
-TEST_TARGETS = $(addprefix test_,$(MODULE_NAMES))
-
-include $(MODULES)

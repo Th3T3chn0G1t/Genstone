@@ -67,6 +67,11 @@
  */
 #define GEN_PACKED __attribute__((packed))
 
+/**
+ * Pretty wrapper for `__attribute__((constructor))`
+ */
+#define GEN_INITIALIZER __attribute__((constructor))
+
 #ifndef __INTELLISENSE
 /**
  * Pretty wrapper for `__attribute__((maybe_unused))`.
