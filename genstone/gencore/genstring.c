@@ -74,7 +74,7 @@ gen_error_t* gen_string_compare(const char* const restrict a, const size_t a_bou
 	error = gen_string_length(b, b_bounds, limit, &b_length);
 	if(error) return error;
 
-	if(limit == GEN_STRING_NO_BOUNDS && a_length != b_length) {
+	if((limit == GEN_STRING_NO_BOUNDS || (a_length < limit || b_length < limit)) && a_length != b_length) {
 		*out_equal = false;
 		return NULL;
 	}

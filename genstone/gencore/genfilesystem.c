@@ -88,7 +88,11 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
     int result = fcntl(fd, F_GETPATH, canonicalized);
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 #elif GEN_PLATFORM == GEN_LINUX
-    char fdpath[sizeof("/proc/self/fd/") + 4 /* We're just gonna presume a process will never have more than 9999 fds open at once */ + 1] = {0};
+    // TODO: We're (reasonably) presuming a process will
+    //       Never have more than 9999 fds open at once -
+    //       It's probably *technically* better to check
+    //       The maximum number of FDs open at once
+    char fdpath[sizeof("/proc/self/fd/") + 4 + 1] = {0};
     error = gen_string_format(sizeof(fdpath), fdpath, NULL, "/proc/self/fd/%si", sizeof("/proc/self/fd/%si") - 1, fd);
     if(error) return error;
     ssize_t result = readlink(fdpath, canonicalized, (size_t) (value + 1));
@@ -365,9 +369,10 @@ gen_error_t* gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict
 		int result = closedir(handle->directory_handle);
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %t", gen_error_description_from_errno());
 	}
-
-	int result = close(handle->file_handle);
-	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %t", gen_error_description_from_errno());
+    else {
+        int result = close(handle->file_handle);
+        if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %t", gen_error_description_from_errno());
+    }
 
 	error = gen_threads_mutex_unlock_and_destroy(&handle->lock);
 	if(error) return error;
@@ -506,9 +511,6 @@ gen_error_t* gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const
 	if(out_list) {
 		for(size_t i = 0; i < entries_length; ++i) {
 			error = gen_string_copy(out_list[i], GEN_MEMORY_NO_BOUNDS, &entries[i * sizeof(char[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX])], GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX, GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX - 1);
-			if(error) return error;
-
-			error = gen_memory_free((void**) &entries[i]);
 			if(error) return error;
 		}
 	}

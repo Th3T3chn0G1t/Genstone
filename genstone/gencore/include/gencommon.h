@@ -68,6 +68,11 @@
 #define GEN_PACKED __attribute__((packed))
 
 /**
+ * Pretty wrapper for `__attribute__((no_sanitize_address)) __attribute__((no_sanitize_memory))`
+ */
+#define GEN_DONT_SANITIZE __attribute__((no_sanitize_address)) __attribute__((no_sanitize_memory))
+
+/**
  * Pretty wrapper for `__attribute__((constructor))`
  */
 #define GEN_INITIALIZER __attribute__((constructor))

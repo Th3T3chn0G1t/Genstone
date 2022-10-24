@@ -42,6 +42,7 @@ const char* gen_error_type_name(const gen_error_type_t error) {
 		case GEN_ERROR_OPERATION_FAILED: return "GEN_ERROR_OPERATION_FAILED";
 		case GEN_ERROR_BAD_TIMING: return "GEN_ERROR_BAD_TIMING";
 		case GEN_ERROR_TIMEOUT: return "GEN_ERROR_TIMEOUT";
+        case GEN_ERROR_DOES_NOT_MATCH: return "GEN_ERROR_DOES_NOT_MATCH";
 	}
 }
 
@@ -69,6 +70,7 @@ const char* gen_error_type_description(const gen_error_type_t error) {
 		case GEN_ERROR_OPERATION_FAILED: return "An operation could not be performed";
 		case GEN_ERROR_BAD_TIMING: return "An operation was performed untimely manner";
 		case GEN_ERROR_TIMEOUT: return "An operation timed out";
+        case GEN_ERROR_DOES_NOT_MATCH: return "The specified values did not match";
 	}
 }
 

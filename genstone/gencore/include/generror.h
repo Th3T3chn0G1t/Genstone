@@ -130,7 +130,12 @@ typedef enum
     /**
      * An operation timed out.
      */
-    GEN_ERROR_TIMEOUT
+    GEN_ERROR_TIMEOUT,
+
+    /**
+     * The specified values did not match.
+     */
+    GEN_ERROR_DOES_NOT_MATCH
 } gen_error_type_t;
 
 /**
