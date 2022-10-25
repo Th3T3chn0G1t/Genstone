@@ -277,15 +277,51 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_path_create_directory(path, sizeof(path) - 1);
         if(error) return error;
 
-        // gen_filesystem_watcher_event_t event = GEN_FILESYSTEM_WATCHER_EVENT_NONE;
-        // error = gen_filesystem_watcher_poll(&watcher, &event);
-        // if(error) return error;
+        gen_filesystem_handle_t handle = {0};
+        error = gen_filesystem_handle_open(path, sizeof(path) - 1, &handle);
+        if(error) return error;
 
-        // error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_NONE));
-        // if(error) return error;
+        gen_filesystem_watcher_t watcher = {0};
+        error = gen_filesystem_watcher_create(&handle, &watcher);
+        if(error) return error;
 
+        error = GEN_TESTS_EXPECT(true, !!watcher.directory_handle);
+        if(error) return error;
+
+        gen_filesystem_watcher_event_t event = GEN_FILESYSTEM_WATCHER_EVENT_NONE;
+        error = gen_filesystem_watcher_poll(&watcher, &event);
+        if(error) return error;
+
+        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_NONE));
+        if(error) return error;
+
+        const char subpath[] = "__genstone_test_directory/__genstone_test_file.txt";
+
+        error = gen_filesystem_path_create_file(subpath, sizeof(subpath) - 1);
+        if(error) return error;
+
+        error = gen_filesystem_watcher_poll(&watcher, &event);
+        if(error) return error;
+
+        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_CREATED));
+        if(error) return error;
+
+        error = gen_filesystem_path_delete(subpath, sizeof(subpath) - 1);
+        if(error) return error;
+
+        error = gen_filesystem_watcher_poll(&watcher, &event);
+        if(error) return error;
+
+        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_DELETED));
+        if(error) return error;
 
         error = gen_filesystem_path_delete(path, sizeof(path) - 1);
+        if(error) return error;
+
+        error = gen_filesystem_watcher_destroy(&watcher);
+        if(error) return error;
+
+        error = gen_filesystem_handle_close(&handle);
         if(error) return error;
     }
 

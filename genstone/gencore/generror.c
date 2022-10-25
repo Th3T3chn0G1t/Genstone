@@ -80,6 +80,7 @@ gen_error_type_t gen_error_type_from_errno(void) {
 		case EACCES: return GEN_ERROR_PERMISSION;
 		case EINVAL: return GEN_ERROR_INVALID_PARAMETER;
 		case EIO: return GEN_ERROR_IO;
+        case ESRCH: return GEN_ERROR_NO_SUCH_OBJECT;
 		case ELOOP: return GEN_ERROR_TOO_LONG;
 		case ENAMETOOLONG: return GEN_ERROR_TOO_LONG;
 		case ENOENT: return GEN_ERROR_NO_SUCH_OBJECT;

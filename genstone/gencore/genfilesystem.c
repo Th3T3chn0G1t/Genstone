@@ -471,7 +471,18 @@ gen_error_t* gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 	if(!out_list && !out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_list` and `out_length` were `NULL`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
+    // TODO: Add secondary type for watchers
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX
+    if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
+#else
+    #error No system library available for file watching
+#endif
+#else
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+    if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY && !(handle->type == GEN_FILESYSTEM_HANDLE_WATCHER && handle->directory_handle)) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
+#endif
+#endif
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
 	rewinddir(handle->directory_handle);
@@ -745,9 +756,13 @@ gen_error_t* gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restric
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %t", gen_error_description_from_errno());
 
 #if GEN_PLATFORM == GEN_OSX
-	if(!(watcher_stat.st_mtimespec.tv_sec == watcher->internal_stat_cached.st_mtimespec.tv_sec && watcher_stat.st_mtimespec.tv_nsec == watcher->internal_stat_cached.st_mtimespec.tv_nsec) || !(watcher_stat.st_ctimespec.tv_sec == watcher->internal_stat_cached.st_ctimespec.tv_sec && watcher_stat.st_ctimespec.tv_nsec == watcher->internal_stat_cached.st_ctimespec.tv_nsec)) {
+	if(    watcher_stat.st_mtimespec.tv_sec  != watcher->internal_stat_cached.st_mtimespec.tv_sec
+        || watcher_stat.st_mtimespec.tv_nsec != watcher->internal_stat_cached.st_mtimespec.tv_nsec
+        || watcher_stat.st_ctimespec.tv_sec  != watcher->internal_stat_cached.st_ctimespec.tv_sec
+        || watcher_stat.st_ctimespec.tv_nsec != watcher->internal_stat_cached.st_ctimespec.tv_nsec) {
 #else
-	if(watcher_stat.st_mtime != watcher->internal_stat_cached.st_mtime || watcher_stat.st_ctime != watcher->internal_stat_cached.st_ctime) {
+	if(    watcher_stat.st_mtime != watcher->internal_stat_cached.st_mtime
+        || watcher_stat.st_ctime != watcher->internal_stat_cached.st_ctime) {
 #endif
 		if(watcher->directory_handle) {
 			size_t items_length = 0;

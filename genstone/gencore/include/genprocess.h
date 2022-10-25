@@ -56,6 +56,14 @@ extern gen_error_t* gen_process_wait(const gen_process_t* const restrict process
 extern gen_error_t* gen_process_kill(const gen_process_t* const restrict process);
 
 /**
+ * Checks if a process is alive.
+ * @param[in] process The process to check.
+ * @param[out] out_alive A pointer to storage for the result of whether the process is alive.
+ * @return An error, otherwise `NULL`.
+ */
+extern gen_error_t* gen_process_check(const gen_process_t* const restrict process, bool* const restrict out_alive);
+
+/**
  * Gets a pointer to the current process' environment.
  * @param[out] out_environment A pointer to a pointer to a buffer of pointers to environment variables.
  * @param[out] out_length A pointer to storage for the length of the environment.

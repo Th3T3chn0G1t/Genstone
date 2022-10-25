@@ -204,7 +204,7 @@ gen_error_t* gen_string_character_first(const char* const restrict string, const
 	}
 #endif
 
-	*out_found = SIZE_MAX;
+	*out_found = GEN_STRING_NO_BOUNDS;
 	return NULL;
 }
 
@@ -339,7 +339,7 @@ static void gen_string_internal_format_number_base10_signed(const size_t len, ch
 	}
 	*offset += copied;
 }
-
+// TODO: Very important - review numeric literal params to format procs to ensure correct casting to avoid `%tz` bugs
 gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buffer, size_t* const restrict out_length, const char* const restrict format, const size_t format_length, va_list list) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_formatv, GEN_FILE_NAME);
 	if(error) return error;
@@ -540,6 +540,7 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 	return NULL;
 }
 
+// TODO: Output offset
 gen_error_t* gen_string_contains(const char* const restrict string, const size_t string_bounds, const char* const restrict target, const size_t target_bounds, const size_t limit, bool* const restrict out_contains) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_contains, GEN_FILE_NAME);
 	if(error) return error;
