@@ -79,4 +79,16 @@ extern gen_error_t* gen_memory_set(void* const restrict address, const size_t le
  */
 extern gen_error_t* gen_memory_copy(void* const restrict to, const size_t to_size, const void* const restrict from, const size_t from_size, const size_t limit);
 
+/**
+ * Compares two blocks of memory.
+ * @param[in] a The first block of memory to compare.
+ * @param[in] a_bounds The bounds of the first block of memory to compare.
+ * @param[in] b The second block of memory to compare.
+ * @param[in] b_bounds The bounds of the second block of memory to compare.
+ * @param[in] limit The number of bytes to compare.
+ * @param[out] out_equal A pointer to storage for the result of whether the two blocks are equal.
+ * @return An error, otherwise `NULL`.
+ */
+extern gen_error_t* gen_memory_compare(const void* const restrict a, const size_t a_bounds, const void* const restrict b, const size_t b_bounds, const size_t limit, bool* const restrict out_equal);
+
 #endif

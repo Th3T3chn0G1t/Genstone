@@ -155,3 +155,17 @@ gen_error_t* gen_memory_copy(void* const restrict to, const size_t to_size, cons
 
 	return NULL;
 }
+
+gen_error_t* gen_memory_compare(const void* const restrict a, const size_t a_bounds, const void* const restrict b, const size_t b_bounds, const size_t limit, bool* const restrict out_equal) {
+ 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_memory_compare, GEN_FILE_NAME);
+	if(error) return error;
+
+	if(!a) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`a` was `NULL`");
+	if(!b) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`b` was `NULL`");
+	if(limit > a_bounds) return gen_error_attach_backtrace(GEN_ERROR_OUT_OF_BOUNDS, GEN_LINE_NUMBER, "`limit` exceeded `a_bounds`");
+	if(limit > b_bounds) return gen_error_attach_backtrace(GEN_ERROR_OUT_OF_BOUNDS, GEN_LINE_NUMBER, "`limit` exceeded `b_bounds`");
+
+    *out_equal = !memcmp(a, b, limit);
+
+	return NULL;
+}

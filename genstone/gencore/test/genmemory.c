@@ -38,6 +38,19 @@ static gen_error_t* gen_main(void) {
     error = GEN_TESTS_EXPECT("AAAAAAAA", buff);
     if(error) return error;
 
+    bool equal = false;
+    error = gen_memory_compare("AAAAAAAA", sizeof("AAAAAAAA"), buff, 9, 9, &equal);
+    if(error) return error;
+
+    error = GEN_TESTS_EXPECT(true, equal);
+    if(error) return error;
+
+    error = gen_memory_compare("BBAAAAAA", sizeof("BBAAAAAA"), buff, 9, 9, &equal);
+    if(error) return error;
+
+    error = GEN_TESTS_EXPECT(false, equal);
+    if(error) return error;
+
     error = gen_memory_free((void**) &buff);
     if(error) return error;
 

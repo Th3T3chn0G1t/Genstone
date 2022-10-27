@@ -48,7 +48,7 @@ GEN_CORE_TEST_SOURCES = $(wildcard $(GENSTONE_DIR)/genstone/gencore/test/*.c)
 GEN_CORE_TEST_OBJECTS = $(GEN_CORE_TEST_SOURCES:.c=$(OBJECT_SUFFIX))
 GEN_CORE_TEST_EXEC = $(GENSTONE_DIR)/genstone/gencore/test/gencore_test$(EXECUTABLE_SUFFIX)
 
-.PHONY: gencore
+.PHONY: test_gencore
 test_gencore: $(GEN_CORE_TEST_EXEC)
 	@$(ECHO) "$(ACTION_PREFIX)$(GEN_CORE_TEST_EXEC)$(ACTION_SUFFIX)"
 	@$(GEN_CORE_TEST_EXEC)
