@@ -277,7 +277,7 @@ gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restr
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_file_handle)
 	gen_filesystem_file_handle_t* file_handle_scope_variable = &fd;
 
-    out_handle->type = GEN_FILESYSTEM_HANDLE_FILE;
+    out_handle->type = GEN_FILESYSTEM_HANDLE_ANONYMOUS;
     out_handle->file_handle = fd;
 
     // Prevent error-cleanup
@@ -292,7 +292,7 @@ gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restr
     int result = unlink("__genstone_anon_file");
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
 
-    out_handle->type = GEN_FILESYSTEM_HANDLE_FILE;
+    out_handle->type = GEN_FILESYSTEM_HANDLE_ANONYMOUS;
     out_handle->file_handle = fd;
 
     // Prevent error-cleanup
@@ -388,7 +388,7 @@ gen_error_t* gen_filesystem_handle_file_size(gen_filesystem_handle_t* const rest
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 	if(!out_size) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_size` was `NULL`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE && handle->type != GEN_FILESYSTEM_HANDLE_ANONYMOUS) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
 	off_t offset = lseek(handle->file_handle, 0, SEEK_END);
@@ -411,7 +411,7 @@ gen_error_t* gen_filesystem_handle_file_read(gen_filesystem_handle_t* const rest
 	if(!out_buffer) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`output_buffer` was `NULL`");
 	if(start > end) return gen_error_attach_backtrace(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "`start` > `end`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE && handle->type != GEN_FILESYSTEM_HANDLE_ANONYMOUS) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
     if(start == end) {
         return NULL;
@@ -438,7 +438,7 @@ gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const res
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 	if(!buffer) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`buffer` was `NULL`");
 
-	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
+	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE && handle->type != GEN_FILESYSTEM_HANDLE_ANONYMOUS) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
 	if(!buffer_size) return NULL;
 
@@ -572,6 +572,7 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 
 	if(!out_watcher) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_watcher` was `NULL`");
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
+    if(handle->type == GEN_FILESYSTEM_HANDLE_ANONYMOUS) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was an anonymous file");
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
 	error = gen_threads_mutex_create(&out_watcher->lock);
@@ -634,6 +635,9 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 #else
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
 	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
+
+    // TODO: Why is this neccesary?
+    GEN_UNUSED volatile int x = handle->file_handle;
 
 	int result = fcntl(handle->file_handle, F_DUPFD);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %t", gen_error_description_from_errno());

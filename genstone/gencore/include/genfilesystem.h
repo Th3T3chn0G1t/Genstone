@@ -110,7 +110,12 @@ typedef enum {
     /**
      * A watcher.
      */
-    GEN_FILESYSTEM_HANDLE_WATCHER
+    GEN_FILESYSTEM_HANDLE_WATCHER,
+
+    /**
+     * An anonymous file.
+     */
+    GEN_FILESYSTEM_HANDLE_ANONYMOUS
 } gen_filesystem_handle_type_t;
 
 /**

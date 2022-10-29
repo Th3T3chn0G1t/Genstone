@@ -160,7 +160,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_handle_open_anonymous(&handle);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT((uintmax_t) GEN_FILESYSTEM_HANDLE_FILE, handle.type);
+        error = GEN_TESTS_EXPECT((uintmax_t) GEN_FILESYSTEM_HANDLE_ANONYMOUS, handle.type);
         if(error) return error;
 
         error = gen_filesystem_test_file_handle(&handle);

@@ -28,12 +28,12 @@ typedef struct {
 extern gen_tests_unit_t gen_tests_list[GEN_TESTS_MAX];
 extern const char* gen_tests_name;
 
-extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str);
-extern gen_error_t* gen_tests_expect_numeric(const uintmax_t a, const char* const restrict a_str, const uintmax_t b, const char* const restrict b_str);
-extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str);
-extern gen_error_t* gen_tests_expect_double(const double a, const char* const restrict a_str, const double b, const char* const restrict b_str);
-extern gen_error_t* gen_tests_expect_long_double(const long double a, const char* const restrict a_str, const long double b, const char* const restrict b_str);
-extern gen_error_t* gen_tests_expect_string(const char* const restrict a, const char* const restrict a_str, const char* const restrict b, const char* const restrict b_str);
+extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str, const char* const restrict file, const size_t line);
+extern gen_error_t* gen_tests_expect_numeric(const uintmax_t a, const char* const restrict a_str, const uintmax_t b, const char* const restrict b_str, const char* const restrict file, const size_t line);
+extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str, const char* const restrict file, const size_t line);
+extern gen_error_t* gen_tests_expect_double(const double a, const char* const restrict a_str, const double b, const char* const restrict b_str, const char* const restrict file, const size_t line);
+extern gen_error_t* gen_tests_expect_long_double(const long double a, const char* const restrict a_str, const long double b, const char* const restrict b_str, const char* const restrict file, const size_t line);
+extern gen_error_t* gen_tests_expect_string(const char* const restrict a, const char* const restrict a_str, const char* const restrict b, const char* const restrict b_str, const char* const restrict file, const size_t line);
 
 #define GEN_TESTS_EXPECT(a, b) \
     GEN_GENERIC(a, \
@@ -44,7 +44,7 @@ extern gen_error_t* gen_tests_expect_string(const char* const restrict a, const 
         double : gen_tests_expect_double, \
         long double : gen_tests_expect_long_double, \
         default : gen_tests_expect_numeric \
-    ) (a, #a, b, #b)
+    ) (a, #a, b, #b, GEN_FILE_NAME, GEN_LINE_NUMBER)
 
 #ifndef GEN_TESTS_DISABLE
 static gen_error_t* gen_main(void);
