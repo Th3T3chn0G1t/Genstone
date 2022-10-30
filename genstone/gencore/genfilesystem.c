@@ -10,7 +10,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 #include <fcntl.h>
 #include <limits.h>
 #include <poll.h>
@@ -42,7 +42,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_p
 GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_fd(gen_filesystem_file_handle_t** file_handle) {
 	if(!*file_handle) return;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	if(**file_handle == -1) return;
 
 	int result = close(**file_handle);
@@ -62,7 +62,7 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
 	if(!out_canonical && !out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "Both `out_canonical` and `out_length` were `NULL`");
 	if(path_length != GEN_STRING_NO_BOUNDS && path[path_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`path` was not NULL-terminated");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
@@ -132,7 +132,7 @@ gen_error_t* gen_filesystem_path_exists(const char* const restrict path, const s
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	const int result = access(path, F_OK);
 	if(result == -1 && errno != ENOENT) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not check whether path `%tz` exists: %t", path, path_length, gen_error_description_from_errno());
 
@@ -152,7 +152,7 @@ gen_error_t* gen_filesystem_path_validate(const char* const restrict path, const
     if(path_length == GEN_STRING_NO_BOUNDS) return NULL;
 
 	if(path_length == 0) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_SHORT, GEN_LINE_NUMBER, "Path `%tz` was too short", path, path_length);
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     long value = pathconf("/", _PC_NAME_MAX);
     if(value == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not validate path `%tz`: %t", gen_error_description_from_errno());
 
@@ -176,7 +176,7 @@ gen_error_t* gen_filesystem_path_create_file(const char* const restrict path, co
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = open(path, O_RDWR | O_CREAT, 0777);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file at path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 	result = close(result);
@@ -196,7 +196,7 @@ gen_error_t* gen_filesystem_path_create_directory(const char* const restrict pat
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = mkdir(path, 0777);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create directory at path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 #endif
@@ -214,7 +214,7 @@ gen_error_t* gen_filesystem_path_delete(const char* const restrict path, const s
 	error = gen_filesystem_path_validate(path, path_length);
 	if(error) return error;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = rmdir(path);
 	if(result == -1 && errno != ENOTDIR) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not remove path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
@@ -240,7 +240,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_lock(ge
 GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_file_handle(gen_filesystem_file_handle_t** file_handle) {
 	if(!*file_handle) return;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	if(**file_handle == -1) return;
 
 	int result = close(**file_handle);
@@ -255,7 +255,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_file_ha
 GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_directory_handle(gen_filesystem_directory_handle_t** directory_handle) {
 	if(!*directory_handle) return;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = closedir(**directory_handle);
 	if(result == -1) {
 		gen_error_t* error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %t", gen_error_description_from_errno());
@@ -289,7 +289,7 @@ gen_error_t* gen_filesystem_handle_open_anonymous(gen_filesystem_handle_t* restr
 
     // Prevent error-cleanup
     file_handle_scope_variable = NULL;
-#elif GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_LINUX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#elif GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_LINUX || GEN_FORCE_UNIX == GEN_ENABLED
 	gen_filesystem_file_handle_t fd = open("__genstone_anon_file", O_CREAT | O_RDWR, 0777);
 	if(fd == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle for an anonymous file: %t", gen_error_description_from_errno());
 
@@ -327,7 +327,7 @@ gen_error_t* gen_filesystem_handle_open(const char* const restrict path, const s
 	GEN_CLEANUP_FUNCTION(gen_filesystem_internal_handle_open_cleanup_lock)
 	gen_threads_mutex_t* lock_scope_variable = &out_handle->lock;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	gen_filesystem_file_handle_t fd = open(path, O_DIRECTORY | O_RDONLY);
 	if(fd == -1 && errno != ENOTDIR) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
@@ -371,7 +371,7 @@ gen_error_t* gen_filesystem_handle_close(gen_filesystem_handle_t* const restrict
 
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	if(handle->type == GEN_FILESYSTEM_HANDLE_DIRECTORY) {
 		int result = closedir(handle->directory_handle);
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not close filesystem handle: %t", gen_error_description_from_errno());
@@ -397,7 +397,7 @@ gen_error_t* gen_filesystem_handle_file_size(gen_filesystem_handle_t* const rest
 
 	if(handle->type != GEN_FILESYSTEM_HANDLE_FILE && handle->type != GEN_FILESYSTEM_HANDLE_ANONYMOUS) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a file");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	off_t offset = lseek(handle->file_handle, 0, SEEK_END);
 	if(offset == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not get file size: %t", gen_error_description_from_errno());
 
@@ -424,7 +424,7 @@ gen_error_t* gen_filesystem_handle_file_read(gen_filesystem_handle_t* const rest
         return NULL;
     }
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	if(handle->file_handle <= STDERR_FILENO) {
         ssize_t result = read(handle->file_handle, out_buffer, (size_t) (end - start));
         if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not read file: %t", gen_error_description_from_errno());
@@ -449,7 +449,7 @@ gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const res
 
 	if(!buffer_size) return NULL;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	if(handle->file_handle <= STDERR_FILENO) {
 		ssize_t result = write(handle->file_handle, buffer, buffer_size);
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not write file: %t", gen_error_description_from_errno());
@@ -486,12 +486,12 @@ gen_error_t* gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const
     #error No system library available for file watching
 #endif
 #else
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY && !(handle->type == GEN_FILESYSTEM_HANDLE_WATCHER && handle->directory_handle)) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
 #endif
 #endif
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	rewinddir(handle->directory_handle);
 
 	size_t entries_length = 0;
@@ -545,7 +545,7 @@ gen_error_t* gen_filesystem_handle_lock(gen_filesystem_handle_t* const restrict 
 
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	error = gen_threads_mutex_lock(&handle->lock);
 	if(error) return error;
 
@@ -562,7 +562,7 @@ gen_error_t* gen_filesystem_handle_unlock(gen_filesystem_handle_t* const restric
 
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	error = gen_threads_mutex_unlock(&handle->lock);
 	if(error) return error;
 
@@ -581,7 +581,7 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 	if(!handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`handle` was `NULL`");
     if(handle->type == GEN_FILESYSTEM_HANDLE_ANONYMOUS) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was an anonymous file");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	error = gen_threads_mutex_create(&out_watcher->lock);
 	if(error) return error;
 
@@ -640,7 +640,7 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 #error No system library available for file watching
 #endif
 #else
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
 	int result = fcntl(handle->file_handle, F_DUPFD);
@@ -758,7 +758,7 @@ gen_error_t* gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restric
 #error No system library available for file watching
 #endif
 #else
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	struct stat watcher_stat = {0};
 	int result = fstat(watcher->file_handle, &watcher_stat);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %t", gen_error_description_from_errno());

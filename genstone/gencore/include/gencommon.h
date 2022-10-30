@@ -113,13 +113,20 @@
  */
 #define GEN_MAXIMUM(a, b) ((a) > (b) ? (a) : (b))
 
+#ifndef GEN_FORCE_UNIX
+/**
+ * Forces genstone backends to use Unix-compatible APIs.
+ */
+#define GEN_FORCE_UNIX GEN_DISABLED
+#endif
+
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdalign.h>
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 #include <sys/types.h>
 #else
 typedef long ssize_t;

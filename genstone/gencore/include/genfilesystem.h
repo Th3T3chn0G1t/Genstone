@@ -12,16 +12,9 @@
 #include "gencommon.h"
 #include "genthreads.h"
 
-#ifndef GEN_FILESYSTEM_FORCE_UNIX
-/**
- * Forces the `genfilesystem` backend to use Unix-compatible APIs.
- */
-#define GEN_FILESYSTEM_FORCE_UNIX GEN_DISABLED
-#endif
-
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -40,7 +33,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #endif
 #endif
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 /**
  * The maximum size of a directory listing.
  */
@@ -78,7 +71,7 @@ typedef enum
     GEN_FILESYSTEM_WATCHER_EVENT_MOVED = 1 << 4
 } gen_filesystem_watcher_event_t;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 /**
  * The native file handle type.
  */
@@ -144,7 +137,7 @@ typedef struct {
     gen_threads_mutex_t lock;
 
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     /**
      * Internal caching of `stat` for file watching.
      */
@@ -163,7 +156,7 @@ typedef struct {
  */
 typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 /**
  * `gen_filesystem_handle_t` wrapper for stdin.
  */

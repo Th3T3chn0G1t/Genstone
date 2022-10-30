@@ -8,7 +8,7 @@
 
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 #include <spawn.h>
 #include <sys/fcntl.h>
 #include <sys/wait.h>
@@ -45,8 +45,6 @@ static void gen_process_internal_create_with_redirect_cleanup_arguments_copy(cha
     }
 }
 
-// TODO: Take environment lengths and argument lengths
-// TODO: Take const-qualified environment
 gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, const char* const restrict * const restrict environment, const size_t* const restrict environment_lengths, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_canonicalize, GEN_FILE_NAME);
 	if(error) return error;
@@ -62,7 +60,7 @@ gen_error_t* gen_process_create_with_redirect(const char* const restrict executa
  	error = gen_filesystem_path_validate(executable_path, executable_path_length);
 	if(error) return error;
     
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     posix_spawn_file_actions_t actions = {0};
 
     int result = posix_spawn_file_actions_init(&actions);
@@ -118,7 +116,7 @@ gen_error_t* gen_process_wait(const gen_process_t* const restrict process, int* 
 	if(!process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`process` was `NULL`");
 	if(!out_exitcode) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_exitcode` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     int status = 0;
     gen_process_t result = waitpid(*process, &status, 0);
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not await process %uz: %t", *process, gen_error_description_from_errno());
@@ -135,7 +133,7 @@ gen_error_t* gen_process_kill(const gen_process_t* const restrict process) {
 
 	if(!process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`process` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     int result = kill(*process, SIGKILL);
     if(result == -1 && errno == ESRCH) return NULL;
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not kill process %uz: %t", *process, gen_error_description_from_errno());
@@ -151,7 +149,7 @@ gen_error_t* gen_process_check(const gen_process_t* const restrict process, bool
 	if(!process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`process` was `NULL`");
 	if(!out_alive) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_alive` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     int result = kill(*process, 0);
     if(result == -1 && errno == ESRCH) {
         *out_alive = false;
@@ -165,8 +163,7 @@ gen_error_t* gen_process_check(const gen_process_t* const restrict process, bool
     return NULL;
 }
 
-// TODO: Add "Force Unix" mode everywhere - not just genfilesystem
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 extern char** environ;
 #endif
 
@@ -178,7 +175,7 @@ gen_error_t* gen_process_get_environment(char*** const restrict out_environment,
 	if(!out_environment) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_environment` was `NULL`");
 	if(!out_length) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_length` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     *out_environment = environ;
 
     for(*out_length = 0; (*out_environment)[*out_length]; ++*out_length);

@@ -7,7 +7,7 @@
 #include "include/genstring.h"
 #include "include/genthreads.h"
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
@@ -75,7 +75,7 @@ const char* gen_error_type_description(const gen_error_type_t error) {
 }
 
 gen_error_type_t gen_error_type_from_errno(void) {
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
 	switch(errno) {
 		case EACCES: return GEN_ERROR_PERMISSION;
 		case EINVAL: return GEN_ERROR_INVALID_PARAMETER;
@@ -108,7 +108,7 @@ gen_error_type_t gen_error_type_from_errno(void) {
 }
 
 const char* gen_error_description_from_errno(void) {
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
 	return strerror(errno); // This is okay over `strerror_r` as the only thread-unsafe case is
 		// Where the supplied `errno` value is outside of `errno`'s accepted
 		// Range - which we can presume will never be relevant to us

@@ -9,7 +9,7 @@ gen_error_t* gen_threads_mutex_create(gen_threads_mutex_t* const restrict out_mu
 
     if(!out_mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_mutex` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = pthread_mutex_init(out_mutex, NULL);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create mutex: %t", gen_error_description_from_errno());
 #endif
@@ -23,7 +23,7 @@ gen_error_t* gen_threads_mutex_destroy(gen_threads_mutex_t* const restrict mutex
 
     if(!mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`mutex` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = pthread_mutex_destroy(mutex);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not destroy mutex: %t", gen_error_description_from_errno());
 #endif
@@ -63,7 +63,7 @@ gen_error_t* gen_threads_mutex_lock(gen_threads_mutex_t* const restrict mutex) {
 
     if(!mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`mutex` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = pthread_mutex_lock(mutex);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not lock mutex: %t", gen_error_description_from_errno());
 #endif
@@ -77,7 +77,7 @@ gen_error_t* gen_threads_mutex_unlock(gen_threads_mutex_t* const restrict mutex)
 
     if(!mutex) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`mutex` was `NULL`");
 
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX
+#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = pthread_mutex_unlock(mutex);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not lock mutex: %t", gen_error_description_from_errno());
 #endif

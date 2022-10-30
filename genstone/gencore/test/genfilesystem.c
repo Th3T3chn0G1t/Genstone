@@ -256,7 +256,7 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
 // TODO: Fix `delete-self` check on other platforms
-#if GEN_PLATFORM == GEN_LINUX && GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED && GEN_FILESYSTEM_FORCE_UNIX == GEN_DISABLED
+#if GEN_PLATFORM == GEN_LINUX && GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED && GEN_FORCE_UNIX == GEN_DISABLED
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
