@@ -158,8 +158,6 @@ typedef struct {
 #endif
 } gen_filesystem_handle_t;
 
-// TODO: Generate an error when trying to create a watcher for a virtual/anonymous file
-
 /**
  * Handle to a filesystem watcher.
  */
