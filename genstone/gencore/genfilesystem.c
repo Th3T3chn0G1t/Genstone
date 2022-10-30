@@ -90,14 +90,15 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 #elif GEN_PLATFORM == GEN_LINUX
     struct rlimit limit = {0};
-    int result = getrlimit(RLIMIT_NOFILE, &rlimit)
+    int result = getrlimit(RLIMIT_NOFILE, &rlimit);
 
     char* fdpath = NULL;
-    error = gen_memory_allocate_zeroed((void**) &fdpath, sizeof("/proc/self/fd/") + limit.rlim_cur, sizeof(char));
+    size_t fdpath_size = sizeof("/proc/self/fd/") + limit.rlim_cur;
+    error = gen_memory_allocate_zeroed((void**) &fdpath, fdpath_size, sizeof(char));
     if(error) return error;
     GEN_CLEANUP_FUNCTION(gen_filesystem_internal_path_canonicalize_cleanup_path) GEN_UNUSED char* fdpath_scope_var = NULL;
 
-    error = gen_string_format(sizeof(fdpath), fdpath, NULL, "/proc/self/fd/%si", sizeof("/proc/self/fd/%si") - 1, fd);
+    error = gen_string_format(fdpath_size, fdpath, NULL, "/proc/self/fd/%si", sizeof("/proc/self/fd/%si") - 1, fd);
     if(error) return error;
 
     ssize_t readlink_result = readlink(fdpath, canonicalized, (size_t) (value + 1));
