@@ -47,13 +47,15 @@ static void gen_process_internal_create_with_redirect_cleanup_arguments_copy(cha
 
 // TODO: Take environment lengths and argument lengths
 // TODO: Take const-qualified environment
-gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t arguments_length, char** const restrict environment, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process) {
+gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, const char* const restrict * const restrict environment, const size_t* const restrict environment_lengths, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_canonicalize, GEN_FILE_NAME);
 	if(error) return error;
 
 	if(!executable_path) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`executable_path` was `NULL`");
-	if(!arguments) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`arguments` was `NULL`");
-	if(!environment) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`environment` was `NULL`");
+	if(arguments_length && !arguments) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`arguments` was `NULL`");
+	if(arguments_length && !argument_lengths) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`argument_lengths` was `NULL`");
+	if(environment_length && !environment) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`environment` was `NULL`");
+	if(environment_length && !environment_lengths) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`environment_lengths` was `NULL`");
 	if(!filesystem_handle) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`filesystem_handle` was `NULL`");
 	if(!out_process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_process` was `NULL`");
 
@@ -84,7 +86,7 @@ gen_error_t* gen_process_create_with_redirect(const char* const restrict executa
     executable_path_copy = NULL;
 
     for(size_t i = 0; i < arguments_length; ++i) {
-        error = gen_string_duplicate(arguments[i], GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &arguments_copy[i + 1], NULL);
+        error = gen_string_duplicate(arguments[i], argument_lengths[i], GEN_STRING_NO_BOUNDS, &arguments_copy[i + 1], NULL);
         if(error) return error;
     }
 
@@ -94,7 +96,7 @@ gen_error_t* gen_process_create_with_redirect(const char* const restrict executa
         if(error) return error;
 
         for(size_t i = 0; i < environment_length; ++i) {
-            error = gen_string_duplicate(environment[i], GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &environment_copy[i], NULL);
+            error = gen_string_duplicate(environment[i], environment_lengths[i], GEN_STRING_NO_BOUNDS, &environment_copy[i], NULL);
             if(error) return error;
         }
     }

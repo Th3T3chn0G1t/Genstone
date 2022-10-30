@@ -16,7 +16,7 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
         gen_process_t process = {0};
-        error = gen_process_create_with_redirect("echo", sizeof("echo") - 1, (const char*[]) {"-n", "Hello, world!"}, 2, (char*[]) {0}, 0, &handle, &process);
+        error = gen_process_create_with_redirect("echo", sizeof("echo") - 1, (const char*[]) {"-n", "Hello, world!"}, (const size_t[]) {sizeof("-n"), sizeof("Hello, world!")}, 2, NULL, NULL, 0, &handle, &process);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(false, process == 0);
@@ -50,7 +50,7 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
         gen_process_t process = {0};
-        error = gen_process_create_with_redirect("sleep", sizeof("sleep") - 1, (const char*[]) {"100"}, 1, (char*[]) {0}, 0, &handle, &process);
+        error = gen_process_create_with_redirect("sleep", sizeof("sleep") - 1, (const char*[]) {"100"}, (const size_t[]) {sizeof("100")}, 1, NULL, NULL, 0, &handle, &process);
         if(error) return error;
 
         error = gen_process_kill(&process);

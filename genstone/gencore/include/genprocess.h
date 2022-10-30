@@ -31,14 +31,16 @@ typedef pid_t gen_process_t;
  * @param[in] executable_path The path to the executable to create the process with. May be taken as a suffix to `PATH`.
  * @param[in] executable_path_length The length of the path to the executable to create the process with.
  * @param[in] arguments The arguments to pass to the created process.
+ * @param[in] argument_lengths The length of each argument to pass to the created process.
  * @param[in] arguments_length The length of the list of arguments to pass to the created process.
  * @param[in] environment The list of environment variables to pass to the created process.
+ * @param[in] environment_lengths The length of each environment variable to pass to the created process.
  * @param[in] environment_length The length of the list of environment variables to pass to the created process.
  * @param[in,out] filesystem_handle The filesystem handle to redirect output to.
  * @param[out] out_process A pointer to storage for a handle to the created process.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t arguments_length, char** const restrict environment, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
+extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, const char* const restrict * const restrict environment, const size_t* const restrict environment_lengths, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
 
 /**
  * Blocks the current thread until the specified process exits.

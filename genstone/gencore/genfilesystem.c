@@ -643,9 +643,6 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FILESYSTEM_FORCE_UNIX == GEN_ENABLED
 	out_watcher->type = GEN_FILESYSTEM_HANDLE_WATCHER;
 
-    // TODO: Why is this neccesary?
-    GEN_UNUSED volatile int x = handle->file_handle;
-
 	int result = fcntl(handle->file_handle, F_DUPFD);
 	if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not create file watcher: %t", gen_error_description_from_errno());
 
