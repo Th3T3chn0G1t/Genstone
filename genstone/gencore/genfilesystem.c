@@ -91,6 +91,7 @@ gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, c
 #elif GEN_PLATFORM == GEN_LINUX
     struct rlimit limit = {0};
     int result = getrlimit(RLIMIT_NOFILE, &limit);
+    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path `%tz`: %t", path, path_length, gen_error_description_from_errno());
 
     char* fdpath = NULL;
     size_t fdpath_size = sizeof("/proc/self/fd/") + limit.rlim_cur;
