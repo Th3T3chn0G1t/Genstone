@@ -15,7 +15,9 @@ gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* 
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_tests_expect_numeric, GEN_FILE_NAME);
     if(error) return error;
 
-    return gen_tests_expect_numeric((uintmax_t) a, a_str, (uintmax_t) b, b_str, file, line);
+    if(a != b) return gen_error_attach_backtrace_formatted(GEN_ERROR_DOES_NOT_MATCH, GEN_LINE_NUMBER, "`%t` (%p) != `%t` (%p) at %t:%uz", a_str, a, b_str, b, file, line);
+
+    return NULL;
 }
 
 gen_error_t* gen_tests_expect_numeric(const uintmax_t a, const char* const restrict a_str, const uintmax_t b, const char* const restrict b_str, const char* const restrict file, const size_t line) {
