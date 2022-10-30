@@ -119,7 +119,7 @@ gen_error_t* gen_process_wait(const gen_process_t* const restrict process, int* 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     int status = 0;
     gen_process_t result = waitpid(*process, &status, 0);
-    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not await process %uz: %t", *process, gen_error_description_from_errno());
+    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not await process %uz: %t", (size_t) *process, gen_error_description_from_errno());
 
     *out_exitcode = WEXITSTATUS(status);
 #endif
@@ -136,7 +136,7 @@ gen_error_t* gen_process_kill(const gen_process_t* const restrict process) {
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     int result = kill(*process, SIGKILL);
     if(result == -1 && errno == ESRCH) return NULL;
-    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not kill process %uz: %t", *process, gen_error_description_from_errno());
+    if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not kill process %uz: %t", (size_t) *process, gen_error_description_from_errno());
 #endif
 
     return NULL;
@@ -155,7 +155,7 @@ gen_error_t* gen_process_check(const gen_process_t* const restrict process, bool
         *out_alive = false;
         return NULL;
     }
-    else if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not check process %uz: %t", *process, gen_error_description_from_errno());
+    else if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not check process %uz: %t", (size_t) *process, gen_error_description_from_errno());
 
     *out_alive = true;
 #endif

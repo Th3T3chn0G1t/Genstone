@@ -28,6 +28,9 @@ typedef struct {
 extern gen_tests_unit_t gen_tests_list[GEN_TESTS_MAX];
 extern const char* gen_tests_name;
 
+// TODO: Promotion into numeric seems to be the issue here
+// TODO: GEN_TESTS_EXPECT_BLOCK
+
 extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str, const char* const restrict file, const size_t line);
 extern gen_error_t* gen_tests_expect_numeric(const uintmax_t a, const char* const restrict a_str, const uintmax_t b, const char* const restrict b_str, const char* const restrict file, const size_t line);
 extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str, const char* const restrict file, const size_t line);
@@ -55,7 +58,7 @@ GEN_INITIALIZER static void gen_tests_internal_register_test(void) {
     size_t i = 0;
     for(; gen_tests_list[i].present; ++i);
     if(i >= GEN_TESTS_MAX) {
-        gen_log_formatted(GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME, "Number of tests exceeded maximum of %uz", GEN_TESTS_MAX);
+        gen_log_formatted(GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME, "Number of tests exceeded maximum of %uz", (size_t) GEN_TESTS_MAX);
         gen_error_abort();
     }
 

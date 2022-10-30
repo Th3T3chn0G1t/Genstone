@@ -129,14 +129,14 @@ static gen_error_t* gen_main(void) {
 
     {
         size_t length = 0;
-        error = gen_string_format(GEN_STRING_NO_BOUNDS, NULL, &length, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, 3, "AAAA", "BBXX", (size_t) 2);
+        error = gen_string_format(GEN_STRING_NO_BOUNDS, NULL, &length, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, (size_t) 3, "AAAA", "BBXX", (size_t) 2);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(13, length);
         if(error) return error;
 
         char buffer[14] = {0};
-        error = gen_string_format(GEN_STRING_NO_BOUNDS, buffer, NULL, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, 3, "AAAA", "BBXX", (size_t) 2);
+        error = gen_string_format(GEN_STRING_NO_BOUNDS, buffer, NULL, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, (size_t) 3, "AAAA", "BBXX", (size_t) 2);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT("ABC 3 AAAA BB", buffer);
@@ -145,13 +145,17 @@ static gen_error_t* gen_main(void) {
 
     {
         bool contains = false;
-        error = gen_string_contains("AAAB", sizeof("AAAB"), "AB", sizeof("AB"), GEN_STRING_NO_BOUNDS, &contains);
+        size_t offset = 0;
+        error = gen_string_contains("AAAB", sizeof("AAAB"), "AB", sizeof("AB"), GEN_STRING_NO_BOUNDS, &contains, &offset);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(true, contains);
         if(error) return error;
 
-        error = gen_string_contains("AAAA", sizeof("AAAA"), "AB", sizeof("AB"), GEN_STRING_NO_BOUNDS, &contains);
+        error = GEN_TESTS_EXPECT(2, offset);
+        if(error) return error;
+        
+        error = gen_string_contains("AAAA", sizeof("AAAA"), "AB", sizeof("AB"), GEN_STRING_NO_BOUNDS, &contains, &offset);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(false, contains);

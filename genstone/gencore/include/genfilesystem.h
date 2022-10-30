@@ -36,6 +36,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 /**
  * The maximum size of a directory listing.
+ * TODO: Replace with fetcher for path limitations
  */
 #define GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX (sizeof(((struct dirent*) NULL)->d_name))
 #endif
@@ -135,6 +136,8 @@ typedef struct {
      * Structure access and operation lock.
      */
     gen_threads_mutex_t lock;
+
+    // TODO: Filesystem context struct w/ settings
 
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
@@ -269,6 +272,8 @@ extern gen_error_t* gen_filesystem_handle_close(gen_filesystem_handle_t* const r
  * @return An error, otherwise `NULL`.
  */
 extern gen_error_t* gen_filesystem_handle_file_size(gen_filesystem_handle_t* const restrict handle, size_t* const restrict out_size);
+
+// TODO: R/W retry timeouts
 
 /**
  * Reads a file's content.

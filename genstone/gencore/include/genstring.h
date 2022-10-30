@@ -134,14 +134,15 @@ extern gen_error_t* gen_string_formatv(const size_t limit, char* const restrict 
 
 /**
  * Searches a string for another string.
- * @param string The string to search in.
- * @param string_bounds The bounds of the string to search in.
- * @param target The string to search for.
- * @param target_bounds The bounds of the string to search for.
- * @param limit The maximum number of characters to search in.
- * @param out_contains A pointer to storage for the result of the search.
+ * @param[in] string The string to search in.
+ * @param[in] string_bounds The bounds of the string to search in.
+ * @param[in] target The string to search for.
+ * @param[in] target_bounds The bounds of the string to search for.
+ * @param[in] limit The maximum number of characters to search in.
+ * @param[out] out_contains A pointer to storage for the result of the search.
+ * @param[out] out_offset A pointer to storage for the offset of the string from the search, if found.
  * @return An error, otherwise `NULL`.
  */
-extern gen_error_t* gen_string_contains(const char* const restrict string, const size_t string_bounds, const char* const restrict target, const size_t target_bounds, const size_t limit, bool* const restrict out_contains);
+extern gen_error_t* gen_string_contains(const char* const restrict string, const size_t string_bounds, const char* const restrict target, const size_t target_bounds, const size_t limit, bool* const restrict out_contains, size_t* const restrict out_offset);
 
 #endif

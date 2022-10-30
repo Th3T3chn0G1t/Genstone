@@ -339,7 +339,7 @@ static void gen_string_internal_format_number_base10_signed(const size_t len, ch
 	}
 	*offset += copied;
 }
-// TODO: Very important - review numeric literal params to format procs to ensure correct casting to avoid `%tz` bugs
+
 gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buffer, size_t* const restrict out_length, const char* const restrict format, const size_t format_length, va_list list) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_formatv, GEN_FILE_NAME);
 	if(error) return error;
@@ -540,14 +540,12 @@ gen_error_t* gen_string_formatv(const size_t limit, char* const restrict out_buf
 	return NULL;
 }
 
-// TODO: Output offset
-gen_error_t* gen_string_contains(const char* const restrict string, const size_t string_bounds, const char* const restrict target, const size_t target_bounds, const size_t limit, bool* const restrict out_contains) {
+gen_error_t* gen_string_contains(const char* const restrict string, const size_t string_bounds, const char* const restrict target, const size_t target_bounds, const size_t limit, bool* const restrict out_contains, size_t* const restrict out_offset) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_string_contains, GEN_FILE_NAME);
 	if(error) return error;
 
     if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
     if(!target) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`target` was `NULL`");
-    if(!out_contains) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_contains` was `NULL`");
 
     size_t target_length = 0;
     error = gen_string_length(target, target_bounds, GEN_STRING_NO_BOUNDS, &target_length);
@@ -563,12 +561,13 @@ gen_error_t* gen_string_contains(const char* const restrict string, const size_t
         if(error) return error;
 
         if(equal) {
-            *out_contains = true;
+            if(out_contains) *out_contains = true;
+            if(out_offset) *out_offset = i;
             return NULL;
         }
     }
 
-    *out_contains = false;
+    if(out_contains) *out_contains = false;
 
     return NULL;
 }
