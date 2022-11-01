@@ -159,21 +159,28 @@ typedef struct {
  */
 typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
 
+
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
+#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_DISABLED
 /**
  * `gen_filesystem_handle_t` wrapper for stdin.
  */
-#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDIN_FILENO, NULL})
+#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDIN_FILENO, NULL, {0}, {0}, 0})
 
 /**
  * `gen_filesystem_handle_t` wrapper for stdout.
  */
-#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDOUT_FILENO, NULL})
+#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDOUT_FILENO, NULL, {0}, {0}, 0})
 
 /**
  * `gen_filesystem_handle_t` wrapper for stderr.
  */
+#define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDERR_FILENO, NULL, {0}, {0}, 0})
+#else
+#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDIN_FILENO, NULL})
+#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDOUT_FILENO, NULL})
 #define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, STDERR_FILENO, NULL})
+#endif
 #else
 /**
  * `gen_filesystem_handle_t` wrapper for stdin.

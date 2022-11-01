@@ -5,16 +5,11 @@ GEN_CORE_DIAGNOSTIC_CFLAGS = -Werror -Weverything
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings -Wno-gnu-conditional-omitted-operand
-GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-missing-field-initializers # TODO: This might be desirable for genfx/vk
 
 GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
 GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
 
-# TODO: Sort out sanitizer flag mess
-ifeq ($(SANITIZERS),ENABLED)
-	GEN_CORE_INTERNAL_CFLAGS += -fsanitize=undefined,address,cfi
-	GEN_CORE_INTERNAL_LFLAGS += -fsanitize=undefined,address,cfi
-endif
+GEN_CORE_SANITIZERS = undefined,address,cfi
 
 ifeq ($(PLATFORM),LINUX)
 	GEN_CORE_COMMON_LFLAGS += -lpthread
@@ -39,6 +34,7 @@ GEN_CORE_LIB = $(GENSTONE_DIR)/lib/$(LIB_PREFIX)gencore$(DYNAMIC_LIB_SUFFIX)
 $(GEN_CORE_LIB): CFLAGS = $(GEN_CORE_INTERNAL_CFLAGS)
 $(GEN_CORE_LIB): LFLAGS = $(GEN_CORE_INTERNAL_LFLAGS)
 $(GEN_CORE_LIB): LIBDIRS =
+$(GEN_CORE_LIB): SANITIZERS = $(GEN_CORE_SANITIZERS)
 $(GEN_CORE_LIB): $(GEN_CORE_OBJECTS) | $(GENSTONE_DIR)/lib
 
 .PHONY: gencore
@@ -56,6 +52,7 @@ test_gencore: $(GEN_CORE_TEST_EXEC)
 $(GEN_CORE_TEST_EXEC): CFLAGS = $(GEN_CORE_INTERNAL_CFLAGS) $(GEN_CORE_CFLAGS) $(GEN_TESTS_CFLAGS) -DGEN_TESTS_NAME=\"gencore-test\"
 $(GEN_CORE_TEST_EXEC): LFLAGS = $(GEN_CORE_INTERNAL_LFLAGS) $(GEN_CORE_LFLAGS) $(GEN_TESTS_LFLAGS)
 $(GEN_CORE_TEST_EXEC): LIBDIRS = $(GEN_CORE_LIBDIRS) $(GEN_TESTS_LIBDIRS)
+$(GEN_CORE_TEST_EXEC): SANITIZERS = $(GEN_CORE_SANITIZERS)
 $(GEN_CORE_TEST_EXEC): $(GEN_CORE_TEST_OBJECTS) $(GEN_CORE_LIB) $(GEN_TESTS_LIB)
 
 .PHONY: clean_gencore

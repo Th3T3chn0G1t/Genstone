@@ -20,7 +20,7 @@ MODE ?= DEBUG
 # Set whether to enable sanitizers
 # `ENABLED`: Enables sanitizers
 # `DISABLED`: Disables sanitizers
-SANITIZERS ?= ENABLED
+SANITIZE ?= ENABLED
 
 # Set whether to enable static analysis
 # `ENABLED`: Enables static analysis

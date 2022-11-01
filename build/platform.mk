@@ -36,15 +36,20 @@ ifeq ($(PLATFORM), LINUX)
 
 	GLOBAL_CFLAGS += -fPIC -D_SVID_SOURCE -D_GNU_SOURCE -D_DEFAULT_SOURCE -D__USE_GNU
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
+ifeq ($(SANITIZE),ENABLED)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	EXECUTABLE_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS))) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+else
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS))) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+endif
 
-        ifeq ($(shell uname -o),Android)
-                GLOBAL_CFLAGS += -DGEN_LINUX_ANDROID
+	ifeq ($(shell uname -o),Android)
+		GLOBAL_CFLAGS += -DGEN_LINUX_ANDROID
 		DYNAMIC_LIB_TOOL += $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS)))
-        endif
+	endif
 endif
 
 ifeq ($(HOST),OSX)
@@ -68,10 +73,15 @@ ifeq ($(PLATFORM), OSX)
 
 	GLOBAL_CFLAGS += -fPIC
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
+ifeq ($(SANITIZE),ENABLED)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -dynamiclib $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	EXECUTABLE_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+else
+	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+endif
 endif
 
 ifeq ($(HOST), WINDOWS)
@@ -93,7 +103,12 @@ ifeq ($(PLATFORM), WINDOWS)
 	EXECUTABLE_SUFFIX = .exe
 	OBJECT_SUFFIX = .obj
 
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
+ifeq ($(SANITIZE),ENABLED)
+	DYNAMIC_LIB_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	EXECUTABLE_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+else
+	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+endif
 endif
