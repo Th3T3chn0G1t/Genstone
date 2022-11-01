@@ -23,14 +23,14 @@ static void gen_dynamic_library_internal_handle_open_cleanup_library_name(char**
     }
 }
 
-gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library) {
+gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_open, GEN_FILE_NAME);
 	if(error) return error;
 
-	if(!library_name) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_name` was `NULL`");
-	if(!out_dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_dynamic_library` was `NULL`");
+	if(!library_name) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_name` was `GEN_NULL`");
+	if(!out_dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_dynamic_library` was `GEN_NULL`");
 
-	if(library_name[library_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_file_name` was not NULL-terminated");
+	if(library_name[library_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_file_name` was not GEN_NULL-terminated");
 
 #if GEN_PLATFORM == GEN_LINUX
 	static const char library_prefix[] = "lib";
@@ -46,8 +46,8 @@ gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_
 	static const char library_suffix[] = "";
 #endif
 
-	GEN_CLEANUP_FUNCTION(gen_dynamic_library_internal_handle_open_cleanup_library_name) char* library_file_name = NULL;
-	const size_t library_file_name_length = (sizeof(library_prefix) - 1) + library_name_length + (sizeof(library_suffix) - 1);
+	GEN_CLEANUP_FUNCTION(gen_dynamic_library_internal_handle_open_cleanup_library_name) char* library_file_name = GEN_NULL;
+	const gen_size_t library_file_name_length = (sizeof(library_prefix) - 1) + library_name_length + (sizeof(library_suffix) - 1);
 
 	error = gen_memory_allocate_zeroed((void**) &library_file_name, library_file_name_length + 1, sizeof(char));
 	if(error) return error;
@@ -63,35 +63,35 @@ gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_
         return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to open library `%tz`: %t", library_file_name, library_file_name_length, dlerror());
 	}
 
-	return NULL;
+	return GEN_NULL;
 }
 
 gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t* const restrict dynamic_library) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_close, GEN_FILE_NAME);
 	if(error) return error;
 
-	if(!dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`dynamic_library` was `NULL`");
+	if(!dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`dynamic_library` was `GEN_NULL`");
 
 	if(dlclose(*dynamic_library)) {
 		return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to close library: %t", dlerror());
 	}
 
-	return NULL;
+	return GEN_NULL;
 }
 
-gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, void* restrict* const restrict out_address) {
+gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, gen_size_t symbol_name_length, void* restrict* const restrict out_address) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_get_symbol, GEN_FILE_NAME);
 	if(error) return error;
 
-	if(!dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`dynamic_library` was `NULL`");
-	if(!symbol_name) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was `NULL`");
-	if(!out_address) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_address` was `NULL`");
+	if(!dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`dynamic_library` was `GEN_NULL`");
+	if(!symbol_name) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was `GEN_NULL`");
+	if(!out_address) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_address` was `GEN_NULL`");
 
-	if(symbol_name[symbol_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was not NULL-terminated");
+	if(symbol_name[symbol_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was not GEN_NULL-terminated");
 
 	if(!(*out_address = dlsym(*dynamic_library, symbol_name))) {
 		return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Failed to locate symbol `%tz`: %t", symbol_name, symbol_name_length, dlerror());
 	}
 
-	return NULL;
+	return GEN_NULL;
 }

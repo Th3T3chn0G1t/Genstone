@@ -119,7 +119,7 @@ const char* gen_error_description_from_errno(void) {
 
 static GEN_THREAD_LOCAL gen_error_t error_buffer = {0};
 
-gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict string) {
+gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const gen_size_t line, const char* const restrict string) {
 	gen_error_t* retval = &error_buffer;
 
     error_buffer = (gen_error_t) {0};
@@ -127,14 +127,14 @@ gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_
 	retval->type = type;
 	retval->line = line;
 
-    for(size_t i = 0; i < GEN_ERROR_MAXIMUM_CONTEXT_LENGTH && string[i]; ++i) retval->context[i] = string[i];
+    for(gen_size_t i = 0; i < GEN_ERROR_MAXIMUM_CONTEXT_LENGTH && string[i]; ++i) retval->context[i] = string[i];
 
-	gen_error_t* error = gen_tooling_get_backtrace(NULL, &retval->backtrace_length);
+	gen_error_t* error = gen_tooling_get_backtrace(GEN_NULL, &retval->backtrace_length);
 	if(error) {
 		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
-	error = gen_tooling_get_backtrace(retval->backtrace, NULL);
+	error = gen_tooling_get_backtrace(retval->backtrace, GEN_NULL);
 	if(error) {
 		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
@@ -143,20 +143,20 @@ gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_
 	return retval;
 }
 
-gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...) {
+gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, const gen_size_t line, const char* const restrict format, ...) {
 	gen_error_t* retval = gen_error_attach_backtrace(type, line, "");
 
-	va_list list;
-	va_start(list, format);
+	gen_variadic_list_t list;
+	gen_variadic_list_start(list, format);
 
-	size_t length = 0;
+	gen_size_t length = 0;
 	gen_error_t* error = gen_string_length(format, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &length);
 	if(error) {
 		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
 	}
 
-	error = gen_string_formatv(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, NULL, format, length, list);
+	error = gen_string_formatv(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, GEN_NULL, format, length, list);
 	if(error) {
 		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
 		gen_error_abort();
@@ -177,8 +177,8 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 		gen_error_abort();
 	}
 
-	for(size_t i = 0; i < error->backtrace_length; ++i) {
-		size_t backtrace_index = error->backtrace_length - (i + 1);
+	for(gen_size_t i = 0; i < error->backtrace_length; ++i) {
+		gen_size_t backtrace_index = error->backtrace_length - (i + 1);
         // printf("#%zu: %p %s() %s\n", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
 		internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
 		if(internal_error) {

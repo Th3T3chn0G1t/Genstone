@@ -52,12 +52,12 @@ gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict 
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_log, GEN_FILE_NAME);
 	if(error) return error;
 
-	if(!context) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`context` was `NULL`");
-	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+	if(!context) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`context` was `GEN_NULL`");
+	if(!string) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `GEN_NULL`");
 
 	gen_filesystem_handle_t out = severity >= GEN_LOG_LEVEL_WARNING ? GEN_FILESYSTEM_HANDLE_STDERR : GEN_FILESYSTEM_HANDLE_STDOUT;
 
-	size_t context_length = 0;
+	gen_size_t context_length = 0;
 	error = gen_string_length(context, GEN_STRING_NO_BOUNDS, GEN_LOG_CONTEXT_PAD, &context_length);
 	if(error) return error;
 
@@ -69,7 +69,7 @@ gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict 
 		GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_RED) "error" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR,
 		GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_PURPLE) "fatal" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR};
 
-	static const size_t severity_lengths[] = {
+	static const gen_size_t severity_lengths[] = {
 		sizeof(GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_DARK_WHITE) "trace" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR),
 		sizeof(GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_GREEN) "debug" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR),
 		sizeof(GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_CYAN) "info" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR),
@@ -77,7 +77,7 @@ gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict 
 		sizeof(GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_RED) "error" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR),
 		sizeof(GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_PURPLE) "fatal" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR)};
 
-	static const size_t severity_name_lengths[] = {
+	static const gen_size_t severity_name_lengths[] = {
 		sizeof("trace") - 1,
 		sizeof("debug") - 1,
 		sizeof("info") - 1,
@@ -99,49 +99,49 @@ gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict 
         GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR "%t\n";
 	// clang-format on
 
-	size_t formatted_length = 0;
-	error = gen_string_format(GEN_STRING_NO_BOUNDS, NULL, &formatted_length, format, sizeof(format) - 1, context, context_length, ' ', GEN_LOG_CONTEXT_PAD - context_length, severity_names[severity], severity_lengths[severity], ' ', GEN_LOG_SEVERITY_PAD - severity_name_lengths[severity], string);
+	gen_size_t formatted_length = 0;
+	error = gen_string_format(GEN_STRING_NO_BOUNDS, GEN_NULL, &formatted_length, format, sizeof(format) - 1, context, context_length, ' ', GEN_LOG_CONTEXT_PAD - context_length, severity_names[severity], severity_lengths[severity], ' ', GEN_LOG_SEVERITY_PAD - severity_name_lengths[severity], string);
 	if(error) return error;
 
 	GEN_CLEANUP_FUNCTION(gen_log_internal_cleanup_formatted)
-	char* formatted = NULL;
+	char* formatted = GEN_NULL;
 	error = gen_memory_allocate_zeroed((void**) &formatted, formatted_length + 1, sizeof(char));
 	if(error) return error;
 
-	error = gen_string_format(GEN_STRING_NO_BOUNDS, formatted, NULL, format, sizeof(format) - 1, context, context_length, ' ', GEN_LOG_CONTEXT_PAD - context_length, severity_names[severity], severity_lengths[severity], ' ', GEN_LOG_SEVERITY_PAD - severity_name_lengths[severity], string);
+	error = gen_string_format(GEN_STRING_NO_BOUNDS, formatted, GEN_NULL, format, sizeof(format) - 1, context, context_length, ' ', GEN_LOG_CONTEXT_PAD - context_length, severity_names[severity], severity_lengths[severity], ' ', GEN_LOG_SEVERITY_PAD - severity_name_lengths[severity], string);
 	if(error) return error;
 
 	error = gen_filesystem_handle_file_write(&out, (const unsigned char*) formatted, 0, formatted_length);
 	if(error) return error;
 
-	return NULL;
+	return GEN_NULL;
 }
 
 gen_error_t* gen_log_formatted(const gen_log_level_t severity, const char* const restrict context, const char* const restrict format, ...) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_log_formatted, GEN_FILE_NAME);
 	if(error) return error;
 
-	if(!format) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `NULL`");
+	if(!format) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`string` was `GEN_NULL`");
 
-	va_list args;
-	va_list args_copy;
-	va_start(args, format);
-	va_copy(args_copy, args);
+	gen_variadic_list_t args;
+	gen_variadic_list_t args_copy;
+	gen_variadic_list_start(args, format);
+	gen_variadic_list_copy(args_copy, args);
 
-	size_t format_length = 0;
+	gen_size_t format_length = 0;
 	error = gen_string_length(format, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &format_length);
 	if(error) return error;
 
-	size_t formatted_length = 0;
-	error = gen_string_formatv(GEN_STRING_NO_BOUNDS, NULL, &formatted_length, format, format_length, args);
+	gen_size_t formatted_length = 0;
+	error = gen_string_formatv(GEN_STRING_NO_BOUNDS, GEN_NULL, &formatted_length, format, format_length, args);
 	if(error) return error;
 
 	GEN_CLEANUP_FUNCTION(gen_log_internal_cleanup_formatted)
-	char* formatted = NULL;
+	char* formatted = GEN_NULL;
 	error = gen_memory_allocate_zeroed((void**) &formatted, formatted_length + 1, sizeof(char));
 	if(error) return error;
 
-	error = gen_string_formatv(GEN_STRING_NO_BOUNDS, formatted, NULL, format, format_length, args_copy);
+	error = gen_string_formatv(GEN_STRING_NO_BOUNDS, formatted, GEN_NULL, format, format_length, args_copy);
 	if(error) return error;
 
 	return gen_log(severity, context, formatted);

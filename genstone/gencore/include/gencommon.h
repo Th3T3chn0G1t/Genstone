@@ -120,18 +120,81 @@
 #define GEN_FORCE_UNIX GEN_DISABLED
 #endif
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdalign.h>
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
-#include <sys/types.h>
-#else
-typedef long ssize_t;
-#endif
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+// NOTE: These are all here to prevent the need for includes in the public API.
+
+/**
+ * Pretty type for `_Bool`
+ */
+typedef _Bool gen_bool_t;
+/**
+ * Truthy value.
+ */
+#define gen_true (1)
+/**
+ * Falsy value.
+ */
+#define gen_false (0)
+
+/**
+ * Size type.
+ */
+typedef unsigned long long gen_size_t;
+
+/**
+ * Maximum value of a `gen_size_t`.
+ */
+#define GEN_SIZE_MAX ((gen_size_t) -1)
+
+/**
+ * Signed size type.
+ */
+typedef long long gen_ssize_t;
+
+/**
+ * Maximum value of a `gen_ssize_t`.
+ */
+#define GEN_SSIZE_MAX ((gen_ssize_t) 0x7FFF'FFFF'FFFF'FFFF)
+
+/**
+ * 32-bit unsigned integer type.
+ */
+typedef unsigned int gen_uint32_t;
+
+/**
+ * 8-bit unsigned integer type.
+ */
+typedef unsigned char gen_uint8_t;
+
+/**
+ * Null pointer value.
+ */
+#define GEN_NULL ((void*) (0))
+
+/**
+ * Pretty type for `gen_variadic_list_t`.
+ */
+typedef __builtin_va_list gen_variadic_list_t;
+
+/**
+ * Pretty wrapper for `__builtin_va_arg`.
+ */
+#define gen_variadic_list_argument(list, type) __builtin_va_arg(list, type)
+
+/**
+ * Pretty wrapper for `__builtin_va_start`.
+ * TODO: Update once C2x relaxes `va_start`.
+ */
+#define gen_variadic_list_start(list, param) __builtin_va_start(list, param)
+
+/**
+ * Pretty wrapper for `__builtin_va_end`.
+ */
+#define gen_variadic_list_end(list) __builtin_va_end(list)
+
+/**
+ * Pretty wrapper for `__builtin_va_copy`.
+ */
+#define gen_variadic_list_copy(to, from) __builtin_va_copy(to, from)
 
 #include "generror.h"
 #include "gentooling.h"

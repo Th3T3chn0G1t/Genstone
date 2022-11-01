@@ -2,20 +2,14 @@
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
 /**
- * @file genmathtypes.h
+ * @file genmath.h
  * Includes mathematics utilities.
  */
 
-#ifndef GEN_MATH_TYPES_H
-#define GEN_MATH_TYPES_H
+#ifndef GEN_MATH_H
+#define GEN_MATH_H
 
 #include "gencommon.h"
-
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <math.h>
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
-
 
 /**
  * Signed 128-bit integer.
@@ -37,18 +31,31 @@ typedef __fp16 gen_float16_t;
 #endif
 
 /**
- * Performs fuzzy comparison of floating point types.
- * @param[in] a The first number.
- * @param[in] b The second number.
- * @param[in] epsilon The error or "fuzziness" for the comparison. Set to -1 to use the machine epsilon for the provided precision of `a`.
- * @returns Whether `a` and `b` are fuzzily equal.
+ * Compares `float`s taking the type epsilon into account.
+ * @param[in] a The first `float` to compare.
+ * @param[in] b The second `float` to compare.
+ * @param[out] out_equal A pointer to storage for the result of the comparison.
+ * @return An error, otherwise `GEN_NULL`.
  */
-#define GEN_MATH_FLOAT_FUZZY_COMPARE(a, b, epsilon) \
-		(((a) == (b)) \
-		|| (fabs((a) - (b)) < (GEN_GENERIC((a), \
-				float : (((epsilon) == -1.0f) ? FLT_EPSILON : (epsilon)), \
-				double : (((epsilon) == -1.0) ? DBL_EPSILON : (epsilon)), \
-				long double : (((epsilon) == -1.0L) ? LDBL_EPSILON : (epsilon)))))) \
+extern gen_error_t* gen_math_compare_fuzzy_float(const float a, const float b, gen_bool_t* const restrict out_equal);
+
+/**
+ * Compares `double`s taking the type epsilon into account.
+ * @param[in] a The first `double` to compare.
+ * @param[in] b The second `double` to compare.
+ * @param[out] out_equal A pointer to storage for the result of the comparison.
+ * @return An error, otherwise `GEN_NULL`.
+ */
+extern gen_error_t* gen_math_compare_fuzzy_double(const double a, const double b, gen_bool_t* const restrict out_equal);
+
+/**
+ * Compares `long double`s taking the type epsilon into account.
+ * @param[in] a The first `long double` to compare.
+ * @param[in] b The second `long double` to compare.
+ * @param[out] out_equal A pointer to storage for the result of the comparison.
+ * @return An error, otherwise `GEN_NULL`.
+ */
+extern gen_error_t* gen_math_compare_fuzzy_long_double(const long double a, const long double b, gen_bool_t* const restrict out_equal);
 
 /**
  * Type declarator for swizzleable clang vectors (OpenCL-style).

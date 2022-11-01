@@ -11,7 +11,7 @@ static gen_error_t* gen_filesystem_test_file_handle(gen_filesystem_handle_t* con
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_test_file_handle, GEN_FILE_NAME);
     if(error) return error;
 
-    size_t size = 0;
+    gen_size_t size = 0;
     error = gen_filesystem_handle_file_size(handle, &size);
     if(error) return error;
 
@@ -36,7 +36,7 @@ static gen_error_t* gen_filesystem_test_file_handle(gen_filesystem_handle_t* con
 
     // TODO: Test handle locking once `genthreads` is working
 
-    return NULL;
+    return GEN_NULL;
 }
 
 static gen_error_t* gen_main(void) {
@@ -51,15 +51,15 @@ static gen_error_t* gen_main(void) {
         const char path[] = "/./usr/../etc";
         const char expected[] = "/private/etc";
 #endif
-        size_t canonical_length = 0;
-        error = gen_filesystem_path_canonicalize(path, sizeof(path) - 1, NULL, &canonical_length);
+        gen_size_t canonical_length = 0;
+        error = gen_filesystem_path_canonicalize(path, sizeof(path) - 1, GEN_NULL, &canonical_length);
         if(error) return error;
 
-        char* canonical = NULL;
+        char* canonical = GEN_NULL;
         error = gen_memory_allocate_zeroed((void**) &canonical, canonical_length + 1, sizeof(char));
         if(error) return error;
 
-        error = gen_filesystem_path_canonicalize(path, sizeof(path) - 1, canonical, NULL);
+        error = gen_filesystem_path_canonicalize(path, sizeof(path) - 1, canonical, GEN_NULL);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(expected, canonical);
@@ -67,17 +67,17 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        bool exists = false;
+        gen_bool_t exists = gen_false;
         error = gen_filesystem_path_exists(".", sizeof(".") - 1, &exists);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, exists);
+        error = GEN_TESTS_EXPECT(gen_true, exists);
         if(error) return error;
 
         error = gen_filesystem_path_exists("foo/./lets_really_really_hope_that_this_path_doesnt_exist", sizeof("foo/./lets_really_really_hope_that_this_path_doesnt_exist") - 1, &exists);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(false, exists);
+        error = GEN_TESTS_EXPECT(gen_false, exists);
         if(error) return error;
     }
 
@@ -92,11 +92,11 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_path_create_file(path, sizeof(path) - 1);
         if(error) return error;
 
-        bool exists = false;
+        gen_bool_t exists = gen_false;
         error = gen_filesystem_path_exists(path, sizeof(path) - 1, &exists);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, exists);
+        error = GEN_TESTS_EXPECT(gen_true, exists);
         if(error) return error;
 
         {
@@ -104,7 +104,7 @@ static gen_error_t* gen_main(void) {
             error = gen_filesystem_handle_open(path, sizeof(path) - 1, &handle);
             if(error) return error;
 
-            error = GEN_TESTS_EXPECT((uintmax_t) GEN_FILESYSTEM_HANDLE_FILE, handle.type);
+            error = GEN_TESTS_EXPECT((gen_size_t) GEN_FILESYSTEM_HANDLE_FILE, handle.type);
             if(error) return error;
 
             error = gen_filesystem_test_file_handle(&handle);
@@ -124,11 +124,11 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_path_create_directory(path, sizeof(path) - 1);
         if(error) return error;
 
-        bool exists = false;
+        gen_bool_t exists = gen_false;
         error = gen_filesystem_path_exists(path, sizeof(path) - 1, &exists);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, exists);
+        error = GEN_TESTS_EXPECT(gen_true, exists);
         if(error) return error;
 
         {
@@ -136,12 +136,12 @@ static gen_error_t* gen_main(void) {
             error = gen_filesystem_handle_open(path, sizeof(path) - 1, &handle);
             if(error) return error;
 
-            error = GEN_TESTS_EXPECT((uintmax_t) GEN_FILESYSTEM_HANDLE_DIRECTORY, handle.type);
+            error = GEN_TESTS_EXPECT((gen_size_t) GEN_FILESYSTEM_HANDLE_DIRECTORY, handle.type);
             if(error) return error;
 
-            size_t length = 0;
+            gen_size_t length = 0;
             // This is tested better below
-            error = gen_filesystem_handle_directory_list(&handle, NULL, &length);
+            error = gen_filesystem_handle_directory_list(&handle, GEN_NULL, &length);
             if(error) return error;
 
             error = GEN_TESTS_EXPECT(0, length);
@@ -160,7 +160,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_handle_open_anonymous(&handle);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT((uintmax_t) GEN_FILESYSTEM_HANDLE_ANONYMOUS, handle.type);
+        error = GEN_TESTS_EXPECT((gen_size_t) GEN_FILESYSTEM_HANDLE_ANONYMOUS, handle.type);
         if(error) return error;
 
         error = gen_filesystem_test_file_handle(&handle);
@@ -176,11 +176,11 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_handle_open(GENSTONE_DIR "/build", sizeof(GENSTONE_DIR "/build") - 1, &handle);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT((uintmax_t) GEN_FILESYSTEM_HANDLE_DIRECTORY, handle.type);
+        error = GEN_TESTS_EXPECT((gen_size_t) GEN_FILESYSTEM_HANDLE_DIRECTORY, handle.type);
         if(error) return error;
 
-        size_t length = 0;
-        error = gen_filesystem_handle_directory_list(&handle, NULL, &length);
+        gen_size_t length = 0;
+        error = gen_filesystem_handle_directory_list(&handle, GEN_NULL, &length);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(4, length);
@@ -193,11 +193,11 @@ static gen_error_t* gen_main(void) {
             &entries[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX * 2],
             &entries[GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX * 3],
         };
-        error = gen_filesystem_handle_directory_list(&handle, list, NULL);
+        error = gen_filesystem_handle_directory_list(&handle, list, GEN_NULL);
         if(error) return error;
 
-        for(size_t i = 0; i < 4; ++i) {
-            bool equal = false;
+        for(gen_size_t i = 0; i < 4; ++i) {
+            gen_bool_t equal = gen_false;
 
             error = gen_string_compare("common.mk", sizeof("common.mk") - 1, list[i], GEN_FILESYSTEM_DIRECTORY_ENTRY_MAX, GEN_STRING_NO_BOUNDS, &equal);
             if(error) return error;
@@ -240,7 +240,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_NONE));
+        error = GEN_TESTS_EXPECT(gen_true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_NONE));
         if(error) return error;
 
         error = gen_filesystem_handle_file_write(&handle, (unsigned char*) "whatever", 0, sizeof("whatever") - 1);
@@ -249,7 +249,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED));
+        error = GEN_TESTS_EXPECT(gen_true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_MODIFIED));
         if(error) return error;
 
         error = gen_filesystem_path_delete(path, sizeof(path) - 1);
@@ -260,7 +260,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_DELETED));
+        error = GEN_TESTS_EXPECT(gen_true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_DELETED));
         if(error) return error;
 #endif
 
@@ -285,14 +285,14 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_watcher_create(&handle, &watcher);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!watcher.directory_handle);
+        error = GEN_TESTS_EXPECT(gen_true, !!watcher.directory_handle);
         if(error) return error;
 
         gen_filesystem_watcher_event_t event = GEN_FILESYSTEM_WATCHER_EVENT_NONE;
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_NONE));
+        error = GEN_TESTS_EXPECT(gen_true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_NONE));
         if(error) return error;
 
         const char subpath[] = "__genstone_test_directory/__genstone_test_file.txt";
@@ -303,7 +303,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_CREATED));
+        error = GEN_TESTS_EXPECT(gen_true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_CREATED));
         if(error) return error;
 
         error = gen_filesystem_path_delete(subpath, sizeof(subpath) - 1);
@@ -312,7 +312,7 @@ static gen_error_t* gen_main(void) {
         error = gen_filesystem_watcher_poll(&watcher, &event);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_DELETED));
+        error = GEN_TESTS_EXPECT(gen_true, !!(event & GEN_FILESYSTEM_WATCHER_EVENT_DELETED));
         if(error) return error;
 
         error = gen_filesystem_path_delete(path, sizeof(path) - 1);
@@ -325,5 +325,5 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
     }
 
-    return NULL;
+    return GEN_NULL;
 }

@@ -12,18 +12,11 @@
 #include "gencommon.h"
 #include "genfilesystem.h"
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
-#include <unistd.h>
-#endif
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
-
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 /**
  * Handle type for a process.
  */
-typedef pid_t gen_process_t;
+typedef int gen_process_t;
 #endif
 
 /**
@@ -38,22 +31,22 @@ typedef pid_t gen_process_t;
  * @param[in] environment_length The length of the list of environment variables to pass to the created process.
  * @param[in,out] filesystem_handle The filesystem handle to redirect output to.
  * @param[out] out_process A pointer to storage for a handle to the created process.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const size_t executable_path_length, const char* const* const restrict arguments, const size_t* const restrict argument_lengths, const size_t arguments_length, const char* const restrict * const restrict environment, const size_t* const restrict environment_lengths, const size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
+extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process);
 
 /**
  * Blocks the current thread until the specified process exits.
  * @param[in] process The process to wait for.
  * @param[out] out_exitcode A pointer to storage for the exit code of the process.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
 extern gen_error_t* gen_process_wait(const gen_process_t* const restrict process, int* const restrict out_exitcode);
 
 /**
  * Attempts to kill a process.
  * @param[in] process The process to kill.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
 extern gen_error_t* gen_process_kill(const gen_process_t* const restrict process);
 
@@ -61,16 +54,16 @@ extern gen_error_t* gen_process_kill(const gen_process_t* const restrict process
  * Checks if a process is alive.
  * @param[in] process The process to check.
  * @param[out] out_alive A pointer to storage for the result of whether the process is alive.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_check(const gen_process_t* const restrict process, bool* const restrict out_alive);
+extern gen_error_t* gen_process_check(const gen_process_t* const restrict process, gen_bool_t* const restrict out_alive);
 
 /**
  * Gets a pointer to the current process' environment.
  * @param[out] out_environment A pointer to a pointer to a buffer of pointers to environment variables.
  * @param[out] out_length A pointer to storage for the length of the environment.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_get_environment(char*** const restrict out_environment, size_t* const restrict out_length);
+extern gen_error_t* gen_process_get_environment(char*** const restrict out_environment, gen_size_t* const restrict out_length);
 
 #endif

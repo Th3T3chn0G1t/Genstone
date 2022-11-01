@@ -24,5 +24,5 @@ static gen_error_t* gen_main(void) {
     error = gen_dynamic_library_handle_close(&handle);
     if(error) return error;
 
-    return NULL;
+    return GEN_NULL;
 }

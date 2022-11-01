@@ -11,10 +11,6 @@
 
 #include "gentoolingframe.h"
 
-#ifndef EOK
-#define EOK (0)
-#endif
-
 /**
  * The generic type of error encountered.
  * The descriptions on `gen_error_t` enumerations are hints, they may be used in other contexts.
@@ -177,7 +173,7 @@ typedef struct {
     /**
      * The line number at which the error occurred.
      */
-    size_t line;
+    gen_size_t line;
 
     /**
      * A string explaining the context behind an error.
@@ -192,7 +188,7 @@ typedef struct {
     /**
      * The length of the backtrace.
      */
-    size_t backtrace_length;
+    gen_size_t backtrace_length;
 } gen_error_t;
 
 /**
@@ -228,7 +224,7 @@ extern const char* gen_error_description_from_errno(void);
  * @param[in] context The context behind the error.
  * @return The constructed error.
  */
-extern gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const size_t line, const char* const restrict context);
+extern gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const gen_size_t line, const char* const restrict context);
 
 /**
  * Constructs an error and attaches a backtrace down to the caller.
@@ -239,7 +235,7 @@ extern gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, cons
  * @param[in] ... The parameters to the format string.
  * @return The constructed error.
  */
-extern gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, const size_t line, const char* const restrict format, ...);
+extern gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, const gen_size_t line, const char* const restrict format, ...);
 
 /**
  * Prints out an errors details and backtrace.

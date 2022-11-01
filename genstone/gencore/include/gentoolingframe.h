@@ -13,7 +13,7 @@
 /**
  * The maximum depth of a tooled call stack.
  */
-#define GEN_TOOLING_DEPTH 256
+#define GEN_TOOLING_DEPTH 1024
 #endif
 
 /**

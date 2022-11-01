@@ -16,20 +16,20 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
         gen_process_t process = {0};
-        error = gen_process_create_with_redirect("echo", sizeof("echo") - 1, (const char*[]) {"-n", "Hello, world!"}, (const size_t[]) {sizeof("-n"), sizeof("Hello, world!")}, 2, NULL, NULL, 0, &handle, &process);
+        error = gen_process_create_with_redirect("echo", sizeof("echo") - 1, (const char*[]) {"-n", "Hello, world!"}, (const gen_size_t[]) {sizeof("-n"), sizeof("Hello, world!")}, 2, GEN_NULL, GEN_NULL, 0, &handle, &process);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(false, process == 0);
+        error = GEN_TESTS_EXPECT(gen_false, process == 0);
         if(error) return error;
 
         int exit_code = 0;
         error = gen_process_wait(&process, &exit_code);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(0, (uintmax_t) exit_code);
+        error = GEN_TESTS_EXPECT(0, (gen_size_t) exit_code);
         if(error) return error;
 
-        size_t length = 0;
+        gen_size_t length = 0;
         error = gen_filesystem_handle_file_size(&handle, &length);
         if(error) return error;
 
@@ -50,20 +50,20 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
         gen_process_t process = {0};
-        error = gen_process_create_with_redirect("sleep", sizeof("sleep") - 1, (const char*[]) {"100"}, (const size_t[]) {sizeof("100")}, 1, NULL, NULL, 0, &handle, &process);
+        error = gen_process_create_with_redirect("sleep", sizeof("sleep") - 1, (const char*[]) {"100"}, (const gen_size_t[]) {sizeof("100")}, 1, GEN_NULL, GEN_NULL, 0, &handle, &process);
         if(error) return error;
 
         error = gen_process_kill(&process);
         if(error) return error;
     }
 
-    char** environment = NULL;
-    size_t length = 0;
+    char** environment = GEN_NULL;
+    gen_size_t length = 0;
     error = gen_process_get_environment(&environment, &length);
     if(error) return error;
 
-    error = GEN_TESTS_EXPECT(false, environment == NULL);
+    error = GEN_TESTS_EXPECT(gen_false, environment == GEN_NULL);
     if(error) return error;
 
-    return NULL;
+    return GEN_NULL;
 }

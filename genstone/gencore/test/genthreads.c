@@ -21,5 +21,5 @@ static gen_error_t* gen_main(void) {
     error = gen_threads_mutex_destroy(&mutex);
     if(error) return error;
 
-    return NULL;
+    return GEN_NULL;
 }

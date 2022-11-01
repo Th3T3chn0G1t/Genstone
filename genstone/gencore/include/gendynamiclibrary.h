@@ -22,14 +22,14 @@ typedef void* gen_dynamic_library_handle_t;
  * @param[in] library_name The name of the library to open.
  * @param[in] library_name_length The length of the name of the library to open.
  * @param[out] out_dynamic_library A pointer to storage for the opened dynamic library handle.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library);
+extern gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library);
 
 /**
  * Closes a dynamic library handle.
  * @param[in,out] dynamic_library The dynamic library handle to unload.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
 extern gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t* const restrict dynamic_library);
 
@@ -39,8 +39,8 @@ extern gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_h
  * @param[in] symbol_name The symbol to get.
  * @param[in] symbol_name_length The length of the symbol to get.
  * @param[out] out_address A pointer to storage for the symbol's address.
- * @return An error, otherwise `NULL`.
+ * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, size_t symbol_name_length, void* restrict* const restrict out_address);
+extern gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, gen_size_t symbol_name_length, void* restrict* const restrict out_address);
 
 #endif

@@ -18,7 +18,7 @@ static gen_error_t* gen_main(void) {
         "B",
         "C"
     };
-    const size_t argument_lengths[] = {
+    const gen_size_t argument_lengths[] = {
         sizeof("--long-arg-test") - 1,
         sizeof("--long-arg-test-param=param") - 1,
         sizeof("-s") - 1,
@@ -27,20 +27,20 @@ static gen_error_t* gen_main(void) {
         sizeof("B") - 1,
         sizeof("C") - 1
     };
-    const size_t arguments_length = sizeof(arguments) / sizeof(arguments[0]);
+    const gen_size_t arguments_length = sizeof(arguments) / sizeof(arguments[0]);
 
     const char short_arguments[] = {'s', 'p'};
-    const size_t short_arguments_length = sizeof(short_arguments) / sizeof(short_arguments[0]);
+    const gen_size_t short_arguments_length = sizeof(short_arguments) / sizeof(short_arguments[0]);
 
     const char* long_arguments[] = {
         "long-arg-test",
         "long-arg-test-param"
     };
-    const size_t long_argument_lengths[] = {
+    const gen_size_t long_argument_lengths[] = {
         sizeof("long-arg-test") - 1,
         sizeof("long-arg-test-param") - 1
     };
-    const size_t long_arguments_length = sizeof(long_arguments) / sizeof(long_arguments[0]);
+    const gen_size_t long_arguments_length = sizeof(long_arguments) / sizeof(long_arguments[0]);
 
     gen_arguments_parsed_t parsed = {0};
     error = gen_arguments_parse(arguments, argument_lengths, arguments_length, short_arguments, short_arguments_length, long_arguments, long_argument_lengths, long_arguments_length, &parsed);
@@ -54,7 +54,7 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
         error = GEN_TESTS_EXPECT(0, parsed.short_argument_parameter_lengths[0]);
         if(error) return error;
-        error = GEN_TESTS_EXPECT(NULL, parsed.short_argument_parameters[0]);
+        error = GEN_TESTS_EXPECT(GEN_NULL, parsed.short_argument_parameters[0]);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(1, parsed.short_argument_indices[1]);
@@ -73,7 +73,7 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
         error = GEN_TESTS_EXPECT(0, parsed.long_argument_parameter_lengths[0]);
         if(error) return error;
-        error = GEN_TESTS_EXPECT(NULL, parsed.long_argument_parameters[0]);
+        error = GEN_TESTS_EXPECT(GEN_NULL, parsed.long_argument_parameters[0]);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(1, parsed.long_argument_indices[1]);
@@ -96,5 +96,5 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
     }
 
-    return NULL;
+    return GEN_NULL;
 }

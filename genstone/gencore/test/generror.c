@@ -15,10 +15,10 @@ static gen_error_t* gen_main(void) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_main, GEN_FILE_NAME);
     if(error) return error;
 
-    gen_error_t* test_error = gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Test error %uz", (size_t) 42);
+    gen_error_t* test_error = gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Test error %uz", (gen_size_t) 42);
     
     {
-        error = GEN_TESTS_EXPECT((uintmax_t) GEN_ERROR_UNKNOWN, test_error->type);
+        error = GEN_TESTS_EXPECT((gen_size_t) GEN_ERROR_UNKNOWN, test_error->type);
         if(error) return error;
         error = GEN_TESTS_EXPECT(18, test_error->line);
         if(error) return error;
@@ -45,5 +45,5 @@ static gen_error_t* gen_main(void) {
     }
     
 
-    return NULL;
+    return GEN_NULL;
 }

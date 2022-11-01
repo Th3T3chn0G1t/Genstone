@@ -11,23 +11,23 @@ static gen_error_t* gen_main(void) {
     if(error) return error;
 
     {
-        bool equal = false;
+        gen_bool_t equal = gen_false;
         error = gen_string_compare("AAAA", sizeof("AAAA"), "AAAA", sizeof("AAAA"), GEN_STRING_NO_BOUNDS, &equal);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, equal);
+        error = GEN_TESTS_EXPECT(gen_true, equal);
         if(error) return error;
 
         error = gen_string_compare("AAAA", sizeof("AAAA"), "BBBB", sizeof("BBBB"), GEN_STRING_NO_BOUNDS, &equal);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(false, equal);
+        error = GEN_TESTS_EXPECT(gen_false, equal);
         if(error) return error;
 
         error = gen_string_compare("AABB", sizeof("AABB"), "AACC", sizeof("AACC"), 2, &equal);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, equal);
+        error = GEN_TESTS_EXPECT(gen_true, equal);
         if(error) return error;
     }
 
@@ -58,7 +58,7 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        size_t length = 0;
+        gen_size_t length = 0;
         error = gen_string_length("AAAA", sizeof("AAAA"), GEN_STRING_NO_BOUNDS, &length);
         if(error) return error;
 
@@ -73,8 +73,8 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        char* dup = NULL;
-        size_t len = 0;
+        char* dup = GEN_NULL;
+        gen_size_t len = 0;
         error = gen_string_duplicate("AAAA", sizeof("AAAA"), GEN_STRING_NO_BOUNDS, &dup, &len);
         if(error) return error;
 
@@ -89,7 +89,7 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        size_t found = 0;
+        gen_size_t found = 0;
         error = gen_string_character_first("ABAB", sizeof("ABAB"), 'B', GEN_STRING_NO_BOUNDS, &found);
         if(error) return error;
 
@@ -104,7 +104,7 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        size_t found = 0;
+        gen_size_t found = 0;
         error = gen_string_character_last("ABAB", sizeof("ABAB"), 'B', GEN_STRING_NO_BOUNDS, &found);
         if(error) return error;
 
@@ -119,7 +119,7 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        size_t number = 0;
+        gen_size_t number = 0;
         error = gen_string_number("123", sizeof("123"), GEN_STRING_NO_BOUNDS, &number);
         if(error) return error;
 
@@ -128,15 +128,15 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        size_t length = 0;
-        error = gen_string_format(GEN_STRING_NO_BOUNDS, NULL, &length, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, (size_t) 3, "AAAA", "BBXX", (size_t) 2);
+        gen_size_t length = 0;
+        error = gen_string_format(GEN_STRING_NO_BOUNDS, GEN_NULL, &length, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, (gen_size_t) 3, "AAAA", "BBXX", (gen_size_t) 2);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(13, length);
         if(error) return error;
 
         char buffer[14] = {0};
-        error = gen_string_format(GEN_STRING_NO_BOUNDS, buffer, NULL, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, (size_t) 3, "AAAA", "BBXX", (size_t) 2);
+        error = gen_string_format(GEN_STRING_NO_BOUNDS, buffer, GEN_NULL, "ABC %uz %t %tz", sizeof("ABC %uz %t %tz") - 1, (gen_size_t) 3, "AAAA", "BBXX", (gen_size_t) 2);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT("ABC 3 AAAA BB", buffer);
@@ -144,12 +144,12 @@ static gen_error_t* gen_main(void) {
     }
 
     {
-        bool contains = false;
-        size_t offset = 0;
+        gen_bool_t contains = gen_false;
+        gen_size_t offset = 0;
         error = gen_string_contains("AAAB", sizeof("AAAB"), "AB", sizeof("AB"), GEN_STRING_NO_BOUNDS, &contains, &offset);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(true, contains);
+        error = GEN_TESTS_EXPECT(gen_true, contains);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(2, offset);
@@ -158,9 +158,9 @@ static gen_error_t* gen_main(void) {
         error = gen_string_contains("AAAA", sizeof("AAAA"), "AB", sizeof("AB"), GEN_STRING_NO_BOUNDS, &contains, &offset);
         if(error) return error;
 
-        error = GEN_TESTS_EXPECT(false, contains);
+        error = GEN_TESTS_EXPECT(gen_false, contains);
         if(error) return error;
     }
 
-    return NULL;
+    return GEN_NULL;
 }

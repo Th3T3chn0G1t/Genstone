@@ -5,6 +5,7 @@ GEN_CORE_DIAGNOSTIC_CFLAGS = -Werror -Weverything
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
 GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings -Wno-gnu-conditional-omitted-operand
+GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-pre-c2x-compat
 
 GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
 GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
@@ -12,14 +13,10 @@ GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
 GEN_CORE_SANITIZERS = undefined,address,cfi
 
 ifeq ($(PLATFORM),LINUX)
-	GEN_CORE_COMMON_LFLAGS += -lpthread
+	GEN_CORE_COMMON_LFLAGS += -ldl -lm -lpthread
 endif
 ifeq ($(PLATFORM),OSX)
 	GEN_CORE_COMMON_LFLAGS += -lpthread
-endif
-
-ifeq ($(PLATFORM),LINUX)
-	GEN_CORE_COMMON_LFLAGS += -ldl
 endif
 
 GEN_CORE_CFLAGS = -I$(GENSTONE_DIR)/genstone/gencore/include $(GEN_CORE_COMMON_CFLAGS)

@@ -20,7 +20,7 @@ typedef gen_error_t* (*gen_main_t)(void);
 #define GEN_TESTS_MAX 512
 
 typedef struct {
-    bool present;
+    gen_bool_t present;
     const char* name;
     gen_main_t proc;
 } gen_tests_unit_t;
@@ -31,12 +31,12 @@ extern const char* gen_tests_name;
 // TODO: Promotion into numeric seems to be the issue here
 // TODO: GEN_TESTS_EXPECT_BLOCK
 
-extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str, const char* const restrict file, const size_t line);
-extern gen_error_t* gen_tests_expect_numeric(const uintmax_t a, const char* const restrict a_str, const uintmax_t b, const char* const restrict b_str, const char* const restrict file, const size_t line);
-extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str, const char* const restrict file, const size_t line);
-extern gen_error_t* gen_tests_expect_double(const double a, const char* const restrict a_str, const double b, const char* const restrict b_str, const char* const restrict file, const size_t line);
-extern gen_error_t* gen_tests_expect_long_double(const long double a, const char* const restrict a_str, const long double b, const char* const restrict b_str, const char* const restrict file, const size_t line);
-extern gen_error_t* gen_tests_expect_string(const char* const restrict a, const char* const restrict a_str, const char* const restrict b, const char* const restrict b_str, const char* const restrict file, const size_t line);
+extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
+extern gen_error_t* gen_tests_expect_numeric(const gen_size_t a, const char* const restrict a_str, const gen_size_t b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
+extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
+extern gen_error_t* gen_tests_expect_double(const double a, const char* const restrict a_str, const double b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
+extern gen_error_t* gen_tests_expect_long_double(const long double a, const char* const restrict a_str, const long double b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
+extern gen_error_t* gen_tests_expect_string(const char* const restrict a, const char* const restrict a_str, const char* const restrict b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
 
 #define GEN_TESTS_EXPECT(a, b) \
     GEN_GENERIC(a, \
@@ -55,14 +55,14 @@ static gen_error_t* gen_main(void);
 GEN_INITIALIZER static void gen_tests_internal_register_test(void) {
     gen_tests_name = GEN_TESTS_NAME;
     
-    size_t i = 0;
+    gen_size_t i = 0;
     for(; gen_tests_list[i].present; ++i);
     if(i >= GEN_TESTS_MAX) {
-        gen_log_formatted(GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME, "Number of tests exceeded maximum of %uz", (size_t) GEN_TESTS_MAX);
+        gen_log_formatted(GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME, "Number of tests exceeded maximum of %uz", (gen_size_t) GEN_TESTS_MAX);
         gen_error_abort();
     }
 
-    gen_tests_list[i] = (gen_tests_unit_t) {true, GEN_TESTS_UNIT, gen_main};
+    gen_tests_list[i] = (gen_tests_unit_t) {gen_true, GEN_TESTS_UNIT, gen_main};
 }
 #endif
 
