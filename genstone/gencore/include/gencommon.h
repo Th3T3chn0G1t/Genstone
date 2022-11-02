@@ -153,7 +153,7 @@ typedef long long gen_ssize_t;
 /**
  * Maximum value of a `gen_ssize_t`.
  */
-#define GEN_SSIZE_MAX ((gen_ssize_t) 0x7FFF'FFFF'FFFF'FFFF)
+#define GEN_SSIZE_MAX ((gen_ssize_t) 0x7FFFFFFFFFFFFFFF)
 
 /**
  * 32-bit unsigned integer type.
