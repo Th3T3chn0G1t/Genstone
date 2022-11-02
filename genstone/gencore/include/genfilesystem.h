@@ -165,9 +165,9 @@ typedef gen_filesystem_handle_t gen_filesystem_watcher_t;
  */
 #define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 2, GEN_NULL, GEN_NULL, GEN_NULL, 0})
 #else
-#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 0, GEN_NULL})
-#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 1, GEN_NULL})
-#define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 2, GEN_NULL})
+#define GEN_FILESYSTEM_HANDLE_STDIN ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 0, GEN_NULL, GEN_NULL})
+#define GEN_FILESYSTEM_HANDLE_STDOUT ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 1, GEN_NULL, GEN_NULL})
+#define GEN_FILESYSTEM_HANDLE_STDERR ((gen_filesystem_handle_t){GEN_FILESYSTEM_HANDLE_FILE, 2, GEN_NULL, GEN_NULL})
 #endif
 #endif
 
