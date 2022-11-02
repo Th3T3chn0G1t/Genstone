@@ -484,8 +484,6 @@ gen_error_t* gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
 #if GEN_PLATFORM == GEN_LINUX
     if(handle->type != GEN_FILESYSTEM_HANDLE_DIRECTORY) return gen_error_attach_backtrace(GEN_ERROR_WRONG_OBJECT_TYPE, GEN_LINE_NUMBER, "`handle` was not a directory");
-#else
-    #error No system library available for file watching
 #endif
 #else
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
@@ -575,7 +573,7 @@ gen_error_t* gen_filesystem_handle_unlock(gen_filesystem_handle_t* const restric
 	return GEN_NULL;
 }
 
-static void gen_filesystem_internal_watcher_create_cleanup_stat(struct stat** stat) {
+GEN_MAYBE_UNUSED static void gen_filesystem_internal_watcher_create_cleanup_stat(struct stat** stat) {
     if(!*stat) return;
 
     gen_error_t* error = gen_memory_free((void**) stat);
@@ -648,8 +646,6 @@ gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restri
 	file_handle_scope_variable = GEN_NULL;
 
 	return GEN_NULL;
-#else
-#error No system library available for file watching
 #endif
 #else
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
@@ -716,14 +712,6 @@ gen_error_t* gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* const rest
 #endif
 
 	return GEN_NULL;
-	/*
-#if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED
-	#if GEN_PLATFORM == GEN_LINUX
-	#else
-		#error No system library available for file watching
-	#endif
-#else
-*/
 }
 
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED && GEN_PLATFORM == GEN_LINUX
@@ -783,8 +771,6 @@ gen_error_t* gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restric
 	}
 
 	return GEN_NULL;
-#else
-#error No system library available for file watching
 #endif
 #else
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
