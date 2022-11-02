@@ -757,8 +757,8 @@ gen_error_t* gen_filesystem_watcher_poll(gen_filesystem_watcher_t* const restric
 		if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not poll for file watcher events: %t", gen_error_description_from_errno());
 
 		GEN_CLEANUP_FUNCTION(gen_filesystem_internal_watcher_poll_raw_events_cleanup)
-		alignas(alignof(struct inotify_event*)) unsigned char* raw_events = GEN_NULL;
-		error = gen_memory_allocate_zeroed_aligned((void**) &raw_events, events_size, sizeof(unsigned char), alignof(struct inotify_event));
+		GEN_ALIGNAS(GEN_ALIGNOF(struct inotify_event*)) unsigned char* raw_events = GEN_NULL;
+		error = gen_memory_allocate_zeroed_aligned((void**) &raw_events, events_size, sizeof(unsigned char), GEN_ALIGNOF(struct inotify_event));
 		if(error) return error;
 
 		gen_ssize_t events_size_result = read(watcher->file_handle, raw_events, events_size);

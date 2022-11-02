@@ -166,6 +166,16 @@ typedef unsigned int gen_uint32_t;
 typedef unsigned char gen_uint8_t;
 
 /**
+ * Pretty wrapper for `_Alignas`.
+ */
+#define GEN_ALIGNAS(x) _Alignas(x)
+
+/**
+ * Pretty wrapper for `_Alignof`.
+ */
+#define GEN_ALIGNOF(x) _Alignof(x)
+
+/**
  * Null pointer value.
  */
 #define GEN_NULL ((void*) (0))
