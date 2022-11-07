@@ -11,6 +11,11 @@ GLOBAL_CXXFLAGS += $(EXTRA_CXXFLAGS)
 
 GLOBAL_CEXCL_FLAGS = -std=gnu2x
 
+GENSTONE_DIAGNOSTIC_CFLAGS = -Werror -Weverything
+GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
+GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
+GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings -Wno-gnu-conditional-omitted-operand
+
 GLOBAL_CFLAGS += -flto -fvisibility=default
 GLOBAL_CFLAGS += -DGEN_DISABLED=0 -DGEN_ENABLED=1
 GLOBAL_CFLAGS += -DGEN_DEBUG=0 -DGEN_RELEASE=1 -DGEN_BUILD_MODE=GEN_$(MODE) -DGENSTONE_DIR=\"$(GENSTONE_DIR)\"

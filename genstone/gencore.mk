@@ -1,12 +1,7 @@
 GEN_CORE_COMMON_CFLAGS = -fenable-matrix
 GEN_CORE_COMMON_LFLAGS =
 
-GEN_CORE_DIAGNOSTIC_CFLAGS = -Werror -Weverything
-GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
-GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
-GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings -Wno-gnu-conditional-omitted-operand
-
-GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
+GEN_CORE_INTERNAL_CFLAGS = $(GENSTONE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
 GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
 
 GEN_CORE_SANITIZERS = undefined,address

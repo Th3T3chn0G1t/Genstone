@@ -38,7 +38,7 @@ gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_
     error = gen_math_compare_fuzzy_float(a, b, &equal);
     if(error) return error;
     
-    if(equal) return gen_error_attach_backtrace_formatted(GEN_ERROR_DOES_NOT_MATCH, GEN_LINE_NUMBER, "`%t` (%fs) != `%t` (%fs) at %t:%uz", a_str, a, b_str, b, file, line);
+    if(equal) return gen_error_attach_backtrace_formatted(GEN_ERROR_DOES_NOT_MATCH, GEN_LINE_NUMBER, "`%t` (%fs) != `%t` (%fs) at %t:%uz", a_str, (double) a, b_str, (double) b, file, line);
 
     return GEN_NULL;
 }
