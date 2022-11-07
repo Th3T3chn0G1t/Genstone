@@ -36,4 +36,6 @@ typedef struct {
     const char* file;
 } gen_tooling_frame_t;
 
+typedef gen_tooling_frame_t gen_tooling_backtrace_t[GEN_TOOLING_DEPTH];
+
 #endif

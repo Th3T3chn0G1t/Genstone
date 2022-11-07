@@ -181,9 +181,9 @@ typedef struct {
     char context[GEN_ERROR_MAXIMUM_CONTEXT_LENGTH + 1];
 
     /**
-     * An array of tooling frames forming a backtrace.
+     * A backtrace to the origin of the error.
      */
-    gen_tooling_frame_t backtrace[GEN_TOOLING_DEPTH];
+    gen_tooling_backtrace_t backtrace;
 
     /**
      * The length of the backtrace.

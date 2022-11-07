@@ -9,7 +9,7 @@ GEN_CORE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings -Wno-gnu-conditional-omitt
 GEN_CORE_INTERNAL_CFLAGS = $(GEN_CORE_DIAGNOSTIC_CFLAGS) $(GEN_CORE_COMMON_CFLAGS)
 GEN_CORE_INTERNAL_LFLAGS = $(GEN_CORE_COMMON_LFLAGS)
 
-GEN_CORE_SANITIZERS = undefined,address,cfi
+GEN_CORE_SANITIZERS = undefined,address
 
 ifeq ($(PLATFORM),LINUX)
 	GEN_CORE_COMMON_LFLAGS += -ldl -lm -lpthread

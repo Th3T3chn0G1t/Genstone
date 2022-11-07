@@ -79,11 +79,20 @@
 
 #ifndef __INTELLISENSE
 /**
- * Pretty wrapper for `__attribute__((maybe_unused))`.
+ * Pretty wrapper for `[[maybe_unused]]`.
  */
 #define GEN_MAYBE_UNUSED [[maybe_unused]]
 #else
 #define GEN_MAYBE_UNUSED
+#endif
+
+#ifndef __INTELLISENSE
+/**
+ * Pretty wrapper for `[[fallthrough]]`.
+ */
+#define GEN_FALLTHROUGH [[fallthrough]]
+#else
+#define GEN_FALLTHROUGH
 #endif
 
 /**
@@ -164,6 +173,13 @@ typedef unsigned int gen_uint32_t;
  * 8-bit unsigned integer type.
  */
 typedef unsigned char gen_uint8_t;
+
+#ifndef GEN_THREAD_LOCAL
+/**
+ * Pretty wrapper for `_Thread_local`.
+ */
+#define GEN_THREAD_LOCAL _Thread_local
+#endif
 
 /**
  * Pretty wrapper for `_Alignas`.

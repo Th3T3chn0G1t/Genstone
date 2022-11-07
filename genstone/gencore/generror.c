@@ -188,17 +188,13 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 	}
 }
 
-#ifdef GEN_ERROR_INCLUDE
-#include <GEN_ERROR_INCLUDE>
-#endif
-
-#ifndef GEN_ERROR_ABORT_FUNCTION
-/**
- * The function to call to exit the program in the case of a fatal error.
- */
-#define GEN_ERROR_ABORT_FUNCTION abort
-#endif
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
+#include <signal.h>
+#include <unistd.h>
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 void gen_error_abort(void) {
-	GEN_ERROR_ABORT_FUNCTION();
+	kill(getpid(), SIGKILL);
+    __builtin_unreachable();
 }
