@@ -44,36 +44,24 @@ static gen_error_t* gen_threads_internal_initialize_thread_message_modes(gen_thr
 
 GEN_INITIALIZER static void gen_threads_internal_initialize_main_thread_self(void) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_threads_internal_initialize_main_thread_self, GEN_FILE_NAME);
-    if(error) {
-        gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genthreads");
     
     error = gen_memory_allocate_zeroed((void**) &gen_threads_self.native, 1, sizeof(pthread_t));
-    if(error) {
-        gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genthreads");
 
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
     *(pthread_t*) gen_threads_self.native = pthread_self();
 #endif
 
     error = gen_threads_internal_initialize_thread_message_modes(&gen_threads_self);
-    if(error) {
-        gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genthreads");
 }
 
 static void gen_threads_internal_mutex_create_cleanup_mutex(gen_threads_mutex_t** mutex) {
     if(!*mutex) return;
 
     gen_error_t* error = gen_memory_free((void**) mutex);
-    if(error) {
-        gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genthreads");
 }
 
 gen_error_t* gen_threads_mutex_create(gen_threads_mutex_t* const restrict out_mutex) {
@@ -300,10 +288,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 static void gen_threads_internal_signal_handler(int signal, GEN_UNUSED siginfo_t* siginfo, GEN_UNUSED void* ucontext) {
  	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_threads_internal_signal_handler, GEN_FILE_NAME);
-	if(error) {
-        gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genthreads");
 
     gen_threads_message_type_t type = GEN_THREADS_MESSAGE_UNHANDLED;
     switch(signal) {
@@ -370,9 +355,7 @@ static void gen_threads_internal_signal_handler(int signal, GEN_UNUSED siginfo_t
         case SIGSTOP: break;
 
         default: {
-            error = gen_error_attach_backtrace_formatted(GEN_ERROR_INVALID_CONTROL, GEN_LINE_NUMBER, "Reached unknown signal case `%si`", signal);
-            gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-            gen_error_abort();
+	        gen_error_abort_with_error(gen_error_attach_backtrace_formatted(GEN_ERROR_INVALID_CONTROL, GEN_LINE_NUMBER, "Reached unknown signal case `%si`", signal), "genthreads");
         }
     }
 
@@ -408,10 +391,7 @@ static void gen_threads_internal_signal_handler(int signal, GEN_UNUSED siginfo_t
         if(populate_backtrace) {
             gen_size_t length = 0;
             error = gen_tooling_get_backtrace(*populate_backtrace, &length);
-            if(error) {
-                gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-                gen_error_abort();
-            }
+        	if(error) gen_error_abort_with_error(error, "genthreads");
 
             *populate_backtrace_length = length - 1; // Elide the frame for this handler.
         }
@@ -419,10 +399,7 @@ static void gen_threads_internal_signal_handler(int signal, GEN_UNUSED siginfo_t
         gen_bool_t terminate = gen_false;
         if(type == GEN_THREADS_MESSAGE_FATAL || type == GEN_THREADS_MESSAGE_TERMINATE) terminate = gen_true;
         error = gen_threads_self.message_handler(&message, &terminate);
-        if(error) {
-            gen_error_print("genthreads", error, GEN_ERROR_SEVERITY_FATAL);
-            gen_error_abort();
-        }
+        if(error) gen_error_abort_with_error(error, "genthreads");
         if(terminate) pthread_exit(GEN_NULL);
     }
     else if(type == GEN_THREADS_MESSAGE_FATAL || type == GEN_THREADS_MESSAGE_TERMINATE) pthread_exit(GEN_NULL);

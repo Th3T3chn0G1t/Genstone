@@ -13,6 +13,8 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <unistd.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 #endif
 
@@ -130,15 +132,10 @@ gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const gen_s
     for(gen_size_t i = 0; i < GEN_ERROR_MAXIMUM_CONTEXT_LENGTH && string[i]; ++i) retval->context[i] = string[i];
 
 	gen_error_t* error = gen_tooling_get_backtrace(GEN_NULL, &retval->backtrace_length);
-	if(error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "generror");
+
 	error = gen_tooling_get_backtrace(retval->backtrace, GEN_NULL);
-	if(error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "generror");
 
 	return retval;
 }
@@ -151,16 +148,10 @@ gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, c
 
 	gen_size_t length = 0;
 	gen_error_t* error = gen_string_length(format, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &length);
-	if(error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "generror");
 
 	error = gen_string_formatv(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, GEN_NULL, format, length, list);
-	if(error) {
-		gen_error_print("generror", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "generror");
 
 	return retval;
 }
@@ -172,29 +163,22 @@ static gen_log_level_t level_map[] = {
 
 void gen_error_print(const char* const restrict context, const gen_error_t* const restrict error, const gen_error_severity_t severity) {
     gen_error_t* internal_error = gen_log_formatted(level_map[severity], context, "`%t`: %t - \"%tz\" %t:%uz", gen_error_type_name(error->type), gen_error_type_description(error->type), error->context, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, error->backtrace[error->backtrace_length - 1].file, error->line);
-	if(internal_error) {
-		gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(internal_error) gen_error_abort_with_error(internal_error, "generror");
 
 	for(gen_size_t i = 0; i < error->backtrace_length; ++i) {
 		gen_size_t backtrace_index = error->backtrace_length - (i + 1);
-        // printf("#%zu: %p %s() %s\n", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
-		internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
-		if(internal_error) {
-			gen_error_print("generror", internal_error, GEN_ERROR_SEVERITY_FATAL);
-			gen_error_abort();
-		}
+    
+    	internal_error = gen_log_formatted(GEN_LOG_LEVEL_TRACE, context, "#%uz: %p %t() %t", i, error->backtrace[backtrace_index].address, error->backtrace[backtrace_index].function, error->backtrace[backtrace_index].file);
+    	if(internal_error) gen_error_abort_with_error(internal_error, "generror");
 	}
 }
-
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <signal.h>
-#include <unistd.h>
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 void gen_error_abort(void) {
 	kill(getpid(), SIGKILL);
     __builtin_unreachable();
+}
+
+void gen_error_abort_with_error(const gen_error_t* const restrict error, const char* const restrict context) {
+    gen_error_print(context, error, GEN_ERROR_SEVERITY_FATAL);
+    gen_error_abort();
 }

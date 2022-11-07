@@ -143,10 +143,7 @@ static void gen_string_duplicate_duplicated_cleanup(char** duplicated) {
 	if(*duplicated) return;
 
 	gen_error_t* error = gen_memory_free((void**) duplicated);
-	if(error) {
-		gen_error_print("genstring", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "genstring");
 }
 
 gen_error_t* gen_string_duplicate(const char* const restrict string, const gen_size_t string_bounds, const gen_size_t limit, char* restrict* const restrict out_duplicated, gen_size_t* const restrict out_length) {

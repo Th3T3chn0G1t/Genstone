@@ -33,10 +33,7 @@ static GEN_THREAD_LOCAL gen_tooling_stack_t call_stack = {0};
 
 void gen_tooling_internal_auto_cleanup(GEN_UNUSED const void* const restrict p) {
 	gen_error_t* error = gen_tooling_pop();
-	if(error) {
-		gen_error_print("gentooling", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "gentooling");
 }
 
 gen_error_t* gen_tooling_push(const char* const restrict frame, const void* const restrict address, const char* const restrict file) {

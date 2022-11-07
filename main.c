@@ -72,17 +72,11 @@ static gen_error_t* gen_main(const gen_size_t argc, const char* const restrict *
 
 int main(int argc, char** argv) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) main, GEN_FILE_NAME);
-	if(error) {
-        gen_error_print("test-application", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "test-application");
     
     GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
     GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
     error = gen_main(argc, argv);
     GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
-    if(error) {
-        gen_error_print("test-application", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "test-application");
 }

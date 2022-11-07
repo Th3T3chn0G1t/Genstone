@@ -22,10 +22,7 @@ static void gen_process_internal_create_with_redirect_cleanup_executable_path_co
     if(!*executable_path_copy) return;
 
     gen_error_t* error = gen_memory_free((void**) executable_path_copy);
-    if(error) {
-        gen_error_print("genprocess", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genprocess");
 }
 
 static void gen_process_internal_create_with_redirect_cleanup_arguments_copy(char*** arguments_copy) {
@@ -33,17 +30,11 @@ static void gen_process_internal_create_with_redirect_cleanup_arguments_copy(cha
 
     for(gen_size_t i = 0; (*arguments_copy)[i]; ++i) {
         gen_error_t* error = gen_memory_free((void**) &((*arguments_copy)[i]));
-        if(error) {
-            gen_error_print("genprocess", error, GEN_ERROR_SEVERITY_FATAL);
-            gen_error_abort();
-        }
+    	if(error) gen_error_abort_with_error(error, "genprocess");
     }
 
     gen_error_t* error = gen_memory_free((void**) arguments_copy);
-    if(error) {
-        gen_error_print("genprocess", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genprocess");
 }
 
 gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_t* const restrict out_process) {

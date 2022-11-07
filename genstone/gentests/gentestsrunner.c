@@ -9,10 +9,7 @@ const char* gen_tests_name = GEN_TESTS_NAME;
 
 int main(void) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) main, GEN_FILE_NAME);
-    if(error) {
-        gen_error_print(gen_tests_name, error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, gen_tests_name);
 
     gen_size_t len = 0;
     for(; gen_tests_list[len].present && len < GEN_TESTS_MAX; ++len);

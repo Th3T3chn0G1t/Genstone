@@ -42,10 +42,7 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
 static void gen_log_internal_cleanup_formatted(char** formatted) {
 	gen_error_t* error = gen_memory_free((void**) formatted);
-	if(error) {
-		gen_error_print("genlog", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "genlog");
 }
 
 gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict context, const char* const restrict string) {

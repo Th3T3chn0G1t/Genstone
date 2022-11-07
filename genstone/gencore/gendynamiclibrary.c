@@ -17,10 +17,7 @@ static void gen_dynamic_library_internal_handle_open_cleanup_library_name(char**
     if(!*library_name) return;
 
     gen_error_t* error = gen_memory_free((void**) library_name);
-    if(error) {
-        gen_error_print("gendynamiclibrary", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "gendynamiclibrary");
 }
 
 gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library) {

@@ -250,4 +250,11 @@ extern void gen_error_print(const char* const restrict context, const gen_error_
  */
 extern GEN_NORETURN void gen_error_abort(void);
 
+/**
+ * Aborts the program with a pretty-printed error.
+ * @param[in] error The error to print.
+ * @param[in] context The context/location in which the error occurred.
+ */
+extern GEN_NORETURN void gen_error_abort_with_error(const gen_error_t* const restrict error, const char* const restrict context);
+
 #endif

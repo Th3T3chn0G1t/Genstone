@@ -35,10 +35,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_p
     if(!*path) return;
 
     gen_error_t* error = gen_memory_free((void**) path);
-    if(error) {
-        gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genfilesystem");
 }
 
 GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_fd(gen_filesystem_file_handle_t** file_handle) {
@@ -49,9 +46,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_path_canonicalize_cleanup_f
 
 	int result = close(**file_handle);
 	if(result == -1) {
-		gen_error_t* error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path: %t", gen_error_description_from_errno());
-		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
+    	gen_error_abort_with_error(gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not canonicalize path: %t", gen_error_description_from_errno()), "genfilesystem");
 	}
 #endif
 }
@@ -233,10 +228,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_lock(ge
 	if(!*mutex) return;
 
 	gen_error_t* error = gen_threads_mutex_destroy(*mutex);
-	if(error) {
-		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "genfilesystem");
 }
 
 GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_file_handle(gen_filesystem_file_handle_t** file_handle) {
@@ -247,9 +239,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_file_ha
 
 	int result = close(**file_handle);
 	if(result == -1) {
-		gen_error_t* error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %t", gen_error_description_from_errno());
-		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
+	    gen_error_abort_with_error(gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %t", gen_error_description_from_errno()), "genfilesystem");
 	}
 #endif
 }
@@ -260,9 +250,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_open_cleanup_directo
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_FORCE_UNIX == GEN_ENABLED
 	int result = closedir(**directory_handle);
 	if(result == -1) {
-		gen_error_t* error = gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %t", gen_error_description_from_errno());
-		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
+	    gen_error_abort_with_error(gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not open a handle to path: %t", gen_error_description_from_errno()), "genfilesystem");
 	}
 #endif
 }
@@ -467,10 +455,7 @@ gen_error_t* gen_filesystem_handle_file_write(gen_filesystem_handle_t* const res
 
 GEN_MAYBE_UNUSED static void gen_filesystem_internal_handle_directory_list_entries_cleanup(char** entries) {
 	gen_error_t* error = gen_memory_free((void**) entries);
-	if(error) {
-		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "genfilesystem");
 }
 
 gen_error_t* gen_filesystem_handle_directory_list(gen_filesystem_handle_t* const restrict handle, char* restrict* const restrict out_list, gen_size_t* const restrict out_length) {
@@ -577,10 +562,7 @@ GEN_MAYBE_UNUSED static void gen_filesystem_internal_watcher_create_cleanup_stat
     if(!*stat) return;
 
     gen_error_t* error = gen_memory_free((void**) stat);
-    if(error) {
-        gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-        gen_error_abort();
-    }
+	if(error) gen_error_abort_with_error(error, "genfilesystem");
 }
 
 gen_error_t* gen_filesystem_watcher_create(gen_filesystem_handle_t* const restrict handle, gen_filesystem_watcher_t* const restrict out_watcher) {
@@ -717,10 +699,7 @@ gen_error_t* gen_filesystem_watcher_destroy(gen_filesystem_watcher_t* const rest
 #if GEN_FILESYSTEM_WATCHER_USE_SYSTEM_LIBRARY == GEN_ENABLED && GEN_PLATFORM == GEN_LINUX
 static void gen_filesystem_internal_watcher_poll_raw_events_cleanup(unsigned char** raw_events) {
 	gen_error_t* error = gen_memory_free((void**) raw_events);
-	if(error) {
-		gen_error_print("genfilesystem", error, GEN_ERROR_SEVERITY_FATAL);
-		gen_error_abort();
-	}
+	if(error) gen_error_abort_with_error(error, "genfilesystem");
 }
 #endif
 
