@@ -3,80 +3,65 @@
 
 #include "include/gendynamiclibrary.h"
 
+#include "include/genfilesystem.h"
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#if GEN_PLATFORM != GEN_WINDOWS
-#include <dlfcn.h>
-#endif
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+#include <genbackends.h>
+#include <gendynamiclibrary_be.h>
 
-static void gen_dynamic_library_internal_handle_open_cleanup_library_name(char** library_name) {
-    if(!*library_name) return;
-
-    gen_error_t* error = gen_memory_free((void**) library_name);
-	if(error) gen_error_abort_with_error(error, "gendynamiclibrary");
+static void gen_dynamic_library_internal_handle_open_cleanup_native(gen_backends_dynamic_library_handle_t** native) {
+    gen_error_t* error = gen_memory_free((void**) native);
+    if(error) gen_error_abort_with_error(error, "gendynamiclibrary");
 }
 
-gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library) {
+gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_bounds, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_open, GEN_FILE_NAME);
 	if(error) return error;
 
 	if(!library_name) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_name` was `GEN_NULL`");
 	if(!out_dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_dynamic_library` was `GEN_NULL`");
 
-	if(library_name[library_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_file_name` was not GEN_NULL-terminated");
-
-#if GEN_PLATFORM == GEN_LINUX
-	static const char library_prefix[] = "lib";
-	static const char library_suffix[] = ".so";
-#elif GEN_PLATFORM == GEN_OSX
-	static const char library_prefix[] = "lib";
-	static const char library_suffix[] = ".dylib";
-#elif GEN_PLATFORM == GEN_WINDOWS
-	static const char library_prefix[] = "";
-	static const char library_suffix[] = ".dll";
-#else
-	static const char library_prefix[] = "";
-	static const char library_suffix[] = "";
-#endif
-
-	GEN_CLEANUP_FUNCTION(gen_dynamic_library_internal_handle_open_cleanup_library_name) char* library_file_name = GEN_NULL;
-	const gen_size_t library_file_name_length = (sizeof(library_prefix) - 1) + library_name_length + (sizeof(library_suffix) - 1);
-
-	error = gen_memory_allocate_zeroed((void**) &library_file_name, library_file_name_length + 1, sizeof(char));
+    // Just taking the length of the string is a decent way to check that it's valid
+    // As we presume the genstring backend takes responsibility for string bounding/length validity.
+    gen_size_t library_name_length_checked = 0;
+    error = gen_string_length(library_name, library_name_bounds, library_name_length, &library_name_length_checked);
 	if(error) return error;
 
-	error = gen_string_append(library_file_name, library_file_name_length + 1, library_prefix, sizeof(library_prefix), sizeof(library_prefix) - 1);
+    gen_bool_t valid = gen_false;
+    error = gen_filesystem_path_validate(library_name, library_name_bounds, library_name_length_checked, &valid);
 	if(error) return error;
-	error = gen_string_append(library_file_name, library_file_name_length + 1, library_name, library_name_length + 1, library_name_length);
-	if(error) return error;
-	error = gen_string_append(library_file_name, library_file_name_length, library_suffix, sizeof(library_suffix), sizeof(library_suffix) - 1);
+    if(!valid) return gen_error_attach_backtrace_formatted(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`library_name` `%tz` was invalid", library_name, library_name_bounds);
+
+    error = gen_memory_allocate_zeroed((void**) &out_dynamic_library->native, 1, sizeof(gen_backends_dynamic_library_handle_t));
 	if(error) return error;
 
-	if(!(*out_dynamic_library = dlopen(library_file_name, RTLD_LAZY | RTLD_GLOBAL))) {
-        return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to open library `%tz`: %t", library_file_name, library_file_name_length, dlerror());
-	}
+    GEN_CLEANUP_FUNCTION(gen_dynamic_library_internal_handle_open_cleanup_native) gen_backends_dynamic_library_handle_t* native_scope_variable = out_dynamic_library->native;
 
-	return GEN_NULL;
+    error = GEN_BACKENDS_CALL(dynamic_library_handle_open)(library_name, library_name_bounds, library_name_length_checked, out_dynamic_library);
+	if(error) return error;
+
+    native_scope_variable = GEN_NULL;
+
+    return GEN_NULL;
 }
 
-gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t* const restrict dynamic_library) {
+gen_error_t* gen_dynamic_library_handle_close(gen_dynamic_library_handle_t* const restrict dynamic_library) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_close, GEN_FILE_NAME);
 	if(error) return error;
 
 	if(!dynamic_library) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`dynamic_library` was `GEN_NULL`");
 
-	if(dlclose(*dynamic_library)) {
-		return gen_error_attach_backtrace_formatted(GEN_ERROR_UNKNOWN, GEN_LINE_NUMBER, "Failed to close library: %t", dlerror());
-	}
+    error = GEN_BACKENDS_CALL(dynamic_library_handle_close)(dynamic_library);
+	if(error) return error;
+
+    error = gen_memory_free((void**) &dynamic_library->native);
+	if(error) return error;
 
 	return GEN_NULL;
 }
 
-gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, gen_size_t symbol_name_length, void* restrict* const restrict out_address) {
+gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, const gen_size_t symbol_name_bounds, const gen_size_t symbol_name_length, void* restrict* const restrict out_address) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_dynamic_library_handle_get_symbol, GEN_FILE_NAME);
 	if(error) return error;
 
@@ -84,11 +69,12 @@ gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_han
 	if(!symbol_name) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was `GEN_NULL`");
 	if(!out_address) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_address` was `GEN_NULL`");
 
-	if(symbol_name[symbol_name_length] != '\0') return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`symbol_name` was not GEN_NULL-terminated");
+    gen_size_t symbol_name_length_checked = 0;
+    error = gen_string_length(symbol_name, symbol_name_bounds, symbol_name_length, &symbol_name_length_checked);
+	if(error) return error;
 
-	if(!(*out_address = dlsym(*dynamic_library, symbol_name))) {
-		return gen_error_attach_backtrace_formatted(GEN_ERROR_NO_SUCH_OBJECT, GEN_LINE_NUMBER, "Failed to locate symbol `%tz`: %t", symbol_name, symbol_name_length, dlerror());
-	}
+    error = GEN_BACKENDS_CALL(dynamic_library_handle_get_symbol)(dynamic_library, symbol_name, symbol_name_bounds, symbol_name_length_checked, out_address);
+	if(error) return error;
 
 	return GEN_NULL;
 }

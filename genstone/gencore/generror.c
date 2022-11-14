@@ -7,6 +7,8 @@
 #include "include/genstring.h"
 #include "include/genthreads.h"
 
+#include <genbackends.h>
+
 #if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
@@ -76,49 +78,6 @@ const char* gen_error_type_description(const gen_error_type_t error) {
 	}
 }
 
-gen_error_type_t gen_error_type_from_errno(void) {
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
-	switch(errno) {
-		case EACCES: return GEN_ERROR_PERMISSION;
-		case EINVAL: return GEN_ERROR_INVALID_PARAMETER;
-		case EIO: return GEN_ERROR_IO;
-        case ESRCH: return GEN_ERROR_NO_SUCH_OBJECT;
-		case ELOOP: return GEN_ERROR_TOO_LONG;
-		case ENAMETOOLONG: return GEN_ERROR_TOO_LONG;
-		case ENOENT: return GEN_ERROR_NO_SUCH_OBJECT;
-		case ENOMEM: return GEN_ERROR_OUT_OF_MEMORY;
-		case ENOTDIR: return GEN_ERROR_WRONG_OBJECT_TYPE;
-		case EDQUOT: return GEN_ERROR_OUT_OF_SPACE;
-		case EEXIST: return GEN_ERROR_ALREADY_EXISTS;
-		case EMLINK: return GEN_ERROR_TOO_LONG;
-		case ENOSPC: return GEN_ERROR_OUT_OF_SPACE;
-		case EPERM: return GEN_ERROR_PERMISSION;
-		case EROFS: return GEN_ERROR_PERMISSION;
-		case EMFILE: return GEN_ERROR_OUT_OF_HANDLES;
-		case ENFILE: return GEN_ERROR_OUT_OF_HANDLES;
-		case EBADF: return GEN_ERROR_INVALID_PARAMETER;
-		case EBUSY: return GEN_ERROR_IN_USE;
-		case EFAULT: return GEN_ERROR_BAD_CONTENT;
-		case EISDIR: return GEN_ERROR_WRONG_OBJECT_TYPE;
-		case EAGAIN: return GEN_ERROR_BAD_OPERATION;
-		case ECHILD: return GEN_ERROR_NO_SUCH_OBJECT;
-		default: return GEN_ERROR_UNKNOWN;
-	}
-#else
-    return GEN_ERROR_UNKNOWN;
-#endif
-}
-
-const char* gen_error_description_from_errno(void) {
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
-	return strerror(errno); // This is okay over `strerror_r` as the only thread-unsafe case is
-		// Where the supplied `errno` value is outside of `errno`'s accepted
-		// Range - which we can presume will never be relevant to us
-#else
-    return "Unknown error";
-#endif
-}
-
 static GEN_THREAD_LOCAL gen_error_t error_buffer = {0};
 
 gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const gen_size_t line, const char* const restrict string) {
@@ -150,7 +109,7 @@ gen_error_t* gen_error_attach_backtrace_formatted(const gen_error_type_t type, c
 	gen_error_t* error = gen_string_length(format, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &length);
 	if(error) gen_error_abort_with_error(error, "generror");
 
-	error = gen_string_formatv(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, GEN_NULL, format, length, list);
+	error = gen_string_formatv(GEN_ERROR_MAXIMUM_CONTEXT_LENGTH, retval->context, GEN_NULL, format, GEN_STRING_NO_BOUNDS, length, list);
 	if(error) gen_error_abort_with_error(error, "generror");
 
 	return retval;
@@ -174,7 +133,7 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 }
 
 void gen_error_abort(void) {
-	kill(getpid(), SIGKILL);
+    GEN_BACKENDS_CALL(error_abort)();
     __builtin_unreachable();
 }
 

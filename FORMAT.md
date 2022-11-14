@@ -1,7 +1,7 @@
 #### Text
 
 - `%t` - `char*`
-- `%tz` - `char*, gen_size_t` (String w/ Length)
+- `%tz` - `char*, gen_size_t` (String w/ Bounds)
 - `%c` - `char`
 - `%cz` - `char, gen_size_t` (Repeat character size times)
 

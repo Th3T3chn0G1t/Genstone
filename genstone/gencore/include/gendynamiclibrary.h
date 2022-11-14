@@ -11,27 +11,35 @@
 
 #include "gencommon.h"
 
+typedef struct gen_backends_dynamic_library_handle_t gen_backends_dynamic_library_handle_t;
+
 /**
  * A handle for a dynamically loaded library.
  */
-typedef void* gen_dynamic_library_handle_t;
+typedef struct {
+    /**
+     * The underlying library handle.
+     */
+    gen_backends_dynamic_library_handle_t* native;
+} gen_dynamic_library_handle_t;
 
 /**
  * Opens a dynamic library handle.
  * @note The library name should be provided as just the significant portion of the name. e.g. to load `libfoo.so`, `library_name` would be `foo`. This is to ensure that the same name can be used to load libraries on multiple platforms (i.e. on macOS `foo` would load `libfoo.dylib`).
  * @param[in] library_name The name of the library to open.
+ * @param[in] library_name_bounds The bounds of the name of the library to open.
  * @param[in] library_name_length The length of the name of the library to open.
  * @param[out] out_dynamic_library A pointer to storage for the opened dynamic library handle.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library);
+extern gen_error_t* gen_dynamic_library_handle_open(const char* const restrict library_name, const gen_size_t library_name_bounds, const gen_size_t library_name_length, gen_dynamic_library_handle_t* const restrict out_dynamic_library);
 
 /**
  * Closes a dynamic library handle.
  * @param[in,out] dynamic_library The dynamic library handle to unload.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_handle_t* const restrict dynamic_library);
+extern gen_error_t* gen_dynamic_library_handle_close(gen_dynamic_library_handle_t* const restrict dynamic_library);
 
 /**
  * Gets a symbol's address from a dynamic library.
@@ -41,6 +49,6 @@ extern gen_error_t* gen_dynamic_library_handle_close(const gen_dynamic_library_h
  * @param[out] out_address A pointer to storage for the symbol's address.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, gen_size_t symbol_name_length, void* restrict* const restrict out_address);
+extern gen_error_t* gen_dynamic_library_handle_get_symbol(const gen_dynamic_library_handle_t* const restrict dynamic_library, const char* const restrict symbol_name, const gen_size_t symbol_name_bounds, const gen_size_t symbol_name_length, void* restrict* const restrict out_address);
 
 #endif

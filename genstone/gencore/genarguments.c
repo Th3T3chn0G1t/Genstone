@@ -26,7 +26,7 @@ gen_error_t* gen_arguments_parse(const char* const restrict* const restrict argu
 
 			for(gen_size_t j = 0; j < long_argument_count; ++j) {
 				gen_size_t occurrence = 0;
-				error = gen_string_character_first(argument, argument_length + 1, '=', GEN_STRING_NO_BOUNDS, &occurrence);
+				error = gen_string_character_first(argument, argument_length + 1, argument_length, '=', GEN_STRING_NO_BOUNDS, &occurrence);
 				if(error) return error;
 
 				const char* parameter = GEN_NULL;
@@ -37,7 +37,7 @@ gen_error_t* gen_arguments_parse(const char* const restrict* const restrict argu
 				}
 
 				gen_bool_t equal = gen_false;
-				error = gen_string_compare(argument, argument_length + 1, long_arguments[j], long_argument_lengths[j], occurrence, &equal);
+				error = gen_string_compare(argument, argument_length + 1, occurrence, long_arguments[j], long_argument_lengths[j] + 1, long_argument_lengths[j], GEN_STRING_NO_BOUNDS, &equal);
 				if(error) return error;
 
 				if(equal) {

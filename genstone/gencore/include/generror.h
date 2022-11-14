@@ -206,18 +206,6 @@ extern const char* gen_error_type_name(const gen_error_type_t error);
 extern const char* gen_error_type_description(const gen_error_type_t error);
 
 /**
- * Converts the value of errno into a genstone error type.
- * @return The converted error type.
- */
-extern gen_error_type_t gen_error_type_from_errno(void);
-
-/**
- * Converts the value of errno into a string description.
- * @return The converted error description.
- */
-extern const char* gen_error_description_from_errno(void);
-
-/**
  * Constructs an error and attaches a backtrace down to the caller.
  * @param[in] type The generic type of the error to construct.
  * @param[in] line The line number at which the error occurred.

@@ -11,11 +11,11 @@ static gen_error_t* gen_main(void) {
 
     gen_dynamic_library_handle_t handle = {0};
     // We can expect that gencore is available here
-    error = gen_dynamic_library_handle_open("gencore", sizeof("gencore") - 1, &handle);
+    error = gen_dynamic_library_handle_open("gencore", sizeof("gencore"), sizeof("gencore") - 1, &handle);
     if(error) return error;
 
     void (*proc)(void);
-    error = gen_dynamic_library_handle_get_symbol(&handle, "gen_dynamic_library_handle_open", sizeof("gen_dynamic_library_handle_open") - 1, (void**) &proc);
+    error = gen_dynamic_library_handle_get_symbol(&handle, "gen_dynamic_library_handle_open", sizeof("gen_dynamic_library_handle_open"), sizeof("gen_dynamic_library_handle_open") - 1, (void**) &proc);
     if(error) return error;
 
     error = GEN_TESTS_EXPECT((void*) gen_dynamic_library_handle_open, (void*) proc);

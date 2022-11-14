@@ -4,11 +4,6 @@
 #define GEN_TESTS_UNIT "generror"
 #include <gentests.h>
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <stdlib.h>
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
-
 extern int main(void);
 
 static gen_error_t* gen_main(void) {
@@ -20,7 +15,7 @@ static gen_error_t* gen_main(void) {
     {
         error = GEN_TESTS_EXPECT((gen_size_t) GEN_ERROR_UNKNOWN, test_error->type);
         if(error) return error;
-        error = GEN_TESTS_EXPECT(18, test_error->line);
+        error = GEN_TESTS_EXPECT(13, test_error->line);
         if(error) return error;
         error = GEN_TESTS_EXPECT("Test error 42", test_error->context);
         if(error) return error;

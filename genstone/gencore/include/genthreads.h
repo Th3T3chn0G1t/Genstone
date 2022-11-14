@@ -98,14 +98,17 @@ typedef struct {
  */
 typedef gen_error_t* (*gen_threads_message_handler_t)(const gen_threads_message_t* const restrict message, gen_bool_t* const restrict out_terminate);
 
+typedef struct gen_backends_threads_handle_t gen_backends_threads_handle_t;
+
 /**
  * Handle to a thread.
  */
 typedef struct {
     /**
-     * The native process handle.
+     * The underlying process handle.
      */
-    void* native;
+    gen_backends_threads_handle_t* native;
+
     /**
      * A mask of the messages accepted by this thread.
      * This is only for checking accepted messages, for setting the mask see `gen_threads_handle_set_message_mode`.
@@ -120,10 +123,12 @@ typedef struct {
         gen_bool_t subprocess: 1;
         gen_bool_t application: 1;
     } message_mask;
+
     /**
      * Handler for messages delivered to this thread.
      */
     gen_threads_message_handler_t message_handler;
+
     /**
      * Extra data which can be tagged onto the thread for use by the application.
      * This is available in message handlers through `gen_threads_self`.
@@ -137,10 +142,17 @@ typedef struct {
  */
 extern GEN_THREAD_LOCAL gen_threads_handle_t gen_threads_self; // TODO: Make this atomic
 
+typedef struct gen_backends_threads_mutex_t gen_backends_threads_mutex_t;
+
 /**
  * Lockable synchronization mechanism.
  */
-typedef void* gen_threads_mutex_t;
+typedef struct {
+    /**
+     * The underlying mutex handle.
+     */
+    gen_backends_threads_mutex_t* native;
+} gen_threads_mutex_t;
 
 /**
  * Creates a mutex.
@@ -155,20 +167,6 @@ extern gen_error_t* gen_threads_mutex_create(gen_threads_mutex_t* const restrict
  * @return An error, otherwise `GEN_NULL`.
  */
 extern gen_error_t* gen_threads_mutex_destroy(gen_threads_mutex_t* const restrict mutex);
-
-/**
- * Creates and locks a mutex.
- * @param[out] out_mutex A pointer to storage for the created mutex.
- * @return An error, otherwise `GEN_NULL`.
- */
-extern gen_error_t* gen_threads_mutex_create_and_lock(gen_threads_mutex_t* const restrict out_mutex);
-
-/**
- * Unlocks and destroys a mutex.
- * @param[in,out] mutex The mutex to unlock and destroy.
- * @return An error, otherwise `GEN_NULL`.
- */
-extern gen_error_t* gen_threads_mutex_unlock_and_destroy(gen_threads_mutex_t* const restrict mutex);
 
 /**
  * Locks a mutex.
@@ -205,7 +203,7 @@ extern gen_error_t* gen_threads_handle_set_message_mode(gen_threads_handle_t* co
  * Sets the message handler for a thread.
  * @param[in,out] handle The thread to set the message handler on. 
  * @param[in] handler The message handler to set.
- * @return gen_error_t* 
+ * @return An error, otherwise `GEN_NULL`. 
  */
 extern gen_error_t* gen_threads_handle_set_message_handler(gen_threads_handle_t* const restrict handle, const gen_threads_message_handler_t handler);
 

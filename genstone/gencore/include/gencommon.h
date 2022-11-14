@@ -68,14 +68,20 @@
 #define GEN_PACKED __attribute__((packed))
 
 /**
- * Pretty wrapper for `__attribute__((no_sanitize_address)) __attribute__((no_sanitize_memory))`
+ * Pretty wrapper for `__attribute__((no_sanitize_address)) __attribute__((no_sanitize_memory))`.
  */
 #define GEN_DONT_SANITIZE __attribute__((no_sanitize_address)) __attribute__((no_sanitize_memory))
 
 /**
- * Pretty wrapper for `__attribute__((constructor))`
+ * Pretty wrapper for `__attribute__((constructor))`.
  */
 #define GEN_INITIALIZER __attribute__((constructor))
+
+/**
+ * Defines a symbol alias.
+ * The specific behaviour of this is highly platform dependent.
+ */
+#define GEN_ALIAS(symbol, underlying) extern __typeof__(underlying) symbol __attribute__((weak, alias(#underlying)))
 
 #ifndef __INTELLISENSE
 /**
@@ -129,10 +135,10 @@
 #define GEN_FORCE_UNIX GEN_DISABLED
 #endif
 
-// NOTE: These are all here to prevent the need for includes in the public API.
+// These are all here to prevent the need for includes in the public API.
 
 /**
- * Pretty type for `_Bool`
+ * Pretty type for `_Bool`.
  */
 typedef _Bool gen_bool_t;
 /**

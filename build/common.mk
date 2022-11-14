@@ -15,6 +15,8 @@ GENSTONE_DIAGNOSTIC_CFLAGS = -Werror -Weverything
 GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-poison-system-directories -Wno-declaration-after-statement
 GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-c++98-compat -Wno-pointer-arith -Wno-cast-align
 GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-overlength-strings -Wno-gnu-conditional-omitted-operand
+GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-gnu-auto-type
+GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-gnu-statement-expression
 
 GLOBAL_CFLAGS += -flto -fvisibility=default
 GLOBAL_CFLAGS += -DGEN_DISABLED=0 -DGEN_ENABLED=1

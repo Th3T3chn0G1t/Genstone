@@ -38,15 +38,14 @@ ifeq ($(PLATFORM), LINUX)
 
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
-ifeq ($(SANITIZE),ENABLED)
-	DYNAMIC_LIB_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	EXECUTABLE_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS))) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-else
-	DYNAMIC_LIB_TOOL = $(CLINKER) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS))) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-endif
+	ifeq ($(SANITIZE),ENABLED)
+		MODULE_FLAGS = -fsanitize=$(SANITIZERS)
+	endif
+	DYNAMIC_LIB_TOOL = $(CLINKER) -Wl,--whole-archive $(MODULE_FLAGS) -shared $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	EXECUTABLE_TOOL = $(CLINKER) -Wl,--whole-archive $(MODULE_FLAGS) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS))) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 
 	ifeq ($(shell uname -o),Android)
+# TODO: Add API version to definition here and select generic Unix backend if version <30
 		GLOBAL_CFLAGS += -DGEN_LINUX_ANDROID
 		DYNAMIC_LIB_TOOL += $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(subst ./,,$(LIBDIRS)))
 	endif
@@ -75,13 +74,11 @@ ifeq ($(PLATFORM), OSX)
 
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
 	INTERNAL_EXECUTABLE_TOOL_LFLAG := -Wl,-rpath,
-ifeq ($(SANITIZE),ENABLED)
-	DYNAMIC_LIB_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -dynamiclib $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	EXECUTABLE_TOOL = $(CLINKER) -fsanitize=$(SANITIZERS) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-else
-	DYNAMIC_LIB_TOOL = $(CLINKER) -dynamiclib $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-	EXECUTABLE_TOOL = $(CLINKER) -fPIE $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
-endif
+	ifeq ($(SANITIZE),ENABLED)
+		MODULE_FLAGS = -fsanitize=$(SANITIZERS)
+	endif
+	DYNAMIC_LIB_TOOL = $(CLINKER) -Wl,-all_load -dynamiclib $(MODULE_FLAGS) $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(LFLAGS) -install_name "@rpath/$(notdir $@)" -o $@ $(filter %$(OBJECT_SUFFIX),$^)
+	EXECUTABLE_TOOL = $(CLINKER) -Wl,-all_load -fPIE $(MODULE_FLAGS) $(GLOBAL_LFLAGS) $(addprefix -L,$(LIBDIRS)) $(addprefix $(INTERNAL_EXECUTABLE_TOOL_LFLAG),$(LIBDIRS)) $(LFLAGS) -o $@ $(filter %$(OBJECT_SUFFIX),$^)
 endif
 
 ifeq ($(HOST), WINDOWS)

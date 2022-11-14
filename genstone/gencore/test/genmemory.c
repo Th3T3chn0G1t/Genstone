@@ -23,13 +23,13 @@ static gen_error_t* gen_main(void) {
     if(error) return error;
 
     gen_size_t* buff_aligned = GEN_NULL;
-    error = gen_memory_allocate_zeroed_aligned((void**) &buff_aligned, 1, sizeof(gen_size_t), alignof(gen_size_t));
+    error = gen_memory_allocate_zeroed_aligned((void**) &buff_aligned, 1, sizeof(gen_size_t), GEN_ALIGNOF(gen_size_t));
     if(error) return error;
 
     error = GEN_TESTS_EXPECT(gen_false, buff_aligned == GEN_NULL);
     if(error) return error;
 
-    error = gen_memory_set(buff_aligned, sizeof(gen_size_t), 65);
+    error = gen_memory_set(buff_aligned, sizeof(gen_size_t), sizeof(gen_size_t), 65);
     if(error) return error;
 
     error = gen_memory_copy(buff, 9 * sizeof(char), buff_aligned, sizeof(gen_size_t), sizeof(gen_size_t));

@@ -10,6 +10,7 @@ static gen_error_t* gen_main(void) {
     if(error) return error;
 
     // TODO: Create actual tests for this once genthreads is implemented
+    // TODO: Test thread messages
 
     gen_threads_mutex_t mutex = {0};
     error = gen_threads_mutex_create(&mutex);

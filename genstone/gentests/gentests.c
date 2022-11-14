@@ -74,7 +74,7 @@ gen_error_t* gen_tests_expect_string(const char* const restrict a, const char* c
     if(error) return error;
 
     gen_bool_t equal = gen_false;
-    error = gen_string_compare(a, GEN_STRING_NO_BOUNDS, b, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &equal);
+    error = gen_string_compare(a, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, b, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &equal);
     if(error) return error;
 
     if(!equal) return gen_error_attach_backtrace_formatted(GEN_ERROR_DOES_NOT_MATCH, GEN_LINE_NUMBER, "`%t` (%t) != `%t` (%t) at %t:%uz", a_str, a, b_str, b, file, line);

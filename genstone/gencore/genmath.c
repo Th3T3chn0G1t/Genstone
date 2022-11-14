@@ -3,20 +3,14 @@
 
 #include "include/genmath.h"
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <math.h>
-#include <float.h>
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+#include <genbackends.h>
 
 gen_error_t* gen_math_compare_fuzzy_float(const float a, const float b, gen_bool_t* const restrict out_equal) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_math_compare_fuzzy_float, GEN_FILE_NAME);
     if(error) return error;
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Wfloat-equal"))
-    *out_equal = (a == b) || (fabsf(a - b) < FLT_EPSILON);
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+    error = GEN_BACKENDS_CALL(math_compare_fuzzy_float)(a, b, out_equal);
+    if(error) return error;
 
     return GEN_NULL;
 }
@@ -24,10 +18,8 @@ gen_error_t* gen_math_compare_fuzzy_double(const double a, const double b, gen_b
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_math_compare_fuzzy_double, GEN_FILE_NAME);
     if(error) return error;
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Wfloat-equal"))
-    *out_equal = (a == b) || (fabs(a - b) < DBL_EPSILON);
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+    error = GEN_BACKENDS_CALL(math_compare_fuzzy_double)(a, b, out_equal);
+    if(error) return error;
 
     return GEN_NULL;
 }
@@ -35,10 +27,8 @@ gen_error_t* gen_math_compare_fuzzy_long_double(const long double a, const long 
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_math_compare_fuzzy_long_double, GEN_FILE_NAME);
     if(error) return error;
 
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Wfloat-equal"))
-    *out_equal = (a == b) || (fabsl(a - b) < LDBL_EPSILON);
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
+    error = GEN_BACKENDS_CALL(math_compare_fuzzy_long_double)(a, b, out_equal);
+    if(error) return error;
 
     return GEN_NULL;
 }
