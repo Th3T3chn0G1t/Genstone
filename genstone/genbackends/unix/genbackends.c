@@ -16,7 +16,7 @@ static void* gen_backends_internal_selfsym_handle = RTLD_DEFAULT;
 #endif
 
 void* gen_backends_resolve_deferred(const char* const restrict symbol) {
-    void* ptr = dlsym(RTLD_SELF, symbol);
+    void* ptr = dlsym(gen_backends_internal_selfsym_handle, symbol);
     char* error = dlerror();
     if(!error) return ptr;
     return GEN_NULL;
