@@ -171,6 +171,11 @@ typedef long long gen_ssize_t;
 typedef unsigned int gen_uint32_t;
 
 /**
+ * 16-bit unsigned integer type.
+ */
+typedef unsigned short gen_uint16_t;
+
+/**
  * 8-bit unsigned integer type.
  */
 typedef unsigned char gen_uint8_t;
