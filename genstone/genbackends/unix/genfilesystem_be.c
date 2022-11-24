@@ -22,9 +22,9 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
 #include <unistd.h>
 GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
 
-gen_filesystem_handle_t gen_filesystem_standard_input = {GEN_FILESYSTEM_HANDLE_ANONYMOUS, {0}, &(gen_backends_filesystem_handle_t) {GEN_NULL, STDIN_FILENO}};
-gen_filesystem_handle_t gen_filesystem_standard_output = {GEN_FILESYSTEM_HANDLE_ANONYMOUS, {0}, &(gen_backends_filesystem_handle_t) {GEN_NULL, STDOUT_FILENO}};
-gen_filesystem_handle_t gen_filesystem_standard_error = {GEN_FILESYSTEM_HANDLE_ANONYMOUS, {0}, &(gen_backends_filesystem_handle_t) {GEN_NULL, STDERR_FILENO}};
+GEN_DONT_SANITIZE_ADDRESS gen_filesystem_handle_t gen_filesystem_standard_input = {GEN_FILESYSTEM_HANDLE_ANONYMOUS, {0}, &(gen_backends_filesystem_handle_t) {GEN_NULL, STDIN_FILENO}};
+GEN_DONT_SANITIZE_ADDRESS gen_filesystem_handle_t gen_filesystem_standard_output = {GEN_FILESYSTEM_HANDLE_ANONYMOUS, {0}, &(gen_backends_filesystem_handle_t) {GEN_NULL, STDOUT_FILENO}};
+GEN_DONT_SANITIZE_ADDRESS gen_filesystem_handle_t gen_filesystem_standard_error = {GEN_FILESYSTEM_HANDLE_ANONYMOUS, {0}, &(gen_backends_filesystem_handle_t) {GEN_NULL, STDERR_FILENO}};
 
 GEN_INITIALIZER static void gen_backends_filesystem_internal_setup_standard_streams(void) {
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_filesystem_internal_setup_standard_streams, GEN_FILE_NAME);
