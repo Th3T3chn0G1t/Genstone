@@ -140,7 +140,9 @@ static void gen_threads_internal_signal_handler(int signal, GEN_UNUSED siginfo_t
             break;
         }
         case SIGILL: GEN_FALLTHROUGH;
+#ifdef SIGEMT // This is needed due to some classic UNIX system incompatibilities
         case SIGEMT: GEN_FALLTHROUGH;
+#endif
         case SIGFPE: GEN_FALLTHROUGH;
         case SIGBUS: GEN_FALLTHROUGH;
         case SIGSEGV: GEN_FALLTHROUGH;
@@ -184,7 +186,9 @@ static void gen_threads_internal_signal_handler(int signal, GEN_UNUSED siginfo_t
         case SIGTTIN: GEN_FALLTHROUGH;
         case SIGTTOU: GEN_FALLTHROUGH;
         case SIGWINCH: GEN_FALLTHROUGH;
+#ifdef SIGINFO
         case SIGINFO: GEN_FALLTHROUGH;
+#endif
         case SIGKILL: GEN_FALLTHROUGH;
         case SIGSTOP: break;
 
@@ -255,7 +259,10 @@ gen_error_t* gen_backends_unix_threads_install_message_handlers(void) {
         if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not install program-level message handlers: %t", gen_error_description_from_errno());
 
         struct sigaction action = {0};
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Wdisabled-macro-expansion"))
         action.sa_sigaction = gen_threads_internal_signal_handler;
+GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
         action.sa_mask = set;
         action.sa_flags = SA_SIGINFO;
 
@@ -316,8 +323,10 @@ GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Wsign-conversion"))
 
             result = sigaddset(&set, SIGILL);
             if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not populate thread message mask: %t", gen_error_description_from_errno());
+#ifdef SIGEMT
             result = sigaddset(&set, SIGEMT);
             if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not populate thread message mask: %t", gen_error_description_from_errno());
+#endif
             result = sigaddset(&set, SIGFPE);
             if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not populate thread message mask: %t", gen_error_description_from_errno());
             result = sigaddset(&set, SIGBUS);
