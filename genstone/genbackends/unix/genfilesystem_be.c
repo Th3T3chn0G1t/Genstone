@@ -80,7 +80,7 @@ gen_error_t* gen_backends_unix_filesystem_path_canonicalize(const char* const re
     
     GEN_CLEANUP_FUNCTION(gen_backends_filesystem_internal_cleanup_path) GEN_UNUSED char* path_cleanup_scope_var = canonicalized;
 
-    error = gen_backends_unix_filesystem_internal_path_from_fd(fd, canonicalized);
+    error = gen_backends_unix_filesystem_internal_path_from_fd(fd, canonicalized, (gen_size_t) value + 1);
     if(error) return error;
 
 	gen_size_t canonicalized_length = 0;

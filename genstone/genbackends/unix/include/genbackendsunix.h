@@ -4,6 +4,6 @@
 #ifndef GEN_BACKENDS_UNIX_H
 #define GEN_BACKENDS_UNIX_H
 
-extern gen_error_t* gen_backends_unix_filesystem_internal_path_from_fd(const int fd, char* const restrict out_path);
+extern gen_error_t* gen_backends_unix_filesystem_internal_path_from_fd(const int fd, char* const restrict out_path, gen_size_t size);
 
 #endif
