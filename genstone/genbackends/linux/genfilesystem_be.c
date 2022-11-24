@@ -50,10 +50,10 @@ gen_error_t* gen_backends_unix_filesystem_internal_path_from_fd(const int fd, ch
 
     GEN_CLEANUP_FUNCTION(gen_internal_backends_unix_filesystem_internal_path_from_fd_cleanup_path) GEN_UNUSED char* path_scope_variable = GEN_NULL;
 
-    error = gen_string_format(path_bounds, path, GEN_NULL, "/proc/self/fd/%si", sizeof("/proc/self/fd/%si") - 1, fd);
+    error = gen_string_format(path_bounds, path, GEN_NULL, "/proc/self/fd/%si", sizeof("/proc/self/fd/%si"), sizeof("/proc/self/fd/%si") - 1, fd)
     if(error) return error;
 
-    int result = readlink(path, out_path, (gen_size_t) (value + 1));
+    int result = readlink(path, out_path, out_path_bounds);
     if(result == -1) return gen_error_attach_backtrace_formatted(gen_error_type_from_errno(), GEN_LINE_NUMBER, "Could not get path from fd `%si`: %t", fd, gen_error_description_from_errno());
 
     return GEN_NULL;
