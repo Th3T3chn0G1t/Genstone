@@ -36,7 +36,7 @@ ifeq ($(PLATFORM), LINUX)
 
 	GLOBAL_CFLAGS += -fPIC -D_SVID_SOURCE -D_GNU_SOURCE -D_DEFAULT_SOURCE -D__USE_GNU
 
-	BEGIN_FULL_STATIC = -Wl,--whole-archive
+	BEGIN_FULL_STATIC = -Wl,--whole-archive $(eval)
 	END_FULL_STATIC = $(eval) -Wl,--no-whole-archive
 
 	STATIC_LIB_TOOL = $(AR) -r -c $@ $(filter %$(OBJECT_SUFFIX),$^)
