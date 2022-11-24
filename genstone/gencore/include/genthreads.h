@@ -7,7 +7,7 @@
 #include "gencommon.h"
 
 /**
- * Types of message a thread can recieve.
+ * Types of message a thread can receive.
  * The descriptions of these are indicative, exact meanings vary by platform.
  */
 typedef enum {
@@ -44,7 +44,7 @@ typedef enum {
      */
     GEN_THREADS_MESSAGE_APPLICATION, // SIGUSR1 SIGUSR2
     /**
-     * An unhandleable/ignored message was recieved.
+     * An unhandleable/ignored message was received.
      * This should never be delivered to the application.
      */
     GEN_THREADS_MESSAGE_UNHANDLED // SIGCONT SIGTTIN SIGTTOU SIGWINCH SIGINFO SIGKILL SIGSTOP
