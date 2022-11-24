@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file genarguments.h
- * Utility for parsing UNIX-style arguments.
- * Defines basic types used for managing the parser.
- */
-
 #ifndef GEN_ARGUMENTS_H
 #define GEN_ARGUMENTS_H
 

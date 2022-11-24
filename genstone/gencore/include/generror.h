@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file generror.h
- * Contains error value enumerations and API for interacting with errors.
- */
-
 #ifndef GEN_ERROR_H
 #define GEN_ERROR_H
 

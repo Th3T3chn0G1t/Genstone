@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file genthreads.h
- * Includes utilities for threading and synchronization.
- */
-
 #ifndef GEN_THREADS_H
 #define GEN_THREADS_H
 

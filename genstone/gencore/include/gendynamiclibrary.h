@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file gendynamiclibrary.h
- * Utility for managing dynamic libraries.
- */
-
 #ifndef GEN_DYNAMIC_LIBRARY_H
 #define GEN_DYNAMIC_LIBRARY_H
 
@@ -45,7 +40,8 @@ extern gen_error_t* gen_dynamic_library_handle_close(gen_dynamic_library_handle_
  * Gets a symbol's address from a dynamic library.
  * @param[in] dynamic_library The dynamic library to get a symbol from.
  * @param[in] symbol_name The symbol to get.
- * @param[in] symbol_name_length The length of the symbol to get.
+ * @param[in] symbol_name_bounds The bounds of `symbol_name`.
+ * @param[in] symbol_name_length The length of `symbol_name`.
  * @param[out] out_address A pointer to storage for the symbol's address.
  * @return An error, otherwise `GEN_NULL`.
  */

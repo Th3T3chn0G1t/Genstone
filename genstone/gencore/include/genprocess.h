@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file genprocess.h
- * Utility for starting and managing processes.
- */
-
 #ifndef GEN_PROC_H
 #define GEN_PROC_H
 

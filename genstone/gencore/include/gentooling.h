@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file gentooling.h
- * Provides utilities for tooling and profiling.
- */
-
 #ifndef GEN_TOOLING_H
 #define GEN_TOOLING_H
 

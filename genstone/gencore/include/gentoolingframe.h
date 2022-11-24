@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file gentoolingframe.h
- * Provides common definitions for tooling between generror and gentooling.
- */
-
 #ifndef GEN_TOOLING_FRAME_H
 #define GEN_TOOLING_FRAME_H
 

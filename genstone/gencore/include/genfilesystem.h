@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
-/**
- * @file genfilesystem.h
- * Includes filesystem utilities for manipulation and introspection.
- */
-
 #ifndef GEN_FILESYSTEM_H
 #define GEN_FILESYSTEM_H
 
