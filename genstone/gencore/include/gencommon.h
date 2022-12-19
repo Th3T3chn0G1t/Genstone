@@ -68,6 +68,11 @@
 #define GEN_DONT_SANITIZE_ADDRESS __attribute__((no_sanitize_address))
 
 /**
+ * Pretty wrapper for `__attribute__((no_sanitize("undefined")))`.
+ */
+#define GEN_DONT_SANITIZE_UNDEFINED __attribute__((no_sanitize("undefined")))
+
+/**
  * Pretty wrapper for `__attribute__((constructor))`.
  */
 #define GEN_INITIALIZER __attribute__((constructor))
@@ -78,23 +83,25 @@
  */
 #define GEN_ALIAS(symbol, underlying) extern __typeof__(underlying) symbol __attribute__((weak, alias(#underlying)))
 
-#ifndef __INTELLISENSE
 /**
  * Pretty wrapper for `[[maybe_unused]]`.
  */
 #define GEN_MAYBE_UNUSED [[maybe_unused]]
-#else
-#define GEN_MAYBE_UNUSED
-#endif
 
-#ifndef __INTELLISENSE
+/**
+ * Pretty wrapper for `__attribute__((used))`.
+ */
+#define GEN_USED __attribute__((used))
+
+/**
+ * Pretty wrapper for `__attribute__((noinline))`.
+ */
+#define GEN_NO_INLINE __attribute__((noinline))
+
 /**
  * Pretty wrapper for `[[fallthrough]]`.
  */
 #define GEN_FALLTHROUGH [[fallthrough]]
-#else
-#define GEN_FALLTHROUGH
-#endif
 
 /**
  * Pretty wrapper for `_Generic`.
@@ -156,6 +163,16 @@ typedef unsigned long long gen_size_t;
 #define GEN_SIZE_MAX ((gen_size_t) -1)
 
 /**
+ * Integer pointer type.
+ */
+typedef unsigned long long gen_uintptr_t;
+
+/**
+ * Maximum value of a `gen_uintptr_t`.
+ */
+#define GEN_UINTPTR_MAX ((gen_uintptr_t) -1)
+
+/**
  * Signed size type.
  */
 typedef long long gen_ssize_t;
@@ -166,9 +183,24 @@ typedef long long gen_ssize_t;
 #define GEN_SSIZE_MAX ((gen_ssize_t) 0x7FFFFFFFFFFFFFFF)
 
 /**
+ * 64-bit unsigned integer type.
+ */
+typedef unsigned long long gen_uint64_t;
+
+/**
+ * Maximum value of a `gen_uint64_t`.
+ */
+#define GEN_UINT64_MAX ((gen_uint64_t) -1)
+
+/**
  * 32-bit unsigned integer type.
  */
 typedef unsigned int gen_uint32_t;
+
+/**
+ * Maximum value of a `gen_uint32_t`.
+ */
+#define GEN_UINT32_MAX ((gen_uint32_t) -1)
 
 /**
  * 16-bit unsigned integer type.
@@ -176,9 +208,19 @@ typedef unsigned int gen_uint32_t;
 typedef unsigned short gen_uint16_t;
 
 /**
+ * Maximum value of a `gen_uint16_t`.
+ */
+#define GEN_UINT16_MAX ((gen_uint16_t) -1)
+
+/**
  * 8-bit unsigned integer type.
  */
 typedef unsigned char gen_uint8_t;
+
+/**
+ * Maximum value of a `gen_uint8_t`.
+ */
+#define GEN_UINT8_MAX ((gen_uint8_t) -1)
 
 #ifndef GEN_THREAD_LOCAL
 /**
@@ -227,6 +269,16 @@ typedef __builtin_va_list gen_variadic_list_t;
  * Pretty wrapper for `__builtin_va_copy`.
  */
 #define gen_variadic_list_copy(to, from) __builtin_va_copy(to, from)
+
+#define GEN_ASM_BLOCK(ops, ...) __asm__ volatile(ops __VA_ARGS__)
+#define GEN_ASM(...) #__VA_ARGS__ "\n"
+
+#define GEN_USED __attribute__((used))
+#define GEN_NAKED __attribute__((naked))
+#define GEN_FORCE_INLINE __attribute__((always_inline)) __attribute__((artificial)) inline
+#define GEN_NO_INLINE __attribute__((noinline))
+
+#define GEN_FLAG_ENUM __attribute__((enum_extensibility(closed), flag_enum))
 
 #include "generror.h"
 #include "gentooling.h"

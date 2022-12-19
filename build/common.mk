@@ -72,7 +72,7 @@ ifeq ($(STATIC_ANALYSIS),ENABLED)
 endif
 
 %$(OBJECT_SUFFIX): %.m
-ifeq ($(SANITIZE),ENABLED)
+ifeq ($(SANITIZE),ENABLED) # TODO: Why is this not using the new sanitizer specification style?
 	@$(ECHO) "$(ACTION_PREFIX)$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) $(OBJCFLAGS) -o $@ $<$(ACTION_SUFFIX)"
 	@$(CLANG) -c $(GLOBAL_CFLAGS) $(CFLAGS) $(OBJCFLAGS) -o $@ $<
 else
