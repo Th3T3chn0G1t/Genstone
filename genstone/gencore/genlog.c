@@ -8,6 +8,7 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
+#include <genlog_be.h>
 #include <genbackends.h>
 
 gen_error_t* gen_log(const gen_log_level_t severity, const char* const restrict context, const char* const restrict string) {

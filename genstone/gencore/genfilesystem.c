@@ -6,9 +6,9 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-#include <genbackends.h>
 #include <genfilesystem_be.h>
 #include <genfilesystem_be_watcher.h>
+#include <genbackends.h>
 
 gen_error_t* gen_filesystem_path_canonicalize(const char* const restrict path, const gen_size_t path_bounds, const gen_size_t path_length, char* restrict out_canonical, gen_size_t* const restrict out_length) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_canonicalize, GEN_FILE_NAME);

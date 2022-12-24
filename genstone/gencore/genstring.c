@@ -5,6 +5,7 @@
 
 #include "include/genmemory.h"
 
+#include <genstring_be.h>
 #include <genbackends.h>
 
 // TODO: We do not error out with bad bounding and instead just

@@ -20,6 +20,7 @@ ifeq ($(HOST), LINUX)
 	RMDIR = rm -rf
 	ECHO = echo -e
 	CD = cd
+	CP = cp
 	AND = &&
 	MKDIR = mkdir
 	CAT = cat
@@ -59,6 +60,7 @@ ifeq ($(HOST),OSX)
 	RMDIR = rm -rf
 	ECHO = echo
 	CD = cd
+	CP = cp
 	AND = &&
 	MKDIR = mkdir
 	CAT = cat
@@ -92,6 +94,7 @@ ifeq ($(HOST), WINDOWS)
 	RMDIR = rmdir
 	ECHO = echo
 	CD = cd
+	CP = copy
 	AND = &&
 	MKDIR = mkdir
 	CAT = type

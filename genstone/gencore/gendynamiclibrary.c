@@ -7,8 +7,8 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-#include <genbackends.h>
 #include <gendynamiclibrary_be.h>
+#include <genbackends.h>
 
 static void gen_dynamic_library_internal_handle_open_cleanup_native(gen_backends_dynamic_library_handle_t** native) {
     gen_error_t* error = gen_memory_free((void**) native);

@@ -6,8 +6,8 @@
 #include "include/genmemory.h"
 #include "include/genstring.h"
 
-#include <genbackends.h>
 #include <genprocess_be.h>
+#include <genbackends.h>
 
 static void gen_process_internal_create_with_redirect_cleanup_native(gen_backends_process_handle_t** native) {
     if(!*native) return;

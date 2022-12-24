@@ -2251,10 +2251,6 @@ PREDEFINED             = GEN_DISABLED=0 \
                          GEN_DEBUG=0 \
                          GEN_RELEASE=1 \
                          GEN_BUILD_MODE=GEN_DEBUG \
-                         GEN_LINUX=0 \
-                         GEN_OSX=1 \
-                         GEN_WINDOWS=2 \
-                         GEN_PLATFORM=GEN_LINUX
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

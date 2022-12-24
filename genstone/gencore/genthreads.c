@@ -4,8 +4,8 @@
 #include "include/genthreads.h"
 #include "include/genmemory.h"
 
-#include <genbackends.h>
 #include <genthreads_be.h>
+#include <genbackends.h>
 
 static void gen_threads_internal_mutex_create_cleanup_native(gen_backends_threads_mutex_t** native) {
     if(!*native) return;

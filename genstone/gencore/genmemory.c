@@ -5,6 +5,7 @@
 
 #include "include/genmemory.h"
 
+#include <genmemory_be.h>
 #include <genbackends.h>
 
 gen_error_t* gen_memory_allocate_zeroed(void* restrict* const restrict out_address, const gen_size_t count, const gen_size_t size) {

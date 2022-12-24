@@ -7,18 +7,8 @@
 #include "include/genstring.h"
 #include "include/genthreads.h"
 
+#include <generror_be.h>
 #include <genbackends.h>
-
-#if GEN_PLATFORM == GEN_LINUX || GEN_PLATFORM == GEN_OSX || GEN_PLATFORM == GEN_WINDOWS || GEN_FORCE_UNIX == GEN_ENABLED
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_BEGIN)
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_IGNORE("-Weverything"))
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <unistd.h>
-GEN_PRAGMA(GEN_PRAGMA_DIAGNOSTIC_REGION_END)
-#endif
 
 // TODO: Add some sort of `setjmp`/`longjmp` mechanism for returning errors after cleanup attribute
 
@@ -83,14 +73,15 @@ static GEN_THREAD_LOCAL gen_error_t error_buffer = {0};
 gen_error_t* gen_error_attach_backtrace(const gen_error_type_t type, const gen_size_t line, const char* const restrict string) {
 	gen_error_t* retval = &error_buffer;
 
-    error_buffer = (gen_error_t) {0};
+    gen_error_t* error = gen_memory_set(&error_buffer, sizeof(gen_error_t), sizeof(gen_error_t), 0);
+    if(error) gen_error_abort_with_error(error, "generror");
 
 	retval->type = type;
 	retval->line = line;
 
     for(gen_size_t i = 0; i < GEN_ERROR_MAXIMUM_CONTEXT_LENGTH && string[i]; ++i) retval->context[i] = string[i];
 
-	gen_error_t* error = gen_tooling_get_backtrace(GEN_NULL, &retval->backtrace_length);
+	error = gen_tooling_get_backtrace(GEN_NULL, &retval->backtrace_length);
 	if(error) gen_error_abort_with_error(error, "generror");
 
 	error = gen_tooling_get_backtrace(retval->backtrace, GEN_NULL);
@@ -134,7 +125,7 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 
 void gen_error_abort(void) {
     GEN_BACKENDS_CALL(error_abort)();
-    __builtin_unreachable();
+    __builtin_unreachable(); // TODO: Pretty wrapper for this.
 }
 
 void gen_error_abort_with_error(const gen_error_t* const restrict error, const char* const restrict context) {

@@ -44,13 +44,9 @@ static gen_error_t* gen_main(void) {
     if(error) return error;
 
     {
-#if GEN_PLATFORM == GEN_LINUX
-        const char path[] = "/./usr/../etc";
-        const char expected[] = "/etc";
-#elif GEN_PLATFORM == GEN_OSX
-        const char path[] = "/./usr/../etc";
-        const char expected[] = "/private/etc";
-#endif
+        const char path[] = "/./usr/../";
+        const char expected[] = "/";
+
         gen_size_t canonical_length = 0;
         error = gen_filesystem_path_canonicalize(path, sizeof(path), sizeof(path) - 1, GEN_NULL, &canonical_length);
         if(error) return error;
