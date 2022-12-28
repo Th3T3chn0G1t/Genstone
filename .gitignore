@@ -1,11 +1,17 @@
 *.o
-*.obj
+*.o.*
 
 *.a
-*.lib
+*.a.*
+
+*.elf
+*.elf.*
 
 *.so
 *.so.*
+
+*.obj
+*.lib
 *.dll
 *.dylib
 
