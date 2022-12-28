@@ -23,6 +23,20 @@
 
 #define GEN_LOG_RISING_EDGE_LENGTH (GEN_LOG_CONTEXT_PAD + 2 + 1 + GEN_LOG_SEVERITY_PAD + 2 + 1)
 
+#ifndef GEN_LOG_USE_STATIC_FORMAT_BUFFER
+/**
+ * Whether to use static buffers for allocating formatted logs instead of allocating on the heap.
+ */
+#define GEN_LOG_USE_STATIC_FORMAT_BUFFER GEN_DISABLED
+#endif
+
+#ifndef GEN_LOG_STATIC_FORMAT_BUFFER_SIZE
+/**
+ * The size of the static buffer to use when `GEN_LOG_USE_STATIC_FORMAT_BUFFER` is enabled.
+ */
+#define GEN_LOG_STATIC_FORMAT_BUFFER_SIZE 4096
+#endif
+
 /**
  * Logging severity levels.
  */
