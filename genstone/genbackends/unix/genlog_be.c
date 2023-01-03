@@ -49,11 +49,11 @@ gen_error_t* gen_backends_unix_log(const gen_log_level_t severity, const char* c
     GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_log, GEN_FILE_NAME);
     if(error) return error;
 
-    
+    gen_size_t context_length = 0;
+    error = gen_string_length(context, GEN_STRING_NO_BOUNDS, GEN_STRING_NO_BOUNDS, &context_length);
+    if(error) return error;
 
-	gen_size_t context_length = 0;
-	error = gen_string_length(context, GEN_STRING_NO_BOUNDS, GEN_LOG_CONTEXT_PAD, &context_length);
-	if(error) return error;
+    if(context_length > GEN_LOG_CONTEXT_PAD) return gen_error_attach_backtrace_formatted(GEN_ERROR_TOO_LONG, GEN_LINE_NUMBER, "Context string `%t` length (`%uz`) exceeded `GEN_LOG_CONTEXT_PAD` (`%uz`)", context, context_length, GEN_LOG_CONTEXT_PAD);
 
 	static const char* const severity_names[] = {
 		GEN_LOG_INTERNAL_ANSI_SEQUENCE_COLOR_BOLD(GEN_LOG_INTERNAL_ANSI_COLOR_DARK_WHITE) "trace" GEN_LOG_INTERNAL_ANSI_SEQUENCE_CLEAR,

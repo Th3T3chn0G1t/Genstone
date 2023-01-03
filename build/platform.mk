@@ -27,6 +27,8 @@ ifeq ($(HOST), LINUX)
 	LS = ls
 	FIND = find
 	FIND_FNAME = -name
+	GREP = grep
+	LINECOUNT = wc -l
 endif
 ifeq ($(PLATFORM), LINUX)
 	LIB_PREFIX = lib
@@ -67,6 +69,8 @@ ifeq ($(HOST),OSX)
 	LS = ls
 	FIND = find
 	FIND_FNAME = -name
+	GREP = grep
+	LINECOUNT = wc -l
 endif
 ifeq ($(PLATFORM), OSX)
 	LIB_PREFIX = lib
@@ -90,6 +94,7 @@ ifeq ($(PLATFORM), OSX)
 endif
 
 ifeq ($(HOST), WINDOWS)
+	# TODO: Might just be better off re-implementing the UNIX-y utils as we expect them with python or something.
 	RM = del
 	RMDIR = rmdir
 	ECHO = echo
@@ -101,6 +106,8 @@ ifeq ($(HOST), WINDOWS)
 	LS = dir
 	FIND = tree
 	FIND_FNAME =
+	GREP =
+	LINECOUNT =
 endif
 ifeq ($(PLATFORM), WINDOWS)
 	LIB_PREFIX =
