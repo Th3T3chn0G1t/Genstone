@@ -280,6 +280,8 @@ typedef __builtin_va_list gen_variadic_list_t;
 
 #define GEN_FLAG_ENUM __attribute__((enum_extensibility(closed), flag_enum))
 
+typedef char gen_guid_t[16];
+
 #include "generror.h"
 #include "gentooling.h"
 
