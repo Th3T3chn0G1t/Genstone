@@ -29,6 +29,7 @@ ifeq ($(HOST), LINUX)
 	FIND_FNAME = -name
 	GREP = grep
 	LINECOUNT = wc -l
+	MKNUMERIC = bc
 endif
 ifeq ($(PLATFORM), LINUX)
 	LIB_PREFIX = lib
@@ -71,6 +72,7 @@ ifeq ($(HOST),OSX)
 	FIND_FNAME = -name
 	GREP = grep
 	LINECOUNT = wc -l
+	MKNUMERIC = bc
 endif
 ifeq ($(PLATFORM), OSX)
 	LIB_PREFIX = lib
@@ -108,6 +110,7 @@ ifeq ($(HOST), WINDOWS)
 	FIND_FNAME =
 	GREP =
 	LINECOUNT =
+	MKNUMERIC =
 endif
 ifeq ($(PLATFORM), WINDOWS)
 	LIB_PREFIX =
