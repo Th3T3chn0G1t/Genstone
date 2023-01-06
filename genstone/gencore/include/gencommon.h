@@ -270,6 +270,7 @@ typedef __builtin_va_list gen_variadic_list_t;
  */
 #define gen_variadic_list_copy(to, from) __builtin_va_copy(to, from)
 
+// TODO: Docstrings for these
 #define GEN_ASM_BLOCK(ops, ...) __asm__ volatile(ops __VA_ARGS__)
 #define GEN_ASM(...) #__VA_ARGS__ "\n"
 
@@ -277,6 +278,7 @@ typedef __builtin_va_list gen_variadic_list_t;
 #define GEN_NAKED __attribute__((naked))
 #define GEN_FORCE_INLINE __attribute__((always_inline)) __attribute__((artificial)) inline
 #define GEN_NO_INLINE __attribute__((noinline))
+#define GEN_UNREACHABLE __builtin_unreachable()
 
 #define GEN_FLAG_ENUM __attribute__((enum_extensibility(closed), flag_enum))
 

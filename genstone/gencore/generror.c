@@ -125,7 +125,7 @@ void gen_error_print(const char* const restrict context, const gen_error_t* cons
 
 void gen_error_abort(void) {
     GEN_BACKENDS_CALL(error_abort)();
-    __builtin_unreachable(); // TODO: Pretty wrapper for this.
+    GEN_UNREACHABLE;
 }
 
 void gen_error_abort_with_error(const gen_error_t* const restrict error, const char* const restrict context) {
