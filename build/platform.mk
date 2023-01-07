@@ -29,7 +29,7 @@ ifeq ($(HOST), LINUX)
 	FIND_FNAME = -name
 	GREP = grep
 	LINECOUNT = wc -l
-	MKNUMERIC = bc
+	MKNUMERIC = cat
 endif
 ifeq ($(PLATFORM), LINUX)
 	LIB_PREFIX = lib
