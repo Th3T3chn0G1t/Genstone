@@ -130,13 +130,6 @@
  */
 #define GEN_MAXIMUM(a, b) ((a) > (b) ? (a) : (b))
 
-#ifndef GEN_FORCE_UNIX
-/**
- * Forces genstone backends to use Unix-compatible APIs.
- */
-#define GEN_FORCE_UNIX GEN_DISABLED
-#endif
-
 // These are all here to prevent the need for includes in the public API.
 
 /**
@@ -151,11 +144,19 @@ typedef _Bool gen_bool_t;
  * Falsy value.
  */
 #define gen_false (0)
+/**
+ * A pair of `gen_bool_t`s.
+ */
+typedef gen_bool_t gen_bool_pair_t[2];
 
 /**
  * Size type.
  */
 typedef unsigned long long gen_size_t;
+/**
+ * A pair of `gen_size_t`s.
+ */
+typedef gen_size_t gen_size_pair_t[2];
 
 /**
  * Maximum value of a `gen_size_t`.
@@ -166,6 +167,10 @@ typedef unsigned long long gen_size_t;
  * Integer pointer type.
  */
 typedef unsigned long long gen_uintptr_t;
+/**
+ * A pair of `gen_uintptr_t`s.
+ */
+typedef gen_uintptr_t gen_uintptr_pair_t[2];
 
 /**
  * Maximum value of a `gen_uintptr_t`.
@@ -176,6 +181,10 @@ typedef unsigned long long gen_uintptr_t;
  * Signed size type.
  */
 typedef long long gen_ssize_t;
+/**
+ * A pair of `gen_ssize_t`s.
+ */
+typedef gen_ssize_t gen_ssize_pair_t[2];
 
 /**
  * Maximum value of a `gen_ssize_t`.
@@ -186,6 +195,10 @@ typedef long long gen_ssize_t;
  * 64-bit unsigned integer type.
  */
 typedef unsigned long long gen_uint64_t;
+/**
+ * A pair of `gen_uint64_t`s.
+ */
+typedef gen_uint64_t gen_uint64_pair_t[2];
 
 /**
  * Maximum value of a `gen_uint64_t`.
@@ -196,6 +209,10 @@ typedef unsigned long long gen_uint64_t;
  * 32-bit unsigned integer type.
  */
 typedef unsigned int gen_uint32_t;
+/**
+ * A pair of `gen_uint32_t`s.
+ */
+typedef gen_uint32_t gen_uint32_pair_t[2];
 
 /**
  * Maximum value of a `gen_uint32_t`.
@@ -206,6 +223,10 @@ typedef unsigned int gen_uint32_t;
  * 16-bit unsigned integer type.
  */
 typedef unsigned short gen_uint16_t;
+/**
+ * A pair of `gen_uint16_t`s.
+ */
+typedef gen_uint16_t gen_uint16_pair_t[2];
 
 /**
  * Maximum value of a `gen_uint16_t`.
@@ -216,6 +237,10 @@ typedef unsigned short gen_uint16_t;
  * 8-bit unsigned integer type.
  */
 typedef unsigned char gen_uint8_t;
+/**
+ * A pair of `gen_uint8_t`s.
+ */
+typedef gen_uint8_t gen_uint8_pair_t[2];
 
 /**
  * Maximum value of a `gen_uint8_t`.
@@ -281,6 +306,12 @@ typedef __builtin_va_list gen_variadic_list_t;
 #define GEN_UNREACHABLE __builtin_unreachable()
 
 #define GEN_FLAG_ENUM __attribute__((enum_extensibility(closed), flag_enum))
+
+#define GEN_MEMBER_SIZE(type, member) (sizeof(((type*) GEN_NULL)->member))
+
+#define GEN_ARRAY_LENGTH(array) (sizeof((array)) / sizeof((array)[0]))
+
+#define GEN_NEXT_NEAREST(x, multiple) ((((x) + (multiple) - 1) / (multiple)) * (multiple))
 
 typedef char gen_guid_t[16];
 
