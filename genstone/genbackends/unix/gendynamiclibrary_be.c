@@ -27,7 +27,6 @@ gen_error_t* gen_backends_unix_dynamic_library_handle_open(const char* const res
     if(error) return error;
 
     // TODO: Library versioning
-    // TODO: "Version" structure API
 
 	gen_size_t library_file_name_length = 0;
     error = gen_string_format(GEN_STRING_NO_BOUNDS, GEN_NULL, &library_file_name_length, "%tz%tz%tz", sizeof("%tz%tz%tz"), sizeof("%tz%tz%tz") - 1,

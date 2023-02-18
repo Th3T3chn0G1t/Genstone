@@ -48,9 +48,9 @@ static void gen_backends_process_internal_create_with_redirect_cleanup_list(gen_
 	if(error) gen_error_abort_with_error(error, "genprocess");
 }
 
-extern gen_error_t* gen_backends_unix_process_create_with_redirect(const char* const restrict executable_path, GEN_UNUSED const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process);
-gen_error_t* gen_backends_unix_process_create_with_redirect(const char* const restrict executable_path, GEN_UNUSED const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process) {
-    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_create_with_redirect, GEN_FILE_NAME);
+extern gen_error_t* gen_backends_unix_process_handle_create_with_redirect(const char* const restrict executable_path, GEN_UNUSED const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process);
+gen_error_t* gen_backends_unix_process_handle_create_with_redirect(const char* const restrict executable_path, GEN_UNUSED const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process) {
+    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_handle_create_with_redirect, GEN_FILE_NAME);
     if(error) return error;
 
     
@@ -105,9 +105,9 @@ gen_error_t* gen_backends_unix_process_create_with_redirect(const char* const re
     return GEN_NULL;
 }
 
-extern gen_error_t* gen_backends_unix_process_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode);
-gen_error_t* gen_backends_unix_process_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode) {
-    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_wait, GEN_FILE_NAME);
+extern gen_error_t* gen_backends_unix_process_handle_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode);
+gen_error_t* gen_backends_unix_process_handle_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode) {
+    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_handle_wait, GEN_FILE_NAME);
     if(error) return error;
 
     
@@ -121,9 +121,9 @@ gen_error_t* gen_backends_unix_process_wait(const gen_process_handle_t* const re
     return GEN_NULL;
 }
 
-extern gen_error_t* gen_backends_unix_process_kill(const gen_process_handle_t* const restrict process);
-gen_error_t* gen_backends_unix_process_kill(const gen_process_handle_t* const restrict process) {
-    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_kill, GEN_FILE_NAME);
+extern gen_error_t* gen_backends_unix_process_handle_kill(const gen_process_handle_t* const restrict process);
+gen_error_t* gen_backends_unix_process_handle_kill(const gen_process_handle_t* const restrict process) {
+    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_handle_kill, GEN_FILE_NAME);
     if(error) return error;
 
     
@@ -135,9 +135,9 @@ gen_error_t* gen_backends_unix_process_kill(const gen_process_handle_t* const re
     return GEN_NULL;
 }
 
-extern gen_error_t* gen_backends_unix_process_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive);
-gen_error_t* gen_backends_unix_process_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive) {
-    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_check, GEN_FILE_NAME);
+extern gen_error_t* gen_backends_unix_process_handle_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive);
+gen_error_t* gen_backends_unix_process_handle_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive) {
+    GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_backends_unix_process_handle_check, GEN_FILE_NAME);
     if(error) return error;
 
     

@@ -17,11 +17,11 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
         gen_process_handle_t process = {0};
-        error = gen_process_create_with_redirect("echo", sizeof("echo"), sizeof("echo") - 1, (const char*[]) {"-n", "Hello, world!"}, (const gen_size_t[]) {sizeof("-n"), sizeof("Hello, world!")}, 2, GEN_NULL, GEN_NULL, 0, &handle, &process);
+        error = gen_process_handle_create_with_redirect("echo", sizeof("echo"), sizeof("echo") - 1, (const char*[]) {"-n", "Hello, world!"}, (const gen_size_t[]) {sizeof("-n"), sizeof("Hello, world!")}, 2, GEN_NULL, GEN_NULL, 0, &handle, &process);
         if(error) return error;
 
         int exit_code = 0;
-        error = gen_process_wait(&process, &exit_code);
+        error = gen_process_handle_wait(&process, &exit_code);
         if(error) return error;
 
         error = GEN_TESTS_EXPECT(0, (gen_size_t) exit_code);
@@ -48,10 +48,10 @@ static gen_error_t* gen_main(void) {
         if(error) return error;
 
         gen_process_handle_t process = {0};
-        error = gen_process_create_with_redirect("sleep", sizeof("sleep"), sizeof("sleep") - 1, (const char*[]) {"100"}, (const gen_size_t[]) {sizeof("100")}, 1, GEN_NULL, GEN_NULL, 0, &handle, &process);
+        error = gen_process_handle_create_with_redirect("sleep", sizeof("sleep"), sizeof("sleep") - 1, (const char*[]) {"100"}, (const gen_size_t[]) {sizeof("100")}, 1, GEN_NULL, GEN_NULL, 0, &handle, &process);
         if(error) return error;
 
-        error = gen_process_kill(&process);
+        error = gen_process_handle_kill(&process);
         if(error) return error;
     }
 

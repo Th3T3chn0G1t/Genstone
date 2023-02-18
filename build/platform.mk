@@ -96,17 +96,16 @@ ifeq ($(PLATFORM), OSX)
 endif
 
 ifeq ($(HOST), WINDOWS)
-	# TODO: Might just be better off re-implementing the UNIX-y utils as we expect them with python or something.
-	RM = del
-	RMDIR = rmdir
-	ECHO = echo
-	CD = cd
-	CP = copy
-	AND = &&
-	MKDIR = mkdir
-	CAT = type
-	LS = dir
-	FIND = tree
+	RM =
+	RMDIR =
+	ECHO =
+	CD =
+	CP =
+	AND =
+	MKDIR =
+	CAT =
+	LS =
+	FIND =
 	FIND_FNAME =
 	GREP =
 	LINECOUNT =

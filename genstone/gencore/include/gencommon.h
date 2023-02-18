@@ -295,23 +295,69 @@ typedef __builtin_va_list gen_variadic_list_t;
  */
 #define gen_variadic_list_copy(to, from) __builtin_va_copy(to, from)
 
-// TODO: Docstrings for these
+/**
+ * Container for a block of inline ASM.
+ */
 #define GEN_ASM_BLOCK(ops, ...) __asm__ volatile(ops __VA_ARGS__)
+/**
+ * An inline ASM statement.
+ */
 #define GEN_ASM(...) #__VA_ARGS__ "\n"
 
+/**
+ * Pretty wrapper for `__attribute__((used))`.
+ */
 #define GEN_USED __attribute__((used))
+
+/**
+ * Pretty wrapper for `__attribute__((naked))`.
+ */
 #define GEN_NAKED __attribute__((naked))
+
+/**
+ * Fully forces a function to be inline.
+ */
 #define GEN_FORCE_INLINE __attribute__((always_inline)) __attribute__((artificial)) inline
+
+/**
+ * Pretty wrapper for `__attribute__((noinline))`.
+ */
 #define GEN_NO_INLINE __attribute__((noinline))
+
+/**
+ * Pretty wrapper for `__builtin_unreachable()`.
+ */
 #define GEN_UNREACHABLE __builtin_unreachable()
 
+/**
+ * Pretty wrapper for `__attribute__((enum_extensibility(closed), flag_enum))`.
+ */
 #define GEN_FLAG_ENUM __attribute__((enum_extensibility(closed), flag_enum))
 
+/**
+ * Gets the size of a struct/union member without an instance.
+ * @param type The struct/union type.
+ * @param member The member name.
+ */
 #define GEN_MEMBER_SIZE(type, member) (sizeof(((type*) GEN_NULL)->member))
 
+/**
+ * Gets the length of a C array variable.
+ * @param array The array whose length should be taken.
+ */
 #define GEN_ARRAY_LENGTH(array) (sizeof((array)) / sizeof((array)[0]))
 
+/**
+ * Round value up to nearest multiple.
+ * @param x The value to round.
+ * @param multiple The multiple to round up by.
+ */
 #define GEN_NEXT_NEAREST(x, multiple) ((((x) + (multiple) - 1) / (multiple)) * (multiple))
+
+/**
+ * Pretty wrapper for `[[nodiscard]]`.
+ */
+#define GEN_NODISCARD [[nodiscard]]
 
 typedef char gen_guid_t[16];
 

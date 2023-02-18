@@ -135,7 +135,7 @@ typedef struct {
  * A handle to the current thread.
  * Only valid for threads initialized by genthreads and the main thread.
  */
-extern GEN_THREAD_LOCAL gen_threads_handle_t gen_threads_self; // TODO: Make this atomic
+extern GEN_THREAD_LOCAL gen_threads_handle_t gen_threads_self;
 
 typedef struct gen_backends_threads_mutex_t gen_backends_threads_mutex_t;
 

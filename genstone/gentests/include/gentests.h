@@ -28,9 +28,6 @@ typedef struct {
 extern gen_tests_unit_t gen_tests_list[GEN_TESTS_MAX];
 extern const char* gen_tests_name;
 
-// TODO: Promotion into numeric seems to be the issue here
-// TODO: GEN_TESTS_EXPECT_BLOCK
-
 extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
 extern gen_error_t* gen_tests_expect_numeric(const gen_size_t a, const char* const restrict a_str, const gen_size_t b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
 extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);

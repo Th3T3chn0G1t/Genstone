@@ -9,8 +9,6 @@
 
 typedef struct gen_backends_process_handle_t gen_backends_process_handle_t;
 
-// TODO: Rename process functions to include "handle"
-
 /**
  * Handle type for a process.
  */
@@ -36,7 +34,7 @@ typedef struct {
  * @param[out] out_process A pointer to storage for a handle to the created process.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process);
+extern gen_error_t* gen_process_handle_create_with_redirect(const char* const restrict executable_path, const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process);
 
 /**
  * Blocks the current thread until the specified process exits.
@@ -44,14 +42,14 @@ extern gen_error_t* gen_process_create_with_redirect(const char* const restrict 
  * @param[out] out_exitcode A pointer to storage for the exit code of the process.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode);
+extern gen_error_t* gen_process_handle_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode);
 
 /**
  * Attempts to kill a process.
  * @param[in] process The process to kill.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_kill(const gen_process_handle_t* const restrict process);
+extern gen_error_t* gen_process_handle_kill(const gen_process_handle_t* const restrict process);
 
 /**
  * Checks if a process is alive.
@@ -59,8 +57,9 @@ extern gen_error_t* gen_process_kill(const gen_process_handle_t* const restrict 
  * @param[out] out_alive A pointer to storage for the result of whether the process is alive.
  * @return An error, otherwise `GEN_NULL`.
  */
-extern gen_error_t* gen_process_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive);
+extern gen_error_t* gen_process_handle_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive);
 
+// TODO: This can probably just be a single-get `get_env_var("HOME")` style proc.
 /**
  * Gets a pointer to the current process' environment.
  * @param[out] out_environment A pointer to pointers to storage for environment variables.

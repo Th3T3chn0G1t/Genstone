@@ -16,7 +16,7 @@ static void gen_process_internal_create_with_redirect_cleanup_native(gen_backend
     if(error) gen_error_abort_with_error(error, "genprocess");
 }
 
-gen_error_t* gen_process_create_with_redirect(const char* const restrict executable_path, const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process) {
+gen_error_t* gen_process_handle_create_with_redirect(const char* const restrict executable_path, const gen_size_t executable_path_bounds, const gen_size_t executable_path_length, const char* const* const restrict arguments, const gen_size_t* const restrict argument_lengths, const gen_size_t arguments_length, const char* const restrict * const restrict environment, const gen_size_t* const restrict environment_lengths, const gen_size_t environment_length, gen_filesystem_handle_t* const restrict filesystem_handle, gen_process_handle_t* const restrict out_process) {
 	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_filesystem_path_canonicalize, GEN_FILE_NAME);
 	if(error) return error;
 
@@ -42,7 +42,7 @@ gen_error_t* gen_process_create_with_redirect(const char* const restrict executa
 
     GEN_CLEANUP_FUNCTION(gen_process_internal_create_with_redirect_cleanup_native) gen_backends_process_handle_t* native_scope_variable = out_process->native;
 
-    error = GEN_BACKENDS_CALL(process_create_with_redirect)(executable_path, executable_path_bounds, executable_path_length_checked, arguments, argument_lengths, arguments_length, environment, environment_lengths, environment_length, filesystem_handle, out_process);
+    error = GEN_BACKENDS_CALL(process_handle_create_with_redirect)(executable_path, executable_path_bounds, executable_path_length_checked, arguments, argument_lengths, arguments_length, environment, environment_lengths, environment_length, filesystem_handle, out_process);
 	if(error) return error;
 
     native_scope_variable = GEN_NULL;
@@ -50,39 +50,39 @@ gen_error_t* gen_process_create_with_redirect(const char* const restrict executa
     return GEN_NULL;
 }
 
-gen_error_t* gen_process_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode) {
-	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_process_wait, GEN_FILE_NAME);
+gen_error_t* gen_process_handle_wait(const gen_process_handle_t* const restrict process, int* const restrict out_exitcode) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_process_handle_wait, GEN_FILE_NAME);
 	if(error) return error;
 
 	if(!process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`process` was `GEN_NULL`");
 	if(!out_exitcode) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_exitcode` was `GEN_NULL`");
 
-    error = GEN_BACKENDS_CALL(process_wait)(process, out_exitcode);
+    error = GEN_BACKENDS_CALL(process_handle_wait)(process, out_exitcode);
 	if(error) return error;
 
     return GEN_NULL;
 }
 
-gen_error_t* gen_process_kill(const gen_process_handle_t* const restrict process) {
-	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_process_kill, GEN_FILE_NAME);
+gen_error_t* gen_process_handle_kill(const gen_process_handle_t* const restrict process) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_process_handle_kill, GEN_FILE_NAME);
 	if(error) return error;
 
 	if(!process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`process` was `GEN_NULL`");
 
-    error = GEN_BACKENDS_CALL(process_kill)(process);    
+    error = GEN_BACKENDS_CALL(process_handle_kill)(process);
 	if(error) return error;
 
     return GEN_NULL;
 }
 
-gen_error_t* gen_process_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive) {
-	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_process_check, GEN_FILE_NAME);
+gen_error_t* gen_process_handle_check(const gen_process_handle_t* const restrict process, gen_bool_t* const restrict out_alive) {
+	GEN_TOOLING_AUTO gen_error_t* error = gen_tooling_push(GEN_FUNCTION_NAME, (void*) gen_process_handle_check, GEN_FILE_NAME);
 	if(error) return error;
 
 	if(!process) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`process` was `GEN_NULL`");
 	if(!out_alive) return gen_error_attach_backtrace(GEN_ERROR_INVALID_PARAMETER, GEN_LINE_NUMBER, "`out_alive` was `GEN_NULL`");
 
-    error = GEN_BACKENDS_CALL(process_check)(process, out_alive);
+    error = GEN_BACKENDS_CALL(process_handle_check)(process, out_alive);
 	if(error) return error;
 
     return GEN_NULL;
