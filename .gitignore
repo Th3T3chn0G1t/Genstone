@@ -1,8 +1,14 @@
 *.o
 *.o.*
 
+*.obj
+*.obj.*
+
 *.a
 *.a.*
+
+*.lib
+*.lib.*
 
 *.elf
 *.elf.*
@@ -10,23 +16,19 @@
 *.so
 *.so.*
 
-*.obj
-*.lib
 *.dll
+*.dll.*
+
 *.dylib
+*.dylib.*
 
 *.out
+*.out.*
+
 *.exe
-
-*.def
-*.exp
-
-*.spv
+*.exe.*
 
 *.dSYM
-
-documentation/
-!build/documentation/
 
 .vscode
 .vs

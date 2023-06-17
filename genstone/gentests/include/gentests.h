@@ -28,23 +28,20 @@ typedef struct {
 extern gen_tests_unit_t gen_tests_list[GEN_TESTS_MAX];
 extern const char* gen_tests_name;
 
-extern gen_error_t* gen_tests_expect_pointer(const void* const restrict a, const char* const restrict a_str, const void* const restrict b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
-extern gen_error_t* gen_tests_expect_numeric(const gen_size_t a, const char* const restrict a_str, const gen_size_t b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
-extern gen_error_t* gen_tests_expect_float(const float a, const char* const restrict a_str, const float b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
-extern gen_error_t* gen_tests_expect_double(const double a, const char* const restrict a_str, const double b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
-extern gen_error_t* gen_tests_expect_long_double(const long double a, const char* const restrict a_str, const long double b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
-extern gen_error_t* gen_tests_expect_string(const char* const restrict a, const char* const restrict a_str, const char* const restrict b, const char* const restrict b_str, const char* const restrict file, const gen_size_t line);
+#define GEN_TESTS_EXPECT_INTERNAL(a, b) \
+        return gen_error_attach_backtrace( \
+            GEN_ERROR_DOES_NOT_MATCH, GEN_LINE_STRING, "`" a "` != `" b "`")
+
 
 #define GEN_TESTS_EXPECT(a, b) \
-    GEN_GENERIC(a, \
-        const char* : gen_tests_expect_string, \
-        char* : gen_tests_expect_string, \
-        void* : gen_tests_expect_pointer, \
-        float : gen_tests_expect_float, \
-        double : gen_tests_expect_double, \
-        long double : gen_tests_expect_long_double, \
-        default : gen_tests_expect_numeric \
-    ) (a, #a, b, #b, GEN_FILE_NAME, GEN_LINE_NUMBER)
+        if((a) != (b)) GEN_TESTS_EXPECT_INTERNAL(#a, #b)
+
+#define GEN_TESTS_EXPECT_STRING(a, b) \
+        if(({ \
+            gen_size_t i = 0; \
+            for(; (a)[i] && (b)[i] && (a)[i] == (b)[i]; ++i); \
+            (a)[i] != (b)[i]; \
+        })) GEN_TESTS_EXPECT_INTERNAL(#a, #b)
 
 #ifndef GEN_TESTS_DISABLE
 static gen_error_t* gen_main(void);
@@ -55,11 +52,15 @@ GEN_INITIALIZER static void gen_tests_internal_register_test(void) {
     gen_size_t i = 0;
     for(; gen_tests_list[i].present; ++i);
     if(i >= GEN_TESTS_MAX) {
-        gen_log_formatted(GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME, "Number of tests exceeded maximum of %uz", (gen_size_t) GEN_TESTS_MAX);
+        gen_log(
+                GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME,
+                "Number of tests exceeded maximum of %uz",
+                (gen_size_t) GEN_TESTS_MAX);
         gen_error_abort();
     }
 
-    gen_tests_list[i] = (gen_tests_unit_t) {gen_true, GEN_TESTS_UNIT, gen_main};
+    gen_tests_list[i] = (gen_tests_unit_t) {
+                            gen_true, GEN_TESTS_UNIT, gen_main };
 }
 #endif
 

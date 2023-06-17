@@ -1,0 +1,9 @@
+RM = rm -f
+RMDIR = rm -rf
+ECHO = echo -e
+CD = cd
+CP = cp
+AND = &&
+MKDIR = mkdir
+CAT = cat
+LS = ls
