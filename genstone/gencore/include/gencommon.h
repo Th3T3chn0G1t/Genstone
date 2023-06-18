@@ -39,6 +39,7 @@
 #define GEN_FLAG_ENUM __attribute__((enum_extensibility(closed), flag_enum))
 #define GEN_NODISCARD __attribute__((nodiscard))
 #define GEN_LOCAL_ALIAS(s) __attribute__((alias(s)))
+#define GEN_NAKED __attribute__((naked))
 #define GEN_GLOBAL_ALIAS(s) asm(s)
 
 typedef _Bool gen_bool_t;
