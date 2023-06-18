@@ -117,7 +117,7 @@ gen_error_t* gen_format_variadic_list(
                 // "FFFFFFFFFFFFFFFF" -> 16
                 char buf[16];
                 for(gen_size_t j = 0; j < sizeof(buf); ++j) {
-                    buf[i] = "0123456789ABCDEF"[p % 16];
+                    buf[j] = "0123456789ABCDEF"[p % 16];
                     p /= 16;
                 }
 
