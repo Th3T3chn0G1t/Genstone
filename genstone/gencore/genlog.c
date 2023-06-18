@@ -11,7 +11,7 @@
 #endif
 
 #ifndef GEN_LOG_MAXIMUM_CONTEXT_LENGTH
-#define GEN_LOG_MAXIMUM_CONTEXT_LENGTH 16
+#define GEN_LOG_MAXIMUM_CONTEXT_LENGTH 24
 #endif
 
 GEN_BACKENDS_PROC(terminal_write, void)
@@ -60,7 +60,15 @@ gen_error_t* gen_log(
             (GEN_LOG_MAXIMUM_CONTEXT_LENGTH + 12) + 1] = {0};
 
     gen_size_t context_pad = GEN_LOG_MAXIMUM_CONTEXT_LENGTH;
-    for(gen_size_t i = 0; context[i]; ++i) context_pad--;
+    for(gen_size_t i = 0; context[i]; ++i) {
+        context_pad--;
+        if(!context_pad && context[i + 1]) {
+            return gen_error_attach_backtrace(
+                GEN_ERROR_TOO_LONG, GEN_LINE_STRING,
+                "Context string `%t` length exceeded context maximum `%uz`",
+                context, GEN_LOG_MAXIMUM_CONTEXT_LENGTH);
+        }
+    }
 
     error = gen_format(
                 buf, GEN_NULL, sizeof(buf), "[%t%cz][%t] %t",
