@@ -111,6 +111,26 @@ gen_error_t* gen_format_variadic_list(
                 break;
             }
 
+            case 'p': {
+                gen_uintptr_t p = gen_variadic_list_argument(list, gen_uintptr_t);
+
+                // "FFFFFFFFFFFFFFFF" -> 16
+                char buf[16];
+                for(gen_size_t j = 0; j < sizeof(buf); ++j) {
+                    buf[i] = "0123456789ABCDEF"[p % 16];
+                    p /= 16;
+                }
+
+                for(gen_size_t j = 1; j <= sizeof(buf); ++j) {
+                    if(out_buffer && pos < limit) {
+                        out_buffer[pos] = buf[sizeof(buf) - j];
+                    }
+                    ++pos;
+                }
+
+                break;
+            }
+
             case 'e': {
                 gen_error_t* p_error =
                         gen_variadic_list_argument(list, gen_error_t*);
