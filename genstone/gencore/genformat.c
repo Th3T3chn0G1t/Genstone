@@ -10,7 +10,7 @@ gen_error_t* gen_format(
     gen_tooling_push(GEN_FUNCTION_NAME, GEN_FILE_NAME);
     GEN_TOOLING_AUTO gen_error_t* error;
 
-    gen_variadic_list_t list;
+    GEN_VARIADIC_LIST_AUTO gen_variadic_list_t list;
     gen_variadic_list_start(list, format);
 
     return gen_format_variadic_list(out_buffer, out_len, limit, format, list);

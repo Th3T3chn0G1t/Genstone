@@ -34,7 +34,7 @@ gen_error_t* gen_log(
                 "`format` was `GEN_NULL`");
     }
 
-    gen_variadic_list_t list;
+    GEN_VARIADIC_LIST_AUTO gen_variadic_list_t list;
     gen_variadic_list_start(list, format);
 
     char message[GEN_LOG_MAXIMUM_FORMATTED_LENGTH + 1] = {0};

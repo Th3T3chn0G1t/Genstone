@@ -86,6 +86,15 @@ typedef __builtin_va_list gen_variadic_list_t;
 #define gen_variadic_list_end(list) __builtin_va_end(list)
 #define gen_variadic_list_copy(to, from) __builtin_va_copy(to, from)
 
+static GEN_FORCE_INLINE void gen_internal_variadic_list_auto_end(
+                                    gen_variadic_list_t* list) {
+
+    gen_variadic_list_end(*list);
+}
+
+#define GEN_VARIADIC_LIST_AUTO \
+                GEN_CLEANUP_FUNCTION(gen_internal_variadic_list_auto_end)
+
 #define gen_inline_variadic_list_pack __builtin_va_arg_pack()
 #define gen_inline_variadic_list_pack_length __builtin_va_arg_pack_len()
 

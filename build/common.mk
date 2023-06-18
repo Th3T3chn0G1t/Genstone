@@ -24,11 +24,13 @@ ifneq ($(SANITIZERS),)
 endif
 
 SAFLAGS = -Xanalyzer -analyzer-output=text
-CHECKERS = core deadcode optin security unix osx
-CHECKERS += alpha.core alpha.deadcode alpha.unix alpha.osx alpha.clone
+CHECKERS = core deadcode optin security unix osx valist
+CHECKERS += alpha.deadcode alpha.unix alpha.osx alpha.clone
 CHECKERS += alpha.security alpha.security.cert alpha.security.cert.pos
 CHECKERS += alpha.security.cert.env alpha.security.taint
+CHECKERS += alpha.core
 SAFLAGS += $(addprefix -Xanalyzer -analyzer-checker=,$(CHECKERS))
+SAFLAGS += -Xanalyzer -analyzer-disable-checker=alpha.core.CastToStruct
 
 ifeq ($(MODE), DEBUG)
 	GLOBAL_CFLAGS += -glldb -O0
