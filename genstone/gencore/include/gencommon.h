@@ -18,7 +18,9 @@
 #define GEN_FUNCTION_NAME __func__
 
 #define GEN_NORETURN _Noreturn
+#ifndef GEN_THREAD_LOCAL
 #define GEN_THREAD_LOCAL _Thread_local
+#endif
 #define GEN_ALIGNAS(x) _Alignas(x)
 #define GEN_ALIGNOF(x) _Alignof(x)
 #define GEN_GENERIC _Generic
