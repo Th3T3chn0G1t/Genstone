@@ -15,6 +15,7 @@ GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-language-extension-token -Wno-c++98-compat
 GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-missing-prototypes
 GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-missing-variable-declarations
 GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-used-but-marked-unused
+GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-unsafe-buffer-usage
 
 GLOBAL_CFLAGS += -std=gnu17 -flto $(EXTRA_CFLAGS)
 GLOBAL_LFLAGS += -flto $(EXTRA_LFLAGS)
