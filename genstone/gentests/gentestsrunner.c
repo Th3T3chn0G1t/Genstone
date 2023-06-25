@@ -35,7 +35,7 @@ int main(void) {
     }
     if(had_failure) {
         gen_log(GEN_LOG_LEVEL_FATAL, gen_tests_name, "Test suite failed");
-        gen_error_abort();
+        gen_abort();
     }
     else {
         gen_log(GEN_LOG_LEVEL_INFO, gen_tests_name, "All units passing");

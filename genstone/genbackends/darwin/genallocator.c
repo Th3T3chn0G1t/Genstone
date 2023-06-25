@@ -5,4 +5,4 @@
 
 #include <genbackends.h>
 
-GEN_BACKENDS_DEFER(abort, void, darwin, "libc", )
+GEN_BACKENDS_DEFER(get_system_allocator, gen_error_t*, darwin, "libc", return)

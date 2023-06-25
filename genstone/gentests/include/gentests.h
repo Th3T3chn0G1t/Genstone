@@ -56,7 +56,7 @@ GEN_INITIALIZER static void gen_tests_internal_register_test(void) {
                 GEN_LOG_LEVEL_FATAL, GEN_TESTS_NAME,
                 "Number of tests exceeded maximum of %uz",
                 (gen_size_t) GEN_TESTS_MAX);
-        gen_error_abort();
+        gen_abort();
     }
 
     gen_tests_list[i] = (gen_tests_unit_t) {

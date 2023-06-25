@@ -5,4 +5,4 @@
 
 #include <genbackends.h>
 
-GEN_BACKENDS_DEFER_NOGEN(error_abort, GEN_NORETURN void, libc, "abort", )
+GEN_BACKENDS_DEFER_NOGEN(abort, GEN_NORETURN void, libc, "abort", )

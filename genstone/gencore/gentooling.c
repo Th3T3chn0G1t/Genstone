@@ -21,7 +21,7 @@ void gen_tooling_internal_auto_cleanup(
 void gen_tooling_push(
         const char* const restrict frame,const char* const restrict file) {
 
-	if(call_stack.next >= GEN_TOOLING_DEPTH) gen_error_abort();
+	if(call_stack.next >= GEN_TOOLING_DEPTH) gen_abort();
 
 	call_stack.functions[call_stack.next] = frame;
 	call_stack.addresses[call_stack.next] = __builtin_return_address(0);
@@ -30,7 +30,7 @@ void gen_tooling_push(
 }
 
 void gen_tooling_pop(void) {
-	if(call_stack.next == 0)  gen_error_abort();
+	if(call_stack.next == 0)  gen_abort();
 
 	--call_stack.next;
 }

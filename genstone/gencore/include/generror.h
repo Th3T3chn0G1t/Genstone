@@ -81,6 +81,6 @@ gen_error_t* gen_error_attach_backtrace(
             const gen_error_type_t type, const char* const restrict line,
             const char* const restrict format, ...);
 
-GEN_NORETURN void gen_error_abort(void);
+GEN_NORETURN void gen_abort(void);
 
 #endif

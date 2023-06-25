@@ -5,4 +5,4 @@
 
 #include <genbackends.h>
 
-GEN_BACKENDS_DEFER(error_abort, void, linux, "libc", )
+GEN_BACKENDS_DEFER(abort, void, linux, "libc", )

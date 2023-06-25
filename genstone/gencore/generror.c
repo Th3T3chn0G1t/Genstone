@@ -25,12 +25,12 @@ gen_error_t* gen_error_attach_backtrace(
 
     if(gen_format_variadic_list(
             retval->context, GEN_NULL, GEN_ERROR_MAXIMUM_CONTEXT_LENGTH,
-            format, list)) gen_error_abort();
+            format, list)) gen_abort();
 
 	return retval;
 }
 
-GEN_BACKENDS_PROC(error_abort, GEN_NORETURN void)
-void gen_error_abort(void) {
-    gen_backends_error_abort();
+GEN_BACKENDS_PROC(abort, GEN_NORETURN void)
+void gen_abort(void) {
+    gen_backends_abort();
 }
