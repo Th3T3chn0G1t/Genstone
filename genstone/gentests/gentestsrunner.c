@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2022 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
+// Copyright (C) 2023 Emily "TTG" Banerjee <prs.ttg+genstone@pm.me>
 
 #define GEN_TESTS_DISABLE
 #include "include/gentests.h"
