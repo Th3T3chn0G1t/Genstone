@@ -7,15 +7,14 @@ CLINKER = $(CLANG) -fuse-ld=lld
 ANALYZER = $(CLANG) --analyze
 
 GENSTONE_DIAGNOSTIC_CFLAGS = -Werror -Weverything -pedantic -pedantic-errors
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-padded -Wno-deprecated-non-prototype
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-strict-prototypes
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-gnu-zero-variadic-macro-arguments
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-declaration-after-statement
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-language-extension-token -Wno-c++98-compat
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-missing-prototypes
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-missing-variable-declarations
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-used-but-marked-unused
-GENSTONE_DIAGNOSTIC_CFLAGS += -Wno-unsafe-buffer-usage
+DISABLED_DIAGNOSTICS = padded deprecated-non-prototype strict-prototypes \
+						poison-system-directories unknown-warning-option \
+						gnu-zero-variadic-macro-arguments \
+						declaration-after-statement language-extension-token \
+						c++98-compat missing-prototypes \
+						missing-variable-declarations used-but-marked-unused \
+						unsafe-buffer-usage
+GENSTONE_DIAGNOSTIC_CFLAGS += $(addprefix -Wno-,$(DISABLED_DIAGNOSTICS))
 
 GLOBAL_CFLAGS += -std=gnu17 -flto $(EXTRA_CFLAGS)
 GLOBAL_LFLAGS += -flto $(EXTRA_LFLAGS)

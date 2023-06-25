@@ -2,6 +2,8 @@ PLATFORM_SOURCEDIRS += darwin
 
 include $(PLATFORM_DIR)/unix.mk
 
+GLOBAL_CFLAGS += -DGEN_PLATFORM_SYMBOL_PREFIX=\"_\"
+
 DYNAMIC_LIB_SUFFIX = .dylib
 
 BEGIN_FULL_STATIC = -Wl,-force_load,
