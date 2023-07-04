@@ -43,7 +43,7 @@
 #define GEN_LOCAL_ALIAS(s) __attribute__((alias(s)))
 #define GEN_NAKED __attribute__((naked))
 #define GEN_NO_INLINE __attribute__((noinline))
-#define GEN_GLOBAL_ALIAS(s) asm(s)
+#define GEN_GLOBAL_ALIAS(s) __asm__(s)
 
 typedef _Bool gen_bool_t;
 #define gen_true (1)
